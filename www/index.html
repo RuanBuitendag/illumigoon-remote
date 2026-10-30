@@ -26,6 +26,8 @@
     }
     input { width: 100%; margin-bottom: 8px; }
     button { width: 100%; }
+    #lights button { margin-bottom: 8px; text-align: left; }
+    #searching { color: #aaa; }
     #result { margin: 16px 0; padding: 12px; border-radius: 6px; background: #1c1c1c; }
     #result.pass { background: #123d1f; }
     #result.fail { background: #4a1616; }
@@ -34,71 +36,15 @@
 </head>
 <body>
   <h1>Light connection test</h1>
-  <label for="host">Light address</label>
-  <input id="host" inputmode="decimal" autocomplete="off">
-  <button id="connect">Connect</button>
-  <div id="result">Not started.</div>
+  <p id="searching">Looking for lights.</p>
+  <div id="lights"></div>
+  <form id="manual">
+    <label for="host">Or type an address</label>
+    <input id="host" inputmode="decimal" autocomplete="off">
+    <button>Connect</button>
+  </form>
+  <div id="result">Tap a light.</div>
   <div id="log"></div>
-
-  <script>
-    // LIFE-1845, first gate: can an installed app open ws:// to a light? Read-only: it only asks for device_info_req.
-    const SILENCE_MS = 8000;
-    const result = document.getElementById('result');
-    const log = document.getElementById('log');
-    const host = document.getElementById('host');
-    let socket = null;
-    let silence = null;
-    let beats = 0;
-
-    const note = (text) => {
-      log.textContent = `${new Date().toLocaleTimeString()} ${text}\n${log.textContent}`.slice(0, 4000);
-    };
-    const show = (state, text) => {
-      result.className = state;
-      result.textContent = text;
-    };
-    const envelope = (type, payload) => JSON.stringify({
-      type, version: 1, payloadVersion: 1, id: 1, source: 'app-ios-test', target: '', payload,
-    });
-
-    function connect() {
-      if (socket) socket.close();
-      clearTimeout(silence);
-      beats = 0;
-      const url = `ws://${host.value.trim()}/ws`;
-      show('', `Connecting to ${url}`);
-      note(`origin ${location.origin}, opening ${url}`);
-      silence = setTimeout(() => show('fail', 'FAIL: no heartbeat within 8 seconds.'), SILENCE_MS);
-      try {
-        socket = new WebSocket(url);
-      } catch (error) {
-        clearTimeout(silence);
-        show('fail', `FAIL: the app refused the connection: ${error.message}`);
-        note(`constructor threw ${error.name}: ${error.message}`);
-        return;
-      }
-      socket.onopen = () => {
-        note('socket open');
-        socket.send(envelope('device_info_req', {}));
-      };
-      socket.onerror = () => note('socket error');
-      socket.onclose = (event) => {
-        clearTimeout(silence);
-        note(`socket closed, code ${event.code}`);
-        if (!beats) show('fail', `FAIL: closed with code ${event.code} and no heartbeat.`);
-      };
-      socket.onmessage = (event) => {
-        let message;
-        try { message = JSON.parse(event.data); } catch { return; }
-        if (message.type !== 'heartbeat_ws') return;
-        clearTimeout(silence);
-        beats += 1;
-        const beat = message.payload ?? {};
-        show('pass', `PASS: ${beats} heartbeats. ${beat.device_name}, ${beat.room_id}, firmware ${beat.firmware_version}.`);
-      };
-    }
-
-    document.getElementById('connect').addEventListener('click', connect);
-  </script>
+  <script src="app.js"></script>
 </body>
 </html>

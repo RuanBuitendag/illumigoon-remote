@@ -28,6 +28,7 @@ jobs:
           fi
           xcodebuild -version
       - run: npm ci
+      - run: npm run build
       - run: npx cap sync ios
       - name: Archive (no code signing)
         env:
