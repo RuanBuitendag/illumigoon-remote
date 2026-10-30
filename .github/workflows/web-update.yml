@@ -40,4 +40,7 @@ jobs:
       - name: Publish the release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$VERSION" update.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --notes "Web bundle for the iPhone app." --latest
+        # The app passes these notes to the plugin, which refuses a download with no SHA-256 checksum.
+        run: |
+          CHECKSUM=$(sha256sum update.zip | cut -d ' ' -f 1)
+          gh release create "$VERSION" update.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --notes "$CHECKSUM" --latest
