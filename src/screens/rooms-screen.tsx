@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { APP_VERSION } from '../app-update/app-update';
 import { LevelSlider } from '../components/level-slider';
 import { PowerSwitch } from '../components/power-switch';
 import { setBrightness, setPower } from '../store/fleet-store';
@@ -60,6 +61,7 @@ export function RoomsScreen({ rooms, onOpen }: { rooms: Room[]; onOpen: (room: R
       {rooms.map((room) => (
         <RoomRow key={room.id} room={room} onOpen={() => onOpen(room)} />
       ))}
+      <p className="version">Version {APP_VERSION}</p>
     </main>
   );
 }

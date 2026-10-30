@@ -1,0 +1,43 @@
+# Publishes the web bundle as a GitHub Release. The installed app reads the latest release and updates itself.
+# A new native plugin or an Info.plist change still needs a new .ipa from the iOS app workflow.
+name: Web update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'index.html'
+      - 'package-lock.json'
+      - 'vite.config.ts'
+      - '.github/workflows/web-update.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Publish the web bundle
+    runs-on: ubuntu-latest
+    env:
+      VERSION: web-${{ github.run_number }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+        env:
+          VITE_APP_VERSION: ${{ env.VERSION }}
+      - name: Zip the bundle
+        working-directory: dist
+        run: zip -qr ../update.zip .
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$VERSION" update.zip --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$VERSION" --notes "Web bundle for the iPhone app." --latest

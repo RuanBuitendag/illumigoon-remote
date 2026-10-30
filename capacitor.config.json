@@ -4,5 +4,12 @@
   "webDir": "dist",
   "ios": {
     "contentInset": "never"
+  },
+  "plugins": {
+    "CapacitorUpdater": {
+      "autoUpdate": false,
+      "autoDeleteFailed": false,
+      "statsUrl": ""
+    }
   }
 }

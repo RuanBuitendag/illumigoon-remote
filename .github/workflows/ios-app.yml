@@ -29,6 +29,8 @@ jobs:
           xcodebuild -version
       - run: npm ci
       - run: npm run build
+        env:
+          VITE_APP_VERSION: ipa-${{ github.run_number }}
       - run: npx cap sync ios
       - name: Archive (no code signing)
         env:

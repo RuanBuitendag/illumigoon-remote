@@ -7,6 +7,7 @@
     "@base-ui/react": "^1.9.0",
     "@capacitor/core": "8.5.3",
     "@capacitor/ios": "8.5.3",
+    "@capgo/capacitor-updater": "8.54.0",
     "@mhaberler/capacitor-zeroconf-nsd": "5.1.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

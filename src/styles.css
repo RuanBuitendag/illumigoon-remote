@@ -38,6 +38,7 @@ button { padding: 0; border: 0; background: none; text-align: left; cursor: poin
 
 .row { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
 .notice { color: var(--muted); }
+.version { margin: 24px 0 0; color: var(--muted); font-size: 13px; }
 .back { min-height: 44px; color: var(--accent); }
 .back::before { content: "\2039\00a0"; }
 

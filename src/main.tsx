@@ -1,9 +1,11 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './app';
+import { startAppUpdate } from './app-update/app-update';
 import { startFleet } from './store/fleet-store';
 import './styles.css';
 
+startAppUpdate();
 startFleet();
 
 const root = document.getElementById('root');
