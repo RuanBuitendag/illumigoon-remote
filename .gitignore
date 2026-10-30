@@ -4,3 +4,4 @@ www/app.js
 build/
 Payload/
 *.ipa
+.claude/
