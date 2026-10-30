@@ -1,0 +1,13 @@
+{
+  "name": "illumigoon-remote",
+  "private": true,
+  "version": "0.0.1",
+  "description": "iPhone app to control the lights (LIFE-1845). For now, only the connection test.",
+  "dependencies": {
+    "@capacitor/core": "8.5.3",
+    "@capacitor/ios": "8.5.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.5.3"
+  }
+}
