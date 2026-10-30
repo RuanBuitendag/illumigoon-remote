@@ -1,0 +1,263 @@
+{
+  "name": "Embers",
+  "created": "2026-09-09T16:40:49.118Z",
+  "notes": "Fire",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0,
+          "length": 0.016,
+          "softness": 0.115
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0c0100",
+            "2c0900",
+            "581e02",
+            "7e3608"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 0.012,
+          "spread": 0.07,
+          "count": 0,
+          "rate": 125,
+          "speed": 0.46,
+          "speedVary": 0.34,
+          "acceleration": 0.1,
+          "drag": 0.55,
+          "size": 0.048,
+          "sizeVary": 0.45,
+          "softness": 0.98,
+          "lifetime": 1.15,
+          "lifeVary": 0.4,
+          "fade": 0.62,
+          "maxAlive": 160
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffbc5c",
+            "f97e14",
+            "c53c00",
+            "6e1000",
+            "1e0200",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 0.38,
+      "blend": "add",
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 0,
+          "count": 16,
+          "rate": 33.53783,
+          "speed": -0.623638,
+          "speedVary": 1.610909,
+          "acceleration": 0.615452,
+          "drag": 5.352728,
+          "size": 0.013091,
+          "sizeVary": 0.303637,
+          "softness": 0.92,
+          "lifetime": 1.859131,
+          "lifeVary": 1,
+          "fade": 0.625454,
+          "maxAlive": 108
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff6400",
+            "b40000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.66,
+      "blend": "add",
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.6,
+        "slew": 0.13
+      },
+      "wave": "sample_hold"
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.08
+      },
+      "wave": "perlin"
+    },
+    "2": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "3": {
+      "type": "macro",
+      "params": {},
+      "name": "macro2"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.emitter.rate",
+      "depth": 38
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.rate",
+      "depth": -3.309121
+    },
+    {
+      "src": 0,
+      "dst": "L0.emitter.length",
+      "depth": 0.009
+    },
+    {
+      "src": 1,
+      "dst": "L2.emitter.speed",
+      "depth": 0.12
+    },
+    {
+      "src": 2,
+      "dst": "M0.rate",
+      "depth": 3.6
+    },
+    {
+      "src": 2,
+      "dst": "M1.rate",
+      "depth": 0.48
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "flames",
+      "label": "Flames",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.rate",
+      "lo": 0,
+      "hi": 240,
+      "default": 52.0833
+    },
+    {
+      "key": "height",
+      "label": "Height",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.speed",
+      "lo": 0,
+      "hi": 1.5,
+      "default": 30.6667
+    },
+    {
+      "key": "sparks",
+      "label": "Sparks",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L2.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 66
+    },
+    {
+      "key": "coals",
+      "label": "Coals",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.length",
+      "lo": 0,
+      "hi": 0.1,
+      "default": 16
+    }
+  ]
+}

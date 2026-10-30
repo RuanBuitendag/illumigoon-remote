@@ -1,0 +1,289 @@
+{
+  "name": "Mirror Reveal",
+  "created": "2026-09-10T21:26:06.650Z",
+  "notes": "Port of `mirror_brush`: a brush that paints while the room is loud, and whatever it painted scrolls outward from the centre, mirrored. The previous port was one line under a mirror on a triangle LFO, which is a shape bouncing rather than a trail being laid down.\n\nA TRAIL IS PARTICLES WITH A RATE, not a spawner with a trigger. `particles.rate` is a continuous stream in shapes per second, carried across frames so it means the same at 60 FPS as at 200, and the audio band drives it -- so loud paints densely, quiet paints nothing, and the brush going down and up is the band crossing its squelch. That is what makes `threshold` a real knob here: it IS the squelch.\n\n`mirror` maps a screen position to `|pos - centre| * 2`, so the emitter works in a half-strip where source 0 is the middle and source 1 is both ends. Every distance doubles with it: the animation's `min_speed` of 0.15 strip/s is 0.3 in this space, and the knob's ends are its declared 0.01-2 doubled. The animation's own comment says it folds with `abs(pos - 0.5)`; this is that fold as a warp.\n\n`colors` cycling one entry per stroke becomes `colouring: random`, a draw held for the life of each particle. Consecutive strokes therefore differ, but not in the animation's fixed rotation.\n\n`react_speed` and `react_brightness` are toggles and do not port, for the reason `10-perlin-audio` gives -- both default false, so this takes the constant each selects and the reaction lands on density instead. `max_speed` is then the depth of a row that is not there. `bloom` is the animation's falloff either side of a painted SEGMENT and here it is a particle's whole half-extent, which is a different measurement of the same softness.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "length": 0.127273
+        },
+        "sustain": true,
+        "trigger": {
+          "src": 9,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffffff"
+          ],
+          "params": {
+            "hueShift": -1,
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "mask",
+      "order": 1,
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {}
+        }
+      ]
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "evolve": 0.412628
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "indexBias": -0.232727
+        },
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {}
+        },
+        "at": 0
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {}
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "hi": 1,
+        "sensitivity": 12.127114,
+        "threshold": 0.047274,
+        "squelch": 0.145454,
+        "smoothing": 0.10313
+      }
+    },
+    "1": {
+      "type": "macro",
+      "params": {
+        "knob": 1
+      },
+      "name": "hue",
+      "label": "Hue"
+    },
+    "2": {
+      "type": "macro",
+      "params": {
+        "knob": 0.204897
+      },
+      "name": "min_speed",
+      "label": "Speed"
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.2
+      },
+      "name": "bloom",
+      "label": "Bloom"
+    },
+    "4": {
+      "type": "macro",
+      "params": {},
+      "name": "bin_start",
+      "label": "Bin Start"
+    },
+    "5": {
+      "type": "macro",
+      "params": {
+        "knob": 0.076321
+      },
+      "name": "bin_end",
+      "label": "Bin End"
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0.288233
+      },
+      "name": "sensitivity",
+      "label": "Sensitivity"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.46
+      },
+      "name": "threshold",
+      "label": "Threshold"
+    },
+    "8": {
+      "type": "macro",
+      "params": {
+        "knob": 0.373636
+      },
+      "name": "smoothing",
+      "label": "Smoothing"
+    },
+    "9": {
+      "type": "threshold",
+      "params": {
+        "level": 0.427273
+      },
+      "source": 0
+    },
+    "10": {
+      "type": "macro",
+      "params": {},
+      "name": "macro"
+    }
+  },
+  "matrix": [
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2
+    },
+    {
+      "src": "bin_start",
+      "dst": "M0.lo",
+      "depth": 511
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "translate",
+        "params": {}
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.velocity",
+      "lo": 0.05,
+      "hi": 2,
+      "default": 15.3846
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.palette.hueShift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "size",
+      "label": "Brush Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.length",
+      "lo": 0,
+      "hi": 0.4,
+      "default": 31.8183
+    },
+    {
+      "key": "texture",
+      "label": "Texture",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.scale",
+      "lo": 0.2,
+      "hi": 10,
+      "curve": 2,
+      "default": 42.8571
+    },
+    {
+      "key": "shimmer",
+      "label": "Shimmer",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.evolve",
+      "lo": 0,
+      "hi": 2,
+      "default": 20.6314
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 1,
+      "hi": 30,
+      "curve": 2,
+      "default": 61.943
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M9.level",
+      "lo": 0.05,
+      "hi": 0.95,
+      "default": 41.9192
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.smoothing",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 20.626
+    }
+  ]
+}

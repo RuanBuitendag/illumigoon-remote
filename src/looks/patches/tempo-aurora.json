@@ -1,0 +1,271 @@
+{
+  "name": "Tempo Aurora",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "An aurora that moves with the music without ever flashing to it. `tempo` reads how fast the song is as 0-1 between 80 and 160 BPM, and through `M7` (math mul by Tempo Follow) it raises `G.speed` -- the whole patch's clock -- so a slow song lets the curtains drift and a fast one makes them race. Nothing pulses on a beat. Silence reads 0, eased, so a room that goes quiet slows back to its own pace rather than stopping.\n\nThe one thing the rhythm does touch is the colour, once a bar: a `beat` on every bar widens the hue `spread` of a recolour row on the aurora and lets it settle, so on each downbeat the greens fan out towards blue and violet along the strip and gather again. Bar Shimmer scales that through `M9`.\n\nThe curtains are a `wave` blended `multiply` with a black-to-white palette, which dims by its own alpha only where the wave is low, so the aurora hangs in bands. A perlin sways the wave's phase and a slow ripple bends the bands.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.4,
+          "evolve": 0.0375
+        }
+      },
+      "colour": {
+        "index": "u",
+        "at": 0,
+        "params": {},
+        "palette": {
+          "entries": [
+            "00ff80",
+            "00ffc0",
+            "00c0ff",
+            "8000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        },
+        {
+          "type": "hue",
+          "params": {
+            "shift": 0,
+            "spread": 0
+          }
+        }
+      ],
+      "opacity": 0.9,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "wave",
+        "params": {
+          "freq": 6,
+          "phase": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "ripple",
+          "params": {
+            "amp": 0.05,
+            "freq": 2,
+            "phase": 0
+          }
+        }
+      ],
+      "opacity": 0.5,
+      "blend": "multiply",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "tempo",
+      "params": {
+        "slow": 80,
+        "fast": 160,
+        "smoothing": 6
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.0075
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.0125
+      }
+    },
+    "3": {
+      "type": "beat",
+      "every": "bar",
+      "shape": "expo_in",
+      "params": {
+        "decay": 0.6
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "follow",
+      "label": "Tempo Follow",
+      "params": {
+        "knob": 0.6
+      }
+    },
+    "7": {
+      "type": "math",
+      "op": "mul",
+      "source": 0,
+      "sourceB": 6,
+      "params": {}
+    },
+    "8": {
+      "type": "macro",
+      "name": "shimmer",
+      "label": "Bar Shimmer",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "9": {
+      "type": "math",
+      "op": "mul",
+      "source": 3,
+      "sourceB": 8,
+      "params": {}
+    }
+  },
+  "matrix": [
+    {
+      "src": 7,
+      "dst": "G.speed",
+      "depth": 2.5
+    },
+    {
+      "src": 1,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 2,
+      "dst": "L1.emitter.phase",
+      "depth": 1
+    },
+    {
+      "src": 9,
+      "dst": "L0.warp1.spread",
+      "depth": 0.8
+    },
+    {
+      "src": 4,
+      "dst": "M1.rate",
+      "depth": 0.03
+    },
+    {
+      "src": 5,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.225
+    },
+    {
+      "src": 5,
+      "dst": "M1.rate",
+      "depth": 0.045
+    },
+    {
+      "src": 5,
+      "dst": "M2.rate",
+      "depth": 0.075
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.warp1.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "follow",
+      "label": "Tempo Follow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 60
+    },
+    {
+      "key": "curtains",
+      "label": "Curtains",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "shimmer",
+      "label": "Bar Shimmer",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    }
+  ]
+}

@@ -1,0 +1,332 @@
+{
+  "name": "Downpour",
+  "created": "2026-09-08T19:28:08.585Z",
+  "notes": "Rain that swells and eases, seen through gusts, with a storm over it. The stream form of `particles` again, but with a directed `speed` and a small `speedVary` -- drops fall rather than scattering -- and coloured by SPEED, so gravity brightens each drop as it accelerates and the fast ones arrive white. `rate` is the thing being modulated, which is what nothing else in this corpus does: an LFO takes it from 8 a second to 60, and the thunder below pushes the peak to 76, so the patch goes from drizzle to downpour and back without any of its other numbers changing. L1 is the gust field and it works by SUBTRACTION -- a noise layer with a black palette blended `multiply` dims by its own alpha, because premultiplied multiply against black is `(1 - alpha)`, so the rain thins where the noise is dense and the bands travel along the strip as the field drifts. Same trick `ports/02-aurora` uses for a different reason. The gust sits at the TOP of the stack, so it dims the sky as well as the rain -- weather in front of everything.\n\nLIGHTNING is `sample_hold` -> `threshold` -> `envelope`, which is the same converter chain `04-beat-bloom` builds out of audio, with a DIE where the microphone was. That is the point of putting it here: the chain is not an audio feature. A `sample_hold` LFO holds one draw from [-1,1] for 1.1 s at a time; the threshold trips when a draw clears 0.4 and cannot trip again until one comes back under -0.2. So a strike is a Bernoulli trial rather than a scheduled event, and the interval distribution is the whole difference -- median 5.6 s, but a tenth of the gaps run past 12 s and the longest in fifty minutes was 24 s, while one strike in nine lands within 3 s of the one before. Storms cluster and then go quiet, and a jittered `periodic` cannot do that: jitter the period of a metronome and every interval still lands in a narrow band around it, which is a wobble, not a storm. The hysteresis is what sets the refractory floor -- two draws must pass before it can arm and trip again, so nothing arrives closer than 2.2 s.\n\nThe envelope is what turns that edge back into light, opening a sheet layer from a base opacity of ZERO, which is the only base that makes sense for something dark almost all the time. `expo_in` on the decay gives the collapse-then-tail a strike has, where `expo_out` (see `04-beat-bloom`) would hold it lit and then cut. The flash also STUTTERS, because M6 is a 22 Hz `sample_hold` on the same opacity with `op: \"multiply\"`. Multiply is the whole point: it is zero-preserving, so it shakes the flash while it is lit and does exactly nothing between strikes, where an `add` row would raise a permanent floor on a layer whose entire job is to be black. Row order is load-bearing -- `resolve()` walks the rows in document order, so the multiply has to come AFTER the add it is scaling.\n\nTHUNDER is M7, the same trigger through a second envelope, and the delay is the ATTACK. Nothing here models the speed of sound; an envelope that takes 1.7 s to reach its peak simply arrives 1.7 s after the edge that opened it, which is what thunder does. It lights L2 -- a broad, dim, warm glow, the cloud lit from inside rather than the strike itself -- and it also adds to the rain's `rate`, so the squall lands with the noise. That second row shares a target with M0's, which is fine and deliberate: `resolve()` seeds a shared target once from the base captured at load and then lets every row accumulate, so the rain breathes on its slow LFO and surges on top of the rumble.\n\nTwo notes on the seams. M1 drives three things -- the gust field, the lightning sheet and the thunder glow all drift on one 0.055 Hz LFO -- because it is one weather system and it should move as one. And M3 and M6 are both `sample_hold` against LIFE-698, which means they share a seed and draw the identical sequence; their rates differ by a factor of 24, so they walk that sequence at unrelated speeds and the repetition never surfaces. It matters more here than it looks, because the strike TIMING now comes out of that sequence. This patch fills the rack: eight modulators of eight.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 1,
+          "spread": 0.06,
+          "count": 0,
+          "rate": 10.232265,
+          "speed": -0.45,
+          "speedVary": 0.22,
+          "acceleration": -0.841818,
+          "drag": 0.25,
+          "size": 0.006,
+          "sizeVary": 0.7,
+          "softness": 0.55,
+          "lifetime": 2.2,
+          "lifeVary": 0.4,
+          "fade": 0.85,
+          "speedRef": 1.6,
+          "maxAlive": 110
+        },
+        "colouring": "speed"
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0a1830",
+            "3a6ea0",
+            "a8d8ff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 0.127273,
+      "blend": "add",
+      "order": 2
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 3.2
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 0.7,
+      "blend": "multiply",
+      "order": 3
+    },
+    "2": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 1,
+          "rate": 19.619304,
+          "speedVary": 0.298182,
+          "acceleration": 0.214545,
+          "drag": 8,
+          "lifetime": 12,
+          "lifeVary": 0,
+          "fade": 1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 5
+    },
+    "3": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.6
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0e1830",
+            "5f7cc0",
+            "cfe0ff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 0,
+      "blend": "add",
+      "order": 4
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.00525
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.01375
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.00325
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.9
+      },
+      "wave": "sample_hold"
+    },
+    "4": {
+      "type": "threshold",
+      "params": {
+        "level": 0.4,
+        "hysteresis": 0.6
+      },
+      "source": 3
+    },
+    "5": {
+      "type": "envelope",
+      "params": {
+        "attack": 0.004,
+        "decay": 0.55
+      },
+      "shape": "expo_in",
+      "source": 4
+    },
+    "6": {
+      "type": "lfo",
+      "params": {
+        "rate": 22
+      },
+      "wave": "sample_hold"
+    },
+    "7": {
+      "type": "envelope",
+      "params": {
+        "attack": 1.7,
+        "decay": 3.4
+      },
+      "source": 4
+    },
+    "8": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.rate",
+      "depth": 26
+    },
+    {
+      "src": 1,
+      "dst": "L1.emitter.offset",
+      "depth": 4
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.speed",
+      "depth": 0.18
+    },
+    {
+      "src": 7,
+      "dst": "L0.emitter.rate",
+      "depth": 16
+    },
+    {
+      "src": 5,
+      "dst": "L3.layer.opacity",
+      "depth": 1
+    },
+    {
+      "src": 6,
+      "dst": "L3.layer.opacity",
+      "depth": -0.8,
+      "op": "multiply"
+    },
+    {
+      "src": 1,
+      "dst": "L3.emitter.offset",
+      "depth": 2.5
+    },
+    {
+      "src": 8,
+      "dst": "M0.rate",
+      "depth": 0.0315
+    },
+    {
+      "src": 8,
+      "dst": "M1.rate",
+      "depth": 0.0825
+    },
+    {
+      "src": 8,
+      "dst": "M2.rate",
+      "depth": 0.0195
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "rain",
+      "label": "Rain",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.rate",
+      "lo": 0,
+      "hi": 40,
+      "default": 25.5807
+    },
+    {
+      "key": "lightning",
+      "label": "Lightning",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.level",
+      "lo": 0.95,
+      "hi": 0.05,
+      "default": 61.1111
+    },
+    {
+      "key": "gusts",
+      "label": "Gusts",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 70
+    },
+    {
+      "key": "rain_bright",
+      "label": "Rain Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.layer.opacity",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 25.4546
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 {
   "appId": "com.ruanbuitendag.illumigoon",
   "appName": "Illumigoon",
-  "webDir": "www",
+  "webDir": "dist",
   "ios": {
     "contentInset": "never"
   }

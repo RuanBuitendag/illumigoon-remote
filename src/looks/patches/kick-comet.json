@@ -1,0 +1,307 @@
+{
+  "name": "Kick Comet",
+  "created": "2026-09-09T20:03:29.847Z",
+  "notes": "Every kick launches one shape from the near end and the strip is whatever is still in flight. The trigger is a `threshold` on the bass band, and `hysteresis` at 0.2 is what makes it a beat detector rather than a buzzer -- without it a sustained note re-crosses its own ripple dozens of times a second and the comets never separate.\n\nThe envelope beside it drives nothing visual. It sets the comet's `velocity`, so a hard kick throws a fast one and a soft kick a slow one. Nothing in `SpawnerEmitter` reads velocity after birth, so the value at the instant of the trigger is the one the shape keeps for life -- the envelope is being SAMPLED rather than followed, which is what `ports/05-fireworks` does with a `sample_hold` for the same reason. `drag` 0.9 with zero acceleration means each comet coasts to a stall at `velocity / drag` and hangs there fading, so hard hits reach further and soft ones die near the bottom.\n\nThe chain runs backwards up the detector: the envelope drives `M0.smoothing`, so immediately after a hit the band is smoothed heavily and the detector goes briefly deaf, then sharpens again as the tail decays. That is a gate's hold time, and it stops a snare inside the kick's decay from launching a second comet on top of the first. Ember run for the comets, cobalt for the bed -- the one cold thing on the strip is the thing they travel over.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0064ff",
+            "4600ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.22,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    },
+    "1": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "acceleration": 0,
+          "drag": 0.2,
+          "length": 0.07,
+          "softness": 0.045,
+          "lifetime": 3,
+          "fadeOut": 0.65,
+          "speedRef": 2.4,
+          "maxAlive": 16
+        },
+        "trigger": {
+          "src": 1,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0028",
+            "ff5000",
+            "ffaa00",
+            "0064ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "wrap": true
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "hi": 6,
+        "sensitivity": 2.953983,
+        "threshold": 0.014546,
+        "squelch": 0,
+        "smoothing": 0.163619
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "params": {
+        "level": 0.05,
+        "hysteresis": 0
+      },
+      "source": 0
+    },
+    "2": {
+      "type": "envelope",
+      "params": {
+        "attack": 0.002,
+        "decay": 0.05
+      },
+      "shape": "expo_out",
+      "source": 1
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.012
+      }
+    },
+    "4": {
+      "type": "macro",
+      "params": {
+        "knob": 0.529412
+      },
+      "name": "trip",
+      "label": "Trip Level"
+    },
+    "5": {
+      "type": "macro",
+      "params": {
+        "knob": 0.333333
+      },
+      "name": "hold",
+      "label": "Hold"
+    },
+    "6": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {},
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "params": {
+        "knob": 0.184211
+      },
+      "name": "reach",
+      "label": "Reach"
+    },
+    "9": {
+      "type": "macro",
+      "params": {
+        "knob": 0.230769
+      },
+      "name": "decay",
+      "label": "Decay"
+    }
+  },
+  "matrix": [
+    {
+      "src": 2,
+      "dst": "L0.layer.opacity",
+      "depth": 0.55
+    },
+    {
+      "src": 2,
+      "dst": "L1.emitter.length",
+      "depth": 0.06
+    },
+    {
+      "src": 0,
+      "dst": "L0.colour.indexBias",
+      "depth": 0.4
+    },
+    {
+      "src": 3,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": "speed",
+      "dst": "M3.rate",
+      "depth": 0.04
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": 1
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": -0.5
+    },
+    {
+      "src": "trip",
+      "dst": "M1.level",
+      "depth": 0.85
+    },
+    {
+      "src": "hold",
+      "dst": "M1.hysteresis",
+      "depth": 0.6
+    },
+    {
+      "src": "reach",
+      "dst": "L1.emitter.drag",
+      "depth": 3.8
+    },
+    {
+      "src": "decay",
+      "dst": "M2.decay",
+      "depth": 1.95
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 52.9412
+    },
+    {
+      "key": "hold",
+      "label": "Hold",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 33.3333
+    },
+    {
+      "key": "reach",
+      "label": "Reach",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 18.4211
+    },
+    {
+      "key": "decay",
+      "label": "Decay",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 23.0769
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 0.5,
+      "hi": 15,
+      "curve": 2,
+      "default": 41.1388
+    }
+  ]
+}

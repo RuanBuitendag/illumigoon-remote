@@ -1,0 +1,275 @@
+{
+  "name": "Coals",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "The fire after it has burned down. A dim crimson bed that barely moves, and over it a second, finer noise whose palette is BLACK for most of its range -- black here means off -- so only its crests light, glowing orange-to-gold where the coals are hottest. Heat is that layer's `indexBias`: turn it up and more of each coal catches.\n\nThe crests breathe on a slow sine into the same `indexBias`, and a perlin LFO drives that sine's rate, so the glow swells and settles irregularly instead of on a count. A fast, shallow perlin shimmers the crest layer's opacity -- heat haze, not flicker. The bed and the crests drift in opposite directions at very different speeds, so the hot spots slide over the embers rather than sitting on them.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.8,
+          "evolve": 0.005
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0018",
+            "ff1000",
+            "ff2400"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.6,
+          "evolve": 0.0125
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 1.4,
+          "indexBias": -0.5
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "000000",
+            "ff2000",
+            "ff6800",
+            "ffb000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0.6,
+      "blend": "add",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.0125
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.006
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.004
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.075
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "heat",
+      "label": "Heat",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "colour",
+      "label": "Colour",
+      "params": {
+        "knob": 0
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "glow",
+      "label": "Bed Glow",
+      "params": {
+        "knob": 0.4
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.colour.indexBias",
+      "depth": 0.15
+    },
+    {
+      "src": 1,
+      "dst": "M0.rate",
+      "depth": 0.03
+    },
+    {
+      "src": 2,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp0.offset",
+      "depth": -0.8
+    },
+    {
+      "src": 4,
+      "dst": "L1.layer.opacity",
+      "depth": 0.08
+    },
+    {
+      "src": 5,
+      "dst": "L1.colour.indexBias",
+      "depth": 0.4
+    },
+    {
+      "src": 6,
+      "dst": "L0.palette.hueShift",
+      "depth": 0.08
+    },
+    {
+      "src": 6,
+      "dst": "L1.palette.hueShift",
+      "depth": 0.08
+    },
+    {
+      "src": 7,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.03
+    },
+    {
+      "src": 7,
+      "dst": "L1.emitter.evolve",
+      "depth": 0.075
+    },
+    {
+      "src": 7,
+      "dst": "M0.rate",
+      "depth": 0.075
+    },
+    {
+      "src": 7,
+      "dst": "M4.rate",
+      "depth": 0.45
+    },
+    {
+      "src": 8,
+      "dst": "L0.layer.opacity",
+      "depth": 0.5
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "heat",
+      "label": "Heat",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "glow",
+      "label": "Bed Glow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 40
+    }
+  ]
+}

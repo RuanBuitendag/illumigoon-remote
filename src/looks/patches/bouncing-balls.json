@@ -1,0 +1,206 @@
+{
+  "name": "Bouncing balls",
+  "created": "2026-09-10T20:16:32.295Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "bodies",
+        "params": {
+          "count": 6,
+          "size": 0.049182,
+          "sizeVary": 0.603636,
+          "softness": 0.894545,
+          "gravity": -3.410911,
+          "drag": 2.530911,
+          "bounce": 0.578182,
+          "collide": 0.749091,
+          "kick": 0.909091,
+          "kickVary": 0.625455
+        },
+        "trigger": {
+          "src": 1,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteOffset": 0.214,
+          "paletteSpan": 1.23,
+          "indexBias": -0.0375
+        },
+        "palette": {
+          "entries": [
+            "00ff62",
+            "00ff8b",
+            "ff009d"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 0
+      },
+      "opacity": 0.922,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {
+            "offset": 0.126
+          },
+          "bypass": true
+        },
+        {
+          "type": "mirror",
+          "params": {},
+          "bypass": true
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "hi": 8,
+        "sensitivity": 18.69775,
+        "threshold": 0.112182,
+        "squelch": 0.004854,
+        "smoothing": 0.069503,
+        "slew": 0.0578
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "params": {
+        "level": 0.365455
+      },
+      "source": 0
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.indexBias",
+      "depth": 0.771,
+      "op": "multiply"
+    }
+  ],
+  "global": {
+    "opacity": 0.396364,
+    "warps": [
+      {
+        "type": "mirror",
+        "params": {},
+        "bypass": true
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.palette.hueShift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 1,
+      "hi": 30,
+      "curve": 2,
+      "default": 78.1196
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.level",
+      "lo": 0.05,
+      "hi": 0.95,
+      "default": 35.0506
+    },
+    {
+      "key": "kick",
+      "label": "Kick",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.kick",
+      "lo": 0,
+      "hi": 3,
+      "default": 30.303
+    },
+    {
+      "key": "gravity",
+      "label": "Gravity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.gravity",
+      "lo": -0.5,
+      "hi": -8,
+      "default": 38.8121
+    },
+    {
+      "key": "count",
+      "label": "Balls",
+      "type": "slider",
+      "min": 1,
+      "max": 16,
+      "step": 1,
+      "target": "L0.emitter.count",
+      "default": 6
+    },
+    {
+      "key": "size",
+      "label": "Ball Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.size",
+      "lo": 0.01,
+      "hi": 0.12,
+      "default": 35.62
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 39.6364
+    }
+  ]
+}

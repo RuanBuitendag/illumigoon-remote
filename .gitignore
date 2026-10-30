@@ -1,6 +1,5 @@
 node_modules/
-www/capacitor.js
-www/app.js
+dist/
 build/
 Payload/
 *.ipa

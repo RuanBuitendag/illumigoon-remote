@@ -2,17 +2,39 @@
   "name": "illumigoon-remote",
   "private": true,
   "version": "0.0.1",
-  "description": "iPhone app to control the lights (LIFE-1845). For now, only the connection test.",
+  "description": "iPhone app to control the lights (LIFE-1845).",
   "dependencies": {
+    "@base-ui/react": "^1.9.0",
     "@capacitor/core": "8.5.3",
     "@capacitor/ios": "8.5.3",
-    "@mhaberler/capacitor-zeroconf-nsd": "5.1.0"
+    "@mhaberler/capacitor-zeroconf-nsd": "5.1.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zustand": "^5.0.16"
   },
   "devDependencies": {
+    "@biomejs/biome": "^2.5.15",
     "@capacitor/cli": "8.5.3",
-    "esbuild": "0.28.2"
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "dependency-cruiser": "^18.7.0",
+    "jscpd": "^4.3.0",
+    "knip": "^6.44.0",
+    "oxlint": "^1.90.0",
+    "typescript": "~6.0.2",
+    "vite": "^8.3.5"
   },
   "scripts": {
-    "build": "esbuild src/main.js --bundle --format=iife --target=es2020 --outfile=www/app.js"
-  }
+    "dev": "vite --port 5173 --strictPort",
+    "build": "tsc --noEmit && vite build",
+    "lint": "npm run lint:types && npm run lint:code && npm run lint:complexity && npm run lint:layers && npm run lint:dupes && npm run lint:unused",
+    "lint:types": "tsc --noEmit",
+    "lint:code": "oxlint --deny-warnings src",
+    "lint:complexity": "biome lint --max-diagnostics=none",
+    "lint:layers": "depcruise src --config .dependency-cruiser.cjs --output-type err",
+    "lint:dupes": "jscpd --min-tokens 50 --min-lines 5 --threshold 0 --exitCode 1 --reporters console --format typescript,tsx src",
+    "lint:unused": "knip"
+  },
+  "type": "module"
 }

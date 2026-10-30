@@ -1,0 +1,372 @@
+{
+  "name": "Echo",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "Every kick throws a comet outward from the centre, and the room throws it back twice: once after Echo Gap, and again after twice that, each fainter and a shade further toward violet.\n\nThe echoes are `delay` nodes. `M2` delays the kick's edge, and `M3` delays `M2`'s, so one Gap knob spaces both and the second echo always lands at twice the first. A delay keeps a queue, so a kick arriving while an echo is still on its way adds another rather than cancelling it.\n\nEach delay also CARRIES a value: `M2` reads the bass band on the frame the kick arrives and publishes that reading on the frame its echo leaves, and `M3` carries `M2`'s on again. That value sets the echo's launch speed, so a hard kick's echoes fly as far as the kick did -- without the carry, an echo would launch at whatever the music happened to be doing a third of a second later.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "age",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.6,
+          "acceleration": -0.3,
+          "drag": 0.6,
+          "length": 0.05,
+          "softness": 0.03,
+          "lifetime": 2,
+          "fadeOut": 0.6,
+          "maxAlive": 8
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "00e0ff",
+            "0080ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "opacity": 1,
+      "blend": "screen",
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "age",
+        "trigger": {
+          "src": 2,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.6,
+          "acceleration": -0.3,
+          "drag": 0.6,
+          "length": 0.05,
+          "softness": 0.03,
+          "lifetime": 2,
+          "fadeOut": 0.6,
+          "maxAlive": 8
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0080ff",
+            "4000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "opacity": 0.15,
+      "blend": "screen",
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "age",
+        "trigger": {
+          "src": 3,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.6,
+          "acceleration": -0.3,
+          "drag": 0.6,
+          "length": 0.05,
+          "softness": 0.03,
+          "lifetime": 2,
+          "fadeOut": 0.6,
+          "maxAlive": 8
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "4000ff",
+            "a000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "opacity": 0.05,
+      "blend": "screen",
+      "order": 3
+    },
+    "3": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1,
+          "evolve": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0020ff",
+            "2000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0.06,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "hi": 6,
+        "sensitivity": 3,
+        "threshold": 0.015,
+        "squelch": 0,
+        "smoothing": 0.15
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "params": {
+        "level": 0.5,
+        "hysteresis": 0.2
+      }
+    },
+    "2": {
+      "type": "delay",
+      "source": 1,
+      "sourceB": 0,
+      "params": {
+        "time": 0.075
+      }
+    },
+    "3": {
+      "type": "delay",
+      "source": 2,
+      "sourceB": 2,
+      "params": {
+        "time": 0.075
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.01
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "gap",
+      "label": "Echo Gap",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "level",
+      "label": "Echo Level",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.velocity",
+      "depth": 1.2
+    },
+    {
+      "src": 2,
+      "dst": "L1.emitter.velocity",
+      "depth": 1.2
+    },
+    {
+      "src": 3,
+      "dst": "L2.emitter.velocity",
+      "depth": 1.2
+    },
+    {
+      "src": 4,
+      "dst": "L3.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 5,
+      "dst": "M2.time",
+      "depth": 0.45
+    },
+    {
+      "src": 5,
+      "dst": "M3.time",
+      "depth": 0.45
+    },
+    {
+      "src": 6,
+      "dst": "L1.layer.opacity",
+      "depth": 0.8
+    },
+    {
+      "src": 6,
+      "dst": "L2.layer.opacity",
+      "depth": 0.5
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 0.5,
+      "hi": 15,
+      "curve": 2,
+      "default": 41.5227
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.level",
+      "lo": 0.1,
+      "hi": 0.9,
+      "default": 50
+    },
+    {
+      "key": "gap",
+      "label": "Echo Gap",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "level",
+      "label": "Echo Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "bed",
+      "label": "Bed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L3.layer.opacity",
+      "lo": 0,
+      "hi": 0.2,
+      "default": 30
+    }
+  ]
+}

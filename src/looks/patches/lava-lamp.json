@@ -1,0 +1,211 @@
+{
+  "name": "Lava lamp",
+  "created": "2026-09-14T19:29:06.222Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "bodies",
+        "params": {
+          "count": 2,
+          "origin": 0.477,
+          "spread": 0.627,
+          "size": 0.0509,
+          "sizeVary": 0.835,
+          "softness": 0.231,
+          "gravity": 1.545155,
+          "drag": 0.951,
+          "bounce": 0.703,
+          "collide": 0.192,
+          "kick": 1.82,
+          "kickVary": 0.563,
+          "speedRef": 7.10036
+        },
+        "trigger": {
+          "src": 2,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteOffset": 0.484,
+          "paletteSpan": 1.01,
+          "indexBias": -0.067173
+        },
+        "palette": {
+          "entries": [
+            "ff3300",
+            "b40000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 0
+      },
+      "opacity": 0.732,
+      "blend": "screen",
+      "order": 0,
+      "warps": [
+        {
+          "type": "tile",
+          "params": {
+            "count": 2.799322
+          }
+        }
+      ]
+    },
+    "1": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "velocity": 0.029999,
+          "acceleration": 0.018183
+        },
+        "colouring": "index",
+        "trigger": {
+          "src": 4,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteOffset": 0.331,
+          "paletteSpan": 2.39,
+          "indexBias": -0.00632
+        },
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "ff3300",
+            "3700ff",
+            "ff3300",
+            "ff3300",
+            "ff00a0"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 0
+      },
+      "opacity": 0.854072,
+      "blend": "screen",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.035432,
+        "phase": 0.894138
+      }
+    },
+    "1": {
+      "type": "tempo",
+      "params": {
+        "slow": 160,
+        "fast": 190,
+        "smoothing": 7.46,
+        "sensitivity": 6.72,
+        "threshold": 0.000911,
+        "hold": 12,
+        "slew": 0.663
+      }
+    },
+    "2": {
+      "type": "delay",
+      "params": {
+        "time": 0.498,
+        "slew": 0.195
+      },
+      "source": 0,
+      "sourceB": 1
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.327218,
+        "phase": 0.836983,
+        "slew": 1.578182
+      },
+      "wave": "sample_hold"
+    },
+    "4": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.157341,
+        "slew": 1.047273
+      },
+      "wave": "sample_hold"
+    },
+    "14": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "15": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    }
+  },
+  "matrix": [
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 0.524
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.908
+    },
+    {
+      "src": "speed",
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1
+    },
+    {
+      "src": 0,
+      "dst": "M1.threshold",
+      "depth": 0.0101
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.kickVary",
+      "depth": 0.3
+    },
+    {
+      "src": 3,
+      "dst": "M0.smoothing",
+      "depth": -10.4
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.speedRef",
+      "depth": -2.67
+    },
+    {
+      "src": 3,
+      "dst": "L0.warp0.count",
+      "depth": 1.61
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {}
+      }
+    ]
+  }
+}

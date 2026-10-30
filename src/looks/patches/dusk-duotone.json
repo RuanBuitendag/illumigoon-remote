@@ -1,0 +1,273 @@
+{
+  "name": "Dusk Duotone",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "Two slow noise fields in plain grey, repainted in two hues by a `duotone` on MASTER: whatever is dark takes the shadow hue, whatever is bright takes the light hue, and the result keeps the grey's own brightness, so dim stays dim. Indigo shadows and amber light by default -- dusk.\n\nBecause the colour is decided after the layers are summed, the two fields blend in luminance first and only then get their hues, which a pair of coloured layers cannot do: where both fields are bright the light hue wins outright instead of mixing into mud. The shadow and light hues each wander on their own very slow sine, and a perlin LFO walks `balance`, the brightness where dark turns to light -- so the border between the two colours creeps across the strip on its own. A second perlin drives that one's rate. Shadow, Light, Balance and Softness are the duotone's own settings, handed straight to the phone.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1,
+          "evolve": 0.015
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "101010",
+            "808080",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.3,
+          "evolve": 0.005
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "101010",
+            "808080",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0.5,
+      "blend": "screen",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.004
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.003,
+        "phase": 0.5
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.0015
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.001
+      }
+    },
+    "5": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.01
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "G.warp0.shadow",
+      "depth": 0.08
+    },
+    {
+      "src": 1,
+      "dst": "G.warp0.light",
+      "depth": 0.05
+    },
+    {
+      "src": 2,
+      "dst": "G.warp0.balance",
+      "depth": 0.15
+    },
+    {
+      "src": 3,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 4,
+      "dst": "L1.warp0.offset",
+      "depth": -0.7
+    },
+    {
+      "src": 5,
+      "dst": "M2.rate",
+      "depth": 0.015
+    },
+    {
+      "src": 6,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.09
+    },
+    {
+      "src": 6,
+      "dst": "L1.emitter.evolve",
+      "depth": 0.03
+    },
+    {
+      "src": 6,
+      "dst": "M3.rate",
+      "depth": 0.009
+    },
+    {
+      "src": 6,
+      "dst": "M4.rate",
+      "depth": 0.006
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "duotone",
+        "params": {
+          "shadow": 0.72,
+          "light": 0.06,
+          "balance": 0.6,
+          "soft": 1,
+          "amount": 1
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "shadow",
+      "label": "Shadow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shadow",
+      "lo": 0,
+      "hi": 1,
+      "default": 72
+    },
+    {
+      "key": "light",
+      "label": "Light",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.light",
+      "lo": 0,
+      "hi": 1,
+      "default": 6
+    },
+    {
+      "key": "balance",
+      "label": "Balance",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.balance",
+      "lo": 0,
+      "hi": 1,
+      "default": 60
+    },
+    {
+      "key": "soft",
+      "label": "Softness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.soft",
+      "lo": 0,
+      "hi": 1,
+      "default": 100
+    },
+    {
+      "key": "scale",
+      "label": "Scale",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.scale",
+      "lo": 0.2,
+      "hi": 5,
+      "curve": 2,
+      "default": 40.8248
+    }
+  ]
+}

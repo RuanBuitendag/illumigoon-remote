@@ -1,0 +1,177 @@
+{
+  "name": "Flickering Fire",
+  "created": "2026-09-08T16:35:43.140Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.008,
+          "softness": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "fff4c0",
+            "ffffff",
+            "fff4c0"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1,
+      "muted": true
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 0,
+          "spread": 0.012,
+          "count": 0,
+          "rate": 90,
+          "speedVary": 0.3,
+          "acceleration": 2.367273,
+          "drag": 7.200002,
+          "size": 0.007,
+          "sizeVary": 0.7,
+          "softness": 1,
+          "lifetime": 1.450785,
+          "lifeVary": 0.55,
+          "fade": 1,
+          "maxAlive": 140
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "9b8231",
+            "ffc850",
+            "ff5000",
+            "f50000",
+            "ff0000",
+            "ff0000",
+            "ff0000"
+          ],
+          "params": {
+            "saturation": 1.996364,
+            "value": 2
+          }
+        },
+        "wrap": true
+      },
+      "opacity": 0.4,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.19
+      },
+      "wave": "triangle",
+      "bypass": true
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 12.660328,
+        "slew": 0.421818
+      },
+      "wave": "sample_hold"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.48
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.origin",
+      "depth": 0.48
+    },
+    {
+      "src": 1,
+      "dst": "L1.layer.opacity",
+      "depth": 0.319091
+    }
+  ],
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.palette.hueShift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "flames",
+      "label": "Flames",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.rate",
+      "lo": 0,
+      "hi": 240,
+      "default": 37.5
+    },
+    {
+      "key": "height",
+      "label": "Height",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.acceleration",
+      "lo": 0,
+      "hi": 6,
+      "default": 39.4546
+    },
+    {
+      "key": "flicker",
+      "label": "Flicker",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.slew",
+      "lo": 1.2,
+      "hi": 0.1,
+      "default": 70.7438
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 40
+    }
+  ]
+}

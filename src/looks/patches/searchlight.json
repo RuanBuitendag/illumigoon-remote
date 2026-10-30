@@ -1,0 +1,162 @@
+{
+  "name": "Searchlight",
+  "created": "2026-09-09T20:06:09.074Z",
+  "notes": "The inverse of every animation in the flat set: instead of drawing light, layer 1 removes it. A warm strip is lit end to end, and an ERASE layer punches a soft moving hole through it -- `acc *= (1 - src.alpha)`, so the erasing layer's colour is irrelevant and only its density matters. Add a third layer above this one and it draws into the hole. Note the ordering: erase is order 1, so it cuts what is already there; at order 0 it would have nothing to cut and the patch would look like a plain fill.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff6000",
+            "ffc370",
+            "ff6000"
+          ],
+          "params": {
+            "hueShift": -0.087273
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.02
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "erase",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.02
+      },
+      "wave": "triangle"
+    },
+    "1": {
+      "type": "macro",
+      "params": {
+        "knob": 0.029091
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "2": {
+      "type": "macro",
+      "params": {
+        "knob": 0.241379
+      },
+      "name": "beam",
+      "label": "Beam Width"
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.25
+      },
+      "name": "edge",
+      "label": "Edge"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.emitter.centre",
+      "depth": 0.45
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 1.48
+    },
+    {
+      "src": "beam",
+      "dst": "L1.emitter.length",
+      "depth": 0.58
+    },
+    {
+      "src": "edge",
+      "dst": "L1.emitter.softness",
+      "depth": 0.4
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 2.9091
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.palette.hueShift",
+      "lo": -0.087273,
+      "hi": 0.912727,
+      "default": 0
+    },
+    {
+      "key": "beam",
+      "label": "Beam Width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 24.1379
+    },
+    {
+      "key": "edge",
+      "label": "Edge",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 25
+    }
+  ]
+}

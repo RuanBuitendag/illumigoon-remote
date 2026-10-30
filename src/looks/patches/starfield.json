@@ -1,0 +1,302 @@
+{
+  "name": "Starfield",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "A night sky: stars that fade in, hold and fade out where they are, over a faint deep-blue sky, with a shooting star every so often.\n\nThe stars are `particles` with no speed, no gravity and `fade` 0, because fade only fades OUT and a star has to come up as well. The twinkle lives in the colour instead, as in `37-foxfire`: coloured by AGE through a palette that starts and ends black, so each star's whole life is one rise and fall. The palette is left unboosted on purpose -- saturation 2 would turn the near-white entries into pure hues, and stars are white. A perlin LFO on the birth rate clusters them; a slower perlin varies that one's rate.\n\nThe shooting star is `downpour`'s lightning chain with a shape where the flash was: a `sample_hold` draw has to clear 0.85 to trip the threshold, about one draw in thirteen at a quarter-hertz, so a streak arrives every minute or so and never on a schedule. The same draw sets where it starts. Its tail is a `fade` warp listed ABOVE the colour row, so the palette colours the tail as it decays -- white at the head, blue behind.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.6,
+          "evolve": 0.0025
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0010ff",
+            "2000ff",
+            "0040ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0.12,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "params": {
+          "origin": 0.5,
+          "spread": 1,
+          "count": 0,
+          "rate": 3,
+          "speed": 0,
+          "speedVary": 0,
+          "acceleration": 0,
+          "drag": 0,
+          "size": 0.006,
+          "sizeVary": 0.6,
+          "softness": 0.5,
+          "lifetime": 4,
+          "lifeVary": 0.6,
+          "fade": 0,
+          "maxAlive": 60
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "80c0ff",
+            "ffffff",
+            "ffe0a0",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "age",
+        "trigger": {
+          "src": 2,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.5,
+          "velocity": 2.5,
+          "acceleration": 0,
+          "drag": 0.5,
+          "length": 0.03,
+          "softness": 0.03,
+          "lifetime": 0.9,
+          "fadeOut": 0.8,
+          "maxAlive": 4
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "4080ff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "fade",
+          "params": {
+            "attack": 0,
+            "release": 0.6,
+            "cells": 128
+          }
+        }
+      ],
+      "opacity": 1,
+      "blend": "add",
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.005
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 0.25
+      }
+    },
+    "2": {
+      "type": "threshold",
+      "source": 1,
+      "params": {
+        "level": 0.85,
+        "hysteresis": 0.9
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.00125
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.01
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.emitter.rate",
+      "depth": 2
+    },
+    {
+      "src": 1,
+      "dst": "L2.emitter.origin",
+      "depth": 0.4
+    },
+    {
+      "src": 3,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 4,
+      "dst": "M0.rate",
+      "depth": 0.015
+    },
+    {
+      "src": 7,
+      "dst": "M3.rate",
+      "depth": 0.0075
+    },
+    {
+      "src": 7,
+      "dst": "M0.rate",
+      "depth": 0.03
+    },
+    {
+      "src": 7,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.015
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "stars",
+      "label": "Stars",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.rate",
+      "lo": 0,
+      "hi": 12,
+      "default": 25
+    },
+    {
+      "key": "shooting",
+      "label": "Shooting Stars",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M2.level",
+      "lo": 1,
+      "hi": 0.5,
+      "default": 30
+    },
+    {
+      "key": "twinkle",
+      "label": "Twinkle",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.lifetime",
+      "lo": 8,
+      "hi": 1,
+      "default": 57.1429
+    },
+    {
+      "key": "sky",
+      "label": "Sky",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.layer.opacity",
+      "lo": 0,
+      "hi": 0.4,
+      "default": 30
+    }
+  ]
+}

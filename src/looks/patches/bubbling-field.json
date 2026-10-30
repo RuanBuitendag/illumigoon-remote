@@ -1,0 +1,207 @@
+{
+  "name": "Bubbling field",
+  "created": "2026-09-10T19:31:34.558Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 3.179312,
+          "evolve": 0.305719,
+          "time": -11,
+          "offset": -2.49
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {
+          "paletteOffset": 0.213,
+          "paletteSpan": 0.717,
+          "indexBias": 0.109
+        },
+        "palette": {
+          "entries": [
+            "00f0ff",
+            "00a1ff",
+            "ff0029",
+            "000000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 0
+      },
+      "opacity": 0.816,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "ripple",
+          "params": {
+            "amp": 0.14,
+            "freq": 4.36,
+            "phase": 0.096
+          }
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "1": {
+      "type": "threshold",
+      "params": {
+        "level": 0.391,
+        "hysteresis": 0.0908,
+        "slew": 0.136
+      }
+    },
+    "2": {
+      "type": "audio_band",
+      "params": {
+        "lo": 0,
+        "sensitivity": 2.591696,
+        "threshold": 0.043637,
+        "squelch": 0,
+        "smoothing": 0.187039
+      }
+    },
+    "14": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "15": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "M2.duty",
+      "depth": 0.253
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.scale",
+      "depth": -2.08
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 1.4
+    },
+    {
+      "src": "speed",
+      "dst": "M3.rate",
+      "depth": 2.98
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 0.533
+    },
+    {
+      "src": 2,
+      "dst": "G.opacity",
+      "depth": 0.64
+    },
+    {
+      "src": 14,
+      "dst": "L0.emitter.evolve",
+      "depth": 1.834314
+    }
+  ],
+  "global": {
+    "opacity": 0.396364
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M14.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M15.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M2.sensitivity",
+      "lo": 0.5,
+      "hi": 15,
+      "curve": 2,
+      "default": 37.9809
+    },
+    {
+      "key": "scale",
+      "label": "Scale",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.scale",
+      "lo": 0.5,
+      "hi": 10,
+      "curve": 2,
+      "default": 53.1068
+    },
+    {
+      "key": "ripple",
+      "label": "Ripple",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.warp0.amp",
+      "lo": 0,
+      "hi": 0.3,
+      "default": 46.6667
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 39.6364
+    }
+  ]
+}

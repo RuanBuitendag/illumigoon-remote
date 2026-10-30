@@ -1,0 +1,465 @@
+{
+  "name": "Beach Sunset",
+  "created": "2026-09-14T19:45:00.000Z",
+  "notes": "A beach at sunset, bottom to top: sea, sand, sky. Each band is its own layer cut to its stretch of the strip by a soft `window` gate, so the bands blend where they meet -- the sea into wet sand, the sand into a glowing horizon.\n\nThe sea is a blue perlin. Its waves wash up the sand: a sine at about 0.09 Hz pushes the window's top edge up and down by a few LEDs, with `noise` roughening each wash and a perlin LFO on its rate so the waves arrive in sets rather than on a metronome. The same sine nudges the water's own drift, so the texture rides in with the wave. A thin white foam line follows the waterline, brightest at the top of each wash, and its `fade` warp sits above the Colour row with a 3.5 s release -- a retreating wave leaves a glistening streak on the sand that dims from white to pale blue.\n\nThe sand is a plain cream gradient, damp gold at the shore to near-white towards the horizon. It and the foam are the two palettes left at saturation and value 1, because a whitish colour is exactly what 2.0 would boost away into a pure hue.\n\nThe sky is two layers. Underneath, a steady `block` glow coloured by position, orange at the horizon deepening to crimson overhead, so the sky never goes out. Over it, a red-to-amber perlin, big-featured and boiling very slowly. A perlin's density is its noise, so on its own a dip would black out the whole sky; over the glow, the dips read as darker cloud instead. A slow perlin LFO drifts that field along the strip. A soft gold sun on `screen` sits just above the horizon. A sine of about 14 minutes sinks it towards the sand and dims it, and the same sine walks the sky's `indexBias` so the clouds turn crimson as it sets and amber again as it rises. A second perlin wanders that bias on its own, so no two dusks match.\n\nTide moves the whole shoreline -- sea edge, foam and sand -- up or down the strip. Colour turns the scene towards twilight: the sky towards rose and the sea towards violet.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.2,
+          "evolve": 0.006
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0020",
+            "ff1000",
+            "ff3800",
+            "ff7000",
+            "ffa000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0.56,
+            "to": 1,
+            "soft": 0.06
+          }
+        }
+      ],
+      "opacity": 0.7,
+      "blend": "add",
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.64,
+          "length": 0.05,
+          "softness": 0.08
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff5000",
+            "ffb000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.55,
+      "blend": "screen",
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {},
+        "palette": {
+          "entries": [
+            "d9a86a",
+            "ffe6c2",
+            "fff2dc"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0.16,
+            "to": 0.6,
+            "soft": 0.05
+          }
+        }
+      ],
+      "opacity": 0.7,
+      "blend": "add",
+      "order": 3
+    },
+    "3": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff4000",
+            "ff4000",
+            "ff3010",
+            "c8102a"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0.56,
+            "to": 1,
+            "soft": 0.06
+          }
+        }
+      ],
+      "opacity": 0.4,
+      "blend": "add",
+      "order": 0
+    },
+    "4": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 4,
+          "evolve": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0010ff",
+            "0040ff",
+            "0078ff",
+            "00c0ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0,
+            "to": 0.2,
+            "soft": 0.035
+          }
+        }
+      ],
+      "opacity": 0.9,
+      "blend": "add",
+      "order": 4
+    },
+    "5": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.2,
+          "length": 0.012,
+          "softness": 0.025
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "6ab8ff",
+            "eaf8ff"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "fade",
+          "params": {
+            "attack": 0.3,
+            "release": 3.5,
+            "cells": 128
+          }
+        }
+      ],
+      "opacity": 0.4,
+      "blend": "add",
+      "order": 5
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.002
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.0015
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.0006,
+        "phase": 0.25
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.05,
+        "noise": 0.3,
+        "noiseRate": 0.05
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.01
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "colour",
+      "label": "Colour",
+      "params": {
+        "knob": 0
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "tide",
+      "label": "Tide",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.indexBias",
+      "depth": 0.12
+    },
+    {
+      "src": 2,
+      "dst": "L0.colour.indexBias",
+      "depth": 0.15
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.offset",
+      "depth": 1.2
+    },
+    {
+      "src": 2,
+      "dst": "L1.emitter.centre",
+      "depth": 0.05
+    },
+    {
+      "src": 2,
+      "dst": "L1.layer.opacity",
+      "depth": 0.15
+    },
+    {
+      "src": 3,
+      "dst": "L4.warp0.to",
+      "depth": 0.035
+    },
+    {
+      "src": 3,
+      "dst": "L5.emitter.centre",
+      "depth": 0.035
+    },
+    {
+      "src": 3,
+      "dst": "L5.layer.opacity",
+      "depth": 0.15
+    },
+    {
+      "src": 3,
+      "dst": "L4.emitter.offset",
+      "depth": -0.2
+    },
+    {
+      "src": 4,
+      "dst": "M3.rate",
+      "depth": 0.03
+    },
+    {
+      "src": 6,
+      "dst": "M0.rate",
+      "depth": 0.004
+    },
+    {
+      "src": 6,
+      "dst": "M1.rate",
+      "depth": 0.003
+    },
+    {
+      "src": 6,
+      "dst": "M2.rate",
+      "depth": 0.0012
+    },
+    {
+      "src": 6,
+      "dst": "M3.rate",
+      "depth": 0.08
+    },
+    {
+      "src": 6,
+      "dst": "M4.rate",
+      "depth": 0.02
+    },
+    {
+      "src": 6,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.012
+    },
+    {
+      "src": 6,
+      "dst": "L4.emitter.evolve",
+      "depth": 0.06
+    },
+    {
+      "src": 7,
+      "dst": "L0.palette.hueShift",
+      "depth": -0.1
+    },
+    {
+      "src": 7,
+      "dst": "L1.palette.hueShift",
+      "depth": -0.05
+    },
+    {
+      "src": 7,
+      "dst": "L3.palette.hueShift",
+      "depth": -0.1
+    },
+    {
+      "src": 7,
+      "dst": "L4.palette.hueShift",
+      "depth": 0.08
+    },
+    {
+      "src": 8,
+      "dst": "L4.warp0.to",
+      "depth": 0.2
+    },
+    {
+      "src": 8,
+      "dst": "L5.emitter.centre",
+      "depth": 0.2
+    },
+    {
+      "src": 8,
+      "dst": "L2.warp0.from",
+      "depth": 0.2
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "tide",
+      "label": "Tide",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "sun",
+      "label": "Sun",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 55
+    },
+    {
+      "key": "foam",
+      "label": "Foam",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L5.layer.opacity",
+      "lo": 0,
+      "hi": 0.8,
+      "default": 50
+    }
+  ]
+}

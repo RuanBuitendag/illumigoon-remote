@@ -1,0 +1,304 @@
+{
+  "name": "Ricochet",
+  "created": "2026-09-09T18:24:17.517Z",
+  "notes": "Shapes launched from one end that bounce off the middle of the strip. There is no collision here and nothing in `SpawnerEmitter` knows what a wall is -- `mirror` folds the coordinate about its centre, so a shape crossing that point re-emerges travelling the other way. `MirrorWarp::toSource` is `|pos - centre| * 2`, which means the reflection is EXACT and free, and it costs one warp.\n\nThe mirror's `centre` is on a slow triangle, so the wall moves. A shape launched while the wall is far travels most of the strip before turning; one launched while it is near turns almost immediately. Same emitter, same velocity, completely different flight -- and because the wall keeps moving while a shape is in the air, the turn happens somewhere neither the launch nor the wall alone determines.\n\nThe chain is `M2 -> M0.rate`, the launch clock on a noise source, so shots arrive in bursts and gaps rather than on a beat. `colouring: \"speed\"` with `drag` 0.7 means each shape is born hot and cools as it slows, so you can read how long ago a thing was fired from its colour alone. Split complement: cerise and violet for the shapes with acid lime 200 degrees away on the wall glow, which is the only thing marking where the fold currently is.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "velocity": 1.267273,
+          "acceleration": 0,
+          "drag": 0.7,
+          "length": 0.01,
+          "softness": 0.018,
+          "lifetime": 0.5,
+          "fadeOut": 0,
+          "speedRef": 1.8
+        },
+        "trigger": {
+          "src": 0,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "ff3300",
+            "3700ff",
+            "ff3300",
+            "ff3300",
+            "ff00a0"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1,
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {}
+        }
+      ]
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.005,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {
+          "paletteSpan": 1.760001
+        },
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "ff3300",
+            "3700ff",
+            "ff3300",
+            "ff3300",
+            "ff00a0"
+          ],
+          "params": {
+            "hueShift": -0.050909,
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.683636,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.060896
+      },
+      "wave": "ramp_up"
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.017
+      },
+      "wave": "triangle"
+    },
+    "2": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.05
+      },
+      "wave": "perlin"
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.008
+      }
+    },
+    "4": {
+      "type": "macro",
+      "params": {
+        "knob": 0.546986
+      },
+      "name": "size",
+      "label": "Shot Size"
+    },
+    "5": {
+      "type": "macro",
+      "params": {
+        "knob": 0.407407
+      },
+      "name": "life",
+      "label": "Lifetime"
+    },
+    "6": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.116364
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "params": {
+        "knob": 0.256175
+      },
+      "name": "wall",
+      "label": "Wall Glow"
+    },
+    "9": {
+      "type": "macro",
+      "params": {
+        "knob": 0.6
+      },
+      "name": "trail",
+      "label": "Fade"
+    },
+    "10": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.180107
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 2,
+      "dst": "M0.rate",
+      "depth": 0.090907
+    },
+    {
+      "src": 3,
+      "dst": "L0.emitter.drag",
+      "depth": 0.55
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 2.4
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.05
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.15
+    },
+    {
+      "src": "size",
+      "dst": "L0.emitter.length",
+      "depth": 0.19
+    },
+    {
+      "src": "life",
+      "dst": "L0.emitter.lifetime",
+      "depth": 13.5
+    },
+    {
+      "src": "wall",
+      "dst": "L1.emitter.length",
+      "depth": 0.145
+    },
+    {
+      "src": "trail",
+      "dst": "L0.emitter.fadeOut",
+      "depth": 1
+    },
+    {
+      "src": 10,
+      "dst": "L1.colour.paletteSpan",
+      "depth": 0.272728
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": 0.5
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 11.6364
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "size",
+      "label": "Shot Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 54.6986
+    },
+    {
+      "key": "life",
+      "label": "Lifetime",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 40.7407
+    },
+    {
+      "key": "wall",
+      "label": "Wall Glow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 25.6175
+    },
+    {
+      "key": "trail",
+      "label": "Fade",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 60
+    }
+  ]
+}

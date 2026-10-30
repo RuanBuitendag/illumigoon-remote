@@ -1,0 +1,385 @@
+{
+  "name": "Prism pulse",
+  "created": "2026-09-10T19:08:36.986Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 0,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.25,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 1,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.75,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 2,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    },
+    "3": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.1,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 3,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    },
+    "4": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.9,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "screen",
+      "order": 4,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.922121
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.12212
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.32212
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.522118
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.722119
+      }
+    },
+    "5": {
+      "type": "audio_band",
+      "params": {
+        "hi": 14,
+        "sensitivity": 0.174311,
+        "threshold": 0.058181,
+        "squelch": 0,
+        "smoothing": 0.074833
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {},
+      "name": "depth",
+      "label": "Sweep Depth"
+    },
+    "7": {
+      "type": "macro",
+      "params": {},
+      "name": "audio",
+      "label": "Audio Amount"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.warp0.offset",
+      "depth": 0.12
+    },
+    {
+      "src": 1,
+      "dst": "L1.warp0.offset",
+      "depth": 0.12
+    },
+    {
+      "src": 2,
+      "dst": "L2.warp0.offset",
+      "depth": 0.12
+    },
+    {
+      "src": 3,
+      "dst": "L3.warp0.offset",
+      "depth": 0.12
+    },
+    {
+      "src": 4,
+      "dst": "L4.warp0.offset",
+      "depth": 0.12
+    },
+    {
+      "src": "depth",
+      "dst": "L0.warp0.offset",
+      "depth": 2.75,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L1.warp0.offset",
+      "depth": 2.75,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L2.warp0.offset",
+      "depth": 2.75,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L3.warp0.offset",
+      "depth": 2.75,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L4.warp0.offset",
+      "depth": 2.75,
+      "op": "multiply"
+    },
+    {
+      "src": 5,
+      "dst": "M6.knob",
+      "depth": 0.5
+    },
+    {
+      "src": 5,
+      "dst": "G.warp1.zoom",
+      "depth": 2.138181
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0.429091
+        }
+      },
+      {
+        "type": "scale",
+        "params": {
+          "zoom": 0.476369
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.speed",
+      "lo": 0.25,
+      "hi": 1.75,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 42.9091
+    },
+    {
+      "key": "depth",
+      "label": "Sweep Depth",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "audio",
+      "label": "Audio Amount",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.sensitivity",
+      "lo": 0.1,
+      "hi": 12,
+      "curve": 2,
+      "default": 7.9023
+    },
+    {
+      "key": "zoom",
+      "label": "Zoom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp1.zoom",
+      "lo": 0.2,
+      "hi": 2,
+      "default": 15.3538
+    }
+  ]
+}

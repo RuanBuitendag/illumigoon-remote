@@ -1,0 +1,231 @@
+{
+  "name": "Jizzing",
+  "created": "2026-09-10T19:40:27.411Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 0.605455
+        },
+        "trigger": {
+          "src": 1,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "ffffff"
+          ],
+          "params": {}
+        },
+        "at": 0
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 2
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 1,
+          "length": 1,
+          "softness": 0.310909
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteOffset": 0.231,
+          "paletteSpan": 1.73,
+          "indexBias": 0.375727
+        },
+        "palette": {
+          "entries": [
+            "ff5300",
+            "ff7900",
+            "00acff"
+          ],
+          "params": {
+            "hueShift": -0.050909,
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 0
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1,
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0,
+            "to": 1
+          }
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 0,
+        "sensitivity": 5.829585,
+        "threshold": 0.065454,
+        "squelch": 0,
+        "smoothing": 0.135117
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "params": {
+        "level": 0.023636,
+        "hysteresis": 0.018182
+      },
+      "source": 3
+    },
+    "3": {
+      "type": "audio_band",
+      "params": {
+        "hi": 60,
+        "sensitivity": 17.051182,
+        "threshold": 0.074482,
+        "squelch": 0.370182,
+        "smoothing": 0.193844,
+        "agcRelease": 1.026577,
+        "slew": 0.152
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.colour.paletteSpan",
+      "depth": -0.931
+    },
+    {
+      "src": 3,
+      "dst": "L1.colour.indexBias",
+      "depth": 0.315
+    },
+    {
+      "src": 0,
+      "dst": "L1.colour.indexBias",
+      "depth": -0.427
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.softness",
+      "depth": -0.148
+    }
+  ],
+  "global": {
+    "opacity": 0.396364,
+    "warps": [
+      {
+        "type": "mirror",
+        "params": {}
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.palette.hueShift",
+      "lo": -0.050909,
+      "hi": 0.949091,
+      "default": 0
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.sensitivity",
+      "lo": 1,
+      "hi": 30,
+      "curve": 2,
+      "default": 74.3968
+    },
+    {
+      "key": "bass",
+      "label": "Bass",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 0.5,
+      "hi": 15,
+      "curve": 2,
+      "default": 60.6265
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.level",
+      "lo": 0,
+      "hi": 0.2,
+      "default": 11.818
+    },
+    {
+      "key": "sparks",
+      "label": "Sparks",
+      "type": "slider",
+      "min": 0,
+      "max": 32,
+      "step": 1,
+      "target": "L0.emitter.count",
+      "default": 12
+    },
+    {
+      "key": "glow",
+      "label": "Glow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L1.emitter.softness",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 62.1818
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 39.6364
+    }
+  ]
+}

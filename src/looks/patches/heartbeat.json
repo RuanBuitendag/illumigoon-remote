@@ -1,0 +1,359 @@
+{
+  "name": "Heartbeat",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "A heart at the middle of the strip: lub, then dub a sixth of a second later, on the beat of whatever is playing -- and a resting pulse when nothing is.\n\nThe lub is the `beat` tracker's pulse. The dub is a `delay` re-firing the beat's edge into an envelope, which is what a delay is for: an envelope alone restarts on a new edge and loses the one in flight. `tempo` shortens the gap as the song speeds up, so a fast track beats tight and a slow one lazily.\n\n`beat` reads nothing until it has locked -- seven to ten beats of music with a clear kick -- and nothing at all in a quiet room. So a `periodic` at 60 BPM runs the same lub-dub chain as a resting heart, scaled by Resting Pulse, and `math max` takes whichever of the two is stronger for each beat. With music playing and Resting Pulse up you get both, slightly out of step; turn it down when the room is loud.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.1,
+          "softness": 0.15
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0020",
+            "ff0040",
+            "ff3060"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0,
+      "blend": "add",
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.07,
+          "softness": 0.12
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0010",
+            "ff0030"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0,
+      "blend": "add",
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.5,
+          "evolve": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0030",
+            "ff0050",
+            "ff0070",
+            "6000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.08,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "beat",
+      "every": "beat",
+      "shape": "expo_in",
+      "params": {
+        "decay": 0.25
+      }
+    },
+    "1": {
+      "type": "delay",
+      "source": 0,
+      "params": {
+        "time": 0.0425
+      }
+    },
+    "2": {
+      "type": "envelope",
+      "shape": "expo_in",
+      "source": 1,
+      "params": {
+        "attack": 0.005,
+        "decay": 0.2
+      }
+    },
+    "3": {
+      "type": "tempo",
+      "params": {
+        "slow": 60,
+        "fast": 160,
+        "smoothing": 4
+      }
+    },
+    "4": {
+      "type": "periodic",
+      "params": {
+        "period": 1
+      }
+    },
+    "5": {
+      "type": "envelope",
+      "shape": "expo_in",
+      "source": 4,
+      "params": {
+        "attack": 0.01,
+        "decay": 0.22
+      }
+    },
+    "6": {
+      "type": "delay",
+      "source": 4,
+      "params": {
+        "time": 0.0425
+      }
+    },
+    "7": {
+      "type": "envelope",
+      "shape": "expo_in",
+      "source": 6,
+      "params": {
+        "attack": 0.005,
+        "decay": 0.2
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "rest",
+      "label": "Resting Pulse",
+      "params": {
+        "knob": 0.6
+      }
+    },
+    "9": {
+      "type": "math",
+      "op": "mul",
+      "source": 5,
+      "sourceB": 8,
+      "params": {}
+    },
+    "10": {
+      "type": "math",
+      "op": "max",
+      "source": 0,
+      "sourceB": 9,
+      "params": {}
+    },
+    "11": {
+      "type": "math",
+      "op": "mul",
+      "source": 7,
+      "sourceB": 8,
+      "params": {}
+    },
+    "12": {
+      "type": "math",
+      "op": "max",
+      "source": 2,
+      "sourceB": 11,
+      "params": {}
+    },
+    "14": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.05
+      }
+    },
+    "15": {
+      "type": "macro",
+      "name": "gap",
+      "label": "Lub-Dub Gap",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 10,
+      "dst": "L0.layer.opacity",
+      "depth": 1
+    },
+    {
+      "src": 10,
+      "dst": "L0.emitter.length",
+      "depth": 0.12
+    },
+    {
+      "src": 12,
+      "dst": "L1.layer.opacity",
+      "depth": 0.7
+    },
+    {
+      "src": 12,
+      "dst": "L1.emitter.length",
+      "depth": 0.08
+    },
+    {
+      "src": 3,
+      "dst": "M1.time",
+      "depth": -0.07,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L2.emitter.evolve",
+      "depth": 0.3,
+      "bipolar": false
+    },
+    {
+      "src": 14,
+      "dst": "L2.layer.opacity",
+      "depth": 0.04
+    },
+    {
+      "src": 15,
+      "dst": "M1.time",
+      "depth": 0.255
+    },
+    {
+      "src": 15,
+      "dst": "M6.time",
+      "depth": 0.255
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "rest",
+      "label": "Resting Pulse",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 60
+    },
+    {
+      "key": "rate",
+      "label": "Resting Rate",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.period",
+      "lo": 1.6,
+      "hi": 0.4,
+      "default": 50
+    },
+    {
+      "key": "gap",
+      "label": "Lub-Dub Gap",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M15.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "decay",
+      "label": "Beat Decay",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.decay",
+      "lo": 0.05,
+      "hi": 0.6,
+      "default": 36.3636
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 0.25,
+      "hi": 16,
+      "curve": 3,
+      "default": 36.246
+    },
+    {
+      "key": "bed",
+      "label": "Bed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L2.layer.opacity",
+      "lo": 0,
+      "hi": 0.3,
+      "default": 26.6667
+    }
+  ]
+}

@@ -1,0 +1,285 @@
+{
+  "name": "Black Hole",
+  "created": "2026-09-09T20:05:21.877Z",
+  "notes": "Two bodies drift toward each other on opposed LFOs and detonate when they touch. What makes it possible is that the separation is read off the SHAPES -- `math abs_diff` on `L0.emitter.centre` and `L1.emitter.centre` -- rather than off the oscillators driving them. So the glow answers to where the bodies actually are, and it keeps answering if you grab the drift macro and move them by hand, which a patch built on the LFO outputs could not do. M4 is the contact: `lt` against the merge distance, latching with hysteresis so a graze fires once rather than stuttering, and firing an EDGE so it can kick the particles directly without a threshold node in between. M6 adds the two centres and the row halves it, so the burst happens at the midpoint and travels with it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.3,
+          "length": 0.0125,
+          "softness": 0.035
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0a1030",
+            "3050ff",
+            "a0d0ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.7,
+          "length": 0.0125,
+          "softness": 0.035
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "300804",
+            "ff4020",
+            "ffc080"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 2
+    },
+    "3": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 0,
+          "spread": 0.03,
+          "count": 4,
+          "speedVary": 1.4,
+          "acceleration": 0,
+          "drag": 2.2,
+          "sizeVary": 0.6,
+          "lifetime": 1.1,
+          "fade": 0.85,
+          "maxAlive": 64
+        },
+        "trigger": {
+          "src": 4,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ffd080",
+            "ff4000",
+            "200000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 3
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.02,
+        "phase": 0.5
+      }
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.08
+      },
+      "name": "merge",
+      "label": "Merge Distance"
+    },
+    "4": {
+      "type": "math",
+      "params": {
+        "hysteresis": 0.06
+      },
+      "op": "lt",
+      "source": "M2",
+      "sourceB": "M3"
+    },
+    "6": {
+      "type": "math",
+      "params": {},
+      "op": "add",
+      "source": "L0.emitter.centre",
+      "sourceB": "L1.emitter.centre"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.155172
+      },
+      "name": "drift",
+      "label": "Approach Speed"
+    },
+    "8": {
+      "type": "macro",
+      "params": {
+        "knob": 0.533333
+      },
+      "name": "burst",
+      "label": "Burst Size"
+    },
+    "9": {
+      "type": "macro",
+      "name": "size",
+      "label": "Body Size",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.22
+    },
+    {
+      "src": 1,
+      "dst": "L1.emitter.centre",
+      "depth": 0.22
+    },
+    {
+      "src": 6,
+      "dst": "L3.emitter.origin",
+      "depth": 0.5
+    },
+    {
+      "src": "drift",
+      "dst": "M0.rate",
+      "depth": 0.58
+    },
+    {
+      "src": "drift",
+      "dst": "M1.rate",
+      "depth": 0.58
+    },
+    {
+      "src": "burst",
+      "dst": "L3.emitter.count",
+      "depth": 60
+    },
+    {
+      "src": 9,
+      "dst": "L0.emitter.length",
+      "depth": 0.075
+    },
+    {
+      "src": 9,
+      "dst": "L1.emitter.length",
+      "depth": 0.075
+    }
+  ],
+  "global": {
+    "warps": [
+      {
+        "type": "hue",
+        "params": {
+          "shift": 0
+        }
+      }
+    ]
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 15.5172
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "G.warp0.shift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "merge",
+      "label": "Merge Distance",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 8
+    },
+    {
+      "key": "burst",
+      "label": "Burst Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 53.3333
+    },
+    {
+      "key": "size",
+      "label": "Body Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    }
+  ]
+}

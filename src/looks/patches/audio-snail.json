@@ -1,0 +1,168 @@
+{
+  "name": "Audio snail",
+  "created": "2026-09-10T15:56:04.369Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {}
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "5a0000",
+            "dc2800",
+            "ff9628",
+            "ffe0a0"
+          ],
+          "params": {}
+        },
+        "at": 0
+      },
+      "opacity": 0.65365,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "pinch",
+          "params": {}
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0,
+        "phase": 0.684451,
+        "slew": 0.523637
+      },
+      "wave": "sample_hold",
+      "source": 4
+    },
+    "1": {
+      "type": "macro",
+      "params": {
+        "knob": 0.304348
+      },
+      "name": "sensitivity",
+      "label": "Sensitivity"
+    },
+    "2": {
+      "type": "macro",
+      "params": {
+        "knob": 0.234783
+      },
+      "name": "texture",
+      "label": "Texture"
+    },
+    "3": {
+      "type": "audio_band",
+      "params": {
+        "sensitivity": 3.806418,
+        "threshold": 0.087273,
+        "squelch": 1,
+        "smoothing": 0.059885
+      }
+    },
+    "4": {
+      "type": "threshold",
+      "params": {
+        "hysteresis": 0.42
+      },
+      "source": 3
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.25
+    }
+  ],
+  "surface": [
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.palette.hueShift",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.sensitivity",
+      "lo": 1,
+      "hi": 30,
+      "curve": 2,
+      "default": 31.1084
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.level",
+      "lo": 0.05,
+      "hi": 0.95,
+      "default": 50
+    },
+    {
+      "key": "glide",
+      "label": "Glide",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.slew",
+      "lo": 0.02,
+      "hi": 2,
+      "default": 25.4362
+    },
+    {
+      "key": "size",
+      "label": "Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.length",
+      "lo": 0.02,
+      "hi": 0.6,
+      "default": 31.0345
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.layer.opacity",
+      "lo": 0,
+      "hi": 1,
+      "default": 65.365
+    }
+  ]
+}

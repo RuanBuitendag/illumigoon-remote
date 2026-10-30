@@ -1,0 +1,267 @@
+{
+  "name": "Mirror",
+  "created": "2026-09-10T17:49:17.304Z",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "velocity": 0.02,
+          "acceleration": 0,
+          "length": 0,
+          "softness": 0,
+          "fadeOut": 0,
+          "maxAlive": 64
+        },
+        "colouring": "age",
+        "sustain": true,
+        "trigger": {
+          "src": 9,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "ff3300",
+            "3700ff",
+            "ff3300",
+            "ff3300",
+            "ff00a0"
+          ],
+          "params": {
+            "hueShift": -1,
+            "saturation": 2,
+            "value": 2
+          }
+        },
+        "at": 1
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {}
+        },
+        {
+          "type": "pinch",
+          "params": {}
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 0,
+        "hi": 16,
+        "sensitivity": 3.186325,
+        "threshold": 0.08,
+        "squelch": 0,
+        "smoothing": 0.06307
+      }
+    },
+    "1": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "hue",
+      "label": "Hue"
+    },
+    "2": {
+      "type": "macro",
+      "params": {
+        "knob": 0.110352
+      },
+      "name": "min_speed",
+      "label": "Speed"
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.2
+      },
+      "name": "bloom",
+      "label": "Bloom"
+    },
+    "4": {
+      "type": "macro",
+      "params": {},
+      "name": "bin_start",
+      "label": "Bin Start"
+    },
+    "5": {
+      "type": "macro",
+      "params": {
+        "knob": 0.076321
+      },
+      "name": "bin_end",
+      "label": "Bin End"
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0.197324
+      },
+      "name": "sensitivity",
+      "label": "Sensitivity"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.1
+      },
+      "name": "threshold",
+      "label": "Threshold"
+    },
+    "8": {
+      "type": "macro",
+      "params": {
+        "knob": 0.25
+      },
+      "name": "smoothing",
+      "label": "Smoothing"
+    },
+    "9": {
+      "type": "threshold",
+      "params": {
+        "level": 0.083636,
+        "hysteresis": 0
+      },
+      "source": 0
+    }
+  },
+  "matrix": [
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2
+    },
+    {
+      "src": "min_speed",
+      "dst": "L0.emitter.velocity",
+      "depth": 3.98
+    },
+    {
+      "src": "bloom",
+      "dst": "L0.emitter.softness",
+      "depth": 0.2
+    },
+    {
+      "src": "bin_start",
+      "dst": "M0.lo",
+      "depth": 511
+    },
+    {
+      "src": 0,
+      "dst": "M2.knob",
+      "depth": 0.399091
+    },
+    {
+      "src": 0,
+      "dst": "L0.warp1.amount",
+      "depth": 0.143636
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 11.0352
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 20
+    },
+    {
+      "key": "pinch",
+      "label": "Pinch",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.warp1.amount",
+      "lo": -1,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.sensitivity",
+      "lo": 1,
+      "hi": 30,
+      "curve": 2,
+      "default": 27.4573
+    },
+    {
+      "key": "trip",
+      "label": "Trip Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M9.level",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 16.7272
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.smoothing",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 12.614
+    }
+  ]
+}

@@ -1,0 +1,271 @@
+{
+  "name": "Sunset",
+  "created": "2026-09-13T18:00:00.000Z",
+  "notes": "The strip is a sky. A `block` coloured by POSITION lays a gradient along it -- orange at the horizon end through red and rose to violet and indigo -- with `paletteSpan` 0.6, so the strip only ever shows sixty percent of that sky. A sine at 0.0008 Hz slides `paletteOffset` through the other forty: the window starts on the warm end and walks to the cold one, which is the sun going down, then walks back.\n\nAt Speed 50 % one full dusk-and-return takes about 21 minutes; the knob runs it from about 12 minutes to over an hour. Nothing in a patch can read the wall clock, so it begins wherever the sine is when the patch starts -- the phase is set so that is sunset, not midnight.\n\nThe same slow clock sinks the sun: a soft glint near the horizon end that slides further down and fades as the sky cools. Clouds are a noise layer with a black palette blended `multiply`, which dims by its own alpha and so darkens the sky in drifting bands -- the trick `downpour` uses for its gusts.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 0.6
+        },
+        "palette": {
+          "entries": [
+            "ff6000",
+            "ff2a00",
+            "ff0040",
+            "c000ff",
+            "3000ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.8,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.5,
+          "evolve": 0.02
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "opacity": 0,
+      "blend": "multiply",
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.12,
+          "length": 0.12,
+          "softness": 0.3
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff8000",
+            "ffb000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0,
+      "blend": "add",
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.0002,
+        "phase": 0.75
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.0025
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.03
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "colour",
+      "label": "Colour",
+      "params": {
+        "knob": 0
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "clouds",
+      "label": "Clouds",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "sun",
+      "label": "Sun",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 0.4,
+      "bipolar": false
+    },
+    {
+      "src": 6,
+      "dst": "L2.layer.opacity",
+      "depth": 1
+    },
+    {
+      "src": 0,
+      "dst": "L2.layer.opacity",
+      "depth": -0.5,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.centre",
+      "depth": -0.1,
+      "bipolar": false
+    },
+    {
+      "src": 1,
+      "dst": "L1.warp0.offset",
+      "depth": 1
+    },
+    {
+      "src": 2,
+      "dst": "L1.layer.opacity",
+      "depth": 0.1
+    },
+    {
+      "src": 1,
+      "dst": "M2.rate",
+      "depth": 0.02
+    },
+    {
+      "src": 3,
+      "dst": "M0.rate",
+      "depth": 0.0012
+    },
+    {
+      "src": 3,
+      "dst": "M1.rate",
+      "depth": 0.015
+    },
+    {
+      "src": 4,
+      "dst": "L0.palette.hueShift",
+      "depth": 0.15
+    },
+    {
+      "src": 4,
+      "dst": "L2.palette.hueShift",
+      "depth": 0.15
+    },
+    {
+      "src": 5,
+      "dst": "L1.layer.opacity",
+      "depth": 0.7
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "clouds",
+      "label": "Clouds",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    },
+    {
+      "key": "sun",
+      "label": "Sun",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 50
+    }
+  ]
+}

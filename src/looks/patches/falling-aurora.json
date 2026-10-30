@@ -1,0 +1,294 @@
+{
+  "name": "Falling aurora",
+  "created": "2026-09-08T21:40:24.405Z",
+  "notes": "Falling balls on top of an aurora",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "origin": 1,
+          "spread": 0.9,
+          "count": 0,
+          "rate": 0.044962,
+          "speedVary": 0,
+          "acceleration": -0.534546,
+          "drag": 0.839091,
+          "bounce": 0.92,
+          "size": 0.03,
+          "sizeVary": 0.45,
+          "softness": 0,
+          "lifetime": 1.927079,
+          "fade": 1,
+          "maxAlive": 90
+        },
+        "colouring": "speed"
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "0028ff",
+            "0064ff",
+            "00c8ff",
+            "00ffb4",
+            "ff3200"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "perlin",
+        "params": {}
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "ff3300",
+            "3700ff",
+            "ff3300",
+            "ff3300",
+            "ff00a0"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.013
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.06
+      },
+      "wave": "perlin"
+    },
+    "2": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.009
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.02
+      },
+      "wave": "perlin"
+    },
+    "6": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {},
+      "name": "speed",
+      "label": "Speed"
+    }
+  },
+  "matrix": [
+    {
+      "src": 2,
+      "dst": "M1.rate",
+      "depth": 0.06
+    },
+    {
+      "src": 3,
+      "dst": "L0.emitter.bounce",
+      "depth": 0.14
+    },
+    {
+      "src": 7,
+      "dst": "M0.rate",
+      "depth": 0.04
+    },
+    {
+      "src": 7,
+      "dst": "M1.rate",
+      "depth": 0.18
+    },
+    {
+      "src": 7,
+      "dst": "M3.rate",
+      "depth": 0.06
+    },
+    {
+      "src": 6,
+      "dst": "L0.palette.hueShift",
+      "depth": 1
+    }
+  ],
+  "macros": {
+    "speed": {
+      "label": "Speed",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "targets": [
+        "M7.knob"
+      ]
+    },
+    "colour": {
+      "label": "Colour",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "targets": [
+        "M6.knob"
+      ]
+    },
+    "size": {
+      "label": "Ball Size",
+      "min": 0.008,
+      "max": 0.09,
+      "value": 0.03,
+      "targets": [
+        "L0.emitter.size"
+      ]
+    },
+    "life": {
+      "label": "Lifetime",
+      "min": 1,
+      "max": 12,
+      "value": 9,
+      "targets": [
+        "L0.emitter.lifetime"
+      ]
+    },
+    "drag": {
+      "label": "Air",
+      "min": 0,
+      "max": 3,
+      "value": 0.839091,
+      "targets": [
+        "L0.emitter.drag"
+      ]
+    },
+    "edge": {
+      "label": "Ball Edge",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "targets": [
+        "L0.emitter.softness"
+      ]
+    }
+  },
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    },
+    {
+      "key": "rate",
+      "label": "Ball Rate",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.rate",
+      "lo": 0,
+      "hi": 0.5,
+      "default": 8.9924
+    },
+    {
+      "key": "size",
+      "label": "Ball Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.size",
+      "lo": 0.008,
+      "hi": 0.09,
+      "default": 26.8293
+    },
+    {
+      "key": "life",
+      "label": "Lifetime",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.lifetime",
+      "lo": 1,
+      "hi": 12,
+      "default": 8.428
+    },
+    {
+      "key": "drag",
+      "label": "Air",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.drag",
+      "lo": 0,
+      "hi": 3,
+      "default": 27.9697
+    },
+    {
+      "key": "edge",
+      "label": "Ball Edge",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.softness",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    }
+  ]
+}

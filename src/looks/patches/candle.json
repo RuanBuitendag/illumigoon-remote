@@ -1,0 +1,207 @@
+{
+  "name": "Candle",
+  "created": "2026-09-13T18:24:54.210Z",
+  "notes": "One small flame and the glow it throws. The flame is a short soft `line` coloured by DENSITY, so its soft edges are red and its core runs to amber -- a candle is hotter in the middle. The halo is a wide, very soft line under it at a fifth the opacity.\n\nThe flicker is a perlin LFO multiplied by the Flicker knob through `M6` (math mul), so the knob sets how much the flame dances rather than how bright it is. A slow `sample_hold` gutters the flame now and then: it dips the brightness a little and, through `M0.rate`, makes the flicker hurry while it recovers, the way a draught catches a real one. A slower perlin sways the flame a hair either side of centre and breathes the halo.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.015,
+          "softness": 0.12
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff1800",
+            "ff4a00",
+            "ff8000"
+          ],
+          "params": {
+            "hueShift": -0.036364,
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.9,
+      "blend": "add",
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.1,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff1000",
+            "ff3c00"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.18,
+      "blend": "screen",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.45
+      },
+      "wave": "perlin"
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.0375
+      },
+      "wave": "perlin"
+    },
+    "2": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.4,
+        "slew": 0.25
+      },
+      "wave": "sample_hold"
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "4": {
+      "type": "macro",
+      "params": {},
+      "name": "colour",
+      "label": "Colour"
+    },
+    "5": {
+      "type": "macro",
+      "params": {
+        "knob": 0.4
+      },
+      "name": "flicker",
+      "label": "Flicker"
+    },
+    "6": {
+      "type": "math",
+      "params": {},
+      "op": "mul",
+      "source": 0,
+      "sourceB": 5
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "size",
+      "label": "Flame Size"
+    }
+  },
+  "matrix": [
+    {
+      "src": 6,
+      "dst": "L0.emitter.length",
+      "depth": 0.03
+    },
+    {
+      "src": 6,
+      "dst": "L0.layer.opacity",
+      "depth": 0.15
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.centre",
+      "depth": 0.01
+    },
+    {
+      "src": 1,
+      "dst": "L1.layer.opacity",
+      "depth": 0.05
+    },
+    {
+      "src": 2,
+      "dst": "M0.rate",
+      "depth": 1.2
+    },
+    {
+      "src": 2,
+      "dst": "L0.layer.opacity",
+      "depth": 0.08
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 2.7
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.225
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": 0.1
+    },
+    {
+      "src": "size",
+      "dst": "L0.emitter.length",
+      "depth": 0.09
+    },
+    {
+      "src": "size",
+      "dst": "L1.emitter.length",
+      "depth": 0.5
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "breath",
+      "label": "Breath",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}
