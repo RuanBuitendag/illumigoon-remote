@@ -3,11 +3,11 @@ import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { setBrightness, setPower, type Light } from '../store/fleet-store';
 import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
-import { openControls } from '../store/open-controls';
 import {
   highestBrightness,
   isAnyOn,
   isMixedLook,
+  lightsInScope,
   lightState,
   lookNameOf,
   previewOfAnimation,
@@ -15,8 +15,7 @@ import {
 } from '../store/rooms';
 import { roomSchedules } from '../store/schedules';
 import { lightCount } from '../store/scenes';
-import { ControlsSheet } from './controls-sheet';
-import { LookLibrary } from './look-library';
+import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
 
 const ALL_LIGHTS = 'all';
@@ -103,51 +102,37 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
   const isOn = isAnyOn(lights);
   const level = highestBrightness(lights);
   const isMixed = isMixedLook(lights);
-  const canAdjust = !isMixed && lights.length > 0;
+  const hasLights = lights.length > 0;
   return (
     <Hero
       tint={recording?.tint}
       strip={<LookStrip source={source} shape="hero" isOn={isOn} brightness={level} />}
       lookName={isMixed ? 'Mixed' : (lookNameOf(first) ?? '')}
-      onAdjust={canAdjust ? () => openControls(lights) : undefined}
+      onChangeLook={hasLights ? () => openPage('looks', room.id) : undefined}
     >
       <LevelRow
         label={room.name}
         isOn={isOn}
         level={level}
-        disabled={lights.length === 0}
+        disabled={!hasLights}
         onPower={(next) => setPower(lights, next)}
         onLevel={(next) => setBrightness(lights, next)}
       />
+      {hasLights && !isMixed && <LookControls lights={lights} />}
     </Hero>
   );
 }
 
 export function RoomScreen({ room }: { room: Room }) {
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  const isSheetOpen = useNavigation((navigation) => navigation.isSheetOpen);
-  const scoped = room.writableLights.filter(({ address }) => address === scopeAddress);
-  const lights = scoped.length > 0 ? scoped : room.writableLights;
+  const lights = lightsInScope(room, scopeAddress);
+  const isScoped = lights.some(({ address }) => address === scopeAddress);
   return (
-    <>
-      <RoomLayout
-        name={room.name}
-        countText={lightCount(room.lights.length)}
-        backLabel="Rooms"
-        onBack={closeRoom}
-      >
-        <RoomScope room={room} scope={scoped.length > 0 ? scopeAddress : null} />
-        <RoomHero room={room} lights={lights} />
-        <RoomSection
-          title="Looks"
-          help="Tap a look to play it in this room. Tap the one that's playing to adjust it."
-        >
-          <LookLibrary lights={lights} />
-        </RoomSection>
-        <LightRows room={room} />
-        <RoomMore room={room} />
-      </RoomLayout>
-      {isSheetOpen && <ControlsSheet lights={lights} />}
-    </>
+    <RoomLayout name={room.name} countText={lightCount(room.lights.length)} backLabel="Rooms" onBack={closeRoom}>
+      <RoomScope room={room} scope={isScoped ? scopeAddress : null} />
+      <RoomHero room={room} lights={lights} />
+      <LightRows room={room} />
+      <RoomMore room={room} />
+    </RoomLayout>
   );
 }

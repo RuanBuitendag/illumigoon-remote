@@ -1,7 +1,7 @@
 import type { Colour } from '../../design-system';
 import type { AnimationState, Manifest, Parameter } from '../light-network/protocol';
 import { useMemo } from 'react';
-import { findPatchLook, lookShape } from '../looks/look-catalog';
+import { findPatchLook, latestDocumentOf, lookShape } from '../looks/look-catalog';
 import type { PatchLook } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
 import { useFleet, type Light } from './fleet-store';
@@ -89,6 +89,11 @@ const playsPatches = (light: Light) =>
 
 export const patchLights = (lights: Light[]) => lights.filter(playsPatches);
 
+export function lightsInScope({ writableLights }: Room, scopeAddress: string | null) {
+  const scoped = writableLights.filter(({ address }) => address === scopeAddress);
+  return scoped.length > 0 ? scoped : writableLights;
+}
+
 export const lightsWithLook = (lights: Light[], animationId: string) =>
   lights.filter((light) => light.manifests.some((manifest) => manifest.id === animationId));
 
@@ -101,7 +106,10 @@ export function defaultParams({ parameters }: Manifest) {
 export function currentControls(light: Light | undefined): Parameter[] {
   const animation = light?.animation;
   if (!animation) return [];
-  if (animation.type === 'patch') return (animation.params.surface as Parameter[] | undefined) ?? [];
+  if (animation.type === 'patch') {
+    const { surface } = latestDocumentOf(animation.params) ?? animation.params;
+    return (surface as Parameter[] | undefined) ?? [];
+  }
   const manifest = light.manifests.find(({ id }) => id === animation.type);
   const params = animation.params as Record<string, Parameter['default']>;
   return (manifest?.parameters ?? []).map((parameter) => ({

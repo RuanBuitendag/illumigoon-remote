@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { AdjustMark, BackKey, ChevronMark, Eyebrow, OptionRow, Press, StatusMark, TextKey, tintStyle } from '../design-system';
+import { BackKey, ChevronMark, Eyebrow, OptionRow, Press, StatusMark, TextKey, tintStyle } from '../design-system';
 
 type RoomLayoutProps = {
   name: string;
@@ -38,20 +38,20 @@ type HeroProps = {
   tint?: string;
   strip: ReactNode;
   lookName: string;
-  onAdjust?: () => void;
+  onChangeLook?: () => void;
   children: ReactNode;
 };
 
-export function Hero({ tint, strip, lookName, onAdjust, children }: HeroProps) {
+export function Hero({ tint, strip, lookName, onChangeLook, children }: HeroProps) {
   return (
     <div className="hero" style={tintStyle(tint)}>
-      {strip}
+      <div className="hero-strip">{strip}</div>
       <div className="hero-look">
         <span className="hero-look-name">{lookName}</span>
-        {onAdjust && (
-          <TextKey onClick={onAdjust}>
-            <AdjustMark />
-            ADJUST
+        {onChangeLook && (
+          <TextKey onClick={onChangeLook}>
+            CHANGE LOOK
+            <ChevronMark direction="right" />
           </TextKey>
         )}
       </div>
@@ -60,14 +60,13 @@ export function Hero({ tint, strip, lookName, onAdjust, children }: HeroProps) {
   );
 }
 
-type RoomSectionProps = { title?: string; eyebrow?: string; help?: string; children: ReactNode };
+type RoomSectionProps = { title?: string; eyebrow?: string; children: ReactNode };
 
-export function RoomSection({ title, eyebrow, help, children }: RoomSectionProps) {
+export function RoomSection({ title, eyebrow, children }: RoomSectionProps) {
   return (
     <section className="room-section">
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       {title && <h2 className="section-title">{title}</h2>}
-      {help && <p className="library-help">{help}</p>}
       {children}
     </section>
   );

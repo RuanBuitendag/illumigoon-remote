@@ -2,17 +2,17 @@ import { useState } from 'react';
 import {
   ColourEditor,
   ControlGroup,
+  ControlList,
   NamingRow,
   SelectRow,
-  Sheet,
-  SheetNote,
+  SheetFooter,
   SliderRow,
 } from '../../composites';
 import { BLACK_HEX, colourToHex, hexToColour, TextKey, type Colour } from '../../design-system';
 import type { Parameter, ParameterValue } from '../light-network/protocol';
-import { setParameter, setTransition, type Light } from '../store/fleet-store';
+import { changeControl } from '../store/change-control';
+import { setTransition, type Light } from '../store/fleet-store';
 import { addColourSet, addSavedLook, useHousehold } from '../store/household-store';
-import { setSheetOpen } from '../store/navigation-store';
 import { currentControls, lookNameOf } from '../store/rooms';
 import { LookControl } from './look-control';
 
@@ -66,14 +66,14 @@ function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter:
       colours={toHexList(parameter)}
       minimumColours={parameter.min ?? 1}
       sets={sets}
-      onChange={(colours) => setParameter(lights, parameter.key, toValue(colours))}
+      onChange={(colours) => changeControl(lights, parameter.key, toValue(colours))}
       onKeepSet={addColourSet}
       onClose={onClose}
     />
   );
 }
 
-export function ControlsSheet({ lights }: { lights: Light[] }) {
+export function LookControls({ lights }: { lights: Light[] }) {
   const [isNaming, setNaming] = useState(false);
   const [editingKey, setEditingKey] = useState<string | null>(null);
   const light = lights[0];
@@ -87,32 +87,30 @@ export function ControlsSheet({ lights }: { lights: Light[] }) {
     setNaming(false);
   };
 
-  const actions = (
-    <>
-      <TextKey isQuiet onClick={() => setNaming(true)}>
-        SAVE AS
-      </TextKey>
-      <TextKey onClick={() => setSheetOpen(false)}>DONE</TextKey>
-    </>
-  );
-
   return (
-    <Sheet label="Adjust the look" title={lookNameOf(light)} actions={actions}>
-      {isNaming && <NamingRow label="Name of the look" onCancel={() => setNaming(false)} onKeep={keepLook} />}
-      {controls.length === 0 && <SheetNote>This look has nothing to adjust.</SheetNote>}
+    <ControlList>
       {groupControls(controls).map(([group, parameters]) => (
         <ControlGroup key={group} title={group}>
           {parameters.map((parameter) => (
             <LookControl
               key={parameter.key}
               parameter={parameter}
-              onChange={(value) => setParameter(lights, parameter.key, value)}
+              onChange={(value) => changeControl(lights, parameter.key, value)}
               onEditColours={() => setEditingKey(parameter.key)}
             />
           ))}
         </ControlGroup>
       ))}
       <TransitionControls lights={lights} light={light} />
-    </Sheet>
+      {isNaming ? (
+        <NamingRow label="Name of the look" onCancel={() => setNaming(false)} onKeep={keepLook} />
+      ) : (
+        <SheetFooter>
+          <TextKey isQuiet onClick={() => setNaming(true)}>
+            SAVE AS A NEW LOOK
+          </TextKey>
+        </SheetFooter>
+      )}
+    </ControlList>
   );
 }

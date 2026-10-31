@@ -106,7 +106,7 @@ export const groupedLooks = () =>
     looks: group.ids.flatMap((id) => looksById.get(id) ?? []),
   }));
 
-type Surface = { key?: string; type?: string }[];
+type Surface = { key?: string; type?: string; default?: unknown }[];
 
 const LATER_CONTROLS = new Set(['palette', 'select']);
 
@@ -130,11 +130,21 @@ export const lookShape = ({ type, params }: { type: string; params: Record<strin
 export const findPatchLook = (document: Record<string, unknown>): PatchLook | undefined =>
   looksByShape.get(shapeOf(document));
 
-const controlsOf = (document: Record<string, unknown>) =>
-  ((document.surface as Surface | undefined) ?? []).map(({ key, type }) => `${key}:${type}`).join(',');
+const surfaceOf = (document: Record<string, unknown>) => (document.surface as Surface | undefined) ?? [];
+const controlId = ({ key, type }: Surface[number]) => `${key}:${type}`;
 
 // A light keeps the document it was sent, so after an app update it can play an older copy of a look.
-export function newerCopyOf(document: Record<string, unknown>) {
+// This gives the new copy with the positions of the older one, or nothing when the copy is current.
+export function latestDocumentOf(document: Record<string, unknown>) {
   const look = findPatchLook(document);
-  return look && controlsOf(look.document) !== controlsOf(document) ? look : undefined;
+  if (!look) return undefined;
+  const controls = surfaceOf(document);
+  const isCurrent = surfaceOf(look.document).map(controlId).join() === controls.map(controlId).join();
+  if (isCurrent) return undefined;
+  const positions = new Map(controls.map((control) => [controlId(control), control.default]));
+  const surface = surfaceOf(look.document).map((control) => {
+    const position = positions.get(controlId(control));
+    return position === undefined ? control : { ...control, default: position };
+  });
+  return { ...look.document, surface };
 }

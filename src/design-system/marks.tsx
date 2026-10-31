@@ -30,14 +30,6 @@ export function ChevronMark({ direction }: { direction: 'left' | 'right' | 'up' 
   );
 }
 
-export function AdjustMark() {
-  return (
-    <svg className="mark" width="14" height="10" viewBox="0 0 14 10" aria-hidden="true">
-      <path d="M0 1h14M0 5h14M0 9h14" stroke="currentColor" strokeWidth="1.3" />
-    </svg>
-  );
-}
-
 export function StatusMark({ state }: { state: 'on' | 'off' | 'silent' }) {
   return <i className="status-mark" data-state={state} />;
 }

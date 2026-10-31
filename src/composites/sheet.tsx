@@ -24,8 +24,8 @@ export function SheetFooter({ children }: { children: ReactNode }) {
   return <div className="sheet-footer">{children}</div>;
 }
 
-export function SheetNote({ children }: { children: ReactNode }) {
-  return <p className="sheet-note">{children}</p>;
+export function ControlList({ children }: { children: ReactNode }) {
+  return <div className="control-list">{children}</div>;
 }
 
 export function ControlGroup({ title, children }: { title?: string; children: ReactNode }) {

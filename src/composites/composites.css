@@ -52,15 +52,17 @@
 
 /* Room */
 
-.room-scroll { padding: max(54px, env(safe-area-inset-top)) 24px 80px; }
+.room-scroll { padding: 0 24px 80px; }
+.room-scroll::before { content: ''; display: block; height: max(54px, env(safe-area-inset-top)); }
 .room-title { margin-top: 6px; font-weight: 300; font-size: 36px; letter-spacing: -0.015em; }
 .scope-tabs { margin-top: 12px; }
 .hero { margin-top: 8px; }
+.hero-strip { position: sticky; top: env(safe-area-inset-top); z-index: 1; margin: 0 -24px; padding: 0 24px; background: var(--background); }
+.hero-strip::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: env(safe-area-inset-top); background: var(--background); }
 .hero-look { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
 .hero-look-name { font-size: 20px; }
 .room-section { display: flex; flex-direction: column; margin-top: 44px; }
 .section-title { font-weight: 300; font-size: 26px; }
-.library-help { margin-top: 6px; color: var(--text-3); font-size: 14px; line-height: 1.45; }
 .library { display: flex; flex-direction: column; gap: 36px; margin-top: 28px; }
 .library-group { display: flex; flex-direction: column; gap: 22px; }
 .library-group .eyebrow { margin-bottom: -18px; }
@@ -79,11 +81,11 @@
 
 /* Sheets */
 
-.sheet { position: absolute; left: 0; right: 0; top: 270px; bottom: 0; z-index: 4; display: flex; flex-direction: column; gap: 14px; padding: 18px 24px 40px; overflow-y: auto; background: linear-gradient(var(--background-clear), var(--background) 18px); }
+.sheet { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; gap: 14px; padding: max(54px, env(safe-area-inset-top)) 24px 40px; overflow-y: auto; background: var(--background); }
+.control-list { display: flex; flex-direction: column; gap: 22px; margin-top: 24px; }
 .sheet-heading { display: flex; align-items: center; gap: 16px; }
 .sheet-title { flex: 1; font-size: 20px; }
 .sheet-footer { display: flex; justify-content: space-between; margin-top: 8px; padding-top: 4px; border-top: 1px solid var(--track); }
-.sheet-note { color: var(--text-3); font-size: 14px; }
 .control-group { display: flex; flex-direction: column; gap: 8px; }
 .control-label { display: flex; align-items: center; justify-content: space-between; color: var(--text-2); font-size: 15px; }
 .control-line { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 44px; }

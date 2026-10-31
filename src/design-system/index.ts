@@ -23,6 +23,6 @@ export { AddKey, BackKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey }
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
-export { AdjustMark, ChevronMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
+export { ChevronMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
 export { Eyebrow, ValueText } from './text';
 export { TextField } from './text-field';

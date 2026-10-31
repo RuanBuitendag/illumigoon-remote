@@ -5,12 +5,14 @@ import { useRooms, type Room } from '../store/rooms';
 import { AddLightPage } from './add-light-page';
 import { HomeScreen } from './home-screen';
 import { LightSoftwarePage } from './light-software-page';
+import { LooksPage } from './looks-page';
 import { ArrangePage, LockPage, TakeBackPage } from './room-pages';
 import { RoomScreen } from './room-screen';
 import { SchedulesPage } from './schedules-page';
 import { SearchScreen } from './search-screen';
 
 const ROOM_PAGES = {
+  looks: LooksPage,
   schedules: SchedulesPage,
   software: LightSoftwarePage,
   lock: LockPage,

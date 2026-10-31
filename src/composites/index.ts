@@ -29,4 +29,4 @@ export { LockNote, RoomCard } from './room-card';
 export { Hero, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from './room-layout';
 export { SceneCard, SceneLine, SceneShelf } from './scene-shelf';
 export { ScreenStack, SearchLayout } from './screen-stack';
-export { ControlGroup, Sheet, SheetNote } from './sheet';
+export { ControlGroup, ControlList, SheetFooter } from './sheet';

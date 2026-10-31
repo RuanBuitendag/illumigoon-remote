@@ -223,7 +223,7 @@ export function setBrightness(lights: Light[], brightness: number) {
 }
 
 // A patch keeps each control's position in the `default` of its surface, a flat look in its params.
-function withParameter({ type, params }: AnimationState, key: string, value: ParameterValue): AnimationState {
+export function withParameter({ type, params }: AnimationState, key: string, value: ParameterValue): AnimationState {
   if (type !== 'patch') return { type, params: { ...params, [key]: value } };
   const surface = (params.surface as Parameter[] | undefined) ?? [];
   const moved = surface.map((control) => (control.key === key ? { ...control, default: value } : control));
