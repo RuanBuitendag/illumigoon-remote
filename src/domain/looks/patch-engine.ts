@@ -1,4 +1,5 @@
 import { LED_COUNT } from '../../design-system';
+import type { Parameter } from '../light-network/protocol';
 import type { EngineModule } from './engine/engine.mjs';
 
 // The patch engine as the firmware builds it, compiled to WebAssembly, so a preview shows what the
@@ -33,10 +34,17 @@ export type PatchTake = {
   frameCount: number;
 };
 
+// The engine reads no `default`, so the position of each control goes in beside the document.
+function positionsOf(document: object) {
+  const { surface = [] } = document as { surface?: Parameter[] };
+  return Object.fromEntries(surface.map(({ key, default: position }) => [key, position]));
+}
+
 // Frames follow each other in one flat array of red, green and blue bytes.
 export async function recordPatch(document: object, take: PatchTake) {
   const module = await loadEngine();
-  send(module, 'light_set_state', { animation: { type: 'patch', params: document } });
+  const animation = { type: 'patch', params: document, values: positionsOf(document) };
+  send(module, 'light_set_state', { animation });
   // A look that listens to music is dark in a quiet engine, so it hears a stand-in beat.
   module._eng_demo_audio(module._eng_uses_audio());
   tick(module, take.warmUpSeconds);
