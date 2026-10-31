@@ -236,7 +236,7 @@
       "target": "L2.palette.entries"
     },
     {
-      "key": "colours-2",
+      "key": "colours_2",
       "label": "Second colours",
       "group": "Colour",
       "type": "palette",
