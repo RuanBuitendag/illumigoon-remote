@@ -1,3 +1,5 @@
+import type { AnimationState, Parameter } from '../light-network/protocol';
+
 export type PatchLook = { id: string; name: string; document: Record<string, unknown> };
 
 type PatchFile = Record<string, unknown> & { name?: string };
@@ -13,3 +15,12 @@ function toLook([path, file]: [string, PatchFile]): PatchLook {
 export const PATCH_LOOKS = Object.entries(patchFiles)
   .map(toLook)
   .sort((a, b) => a.name.localeCompare(b.name));
+
+// A patch starts at the positions it was authored with, because nothing reads `default`. A moved
+// control therefore goes in beside the document, both to a light and to the preview engine.
+export function withPositions(animation: AnimationState): AnimationState {
+  if (animation.type !== 'patch') return animation;
+  const surface = (animation.params.surface as Parameter[] | undefined) ?? [];
+  const values = Object.fromEntries(surface.map(({ key, default: position }) => [key, position]));
+  return { ...animation, values };
+}

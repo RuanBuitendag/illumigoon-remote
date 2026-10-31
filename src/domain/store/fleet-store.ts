@@ -5,6 +5,7 @@ import { startDiscovery } from '../light-network/discovery';
 import { LightConnection } from '../light-network/light-connection';
 import { lockKey, lockProof } from '../light-network/lock-keys';
 import { lookShape } from '../looks/look-catalog';
+import { withPositions } from '../looks/looks';
 import { loadLatestVersions } from './firmware-versions';
 import type {
   AnimationState,
@@ -246,7 +247,7 @@ const appliedLook = (name: string, animation: AnimationState): AppliedLook => ({
 export function applyLook(lights: Light[], lookName: string, animation: AnimationState) {
   const applied = appliedLook(lookName, animation);
   for (const { address } of lights) {
-    connections.get(address)?.send('light_set_state', { is_on: true, animation });
+    connections.get(address)?.send('light_set_state', { is_on: true, animation: withPositions(animation) });
     updateLight(address, { isOn: true, animation, localWriteUntil: holdLocalWrite(), appliedLook: applied });
   }
 }
@@ -255,7 +256,7 @@ export type LightState = { isOn: boolean; brightness?: number; lookName?: string
 
 // One message, so a light never shows half of a scene.
 export function applyState(lights: Light[], { isOn, brightness, lookName, animation }: LightState) {
-  const state = animation ? { is_on: isOn, brightness, animation } : { is_on: isOn, brightness };
+  const state = { is_on: isOn, brightness, ...(animation && { animation: withPositions(animation) }) };
   for (const light of lights) {
     connections.get(light.address)?.send('light_set_state', state);
     updateLight(light.address, {

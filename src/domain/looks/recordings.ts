@@ -7,7 +7,7 @@ import { recordPatch } from './patch-engine';
 export const SCAN_PREVIEW: PreviewSource = { kind: 'scan', key: 'scan' };
 
 export type PreviewSource =
-  | { kind: 'patch'; key: string; document: object }
+  | { kind: 'patch'; key: string; document: Record<string, unknown> }
   | { kind: 'colours'; key: string; colours: Colour[] }
   | { kind: 'scan'; key: string };
 

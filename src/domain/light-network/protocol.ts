@@ -20,6 +20,7 @@ export type Manifest = { id: string; name: string; parameters: Parameter[] };
 export type AnimationState = {
   type: string;
   params: Record<string, unknown>;
+  values?: Record<string, unknown>;
 };
 
 export type Heartbeat = {
