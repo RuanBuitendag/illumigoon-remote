@@ -1,12 +1,8 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App } from './app';
-import { startAppUpdate } from './app-update/app-update';
-import { startFleet } from './store/fleet-store';
-import './styles.css';
+import { App, startApp } from './domain';
 
-startAppUpdate();
-startFleet();
+startApp();
 
 const root = document.getElementById('root');
 if (root) {

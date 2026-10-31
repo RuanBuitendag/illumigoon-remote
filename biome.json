@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
-  "files": { "includes": ["src/**", "!**/*.css", "!**/*.json"] },
+  "files": { "includes": ["src/**", "!**/*.css", "!**/*.json", "!src/domain/looks/engine/**"] },
   "formatter": { "enabled": false },
   "assist": { "enabled": false },
   "linter": {

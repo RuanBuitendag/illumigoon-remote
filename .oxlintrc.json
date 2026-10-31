@@ -1,0 +1,28 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "import", "unicorn"],
+  "categories": { "correctness": "error" },
+  "ignorePatterns": ["dist", "ios", "build", "src/domain/looks/engine"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/jsx-key": "error",
+    "react/only-export-components": "off",
+    "import/no-cycle": "error",
+    "import/no-self-import": "error",
+    "import/no-duplicates": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "max-lines": ["error", { "max": 600, "skipBlankLines": true, "skipComments": true }],
+    "max-lines-per-function": ["error", { "max": 150, "skipBlankLines": true, "skipComments": true, "IIFEs": true }],
+    "complexity": ["error", 25],
+    "max-depth": ["error", 4],
+    "max-params": ["error", 4],
+    "max-nested-callbacks": ["error", 4]
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**"],
+      "rules": { "no-console": "off" }
+    }
+  ]
+}

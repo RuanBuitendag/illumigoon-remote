@@ -28,6 +28,7 @@ jobs:
           fi
           xcodebuild -version
       - run: npm ci
+      - run: npm run lint
       - run: npm run build
         env:
           VITE_APP_VERSION: ipa-${{ github.run_number }}

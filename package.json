@@ -8,6 +8,8 @@
     "@capacitor/core": "8.5.3",
     "@capacitor/ios": "8.5.3",
     "@capgo/capacitor-updater": "8.54.0",
+    "@fontsource/geist": "^5.3.0",
+    "@fontsource/geist-mono": "^5.3.0",
     "@mhaberler/capacitor-zeroconf-nsd": "5.1.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -29,13 +31,14 @@
   "scripts": {
     "dev": "vite --port 5173 --strictPort",
     "build": "tsc --noEmit && vite build",
-    "lint": "npm run lint:types && npm run lint:code && npm run lint:complexity && npm run lint:layers && npm run lint:dupes && npm run lint:unused",
+    "lint": "node scripts/lint/all.mjs",
     "lint:types": "tsc --noEmit",
-    "lint:code": "oxlint --deny-warnings src",
+    "lint:code": "oxlint --deny-warnings src scripts",
     "lint:complexity": "biome lint --max-diagnostics=none",
     "lint:layers": "depcruise src --config .dependency-cruiser.cjs --output-type err",
-    "lint:dupes": "jscpd --min-tokens 50 --min-lines 5 --threshold 0 --exitCode 1 --reporters console --format typescript,tsx src",
-    "lint:unused": "knip"
+    "lint:dupes": "jscpd --min-tokens 50 --min-lines 5 --threshold 0 --exitCode 1 --reporters console --format typescript,tsx --ignore \"**/looks/engine/**\" src",
+    "lint:unused": "knip",
+    "lint:rules": "node scripts/lint/rules.mjs"
   },
   "type": "module"
 }
