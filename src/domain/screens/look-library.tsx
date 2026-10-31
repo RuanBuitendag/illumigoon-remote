@@ -2,7 +2,7 @@ import { LookGroup, LookItem, LookList } from '../../composites';
 import { applyLook, type Light } from '../store/fleet-store';
 import { useHousehold } from '../store/household-store';
 import { libraryFor, partOfRoomNote, type LibraryLook } from '../store/look-library';
-import { setSheetOpen } from '../store/navigation-store';
+import { openControls } from '../store/open-controls';
 import { isAnyOn, isMixedLook, lookNameOf } from '../store/rooms';
 import { LookStrip } from './look-strip';
 
@@ -13,7 +13,7 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
   const playingName = isMixedLook(lights) ? null : lookNameOf(lights[0]);
 
   const pick = (look: LibraryLook) => {
-    if (look.name === playingName && isAnyOn(lights)) setSheetOpen(true);
+    if (look.name === playingName && isAnyOn(lights)) openControls(lights);
     else applyLook(look.lights, look.name, look.animation);
   };
 

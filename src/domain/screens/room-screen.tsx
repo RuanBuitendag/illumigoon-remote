@@ -2,7 +2,8 @@ import { Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs }
 import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { setBrightness, setPower, type Light } from '../store/fleet-store';
-import { closeRoom, openPage, setScope, setSheetOpen, useNavigation } from '../store/navigation-store';
+import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
+import { openControls } from '../store/open-controls';
 import {
   highestBrightness,
   isAnyOn,
@@ -108,7 +109,7 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
       tint={recording?.tint}
       strip={<LookStrip source={source} shape="hero" isOn={isOn} brightness={level} />}
       lookName={isMixed ? 'Mixed' : (lookNameOf(first) ?? '')}
-      onAdjust={canAdjust ? () => setSheetOpen(true) : undefined}
+      onAdjust={canAdjust ? () => openControls(lights) : undefined}
     >
       <LevelRow
         label={room.name}

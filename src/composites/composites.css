@@ -1,6 +1,6 @@
 /* Screens */
 
-.screen-stack { position: fixed; inset: 0; overflow: hidden; background: var(--background); }
+.screen-stack { position: fixed; inset: 0; overflow: clip; background: var(--background); }
 .screen { position: absolute; inset: 0; background: var(--background); transition: transform 550ms var(--push), opacity 550ms var(--push); }
 .screen-home[data-pushed='true'] { transform: translateX(-28%); opacity: 0.3; }
 .screen-room, .screen-page { transform: translateX(102%); z-index: 2; }

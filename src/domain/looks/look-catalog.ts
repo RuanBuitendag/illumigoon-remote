@@ -129,3 +129,12 @@ export const lookShape = ({ type, params }: { type: string; params: Record<strin
 
 export const findPatchLook = (document: Record<string, unknown>): PatchLook | undefined =>
   looksByShape.get(shapeOf(document));
+
+const controlsOf = (document: Record<string, unknown>) =>
+  ((document.surface as Surface | undefined) ?? []).map(({ key, type }) => `${key}:${type}`).join(',');
+
+// A light keeps the document it was sent, so after an app update it can play an older copy of a look.
+export function newerCopyOf(document: Record<string, unknown>) {
+  const look = findPatchLook(document);
+  return look && controlsOf(look.document) !== controlsOf(document) ? look : undefined;
+}
