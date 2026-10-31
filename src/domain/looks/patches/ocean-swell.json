@@ -281,15 +281,110 @@
     {
       "key": "foam",
       "label": "Foam",
-      "type": "slider",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "target": "L2.layer.opacity",
-      "lo": 0,
-      "hi": 1,
-      "default": 35
+      "type": "toggle",
+      "invert": true,
+      "default": true,
+      "target": "L2.mute"
+    },
+    {
+      "key": "movement",
+      "label": "Movement",
+      "type": "select",
+      "options": [
+        "Smooth",
+        "Even",
+        "Sharp"
+      ],
+      "choices": [
+        "sine",
+        "triangle",
+        "square"
+      ],
+      "default": 0,
+      "target": "M4.wave"
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 24,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 96,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 176,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 255,
+          "b": 224
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "colours-2",
+      "label": "Second colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 160,
+          "g": 240,
+          "b": 255
+        }
+      ],
+      "target": "L2.palette.entries"
+    },
+    {
+      "key": "colours-3",
+      "label": "Third colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 48,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 160,
+          "b": 255
+        }
+      ],
+      "target": "L1.palette.entries"
     }
   ]
 }

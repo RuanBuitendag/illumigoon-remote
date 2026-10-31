@@ -302,6 +302,27 @@
       "hi": 15,
       "curve": 2,
       "default": 41.1388
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 100,
+          "b": 255
+        },
+        {
+          "r": 70,
+          "g": 0,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
     }
   ]
 }

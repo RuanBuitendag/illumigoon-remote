@@ -207,5 +207,28 @@
         "params": {}
       }
     ]
-  }
+  },
+  "surface": [
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 51,
+          "b": 0
+        },
+        {
+          "r": 180,
+          "g": 0,
+          "b": 0
+        }
+      ],
+      "target": "L0.palette.entries"
+    }
+  ]
 }

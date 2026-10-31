@@ -266,6 +266,42 @@
       "lo": 0,
       "hi": 1,
       "default": 50
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 96,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 42,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 0,
+          "b": 64
+        },
+        {
+          "r": 192,
+          "g": 0,
+          "b": 255
+        },
+        {
+          "r": 48,
+          "g": 0,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
     }
   ]
 }

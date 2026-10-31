@@ -358,6 +358,84 @@
       "lo": 0,
       "hi": 1,
       "default": 0
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 16,
+          "b": 64
+        },
+        {
+          "r": 64,
+          "g": 192,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "colours-2",
+      "label": "Second colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 16,
+          "b": 64
+        },
+        {
+          "r": 64,
+          "g": 192,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        }
+      ],
+      "target": "L2.palette.entries"
+    },
+    {
+      "key": "colours-3",
+      "label": "Third colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 16,
+          "b": 64
+        },
+        {
+          "r": 64,
+          "g": 192,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        }
+      ],
+      "target": "L4.palette.entries"
     }
   ]
 }

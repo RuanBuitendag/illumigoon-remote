@@ -193,6 +193,73 @@
       "lo": 0.2,
       "hi": 3,
       "default": 33.9286
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 0,
+          "b": 160
+        },
+        {
+          "r": 255,
+          "g": 51,
+          "b": 0
+        },
+        {
+          "r": 55,
+          "g": 0,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 51,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 51,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 0,
+          "b": 160
+        }
+      ],
+      "target": "L2.palette.entries"
+    },
+    {
+      "key": "colours-2",
+      "label": "Second colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        }
+      ],
+      "target": "L1.palette.entries"
     }
   ]
 }

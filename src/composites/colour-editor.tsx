@@ -24,6 +24,7 @@ type NamedColours = { id: string; name: string; colours: string[] };
 type ColourEditorProps = {
   isPalette: boolean;
   colours: string[];
+  minimumColours: number;
   sets: NamedColours[];
   onChange: (colours: string[]) => void;
   onKeepSet: (name: string, colours: string[]) => void;
@@ -42,17 +43,21 @@ function moved(colours: string[], index: number, shift: number) {
 
 type SwatchSetsProps = {
   sets: NamedColours[];
+  minimumColours: number;
   roomForColours: number;
   onPlace: (colour: string) => void;
   onApplySet: (colours: string[]) => void;
 };
 
-function SwatchSets({ sets, roomForColours, onPlace, onApplySet }: SwatchSetsProps) {
+function SwatchSets({ sets, minimumColours, roomForColours, onPlace, onApplySet }: SwatchSetsProps) {
   return sets.map(({ id, name, colours }) => (
     <div key={id}>
       <div className="swatch-set-heading">
         <Eyebrow>{name.toUpperCase()}</Eyebrow>
-        <TextKey onClick={() => onApplySet(colours.slice(0, roomForColours))}>
+        <TextKey
+          disabled={colours.length < minimumColours}
+          onClick={() => onApplySet(colours.slice(0, roomForColours))}
+        >
           {colours.length > roomForColours ? `APPLY FIRST ${roomForColours}` : `APPLY ALL ${colours.length}`}
         </TextKey>
       </div>
@@ -67,6 +72,7 @@ function SwatchSets({ sets, roomForColours, onPlace, onApplySet }: SwatchSetsPro
 
 type SlotKeysProps = {
   count: number;
+  canRemove: boolean;
   selected: number;
   copied: string | null;
   onCopy: () => void;
@@ -75,7 +81,7 @@ type SlotKeysProps = {
   onRemove: () => void;
 };
 
-function SlotKeys({ count, selected, copied, onCopy, onPaste, onMove, onRemove }: SlotKeysProps) {
+function SlotKeys({ count, canRemove, selected, copied, onCopy, onPaste, onMove, onRemove }: SlotKeysProps) {
   return (
     <KeyRow>
       <TextKey onClick={onCopy}>COPY</TextKey>
@@ -89,7 +95,7 @@ function SlotKeys({ count, selected, copied, onCopy, onPaste, onMove, onRemove }
       <TextKey disabled={selected === count - 1} onClick={() => onMove(1)}>
         <ChevronMark direction="right" />
       </TextKey>
-      <TextKey disabled={count === 1} onClick={onRemove}>
+      <TextKey disabled={!canRemove} onClick={onRemove}>
         REMOVE
       </TextKey>
     </KeyRow>
@@ -124,7 +130,8 @@ function Slots({ colours, selected, onSelect, onAdd }: SlotsProps) {
   );
 }
 
-export function ColourEditor({ isPalette, colours, sets, onChange, onKeepSet, onClose }: ColourEditorProps) {
+export function ColourEditor(props: ColourEditorProps) {
+  const { isPalette, colours, minimumColours, sets, onChange, onKeepSet, onClose } = props;
   const [selected, setSelected] = useState(0);
   const [tab, setTab] = useState<'swatches' | 'custom'>('swatches');
   const [copied, setCopied] = useState<string | null>(null);
@@ -197,6 +204,7 @@ export function ColourEditor({ isPalette, colours, sets, onChange, onKeepSet, on
           <Slots colours={colours} selected={selected} onSelect={setSelected} onAdd={add} />
           <SlotKeys
             count={colours.length}
+            canRemove={colours.length > minimumColours}
             selected={selected}
             copied={copied}
             onCopy={() => setCopied(current)}
@@ -218,6 +226,7 @@ export function ColourEditor({ isPalette, colours, sets, onChange, onKeepSet, on
       {tab === 'swatches' ? (
         <SwatchSets
           sets={sets}
+          minimumColours={minimumColours}
           roomForColours={isPalette ? MAX_COLOURS : 1}
           onPlace={place}
           onApplySet={applySet}

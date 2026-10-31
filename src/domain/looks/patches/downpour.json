@@ -305,15 +305,10 @@
     {
       "key": "gusts",
       "label": "Gusts",
-      "type": "slider",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "target": "L1.layer.opacity",
-      "lo": 0,
-      "hi": 1,
-      "default": 70
+      "type": "toggle",
+      "invert": true,
+      "default": true,
+      "target": "L1.mute"
     },
     {
       "key": "rain_bright",
@@ -327,6 +322,27 @@
       "lo": 0,
       "hi": 0.5,
       "default": 25.4546
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        }
+      ],
+      "target": "L2.palette.entries"
     }
   ]
 }

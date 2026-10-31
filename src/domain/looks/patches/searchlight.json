@@ -157,6 +157,23 @@
       "lo": 0,
       "hi": 1,
       "default": 25
+    },
+    {
+      "key": "movement",
+      "label": "Movement",
+      "type": "select",
+      "options": [
+        "Smooth",
+        "Even",
+        "Sharp"
+      ],
+      "choices": [
+        "sine",
+        "triangle",
+        "square"
+      ],
+      "default": 1,
+      "target": "M0.wave"
     }
   ]
 }

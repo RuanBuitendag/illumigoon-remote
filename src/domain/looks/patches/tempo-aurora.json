@@ -244,15 +244,10 @@
     {
       "key": "curtains",
       "label": "Curtains",
-      "type": "slider",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "target": "L1.layer.opacity",
-      "lo": 0,
-      "hi": 1,
-      "default": 50
+      "type": "toggle",
+      "invert": true,
+      "default": true,
+      "target": "L1.mute"
     },
     {
       "key": "shimmer",
@@ -266,6 +261,75 @@
       "lo": 0,
       "hi": 1,
       "default": 50
+    },
+    {
+      "key": "movement",
+      "label": "Movement",
+      "type": "select",
+      "options": [
+        "Smooth",
+        "Even",
+        "Sharp"
+      ],
+      "choices": [
+        "sine",
+        "triangle",
+        "square"
+      ],
+      "default": 0,
+      "target": "M1.wave"
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 255,
+          "b": 128
+        },
+        {
+          "r": 0,
+          "g": 255,
+          "b": 192
+        },
+        {
+          "r": 0,
+          "g": 192,
+          "b": 255
+        },
+        {
+          "r": 128,
+          "g": 0,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "colours-2",
+      "label": "Second colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        }
+      ],
+      "target": "L1.palette.entries"
     }
   ]
 }

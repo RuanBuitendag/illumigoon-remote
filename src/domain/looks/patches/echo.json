@@ -358,15 +358,31 @@
     {
       "key": "bed",
       "label": "Bed",
-      "type": "slider",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "%",
-      "target": "L3.layer.opacity",
-      "lo": 0,
-      "hi": 0.2,
-      "default": 30
+      "type": "toggle",
+      "invert": true,
+      "default": true,
+      "target": "L3.mute"
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 32,
+          "b": 255
+        },
+        {
+          "r": 32,
+          "g": 0,
+          "b": 255
+        }
+      ],
+      "target": "L3.palette.entries"
     }
   ]
 }

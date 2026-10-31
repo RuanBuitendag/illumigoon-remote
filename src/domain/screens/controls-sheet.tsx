@@ -64,6 +64,7 @@ function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter:
     <ColourEditor
       isPalette={isPalette}
       colours={toHexList(parameter)}
+      minimumColours={parameter.min ?? 1}
       sets={sets}
       onChange={(colours) => setParameter(lights, parameter.key, toValue(colours))}
       onKeepSet={addColourSet}

@@ -106,16 +106,20 @@ export const groupedLooks = () =>
     looks: group.ids.flatMap((id) => looksById.get(id) ?? []),
   }));
 
-type Surface = { key?: string; target?: string; lo?: number; hi?: number }[];
+type Surface = { key?: string; type?: string }[];
+
+const LATER_CONTROLS = new Set(['palette', 'select']);
+
+const countOf = (slots: unknown) => Object.keys((slots as object | undefined) ?? {}).length;
 
 // A light reports the document it plays without its name. The shape of a document still says
-// which look it is: what its controls reach, and how many layers and modulators it has.
+// which look it is: the names of its controls, and how many layers and modulators it has. A light
+// can still play a look from before it had palettes and options, so those do not count.
 function shapeOf(document: Record<string, unknown>) {
   const surface = (document.surface as Surface | undefined) ?? [];
-  const controls = surface.map(({ key, target, lo, hi }) => [key, target, lo, hi].join(':'));
-  const layers = (document.layers as unknown[] | undefined)?.length ?? 0;
-  const modulators = (document.modulators as unknown[] | undefined)?.length ?? 0;
-  return `${layers}/${modulators}/${controls.join(',')}`;
+  const controls = surface.filter(({ type = '' }) => !LATER_CONTROLS.has(type));
+  const keys = controls.map(({ key }) => key);
+  return `${countOf(document.layers)}/${countOf(document.modulators)}/${keys.join(',')}`;
 }
 
 const looksByShape = new Map(PATCH_LOOKS.map((look) => [shapeOf(look.document), look]));

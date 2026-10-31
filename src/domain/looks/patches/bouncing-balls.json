@@ -169,7 +169,7 @@
     {
       "key": "count",
       "label": "Balls",
-      "type": "slider",
+      "type": "stepper",
       "min": 1,
       "max": 16,
       "step": 1,
@@ -201,6 +201,32 @@
       "lo": 0,
       "hi": 1,
       "default": 39.6364
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 255,
+          "b": 98
+        },
+        {
+          "r": 0,
+          "g": 255,
+          "b": 139
+        },
+        {
+          "r": 255,
+          "g": 0,
+          "b": 157
+        }
+      ],
+      "target": "L0.palette.entries"
     }
   ]
 }
