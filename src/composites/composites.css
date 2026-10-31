@@ -53,14 +53,14 @@
 /* Room */
 
 .room-scroll { padding: 0 24px 80px; }
-.room-scroll::before { content: ''; display: block; height: max(54px, env(safe-area-inset-top)); }
+.room-scroll::before { content: ''; position: sticky; top: 0; z-index: 2; display: block; height: env(safe-area-inset-top); margin: 0 -24px max(0px, calc(54px - env(safe-area-inset-top))); background: var(--background); }
 .room-title { margin-top: 6px; font-weight: 300; font-size: 36px; letter-spacing: -0.015em; }
 .scope-tabs { margin-top: 12px; }
 .hero { margin-top: 8px; }
 .hero-strip { position: sticky; top: env(safe-area-inset-top); z-index: 1; margin: 0 -24px; padding: 0 24px; background: var(--background); }
-.hero-strip::before { content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: env(safe-area-inset-top); background: var(--background); }
-.hero-look { display: flex; align-items: center; justify-content: space-between; min-height: 44px; }
-.hero-look-name { font-size: 20px; }
+.hero-look { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
+.hero-look-name { min-width: 0; overflow: hidden; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.hero-look .text-key { flex: none; }
 .room-section { display: flex; flex-direction: column; margin-top: 44px; }
 .section-title { font-weight: 300; font-size: 26px; }
 .library { display: flex; flex-direction: column; gap: 36px; margin-top: 28px; }
