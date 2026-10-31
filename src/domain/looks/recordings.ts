@@ -113,8 +113,11 @@ const recordings = new Map<string, Recording>();
 // The engine holds one look at a time, so takes wait for each other.
 let lastTake: Promise<unknown> = Promise.resolve();
 
+// A take holds the screen until it ends, so the strips get a turn to draw between takes.
+const nextTask = () => new Promise((resolve) => window.setTimeout(resolve));
+
 function record(source: PreviewSource) {
-  const take = lastTake.then(() => framesFor(source));
+  const take = lastTake.then(nextTask).then(() => framesFor(source));
   lastTake = take.catch(() => null);
   return take.then((frames) => {
     const recording = { frames, frameCount: LOOP_FRAMES, tint: tintOf(frames), gradient: gradientOfFrames(frames) };

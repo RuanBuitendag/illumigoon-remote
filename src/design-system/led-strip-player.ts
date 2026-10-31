@@ -13,8 +13,15 @@ export type StripShape = {
   isSlow?: boolean;
 };
 
+type GlowLayer = {
+  canvas: HTMLCanvasElement;
+  context: CanvasRenderingContext2D | null;
+  image: ImageData | undefined;
+};
+
 export type Strip = {
   canvas: HTMLCanvasElement;
+  glowLayer: GlowLayer;
   shape: StripShape;
   isVisible: boolean;
   isOn: boolean;
@@ -43,11 +50,16 @@ const GLOW_MARGIN = 10;
 const GLOW_WIDTH = LED_COUNT + GLOW_MARGIN * 2;
 const GLOW_HEIGHT = 28;
 
-const glowCanvas = document.createElement('canvas');
-glowCanvas.width = GLOW_WIDTH;
-glowCanvas.height = GLOW_HEIGHT;
-const glowContext = glowCanvas.getContext('2d');
-const glowImage = glowContext?.createImageData(GLOW_WIDTH, GLOW_HEIGHT);
+// Each strip has its own layer. A browser can delay a draw, so a layer that one frame rewrites for
+// many strips can reach the screen with the glow of another strip.
+function newGlowLayer(): GlowLayer {
+  const canvas = document.createElement('canvas');
+  canvas.width = GLOW_WIDTH;
+  canvas.height = GLOW_HEIGHT;
+  const context = canvas.getContext('2d');
+  return { canvas, context, image: context?.createImageData(GLOW_WIDTH, GLOW_HEIGHT) };
+}
+
 const glowRow = new Float32Array(GLOW_WIDTH * 3);
 
 const prefersLight = window.matchMedia('(prefers-color-scheme: light)');
@@ -110,6 +122,7 @@ type Tape = { start: number; length: number; pitch: number; centre: number; heig
 
 function drawGlow(context: CanvasRenderingContext2D, strip: Strip, level: number, tape: Tape) {
   const { spread, glow } = strip.shape;
+  const { canvas: glowCanvas, context: glowContext, image: glowImage } = strip.glowLayer;
   if (level < 0.002 || glow <= 0 || !glowContext || !glowImage) return;
   blurAlongStrip(strip.pixels, level, kernelFor(spread));
   for (let row = 0; row < GLOW_HEIGHT; row++) paintGlowRow(row, strip.pixels, level, glowImage.data);
@@ -260,6 +273,7 @@ const viewObserver = new IntersectionObserver(
 export function addStrip(canvas: HTMLCanvasElement, shape: StripShape, onFirstView: () => void) {
   const strip: Strip = {
     canvas,
+    glowLayer: newGlowLayer(),
     shape,
     isVisible: false,
     isOn: true,
