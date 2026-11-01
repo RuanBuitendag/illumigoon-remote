@@ -1164,6 +1164,27 @@
   .patch-editor .body .grow { display: none; }
   .patch-editor .tabs { flex-wrap: wrap; }
 
+  /* A sheet is the whole screen, and each row of a table wraps onto its own lines. */
+  .patch-editor .editor-overlay { padding: 0; }
+  .patch-editor .editor-sheet { width: 100% !important; height: 100dvh; max-height: 100dvh; border: 0; }
+  .patch-editor .editor-sheet .sheethead { height: auto; min-height: 56px; flex-wrap: wrap; gap: 8px; padding: 10px 16px; }
+  .patch-editor .editor-sheet .sheethead > .row { flex-wrap: wrap; min-width: 0; }
+  .patch-editor .editor-sheet .sheetcols { display: none; }
+  .patch-editor .editor-sheet > .row { flex-wrap: wrap; height: auto !important; }
+  .patch-editor .editor-sheet input { min-width: 0; max-width: 100%; }
+  .patch-editor .mrow { height: auto; min-height: 58px; flex-wrap: wrap; gap: 6px 12px; padding-top: 10px; padding-bottom: 10px; }
+  .patch-editor .librow .libacts { opacity: 1; }
+  .patch-editor .modeditor { flex-direction: column; }
+  .patch-editor .modeditor > * { width: 100% !important; }
+
+  /* The house: what is being sent, then the rooms one above the other. */
+  .patch-editor .sendbar { flex-wrap: wrap; gap: 14px; }
+  .patch-editor .sendbar > .col { width: 100% !important; }
+  .patch-editor .sendbar > .vr, .patch-editor .sendbar > .grow { display: none; }
+  .patch-editor .rooms { grid-template-columns: minmax(0, 1fr); }
+  .patch-editor .room { grid-column: auto !important; }
+  .patch-editor .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+
   /* The heading of the selected layer: its name, then the signal chain on a line of its own. */
   .patch-editor .centre > .row:first-child { height: auto !important; flex-wrap: wrap; gap: 8px 14px; padding: 12px 16px !important; }
   .patch-editor .centre > .row:first-child > .row { flex-wrap: wrap; row-gap: 6px; }

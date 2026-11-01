@@ -14,9 +14,11 @@
     "./phone": {
       "types": "./src/phone/phone-types.d.ts",
       "default": "./src/phone/index.ts"
-    }
+    },
+    "./wire": "./src/device/wire.ts"
   },
   "dependencies": {
+    "@illumigoon/led-tape": "*",
     "bonjour-service": "^1.3.0",
     "idb-keyval": "^6.2.2",
     "path-browserify": "^1.0.1",

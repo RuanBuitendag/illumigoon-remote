@@ -77,13 +77,3 @@ export type NewLight = { mac: string; relayAddress: string };
 export type LightStateResponse = {
   animation: AnimationState | null;
 };
-
-export type Message = {
-  type: string;
-  source: string;
-  payload: unknown;
-};
-
-type Envelope = { type: string; id: number; source: string; target: string; payload: object };
-
-export const toEnvelope = (envelope: Envelope) => JSON.stringify({ ...envelope, version: 1, payloadVersion: 1 });

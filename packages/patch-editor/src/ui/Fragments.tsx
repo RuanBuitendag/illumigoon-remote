@@ -265,7 +265,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         <Hr />
 
         {/* ---- columns ---- */}
-        <div className="row" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
           <div style={{ width: 210 }}>
             <Lab className="dim">NAME</Lab>
           </div>

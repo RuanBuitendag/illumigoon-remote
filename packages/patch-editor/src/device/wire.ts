@@ -8,7 +8,9 @@
 import type { Patch } from '../domain/patch';
 import { serialise } from '../domain/patchDocument';
 import { StateWatch } from '../domain/stale';
-import { fromThisDevice, linkStep, type Link, type LinkEvent } from '../domain/connection';
+import {
+  backoffFor, fromThisDevice, linkStep, MAX_ATTEMPTS, type Link, type LinkEvent,
+} from '../domain/connection';
 import { Pending, type Answer } from './pending';
 import { sourceId } from './source';
 import { FLASH } from '../domain/house';
@@ -62,6 +64,10 @@ export interface WireEvents {
    * arrives while something holds `listenAudio()`: a light streams to a subscriber and nobody else.
    */
   audio(payload: unknown): void;
+  /** Every frame this light sent, for a caller that reads types this class does not. */
+  message(type: string, payload: unknown): void;
+  /** A light with no Wi-Fi of its own, heard through this one. */
+  newLight(mac: string): void;
   /*
    * THERE IS NO `wrote` EVENT. There was one, for the editor to clear its "changed
    * elsewhere" badge on: five write paths had to announce themselves and three of them
@@ -145,7 +151,9 @@ export class Wire {
     'limits',
   ];
 
-  private readonly source = sourceId();
+  public readonly url: string;
+  private readonly source: string;
+  private readonly keepTrying: boolean;
   private handlers: Partial<WireEvents> = {};
   private closing = false;
   private reconnectTimer: number | null = null;
@@ -209,7 +217,19 @@ export class Wire {
    */
   private endHandled = false;
 
-  constructor(public readonly url: string) {}
+  /**
+   * @param options.source the name to sign messages with.
+   * @param options.keepTrying never give up. The app holds a socket to each light for as long as
+   *        it runs, so a light that is off for a day is picked up again when it comes back.
+   */
+  constructor(
+    url: string,
+    options: { source?: string; keepTrying?: boolean } = {},
+  ) {
+    this.url = url;
+    this.source = options.source ?? sourceId();
+    this.keepTrying = options.keepTrying ?? false;
+  }
 
   on<K extends keyof WireEvents>(k: K, fn: WireEvents[K]) {
     this.handlers[k] = fn;
@@ -281,7 +301,7 @@ export class Wire {
    * close handler, reachable only by unplugging something.
    */
   private step(e: LinkEvent) {
-    const next = linkStep(this.link, e);
+    const next = this.neverGone(linkStep(this.link, e));
     if (next === this.link) return;
     this.link = next;
 
@@ -295,6 +315,28 @@ export class Wire {
       return;
     }
     this.emit('link', next);
+  }
+
+  private neverGone(next: Link): Link {
+    if (next.at !== 'gone' || !this.keepTrying) return next;
+    const attempt = MAX_ATTEMPTS - 1;
+    return { at: 'backoff', attempt, wait: backoffFor(MAX_ATTEMPTS), cause: next.cause };
+  }
+
+  /** Try now, because the phone woke or the network came back. A live socket stays. */
+  reconnect() {
+    if (this.isOpen) return;
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    this.stopSilence();
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+    }
+    this.link = { at: 'connecting', attempt: 1 };
+    this.connect();
   }
 
   /**
@@ -401,6 +443,10 @@ export class Wire {
     // `fromThisDevice`. Logged rather than dropped silently, because a relayed heartbeat in
     // the log is how you find out a light in this room has lost its Wi-Fi.
     const from = typeof msg.source === 'string' ? msg.source : '';
+    if (type === 'unprovisioned_heartbeat') {
+      this.emit('newLight', from);
+      return;
+    }
     if (!fromThisDevice(this.target, from)) {
       this.emit('log', 'rx', `${type} relayed for ${from}`, raw.length);
       return;
@@ -408,6 +454,7 @@ export class Wire {
 
     this.emit('log', 'rx', type, raw.length);
     const p = msg.payload ?? {};
+    this.emit('message', type, p);
 
     switch (type) {
       case 'heartbeat_ws':
@@ -505,7 +552,7 @@ export class Wire {
     return this.watch.saw(hash, now);
   }
 
-  private send(type: string, payload: unknown) {
+  send(type: string, payload: unknown, target = this.target) {
     if (!this.isOpen) return false;
     const frame = JSON.stringify({
       type,
@@ -513,7 +560,7 @@ export class Wire {
       payloadVersion: 1,
       id: this.seq++,
       source: this.source,
-      target: this.target,
+      target,
       payload,
     });
     this.ws!.send(frame);

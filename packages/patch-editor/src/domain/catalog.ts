@@ -291,10 +291,15 @@ export const nodeById = (id: string): NodeSpec | undefined => currentCatalog().n
  * of them white-screened the editor. See LIFE-702, and `ui/Boundary.tsx` for what catches it.
  */
 export class MissingNode extends Error {
-  constructor(readonly node: string, readonly param?: string) {
+  readonly node: string;
+  readonly param?: string;
+
+  constructor(node: string, param?: string) {
     super(param
       ? `this light's catalog has no '${param}' on its '${node}' node`
       : `this light's catalog has no '${node}' node`);
+    this.node = node;
+    this.param = param;
     this.name = 'MissingNode';
   }
 }

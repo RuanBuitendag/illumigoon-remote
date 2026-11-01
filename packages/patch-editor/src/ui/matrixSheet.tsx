@@ -36,7 +36,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
           </Mono>
         </SheetHead>
 
-        <div className="row" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
           <div style={{ width: 52 }}>
             <Lab className="dim">SRC</Lab>
           </div>

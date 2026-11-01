@@ -48,6 +48,7 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
     <>
       <Hr />
       <div
+        className="modeditor"
         style={{ padding: '16px 18px 20px', display: 'flex', gap: 26, alignItems: 'flex-start' }}
       >
         <div className="col" style={{ gap: 12, width: 300, flexShrink: 0 }}>

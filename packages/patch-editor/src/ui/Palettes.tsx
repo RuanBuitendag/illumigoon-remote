@@ -221,7 +221,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
         <Hr />
 
         {/* ---- columns ---- */}
-        <div className="row" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
           <div style={{ width: 186 }}>
             <Lab className="dim">PALETTE</Lab>
           </div>

@@ -1,22 +1,17 @@
+import { Wire } from '@illumigoon/patch-editor/wire';
 import { APP_IDENTITY } from './app-identity';
-import {
-  toEnvelope,
-  type ConfigValue,
-  type DeviceInfo,
-  type Heartbeat,
-  type LightStateResponse,
-  type Manifest,
-  type Message,
-  type ScheduleEntry,
-  type Transition,
+import type {
+  ConfigValue,
+  DeviceInfo,
+  Heartbeat,
+  LightStateResponse,
+  Manifest,
+  ScheduleEntry,
+  Transition,
 } from './protocol';
 
-const RECONNECT_MS = 2000;
-const SILENCE_MS = 6000;
 const WRITE_SAMPLE_MS = 80;
 const MANIFEST_RETRY_MS = 10000;
-const OWN_WRITE_MS = 5000;
-const STATE_WRITES = new Set(['light_set_state', 'light_apply_params']);
 
 export type LightEvents = {
   onHeartbeat: (heartbeat: Heartbeat) => void;
@@ -30,35 +25,30 @@ export type LightEvents = {
   onOffline: () => void;
 };
 
-// One socket to one light. A Master also forwards the heartbeats of other lights on this socket,
-// so everything that does not come from this light is dropped.
+// What the home and room screens need from one light, on the editor's socket client. A Master also
+// forwards the heartbeats of other lights, and the client drops those by the sender of each frame.
 export class LightConnection {
-  private socket: WebSocket | null = null;
-  private deviceId: string | null = null;
-  private nextId = 1;
-  private lastStateHash: number | undefined;
+  private readonly wire: Wire;
+  private readonly events: LightEvents;
+  private hasIdentity = false;
   private lastScheduleHash: number | undefined;
-  private ownWriteUntil = 0;
   private hasManifests = false;
-  private closed = false;
-  private retryTimer: number | undefined;
-  private silenceTimer: number | undefined;
   private manifestTimer: number | undefined;
   private writeTimer: number | undefined;
   private readonly pendingWrites = new Map<string, () => void>();
-  private readonly address: string;
-  private readonly events: LightEvents;
 
   constructor(address: string, events: LightEvents) {
-    this.address = address;
     this.events = events;
-    this.open();
+    this.wire = new Wire(`ws://${address}/ws`, { source: APP_IDENTITY, keepTrying: true });
+    this.wire
+      .on('link', ({ at }) => this.onLink(at))
+      .on('message', (type, payload) => this.handle(type, payload))
+      .on('newLight', (mac) => this.events.onNewLight(mac));
+    this.wire.connect();
   }
 
-  send(type: string, payload: object = {}, target = '') {
-    if (this.socket?.readyState !== WebSocket.OPEN) return;
-    if (STATE_WRITES.has(type)) this.ownWriteUntil = Date.now() + OWN_WRITE_MS;
-    this.socket.send(toEnvelope({ type, id: this.nextId++, source: APP_IDENTITY, target, payload }));
+  send(type: string, payload: object = {}, target?: string) {
+    this.wire.send(type, payload, target);
   }
 
   // For drags: a light takes the latest value at a steady rate, not one message per touch event.
@@ -68,16 +58,12 @@ export class LightConnection {
   }
 
   reconnect() {
-    if (this.socket?.readyState === WebSocket.OPEN) return;
-    this.socket?.close();
-    window.clearTimeout(this.retryTimer);
-    this.open();
+    this.wire.reconnect();
   }
 
   close() {
-    this.closed = true;
-    window.clearTimeout(this.retryTimer);
-    this.socket?.close();
+    window.clearTimeout(this.manifestTimer);
+    this.wire.close();
   }
 
   private flushWrites() {
@@ -86,30 +72,18 @@ export class LightConnection {
     this.pendingWrites.clear();
   }
 
-  private open() {
-    const socket = new WebSocket(`ws://${this.address}/ws`);
-    this.socket = socket;
-    this.deviceId = null;
-    socket.onopen = () => {
-      this.send('device_info_req');
+  private onLink(at: string) {
+    if (at === 'open') {
       this.send('light_state_req');
       this.send('light_transitions_req');
       this.send('device_config_get', { key: 'ota_url' });
       this.requestManifests();
-      this.expectHeartbeat();
-    };
-    socket.onmessage = (event) => this.receive(String(event.data));
-    socket.onclose = () => this.onClosed(socket);
-  }
-
-  private onClosed(socket: WebSocket) {
-    if (socket !== this.socket) return;
-    window.clearTimeout(this.silenceTimer);
-    window.clearTimeout(this.manifestTimer);
-    this.lastStateHash = undefined;
-    this.lastScheduleHash = undefined;
-    this.events.onOffline();
-    if (!this.closed) this.retryTimer = window.setTimeout(() => this.open(), RECONNECT_MS);
+    } else if (at === 'backoff') {
+      window.clearTimeout(this.manifestTimer);
+      this.hasIdentity = false;
+      this.lastScheduleHash = undefined;
+      this.events.onOffline();
+    }
   }
 
   private requestManifests() {
@@ -119,31 +93,13 @@ export class LightConnection {
     this.manifestTimer = window.setTimeout(() => this.requestManifests(), MANIFEST_RETRY_MS);
   }
 
-  private expectHeartbeat() {
-    window.clearTimeout(this.silenceTimer);
-    this.silenceTimer = window.setTimeout(() => this.socket?.close(), SILENCE_MS);
-  }
-
-  private receive(text: string) {
-    let message: Message;
-    try {
-      message = JSON.parse(text);
-    } catch {
+  private handle(type: string, payload: unknown) {
+    if (type === 'device_info_res') {
+      this.hasIdentity = true;
+      this.events.onDeviceInfo(payload as DeviceInfo);
+    } else if (!this.hasIdentity) {
       return;
-    }
-    if (message.type === 'device_info_res') {
-      const info = message.payload as DeviceInfo;
-      this.deviceId = info.device_id;
-      this.events.onDeviceInfo(info);
-    } else if (message.type === 'unprovisioned_heartbeat') {
-      this.events.onNewLight(message.source);
-    } else if (message.source === this.deviceId) {
-      this.handle(message);
-    }
-  }
-
-  private handle({ type, payload }: Message) {
-    if (type === 'heartbeat_ws') {
+    } else if (type === 'heartbeat_ws') {
       this.onHeartbeat(payload as Heartbeat);
     } else if (type === 'light_state_res') {
       this.events.onState(payload as LightStateResponse);
@@ -161,15 +117,11 @@ export class LightConnection {
   }
 
   private onHeartbeat(heartbeat: Heartbeat) {
-    this.expectHeartbeat();
     this.events.onHeartbeat(heartbeat);
     this.readScheduleWhenChanged(heartbeat);
-    if (heartbeat.state_hash === this.lastStateHash) return;
     // The reply for a long look can need more memory than the light has in one piece, and a failed
     // allocation restarts it. After a write from this app the app already holds that state.
-    const isOwnWrite = Date.now() < this.ownWriteUntil;
-    if (this.lastStateHash !== undefined && !isOwnWrite) this.send('light_state_req');
-    this.lastStateHash = heartbeat.state_hash;
+    if (this.wire.elsewhere(heartbeat.state_hash)) this.send('light_state_req');
   }
 
   private readScheduleWhenChanged({ light_sched_hash: hash }: Heartbeat) {
