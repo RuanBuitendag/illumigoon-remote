@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import type { Colour } from '../../design-system';
 import { APP_IDENTITY } from '../light-network/app-identity';
 import { startDiscovery } from '../light-network/discovery';
 import { LightConnection } from '../light-network/light-connection';
@@ -26,6 +25,7 @@ const LOCAL_WRITE_HOLD_MS = 1200;
 
 // A light renews nothing by itself, so a flash has to be asked for again before it runs out.
 export const FLASH_MS = 10000;
+const FIND_LIGHT_MS = 4000;
 
 export type Light = {
   address: string;
@@ -327,12 +327,21 @@ export function setScheduleEnabled(lights: Light[], id: string, isOn: boolean) {
   }
 }
 
-const FLASH_COLOUR: Colour = { r: 255, g: 255, b: 255 };
+const flashOf = (isOn: boolean, milliseconds: number) => ({
+  enable: isOn,
+  color: { r: 255, g: 255, b: 255 },
+  effect: 'breathe',
+  ttl_ms: milliseconds,
+});
+
+// A flash is never saved and ends by itself, so a light goes back to what it showed.
+export function flashLights(lights: Light[]) {
+  for (const { address } of lights) connections.get(address)?.send('light_identify', flashOf(true, FIND_LIGHT_MS));
+}
 
 // Sent to the light that reported the new one, which passes it on.
 export function flashNewLight({ mac, relayAddress }: NewLight, isOn: boolean) {
-  const flash = { enable: isOn, color: FLASH_COLOUR, effect: 'breathe', ttl_ms: FLASH_MS };
-  connections.get(relayAddress)?.send('light_identify', flash, mac);
+  connections.get(relayAddress)?.send('light_identify', flashOf(isOn, FLASH_MS), mac);
 }
 
 export function addNewLightToRoom({ mac, relayAddress }: NewLight, roomId: string, name: string) {

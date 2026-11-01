@@ -1,5 +1,6 @@
 import { Switch } from '@base-ui/react/switch';
 import type { ReactNode } from 'react';
+import { useHold } from './hold';
 import { ChevronMark } from './marks';
 
 type PressProps = {
@@ -8,11 +9,14 @@ type PressProps = {
   isPressed?: boolean;
   disabled?: boolean;
   onClick: () => void;
+  onHold?: () => void;
+  onHoldEnd?: () => void;
   children: ReactNode;
 };
 
 // The one tap target with no look of its own. Layers above give it a layout through `className`.
-export function Press({ className, label, isPressed, disabled, onClick, children }: PressProps) {
+export function Press({ className, label, isPressed, disabled, onClick, onHold, onHoldEnd, children }: PressProps) {
+  const hold = useHold(disabled ? undefined : onHold, onHoldEnd);
   return (
     <button
       type="button"
@@ -20,7 +24,12 @@ export function Press({ className, label, isPressed, disabled, onClick, children
       aria-label={label}
       aria-pressed={isPressed}
       disabled={disabled}
-      onClick={onClick}
+      data-held={hold.isHeld}
+      onClick={() => {
+        if (hold.isTap.current) onClick();
+      }}
+      onPointerDown={hold.onPointerDown}
+      onContextMenu={hold.onContextMenu}
     >
       {children}
     </button>

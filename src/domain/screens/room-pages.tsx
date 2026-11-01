@@ -242,6 +242,7 @@ export function ArrangePage({ room }: { room: Room }) {
       </PageSection>
       <PageSection>
         <Eyebrow>LIGHTS, IN ORDER</Eyebrow>
+        {names.length > 1 && <PageHint>Hold a light on the room screen and it breathes white.</PageHint>}
         {room.lights.map((light, index) => (
           <ArrangeRow
             key={light.address}

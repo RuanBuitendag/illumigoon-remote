@@ -1,7 +1,7 @@
 import { Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from '../../composites';
 import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { setBrightness, setPower, type Light } from '../store/fleet-store';
+import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
 import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
 import {
   highestBrightness,
@@ -51,6 +51,7 @@ function LightRows({ room }: { room: Room }) {
           state={lightState(light)}
           disabled={!light.isOnline || light.isLockedByOther}
           onClick={() => setPower([light], !light.isOn)}
+          onHold={() => flashLights([light])}
         />
       ))}
     </RoomSection>

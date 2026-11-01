@@ -78,11 +78,12 @@ type LightRowProps = {
   state: 'on' | 'off' | 'silent';
   disabled: boolean;
   onClick: () => void;
+  onHold: () => void;
 };
 
-export function LightRow({ name, status, state, disabled, onClick }: LightRowProps) {
+export function LightRow({ name, status, state, disabled, onClick, onHold }: LightRowProps) {
   return (
-    <Press className="light-row" disabled={disabled} onClick={onClick}>
+    <Press className="light-row" disabled={disabled} onClick={onClick} onHold={onHold}>
       <span>{name}</span>
       <span className="light-status">{status}</span>
       <StatusMark state={state} />
