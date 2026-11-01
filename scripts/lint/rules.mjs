@@ -5,6 +5,7 @@
 //   - Composites build on the design system: no raw controls, no raw colours, no inline look.
 //   - Only the design system holds raw colours, in TypeScript and in CSS.
 //   - The two CSS files stay with their layer.
+//   - The editor's style sheet takes every colour from the tokens.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,6 +13,7 @@ import path from 'node:path';
 const SOURCE = 'src';
 const LAYERS = ['design-system', 'composites', 'domain'];
 const GENERATED = /^src\/domain\/looks\/engine\//;
+const EDITOR_STYLES = 'packages/patch-editor/src/styles.css';
 
 const walk = (folder) =>
   fs.readdirSync(folder, { withFileTypes: true }).flatMap((entry) => {
@@ -72,6 +74,8 @@ for (const file of walk(SOURCE)) {
   else if (file.endsWith('.css')) checkCss(file, layer);
   else if (/\.tsx?$/.test(file)) runChecks(file, CODE_CHECKS[layer]);
 }
+
+runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);
 
 for (const layer of ['design-system', 'composites']) {
   const door = `${SOURCE}/${layer}/index.ts`;

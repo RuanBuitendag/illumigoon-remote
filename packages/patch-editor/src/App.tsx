@@ -47,7 +47,7 @@ export default function App({ light, onClose }: AppProps) {
   // in the house is still the one picked with a light open.
   const [chosen, setChosen] = useState<Chosen | null>(null);
   // On a phone the library takes the whole screen, so it starts shut.
-  const [railShut, toggleRail] = useCollapsed('rail', matchMedia('(max-width: 820px)').matches);
+  const [railShut, toggleRail] = useCollapsed('rail', matchMedia('(max-width: 899px)').matches);
   const [houseNotice, setHouseNotice] = useState<string | null>(null);
   // Every light on the network, for the house view and the light switcher in the top bar.
   const feed = useHouseFeed();

@@ -23,6 +23,18 @@
   --sans: 'Geist', -apple-system, system-ui, sans-serif;
   --mono: 'Geist Mono', ui-monospace, monospace;
   --push: cubic-bezier(0.32, 0.72, 0, 1);
+  --wash: rgba(255, 255, 255, 0.045);
+  --wash-strong: rgba(255, 255, 255, 0.09);
+  --scrim: rgba(9, 9, 10, 0.72);
+  --float-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  --well: #0b0b0c;
+  --modulation: var(--fill);
+  --modulation-soft: var(--text-1);
+  --modulation-dim: var(--text-4);
+  --modulation-ghost: rgba(var(--tint), 0.1);
+  --modulation-glow: rgba(var(--tint), 0.7);
+  --warn: #c9954a;
+  --bad: #c85f4e;
 }
 
 @media (prefers-color-scheme: light) {
@@ -46,6 +58,15 @@
     --led-off: #2a2a2d;
     --fill: #161618;
     --fill-glow: none;
+    --wash: rgba(0, 0, 0, 0.04);
+    --wash-strong: rgba(0, 0, 0, 0.08);
+    --scrim: rgba(242, 241, 237, 0.72);
+    --float-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+    --well: #131315;
+    --modulation-ghost: rgba(0, 0, 0, 0.08);
+    --modulation-glow: rgba(0, 0, 0, 0.25);
+    --warn: #96661f;
+    --bad: #a8412f;
   }
 }
 
