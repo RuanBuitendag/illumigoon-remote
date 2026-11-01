@@ -53,14 +53,19 @@ export const saveScene = (scene: Scene) =>
     useLibrary.setState(({ scenes }) => ({ scenes: [...scenes, entry] }));
   });
 
-export const renameScene = ({ file, lights, created }: SceneEntry, name: string) =>
+const rewriteScene = ({ file, created }: SceneEntry, scene: Scene) =>
   attempt(async () => {
     const { writeScene } = await library();
-    const entry = await writeScene(file, { name, lights, ...(created && { created }) });
+    const entry = await writeScene(file, { ...scene, ...(created && { created }) });
     useLibrary.setState(({ scenes }) => ({
-      scenes: scenes.map((scene) => (scene.file === file ? entry : scene)),
+      scenes: scenes.map((known) => (known.file === file ? entry : known)),
     }));
   });
+
+export const renameScene = (entry: SceneEntry, name: string) => rewriteScene(entry, { name, lights: entry.lights });
+
+export const updateScene = (entry: SceneEntry, lights: SceneLight[]) =>
+  rewriteScene(entry, { name: entry.name, lights });
 
 export const removeScene = ({ file }: SceneEntry) =>
   attempt(async () => {

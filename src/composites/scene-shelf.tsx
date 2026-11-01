@@ -19,13 +19,14 @@ type SceneCardProps = {
   onApply: () => void;
   onHold: () => void;
   onHoldEnd: () => void;
+  onUpdate: () => void;
   onRename: () => void;
   onDelete: () => void;
   children: ReactNode;
 };
 
 export function SceneCard(props: SceneCardProps) {
-  const { name, summary, isEditing, onApply, onHold, onHoldEnd, onRename, onDelete, children } = props;
+  const { name, summary, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
   return (
     <div className="scene-card">
       <Press className="scene-apply" disabled={isEditing} onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
@@ -35,6 +36,7 @@ export function SceneCard(props: SceneCardProps) {
       </Press>
       {isEditing && (
         <span className="scene-edit">
+          <Press onClick={onUpdate}>Update</Press>
           <Press onClick={onRename}>Rename</Press>
           <Press onClick={onDelete}>Delete</Press>
         </span>

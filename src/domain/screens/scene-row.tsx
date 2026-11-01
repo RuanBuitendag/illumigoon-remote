@@ -1,10 +1,19 @@
 import { useState } from 'react';
 import { SceneCard, SceneLine, SceneShelf } from '../../composites';
 import { useRecording } from '../looks/recordings';
-import { removeScene, useLibrary, type SceneEntry, type SceneLight } from '../store/library-store';
+import { removeScene, updateScene, useLibrary, type SceneEntry, type SceneLight } from '../store/library-store';
 import { endPreview, previewScene } from '../store/look-preview';
 import { previewOfAnimation, type Room } from '../store/rooms';
-import { animationOf, applyScene, roomNameOf, roomOfScene, roomTag, sceneSummary } from '../store/scenes';
+import {
+  animationOf,
+  applyScene,
+  refreshScene,
+  roomNameOf,
+  roomOfScene,
+  roomTag,
+  sceneSummary,
+  WHOLE_HOUSE,
+} from '../store/scenes';
 import { SaveSceneSheet } from './save-scene-sheet';
 
 function LightLine({ tag, light }: { tag: string; light: SceneLight }) {
@@ -29,6 +38,11 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
   const [leftOut, setLeftOut] = useState<string[]>([]);
   const [sheet, setSheet] = useState<SceneSheet | null>(null);
   const leftOutNote = leftOut.length > 0 ? `Left out ${leftOut.join(', ')}. They can't be changed now.` : null;
+  const update = (scene: SceneEntry) => {
+    const { lights, kept } = refreshScene(scene, rooms, room?.id ?? WHOLE_HOUSE);
+    setLeftOut(kept);
+    void updateScene(scene, lights);
+  };
 
   return (
     <>
@@ -48,6 +62,7 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             onApply={() => setLeftOut(applyScene(scene, rooms))}
             onHold={() => previewScene(scene, rooms)}
             onHoldEnd={endPreview}
+            onUpdate={() => update(scene)}
             onRename={() => setSheet({ renaming: scene })}
             onDelete={() => void removeScene(scene)}
           >

@@ -19,6 +19,13 @@ export function captureScene(name: string, rooms: Room[], scope: string): Scene 
   return { name, lights };
 }
 
+// A saved light that is not answering keeps what it had, and the names say which ones those are.
+export function refreshScene(scene: Scene, rooms: Room[], scope: string) {
+  const { lights } = captureScene(scene.name, rooms, scope);
+  const kept = scene.lights.filter(({ id }) => !lights.some((light) => light.id === id));
+  return { lights: [...lights, ...kept], kept: kept.map(({ name }) => name) };
+}
+
 export const sceneLookName = (light: Light, animation: AnimationState) =>
   lookNameOf({ ...light, animation, appliedLook: undefined }) ?? undefined;
 
