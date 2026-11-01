@@ -69,8 +69,10 @@
 .library-group .eyebrow { margin-bottom: -18px; }
 .library-note { margin-bottom: -8px; color: var(--text-4); font-size: 13.5px; }
 .look-item { display: block; width: 100%; }
-.look-item .led-strip { transition: filter 140ms ease-out; }
-.look-item[data-held='true'] .led-strip { filter: brightness(1.35); }
+.look-item .led-strip,
+.scene-bar { transition: filter 140ms ease-out; }
+.look-item[data-held='true'] .led-strip,
+.scene-apply[data-held='true'] .scene-bar { filter: brightness(1.35); }
 .look-item-heading { display: flex; align-items: center; gap: 8px; }
 .look-item-name { font-size: 17px; }
 .look-playing { margin-left: auto; color: var(--text-3); font: 500 10px/1 var(--mono); letter-spacing: 0.14em; }

@@ -19,6 +19,9 @@ export function captureScene(name: string, rooms: Room[], scope: string): Scene 
   return { name, lights };
 }
 
+export const sceneLookName = (light: Light, animation: AnimationState) =>
+  lookNameOf({ ...light, animation, appliedLook: undefined }) ?? undefined;
+
 // A light that cannot play the look keeps its own, and still follows the power and the level.
 function applyToLight(light: Light, saved: SceneLight) {
   const animation = animationOf(saved);
@@ -26,7 +29,7 @@ function applyToLight(light: Light, saved: SceneLight) {
   applyState([light], {
     isOn: saved.is_on,
     brightness: saved.brightness,
-    lookName: canShow ? (lookNameOf({ ...light, animation, appliedLook: undefined }) ?? undefined) : undefined,
+    lookName: canShow ? sceneLookName(light, animation) : undefined,
     animation: canShow ? animation : null,
   });
 }

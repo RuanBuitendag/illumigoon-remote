@@ -41,10 +41,11 @@ function statusOf({ isOnline, isOn }: Light) {
 }
 
 function LightRows({ room }: { room: Room }) {
+  const lights = useShownLights(room.lights);
   if (room.lights.length < 2) return null;
   return (
     <RoomSection eyebrow="LIGHTS">
-      {room.lights.map((light) => (
+      {lights.map((light) => (
         <LightRow
           key={light.address}
           name={light.name}

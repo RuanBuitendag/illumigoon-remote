@@ -11,8 +11,10 @@ import {
   type LightArrival,
   type LightHoldState,
 } from './fleet-store';
+import { lightIdOf, type Scene, type SceneLight } from './library-store';
 import { useNavigation } from './navigation-store';
-import { canPlay } from './rooms';
+import { canPlay, type Room } from './rooms';
+import { animationOf, sceneLookName } from './scenes';
 
 // Hold a look and the lights show it until the finger lifts. Firmware before this version can run
 // out of memory and restart when a long look replaces a long look. A light also saves its look a
@@ -72,19 +74,21 @@ export function useShownLights(lights: Light[]) {
 
 type PreviewTarget = LightHoldState & { lookName?: string };
 
+type PlannedLight = PreviewStep & { target: PreviewTarget };
+
 type Session = { addresses: string[]; timers: number[]; stopWatching: () => void };
 
 let session: Session | null = null;
 const restoreTimers = new Map<string, number>();
 
-function changesLight({ light, action }: PreviewStep, { isOn, brightness }: PreviewTarget) {
+function changesLight({ light, action, target: { isOn, brightness } }: PlannedLight) {
   if (action === 'never') return false;
   return action === 'look' || isOn !== light.isOn || (brightness ?? light.brightness) !== light.brightness;
 }
 
-function carryOut(step: PreviewStep, target: PreviewTarget, timers: number[]) {
-  if (!changesLight(step, target)) return;
-  const { light, action, sendAt } = step;
+function carryOut(planned: PlannedLight, timers: number[]) {
+  if (!changesLight(planned)) return;
+  const { light, action, sendAt, target } = planned;
   const animation = action === 'look' ? target.animation : undefined;
   const arrival = isOlder(light) ? undefined : ARRIVAL;
   const send = () => writeHold(light, { ...target, animation }, arrival);
@@ -93,10 +97,13 @@ function carryOut(step: PreviewStep, target: PreviewTarget, timers: number[]) {
   else send();
 }
 
-function shownBy({ light }: PreviewStep, { isOn, brightness, animation, lookName }: PreviewTarget): ShownLight {
+// A light that sits a hold out keeps its power and level on screen too.
+function shownBy({ light, action, target }: PlannedLight): ShownLight {
+  const { isOn, brightness, animation, lookName } = target;
+  const isChanged = action !== 'never';
   return {
-    isOn,
-    brightness: brightness ?? light.brightness,
+    isOn: isChanged ? isOn : light.isOn,
+    brightness: (isChanged ? brightness : undefined) ?? light.brightness,
     animation: animation ?? light.animation,
     appliedLook: animation && lookName ? appliedLookOf(lookName, animation) : light.appliedLook,
   };
@@ -140,22 +147,51 @@ function watchForEnd() {
   };
 }
 
-function startPreview(steps: PreviewStep[], targetOf: (step: PreviewStep) => PreviewTarget) {
+function startPreview(lights: PlannedLight[]) {
   endPreview();
   const timers: number[] = [];
-  const addresses = steps.map(({ light }) => light.address);
+  const addresses = lights.map(({ light }) => light.address);
   for (const address of addresses) {
     window.clearTimeout(restoreTimers.get(address));
     restoreTimers.delete(address);
   }
   session = { addresses, timers, stopWatching: watchForEnd() };
   usePreview.setState({
-    shown: Object.fromEntries(steps.map((step) => [step.light.address, shownBy(step, targetOf(step))])),
+    shown: Object.fromEntries(lights.map((planned) => [planned.light.address, shownBy(planned)])),
   });
-  for (const step of steps) carryOut(step, targetOf(step), timers);
+  for (const planned of lights) carryOut(planned, timers);
 }
 
 export function previewLook(lights: Light[], lookName: string, look: AnimationState) {
   const target = { isOn: true, animation: look, lookName };
-  startPreview(previewPlan(lights, look, Date.now()), () => target);
+  startPreview(previewPlan(lights, look, Date.now()).map((step) => ({ ...step, target })));
+}
+
+// A saved light that is off, or that cannot play the look, keeps its look and follows the power and level.
+function planSceneLight(light: Light, saved: SceneLight, now: number): PlannedLight[] {
+  const current = lookOnLight(light);
+  if (!current) return [];
+  const animation = animationOf(saved);
+  const showsLook = saved.is_on && canPlay(light, animation);
+  const steps = previewPlan([light], showsLook ? animation : current, now);
+  return steps.map((step) => ({
+    ...step,
+    target: {
+      isOn: saved.is_on,
+      brightness: saved.brightness,
+      animation: showsLook ? animation : undefined,
+      lookName: showsLook ? sceneLookName(light, animation) : undefined,
+    },
+  }));
+}
+
+export function previewScene({ lights }: Scene, rooms: Room[]) {
+  const writable = rooms.flatMap((room) => room.writableLights);
+  const now = Date.now();
+  startPreview(
+    lights.flatMap((saved) => {
+      const light = writable.find((candidate) => lightIdOf(candidate) === saved.id);
+      return light ? planSceneLight(light, saved, now) : [];
+    }),
+  );
 }

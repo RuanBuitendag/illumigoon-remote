@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { SceneCard, SceneLine, SceneShelf } from '../../composites';
 import { useRecording } from '../looks/recordings';
 import { removeScene, useLibrary, type SceneEntry, type SceneLight } from '../store/library-store';
+import { endPreview, previewScene } from '../store/look-preview';
 import { previewOfAnimation, type Room } from '../store/rooms';
 import { animationOf, applyScene, roomNameOf, roomOfScene, roomTag, sceneSummary } from '../store/scenes';
 import { SaveSceneSheet } from './save-scene-sheet';
@@ -45,6 +46,8 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             summary={sceneSummary(scene, room ? [room] : rooms)}
             isEditing={isEditing}
             onApply={() => setLeftOut(applyScene(scene, rooms))}
+            onHold={() => previewScene(scene, rooms)}
+            onHoldEnd={endPreview}
             onRename={() => setSheet({ renaming: scene })}
             onDelete={() => void removeScene(scene)}
           >
