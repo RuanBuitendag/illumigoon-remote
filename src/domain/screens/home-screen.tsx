@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow } from '../../composites';
+import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow, RoomDragList } from '../../composites';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, setBrightness, setPower } from '../store/fleet-store';
+import { setRoomOrder } from '../store/household-store';
 import { moveOldScenes } from '../store/library-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
@@ -70,9 +71,11 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
           <HouseControls rooms={rooms} />
         )}
         <SceneRow rooms={rooms} />
-        {rooms.map((room) => (
-          <RoomSummary key={room.id} room={room} />
-        ))}
+        <RoomDragList ids={rooms.map(({ id }) => id)} onOrder={setRoomOrder}>
+          {rooms.map((room) => (
+            <RoomSummary key={room.id} room={room} />
+          ))}
+        </RoomDragList>
         <HomeAdd onClick={() => openPage('add-light')}>+ Add a light</HomeAdd>
         <HomeAdd onClick={() => openPage('editor')}>Patch editor</HomeAdd>
       </HomeLayout>

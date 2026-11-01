@@ -28,6 +28,7 @@ type Household = {
   colourSets: typeof STARTER_COLOUR_SETS;
   roomNames: Record<string, string>;
   lightOrders: Record<string, string[]>;
+  roomOrder: string[];
 };
 
 export const useHousehold = create<Household>()(
@@ -38,6 +39,7 @@ export const useHousehold = create<Household>()(
       colourSets: STARTER_COLOUR_SETS,
       roomNames: {} as Record<string, string>,
       lightOrders: {} as Record<string, string[]>,
+      roomOrder: [] as string[],
     }),
     { name: 'household' },
   ),
@@ -51,6 +53,10 @@ export function addSavedLook(look: Omit<SavedLook, 'id'>) {
 
 export function renameRoom(id: string, name: string) {
   useHousehold.setState(({ roomNames }) => ({ roomNames: { ...roomNames, [id]: name } }));
+}
+
+export function setRoomOrder(roomOrder: string[]) {
+  useHousehold.setState({ roomOrder });
 }
 
 export function setLightOrder(roomId: string, lightIds: string[]) {

@@ -164,7 +164,7 @@ export function useDragOrder({ ids, handle, needsHold, onOrder }: DragOrderOptio
     const list = event.currentTarget;
     const pressed = (event.target as Element).closest(handle);
     const from = [...list.children].findIndex((child) => child.contains(pressed));
-    if (!pressed || from === -1 || event.button !== 0 || endPress.current) return;
+    if (!pressed || from === -1 || event.button !== 0 || endPress.current || ids.length < 2) return;
     const start = { pointerId: event.pointerId, clientX: event.clientX, clientY: event.clientY };
     const events = {
       onHold: () => {

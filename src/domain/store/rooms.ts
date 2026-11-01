@@ -31,6 +31,7 @@ const inOrder = (lights: Light[], order: string[] = []) => {
 export type RoomSettings = {
   roomNames: Record<string, string>;
   lightOrders: Record<string, string[]>;
+  roomOrder: string[];
 };
 
 function toRoom(id: string, lights: Light[], settings: RoomSettings): Room {
@@ -47,6 +48,12 @@ function toRoom(id: string, lights: Light[], settings: RoomSettings): Room {
   };
 }
 
+// A room nobody has moved yet comes after the ones that have been.
+const placeOfRoom = ({ id }: Room, order: string[]) => {
+  const index = order.indexOf(id);
+  return index === -1 ? order.length : index;
+};
+
 // A light joins a room with its first heartbeat, and it stays there when it stops answering.
 export function groupRooms(lights: Record<string, Light>, settings: RoomSettings): Room[] {
   const byRoom = new Map<string, Light[]>();
@@ -56,14 +63,21 @@ export function groupRooms(lights: Record<string, Light>, settings: RoomSettings
   }
   return [...byRoom]
     .map(([id, roomLights]) => toRoom(id, roomLights, settings))
-    .sort((a, b) => a.id.localeCompare(b.id));
+    .sort(
+      (a, b) =>
+        placeOfRoom(a, settings.roomOrder) - placeOfRoom(b, settings.roomOrder) || a.id.localeCompare(b.id),
+    );
 }
 
 export function useRooms() {
   const lights = useFleet((fleet) => fleet.lights);
   const roomNames = useHousehold((household) => household.roomNames);
   const lightOrders = useHousehold((household) => household.lightOrders);
-  return useMemo(() => groupRooms(lights, { roomNames, lightOrders }), [lights, roomNames, lightOrders]);
+  const roomOrder = useHousehold((household) => household.roomOrder);
+  return useMemo(
+    () => groupRooms(lights, { roomNames, lightOrders, roomOrder }),
+    [lights, roomNames, lightOrders, roomOrder],
+  );
 }
 
 export function lightState({ isOnline, isOn }: Light) {
