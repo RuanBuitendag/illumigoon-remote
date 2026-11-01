@@ -6,6 +6,7 @@ import { lockKey, lockProof } from '../light-network/lock-keys';
 import { lookShape } from '../looks/look-catalog';
 import { withPositions } from '../looks/looks';
 import { loadLatestVersions } from './firmware-versions';
+import { rememberLightAddress, useHousehold } from './household-store';
 import type {
   AnimationState,
   ConfigValue,
@@ -166,10 +167,14 @@ const newLight = (address: string): Light => ({
   schedule: [],
 });
 
+const typedAddresses = new Set<string>();
+
 function connectLight(address: string) {
   useFleet.setState(({ lights }) => ({ lights: { ...lights, [address]: newLight(address) } }));
   const connection = new LightConnection(address, {
     onReady: () => {
+      // Kept only once a light has answered, so a mistyped address is gone on the next start.
+      if (typedAddresses.delete(address)) rememberLightAddress(address);
       if (useFleet.getState().lights[address]?.hold?.isRestoreDue) sendRestore(address);
     },
     onHeartbeat: (heartbeat) => applyHeartbeat(address, heartbeat),
@@ -208,6 +213,13 @@ function onLightLost(serviceName: string) {
   if (address) updateLight(address, { isOnline: false });
 }
 
+export function addLightByAddress(typed: string) {
+  const address = typed.trim().replace(/^ws:\/\//, '').replace(/\/ws$/, '');
+  typedAddresses.add(address);
+  onLightFound(address, address);
+  return address;
+}
+
 const SEARCH_MS = 6000;
 
 export function searchAgain() {
@@ -218,6 +230,7 @@ export function searchAgain() {
 
 export function startFleet() {
   startDiscovery({ onFound: onLightFound, onLost: onLightLost });
+  for (const address of useHousehold.getState().lightAddresses) onLightFound(address, address);
   searchAgain();
   // iOS drops sockets while the app is in the background.
   document.addEventListener('visibilitychange', () => {

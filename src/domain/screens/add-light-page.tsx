@@ -3,7 +3,7 @@ import { HeadingRow, PageFrame, PageHint, PageSection, ScanNote } from '../../co
 import { Eyebrow, OptionRow, TextField, TextKey } from '../../design-system';
 import type { NewLight } from '../light-network/protocol';
 import { SCAN_PREVIEW } from '../looks/recordings';
-import { addNewLightToRoom, flashNewLight, FLASH_MS, useFleet } from '../store/fleet-store';
+import { addLightByAddress, addNewLightToRoom, flashNewLight, FLASH_MS, useFleet } from '../store/fleet-store';
 import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { LookStrip } from './look-strip';
@@ -67,6 +67,29 @@ function NewLightForm({ light, number, rooms, onAdded }: NewLightFormProps) {
   );
 }
 
+// For a light the network does not announce, which is every light on some networks.
+function AddressForm() {
+  const [address, setAddress] = useState('');
+  const [sought, setSought] = useState('');
+  const isFound = useFleet((fleet) => fleet.lights[sought]?.isOnline === true);
+
+  const add = () => {
+    setSought(addLightByAddress(address));
+    setAddress('');
+  };
+
+  return (
+    <PageSection>
+      <Eyebrow>BY ADDRESS</Eyebrow>
+      <TextField size="medium" label="Address of the light" placeholder="Address" value={address} onChange={setAddress} />
+      <TextKey disabled={!address.trim()} onClick={add}>
+        ADD ADDRESS
+      </TextKey>
+      {sought && <PageHint>{isFound ? `Found ${sought}.` : `Looking at ${sought}.`}</PageHint>}
+    </PageSection>
+  );
+}
+
 export function AddLightPage({ rooms }: { rooms: Room[] }) {
   const newLights = useFleet((fleet) => fleet.newLights);
   const [added, setAdded] = useState<string[]>([]);
@@ -94,6 +117,7 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
           onAdded={(message) => setAdded([...added, message])}
         />
       ))}
+      {newLights.length === 0 && <AddressForm />}
       {isDone && (
         <PageSection>
           <PageHint>{doneText}</PageHint>

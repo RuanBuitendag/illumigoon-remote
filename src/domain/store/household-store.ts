@@ -29,6 +29,8 @@ type Household = {
   roomNames: Record<string, string>;
   lightOrders: Record<string, string[]>;
   roomOrder: string[];
+  // Lights the network does not announce, as typed on Add a light.
+  lightAddresses: string[];
 };
 
 export const useHousehold = create<Household>()(
@@ -40,6 +42,7 @@ export const useHousehold = create<Household>()(
       roomNames: {} as Record<string, string>,
       lightOrders: {} as Record<string, string[]>,
       roomOrder: [] as string[],
+      lightAddresses: [] as string[],
     }),
     { name: 'household' },
   ),
@@ -49,6 +52,12 @@ const newId = () => crypto.randomUUID();
 
 export function addSavedLook(look: Omit<SavedLook, 'id'>) {
   useHousehold.setState(({ savedLooks }) => ({ savedLooks: [...savedLooks, { ...look, id: newId() }] }));
+}
+
+export function rememberLightAddress(address: string) {
+  useHousehold.setState(({ lightAddresses }) => ({
+    lightAddresses: lightAddresses.includes(address) ? lightAddresses : [...lightAddresses, address],
+  }));
 }
 
 export function renameRoom(id: string, name: string) {
