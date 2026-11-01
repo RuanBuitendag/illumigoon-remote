@@ -101,9 +101,10 @@
     "2": {
       "type": "lfo",
       "params": {
-        "rate": 0.05
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.2
+      }
     },
     "3": {
       "type": "lfo",
@@ -187,8 +188,8 @@
     },
     {
       "src": "speed",
-      "dst": "M2.rate",
-      "depth": 0.15
+      "dst": "M2.noiseRate",
+      "depth": 0.6
     },
     {
       "src": "size",

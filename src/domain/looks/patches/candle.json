@@ -1,7 +1,7 @@
 {
   "name": "Candle",
   "created": "2026-09-13T18:24:54.210Z",
-  "notes": "One small flame and the glow it throws. The flame is a short soft `line` coloured by DENSITY, so its soft edges are red and its core runs to amber -- a candle is hotter in the middle. The halo is a wide, very soft line under it at a fifth the opacity.\n\nThe flicker is a perlin LFO multiplied by the Flicker knob through `M6` (math mul), so the knob sets how much the flame dances rather than how bright it is. A slow `sample_hold` gutters the flame now and then: it dips the brightness a little and, through `M0.rate`, makes the flicker hurry while it recovers, the way a draught catches a real one. A slower perlin sways the flame a hair either side of centre and breathes the halo.",
+  "notes": "One small flame and the glow it throws. The flame is a short soft `line` coloured by DENSITY, so its soft edges are red and its core runs to amber -- a candle is hotter in the middle. The halo is a wide, very soft line under it at a fifth the opacity.\n\nThe flicker is a noise LFO multiplied by the Flicker knob through `M6` (math mul), so the knob sets how much the flame dances rather than how bright it is. A slow `sample_hold` gutters the flame now and then: it dips the brightness a little and, through `M0.rate`, makes the flicker hurry while it recovers, the way a draught catches a real one. A slower perlin sways the flame a hair either side of centre and breathes the halo.",
   "layers": {
     "0": {
       "emitter": {
@@ -62,16 +62,18 @@
     "0": {
       "type": "lfo",
       "params": {
-        "rate": 0.45
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 1.8
+      }
     },
     "1": {
       "type": "lfo",
       "params": {
-        "rate": 0.0375
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.15
+      }
     },
     "2": {
       "type": "lfo",
@@ -142,8 +144,8 @@
     },
     {
       "src": 2,
-      "dst": "M0.rate",
-      "depth": 1.2
+      "dst": "M0.noiseRate",
+      "depth": 4.8
     },
     {
       "src": 2,
@@ -152,13 +154,13 @@
     },
     {
       "src": "speed",
-      "dst": "M0.rate",
-      "depth": 2.7
+      "dst": "M0.noiseRate",
+      "depth": 10.8
     },
     {
       "src": "speed",
-      "dst": "M1.rate",
-      "depth": 0.225
+      "dst": "M1.noiseRate",
+      "depth": 0.9
     },
     {
       "src": "colour",

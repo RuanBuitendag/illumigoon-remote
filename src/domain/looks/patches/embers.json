@@ -120,9 +120,10 @@
     "1": {
       "type": "lfo",
       "params": {
-        "rate": 0.08
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.32
+      }
     },
     "2": {
       "type": "macro",
@@ -166,8 +167,8 @@
     },
     {
       "src": 2,
-      "dst": "M1.rate",
-      "depth": 0.48
+      "dst": "M1.noiseRate",
+      "depth": 1.92
     }
   ],
   "global": {

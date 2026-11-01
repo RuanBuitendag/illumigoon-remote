@@ -1,7 +1,7 @@
 {
   "name": "Dusk Duotone",
   "created": "2026-09-13T18:00:00.000Z",
-  "notes": "Two slow noise fields in plain grey, repainted in two hues by a `duotone` on MASTER: whatever is dark takes the shadow hue, whatever is bright takes the light hue, and the result keeps the grey's own brightness, so dim stays dim. Indigo shadows and amber light by default -- dusk.\n\nBecause the colour is decided after the layers are summed, the two fields blend in luminance first and only then get their hues, which a pair of coloured layers cannot do: where both fields are bright the light hue wins outright instead of mixing into mud. The shadow and light hues each wander on their own very slow sine, and a perlin LFO walks `balance`, the brightness where dark turns to light -- so the border between the two colours creeps across the strip on its own. A second perlin drives that one's rate. Shadow, Light, Balance and Softness are the duotone's own settings, handed straight to the phone.",
+  "notes": "Two slow noise fields in plain grey, repainted in two hues by a `duotone` on MASTER: whatever is dark takes the shadow hue, whatever is bright takes the light hue, and the result keeps the grey's own brightness, so dim stays dim. Indigo shadows and amber light by default -- dusk.\n\nBecause the colour is decided after the layers are summed, the two fields blend in luminance first and only then get their hues, which a pair of coloured layers cannot do: where both fields are bright the light hue wins outright instead of mixing into mud. The shadow and light hues each wander on their own very slow sine, and a noise LFO walks `balance`, the brightness where dark turns to light -- so the border between the two colours creeps across the strip on its own. A second perlin drives that one's rate. Shadow, Light, Balance and Softness are the duotone's own settings, handed straight to the phone.",
   "layers": {
     "0": {
       "emitter": {
@@ -23,15 +23,6 @@
           "params": {}
         }
       },
-      "warps": [
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
-        }
-      ],
       "opacity": 1,
       "blend": "add",
       "order": 0
@@ -56,15 +47,6 @@
           "params": {}
         }
       },
-      "warps": [
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
-        }
-      ],
       "opacity": 0.5,
       "blend": "screen",
       "order": 1
@@ -88,9 +70,10 @@
     },
     "2": {
       "type": "lfo",
-      "wave": "perlin",
       "params": {
-        "rate": 0.02
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.08
       }
     },
     "3": {
@@ -109,9 +92,10 @@
     },
     "5": {
       "type": "lfo",
-      "wave": "perlin",
       "params": {
-        "rate": 0.01
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.04
       }
     },
     "6": {
@@ -141,18 +125,18 @@
     },
     {
       "src": 3,
-      "dst": "L0.warp0.offset",
-      "depth": 1
+      "dst": "L0.emitter.offset",
+      "depth": -1
     },
     {
       "src": 4,
-      "dst": "L1.warp0.offset",
-      "depth": -0.7
+      "dst": "L1.emitter.offset",
+      "depth": 0.21
     },
     {
       "src": 5,
-      "dst": "M2.rate",
-      "depth": 0.015
+      "dst": "M2.noiseRate",
+      "depth": 0.06
     },
     {
       "src": 6,

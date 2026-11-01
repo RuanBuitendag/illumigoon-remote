@@ -52,15 +52,6 @@
           "params": {}
         }
       },
-      "warps": [
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
-        }
-      ],
       "opacity": 0,
       "blend": "multiply",
       "order": 2
@@ -104,9 +95,10 @@
     },
     "1": {
       "type": "lfo",
-      "wave": "perlin",
       "params": {
-        "rate": 0.0025
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.01
       }
     },
     "2": {
@@ -175,8 +167,8 @@
     },
     {
       "src": 1,
-      "dst": "L1.warp0.offset",
-      "depth": 1
+      "dst": "L1.emitter.offset",
+      "depth": -1.5
     },
     {
       "src": 2,
@@ -195,8 +187,8 @@
     },
     {
       "src": 3,
-      "dst": "M1.rate",
-      "depth": 0.015
+      "dst": "M1.noiseRate",
+      "depth": 0.06
     },
     {
       "src": 4,

@@ -83,10 +83,11 @@
     "1": {
       "type": "lfo",
       "params": {
-        "rate": 0.08,
-        "phase": 0.974762
-      },
-      "wave": "perlin"
+        "phase": 0.974762,
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.32
+      }
     },
     "2": {
       "type": "macro",
@@ -132,8 +133,8 @@
     },
     {
       "src": 3,
-      "dst": "M1.rate",
-      "depth": 0.48
+      "dst": "M1.noiseRate",
+      "depth": 1.92
     },
     {
       "src": 3,

@@ -80,9 +80,10 @@
     "1": {
       "type": "lfo",
       "params": {
-        "rate": 0.06
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.24
+      }
     },
     "2": {
       "type": "lfo",
@@ -93,9 +94,10 @@
     "3": {
       "type": "lfo",
       "params": {
-        "rate": 0.02
-      },
-      "wave": "perlin"
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.08
+      }
     },
     "6": {
       "type": "macro",
@@ -113,8 +115,8 @@
   "matrix": [
     {
       "src": 2,
-      "dst": "M1.rate",
-      "depth": 0.06
+      "dst": "M1.noiseRate",
+      "depth": 0.24
     },
     {
       "src": 3,
@@ -128,13 +130,13 @@
     },
     {
       "src": 7,
-      "dst": "M1.rate",
-      "depth": 0.18
+      "dst": "M1.noiseRate",
+      "depth": 0.72
     },
     {
       "src": 7,
-      "dst": "M3.rate",
-      "depth": 0.06
+      "dst": "M3.noiseRate",
+      "depth": 0.24
     },
     {
       "src": 6,

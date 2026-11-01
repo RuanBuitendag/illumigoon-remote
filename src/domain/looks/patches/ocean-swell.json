@@ -1,7 +1,7 @@
 {
   "name": "Ocean Swell",
   "created": "2026-09-13T18:00:00.000Z",
-  "notes": "Long swells rolling along the strip with a shorter chop riding on them and foam catching the light. Two `wave` emitters at different wavelengths travel in opposite directions, each scrolled by a translate on a full unipolar ramp so the scroll never has a seam; where they cross, the water heaves.\n\nThe chop is a `ripple` warp on the long swell, its amount breathing on a slow sine. A perlin LFO drives the main scroll's rate, so sets of waves surge and ease rather than arriving like a conveyor, and a very slow sine stretches and compresses the wavelength itself. Foam is a fine, fast noise whose palette is black until its highest crests, where it turns near-white.",
+  "notes": "Long swells rolling along the strip with a shorter chop riding on them and foam catching the light. Two `wave` emitters at different wavelengths travel in opposite directions, each scrolled by its own `phase` on a unipolar ramp that spans whole turns, so the scroll never has a seam. The ripple's `phase` rides the same ramp so the chop travels with the swell; where they cross, the water heaves.\n\nThe chop is a `ripple` warp on the long swell, its amount breathing on a slow sine. A noise LFO drives the main scroll's rate, so sets of waves surge and ease rather than arriving like a conveyor, and a very slow sine stretches and compresses the wavelength itself. Foam is a fine, fast noise whose palette is black until its highest crests, where it turns near-white.",
   "layers": {
     "0": {
       "emitter": {
@@ -35,13 +35,6 @@
             "freq": 5,
             "phase": 0
           }
-        },
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
         }
       ],
       "opacity": 0.8,
@@ -70,15 +63,6 @@
           }
         }
       },
-      "warps": [
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
-        }
-      ],
       "opacity": 0.35,
       "blend": "screen",
       "order": 1
@@ -114,14 +98,14 @@
       "type": "lfo",
       "wave": "ramp_up",
       "params": {
-        "rate": 0.01
+        "rate": 0.005
       }
     },
     "1": {
       "type": "lfo",
       "wave": "ramp_down",
       "params": {
-        "rate": 0.005
+        "rate": 0.0035
       }
     },
     "2": {
@@ -133,9 +117,10 @@
     },
     "3": {
       "type": "lfo",
-      "wave": "perlin",
       "params": {
-        "rate": 0.015
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.06
       }
     },
     "4": {
@@ -147,9 +132,10 @@
     },
     "5": {
       "type": "lfo",
-      "wave": "perlin",
       "params": {
-        "rate": 0.08
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.32
       }
     },
     "7": {
@@ -164,14 +150,20 @@
   "matrix": [
     {
       "src": 0,
-      "dst": "L0.warp1.offset",
-      "depth": 1,
+      "dst": "L0.emitter.phase",
+      "depth": -3,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L0.warp0.phase",
+      "depth": -10,
       "bipolar": false
     },
     {
       "src": 1,
-      "dst": "L1.warp0.offset",
-      "depth": 1,
+      "dst": "L1.emitter.phase",
+      "depth": -1,
       "bipolar": false
     },
     {
@@ -182,7 +174,7 @@
     {
       "src": 3,
       "dst": "M0.rate",
-      "depth": 0.015
+      "depth": 0.0075
     },
     {
       "src": 4,
@@ -197,12 +189,12 @@
     {
       "src": 7,
       "dst": "M0.rate",
-      "depth": 0.06
+      "depth": 0.03
     },
     {
       "src": 7,
       "dst": "M1.rate",
-      "depth": 0.03
+      "depth": 0.021
     },
     {
       "src": 7,

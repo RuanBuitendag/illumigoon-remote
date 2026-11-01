@@ -163,15 +163,6 @@
           }
         }
       },
-      "warps": [
-        {
-          "type": "translate",
-          "wrap": true,
-          "params": {
-            "offset": 0
-          }
-        }
-      ],
       "opacity": 0.06,
       "blend": "add",
       "order": 0
@@ -254,8 +245,8 @@
     },
     {
       "src": 4,
-      "dst": "L3.warp0.offset",
-      "depth": 1
+      "dst": "L3.emitter.offset",
+      "depth": -1
     },
     {
       "src": 5,
