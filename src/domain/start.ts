@@ -1,5 +1,6 @@
 import { startAppUpdate } from './app-update/app-update';
 import { startFleet } from './store/fleet-store';
+import { startShortcutMirror } from './store/shortcut-mirror';
 
 export function startApp() {
   startAppUpdate();
@@ -8,5 +9,6 @@ export function startApp() {
     void import('./store/demo-fleet').then(({ startDemoFleet }) => startDemoFleet());
   } else {
     startFleet();
+    startShortcutMirror();
   }
 }
