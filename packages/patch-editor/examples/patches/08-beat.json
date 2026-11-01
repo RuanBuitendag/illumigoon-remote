@@ -1,0 +1,130 @@
+{
+  "notes": "The two beat modulators, one job each. `tempo` drives the Master's Speed from 0.5x on a chilled track to 2x on a fast one, so the noise field runs with the song. One `beat` flashes white on every beat, another flashes magenta on every bar's downbeat. All three read 0 until the tracker locks -- roughly 7-10 beats of music with a clear kick -- and there is no microphone on a host, so the golden frame is the slow, dim field alone. LIFE-845.",
+  "global": {
+    "speed": 0.5
+  },
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 2.5,
+          "evolve": 0.2
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "000000",
+            "ff5000",
+            "ffb000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0.35,
+      "blend": "add",
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0,
+      "blend": "screen",
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ff00c8"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "opacity": 0,
+      "blend": "add",
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "tempo",
+      "params": {
+        "slow": 90,
+        "fast": 150,
+        "smoothing": 4
+      }
+    },
+    "1": {
+      "type": "beat",
+      "every": "beat",
+      "shape": "expo_in",
+      "params": {
+        "decay": 0.35,
+        "slew": 0.02
+      }
+    },
+    "2": {
+      "type": "beat",
+      "every": "bar",
+      "shape": "expo_in",
+      "params": {
+        "decay": 0.5,
+        "slew": 0.02
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "G.speed",
+      "depth": 1.5,
+      "bipolar": false
+    },
+    {
+      "src": 1,
+      "dst": "L1.layer.opacity",
+      "depth": 0.4,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "L2.layer.opacity",
+      "depth": 0.8,
+      "bipolar": false
+    }
+  ]
+}

@@ -17,6 +17,7 @@
 const LAYERS = '^src/(design-system|composites|domain)/';
 const LOOK_LIBRARIES = '^node_modules/(@base-ui|@fontsource)';
 const APP_LIBRARIES = '^node_modules/(zustand|@capacitor|@capgo|@mhaberler)';
+const EDITOR = '^(packages/patch-editor|node_modules/@illumigoon)/';
 
 const rule = (name, comment, from, to) => ({ name, comment, severity: 'error', from, to });
 
@@ -46,6 +47,12 @@ module.exports = {
       'State, network and native libraries are app concerns, so they stay out of the UI layers.',
       { path: '^src/', pathNot: '^src/domain/' },
       { path: APP_LIBRARIES },
+    ),
+    rule(
+      'only-the-domain-opens-the-editor',
+      'The editor is a package with its own look, so the UI layers never reach into it.',
+      { path: '^src/', pathNot: '^src/domain/' },
+      { path: EDITOR },
     ),
     rule(
       'only-the-design-system-uses-look-libraries',
@@ -93,7 +100,6 @@ module.exports = {
   options: {
     tsConfig: { fileName: 'tsconfig.json' },
     tsPreCompilationDeps: true,
-    doNotFollow: { path: 'node_modules' },
-    exclude: { path: '^src/domain/looks/engine/' },
+    doNotFollow: { path: ['node_modules', '^packages/'] },
   },
 };

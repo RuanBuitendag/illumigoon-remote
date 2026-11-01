@@ -1,0 +1,99 @@
+{
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.02,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Sweep Rate",
+      "params": {
+        "knob": 0.16666666666666666
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "width",
+      "label": "Width",
+      "params": {
+        "knob": 0.27083333333333337
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 1.98,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "L0.emitter.length",
+      "depth": 0.48,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Sweep Rate",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.6667,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "width",
+      "label": "Width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 27.0833,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

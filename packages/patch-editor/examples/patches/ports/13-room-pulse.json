@@ -1,0 +1,228 @@
+{
+  "name": "Room Pulse",
+  "notes": "Port of `room_pulse`: the whole strip lit, its level a raised cosine that peaks once per lap, resting at `tail` between. The previous port was a line travelling along the strip, which is what a chase looks like from OUTSIDE the room -- this animation is one light's share of that chase, and one light's share is a whole strip brightening and dimming.\n\nThe pulse is `lfo(ramp_up) -> envelope`, not a sine on opacity. A sine spends the whole cycle somewhere, and `width` exists precisely so the pulse can be NARROWER than its cycle. An LFO fires on its phase wrap, so it is the lap clock, and a `smooth` envelope with equal attack and decay is a symmetric raised bump of exactly the length asked for -- smootherstep either side, which is the raised cosine to within a hair.\n\n`width` IS IN SECONDS HERE AND IN CYCLES THERE. The animation's width is a fraction of a lap, so it holds its duty ratio when `freq` changes; an envelope's attack and decay are seconds, and nothing scales one parameter by the reciprocal of another. Turning `freq` up therefore widens the duty rather than keeping it, and past about 1.4 Hz the default pulse no longer fits inside a lap.\n\nCOLOUR ADVANCES BUT DOES NOT STEP. The animation walks one palette entry per lap, counting visits off the room clock; nothing here counts, so a slow ramp at a quarter of the lap rate glides `paletteOffset` through the four entries once every four laps, with `wrap` on so the seam blends instead of snapping. The sequence is the same; the staircase is not.\n\nAND THE POINT OF THE ANIMATION DOES NOT PORT AT ALL. `room_pulse` exists so several strips run one animation in step off `MeshClock`, a chase set up by a single broadcast with nothing to drop. There is no room-clock source (LIFE-676), so two devices running this drift apart and it is simply a pulsing light -- which is, to be fair, exactly what the animation degrades to on a device that has never heard a Master.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "wrap": true,
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "ff2800",
+            "ffb400",
+            "00c8ff",
+            "7800ff"
+          ]
+        }
+      },
+      "blend": "over",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "global": {
+    "opacity": 0
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.05
+      }
+    },
+    "1": {
+      "type": "envelope",
+      "shape": "smooth",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "attack": 0.05,
+        "decay": 0.05
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.0125
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "brightness",
+      "label": "Brightness",
+      "params": {
+        "knob": 1
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "freq",
+      "label": "Laps per second",
+      "params": {
+        "knob": 0.15254237288135591
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "width",
+      "label": "Pulse width",
+      "params": {
+        "knob": 0.3157894736842105
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "tail",
+      "label": "Resting level",
+      "params": {
+        "knob": 0
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "L0.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": false
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "brightness",
+      "dst": "G.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "freq",
+      "dst": "M0.rate",
+      "depth": 2.95,
+      "bipolar": true
+    },
+    {
+      "src": "freq",
+      "dst": "M2.rate",
+      "depth": 0.7375,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "M1.attack",
+      "depth": 0.95,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "M1.decay",
+      "depth": 0.95,
+      "bipolar": true
+    },
+    {
+      "src": "tail",
+      "dst": "L0.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "freq",
+      "label": "Laps per second",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15.2542,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "width",
+      "label": "Pulse width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.5789,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "tail",
+      "label": "Resting level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

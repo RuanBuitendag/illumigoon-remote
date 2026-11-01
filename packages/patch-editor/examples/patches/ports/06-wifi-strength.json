@@ -1,0 +1,70 @@
+{
+  "name": "Wi-Fi Strength",
+  "notes": "Port of `wifi_strength`: a centred line whose LENGTH runs 0.1-1.0 and whose COLOUR runs red to green, both off one number, `t = clamp((rssi + 90) / 40)`.\n\nOne number driving a whole shape's colour is `paletteSpan` 0. With the span at zero the index collapses and `t = paletteOffset`, so every pixel of the line takes the same colour and a row on the offset picks it off the two-entry ramp. `wrap` is off, so the palette is a gradient with two ends rather than a ring -- red at 0, green at 1.\n\nTHE ANIMATION HAS NO USER PARAMETERS. Its only entry is `Parameter::Internal(\"rssi\")`, and nothing in a patch can reach RSSI, heap or link state (LIFE-683), so the rack is one knob standing in for the reading. Note that CLAUDE.md's animation table lists `color_poor`, `color_good` and `color_excellent` for this animation; `wifi_strength.cpp` declares none of them and hardcodes red-to-green. The code is what this ports.\n\nThe animation eases toward the true RSSI at 3/s. A macro is human input and is smoothed upstream at about 5 Hz, which is close enough that nothing was built for it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "ff0000",
+            "00ff00"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "macro",
+      "name": "rssi",
+      "label": "Signal",
+      "params": {
+        "knob": 0.75
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "rssi",
+      "dst": "L0.emitter.length",
+      "depth": 0.9,
+      "bipolar": true
+    },
+    {
+      "src": "rssi",
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "rssi",
+      "label": "Signal",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 75,
+      "target": "M0.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

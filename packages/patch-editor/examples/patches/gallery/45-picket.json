@@ -1,0 +1,370 @@
+{
+  "name": "Picket",
+  "notes": "One `line` that never moves, drawn as a moving fence. `tile` turns a single shape into N copies, `translate` slides the tiled coordinate so the whole set travels, and `mirror` folds it so the fence approaching from one side meets itself coming back. Three warps, all modulated, on an emitter whose `centre` is 0.5 for the entire patch -- every bit of motion you see is the space moving under a stationary object, which is the cheapest complex animation the engine can produce: one trapezoid integration per pixel however many pickets the tile makes.\n\nThe count is on a triangle from three to eleven and it is a float, so between integers the last cell is cut short and a discontinuity travels through the fence once per integer crossed. That is the same artefact `18-phaser` uses deliberately; here it reads as a post being added or removed while you watch.\n\nThe chain is `M3 -> M1.rate`, so the scroll surges and stalls rather than running at a constant speed, and the fence occasionally hangs almost still while the count is still changing under it. `index: \"position\"` means the palette is fixed to the STRIP rather than to the pickets, so a post changes colour as it travels rather than carrying one -- the fence is a moving window onto a stationary gradient. Ember run with a single cobalt accent that only the far end of the strip holds.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.055,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "ff0028",
+            "ff5000",
+            "ffaa00",
+            "0064ff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "tile",
+          "params": {
+            "count": 6
+          }
+        },
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        },
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.03,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "params": {
+          "paletteSpan": 2
+        },
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "ffaa00",
+            "0064ff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "tile",
+          "params": {
+            "count": 3
+          }
+        },
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0.35,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "triangle",
+      "params": {
+        "rate": 0.019
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.11
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "ramp_down",
+      "params": {
+        "rate": 0.04
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "edge",
+      "label": "Post Edge",
+      "params": {
+        "knob": 0.03
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "breathe",
+      "label": "Breathe",
+      "params": {
+        "knob": 0.13999999999999999
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "haze",
+      "label": "Haze Width",
+      "params": {
+        "knob": 0.2340425531914894
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "wander",
+      "label": "Wander",
+      "params": {
+        "knob": 0.20833333333333334
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.warp0.count",
+      "depth": 5,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.warp1.offset",
+      "depth": 1,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "L1.warp1.offset",
+      "depth": 1,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "M1.rate",
+      "depth": 0.1,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L0.warp2.centre",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L0.emitter.length",
+      "depth": 0.04,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L1.layer.opacity",
+      "depth": 0.28,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.warp0.count",
+      "depth": -2,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 0.05,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.5,
+      "bipolar": true
+    },
+    {
+      "src": "edge",
+      "dst": "L0.emitter.softness",
+      "depth": 0.4,
+      "bipolar": true
+    },
+    {
+      "src": "breathe",
+      "dst": "M4.rate",
+      "depth": 0.05,
+      "bipolar": true
+    },
+    {
+      "src": "haze",
+      "dst": "L1.emitter.length",
+      "depth": 0.47,
+      "bipolar": true
+    },
+    {
+      "src": "wander",
+      "dst": "M3.rate",
+      "depth": 0.12,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "edge",
+      "label": "Post Edge",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 3,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "breathe",
+      "label": "Breathe",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 14,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "haze",
+      "label": "Haze Width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 23.4043,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "wander",
+      "label": "Wander",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 20.8333,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

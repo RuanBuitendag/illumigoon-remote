@@ -1,0 +1,117 @@
+{
+  "name": "Progress Line",
+  "notes": "Port of `progress_line`, which is `Line(0.5, len)` -- a bar CENTRED on the strip that grows outward in both directions, not a meter filling from one end. The previous port used `block`, which fills from an end, and so drew a different shape from the animation the OTA progress bar actually shows.\n\n`block` is still the right emitter for a meter and `06-wifi-strength` does not use it either, for the same reason: that one is centred too.\n\nNo modulation but the rack. The animation has no time axis at all -- something outside it sets `len`, which is exactly what a macro is.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "ffffff"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "brightness",
+      "label": "Brightness",
+      "params": {
+        "knob": 1
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "len",
+      "label": "Length",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "brightness",
+      "dst": "L0.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "len",
+      "dst": "L0.emitter.length",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M0.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "len",
+      "label": "Length",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

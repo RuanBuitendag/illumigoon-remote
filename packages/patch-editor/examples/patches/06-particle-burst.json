@@ -1,0 +1,138 @@
+{
+  "name": "Particle Burst",
+  "notes": "The `particles` emitter on a clock. Its whole difference from `04-spawner-trigger` is that every particle here is UNLIKE the others: `speedVary` is symmetric so the burst goes both ways from its origin, and `lifeVary` and `sizeVary` mean they do not all die together or arrive the same size. Set `count` to 1 and every Vary to 0 and this is a spawner. Set `rate` above 0 and the trigger stops mattering -- that is the stream form, for embers rather than bursts.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "trigger": {
+          "src": 0,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.5,
+          "spread": 0.06,
+          "count": 1,
+          "speed": 0,
+          "speedVary": 0.1,
+          "acceleration": 0,
+          "drag": 1.6,
+          "size": 0.014,
+          "sizeVary": 0.5,
+          "softness": 0.7,
+          "lifetime": 1.6,
+          "lifeVary": 0.5,
+          "fade": 0.8,
+          "maxAlive": 64
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ffd070",
+            "ff4000",
+            "200000"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "periodic",
+      "params": {
+        "period": 0.2
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "interval",
+      "label": "Burst Interval",
+      "params": {
+        "knob": 0.20689655172413793
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "count",
+      "label": "Burst Size",
+      "params": {
+        "knob": 0.6129032258064516
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "spread",
+      "label": "Spread",
+      "params": {
+        "knob": 0.3448275862068966
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "interval",
+      "dst": "M0.period",
+      "depth": 5.8,
+      "bipolar": true
+    },
+    {
+      "src": "count",
+      "dst": "L0.emitter.count",
+      "depth": 31,
+      "bipolar": true
+    },
+    {
+      "src": "spread",
+      "dst": "L0.emitter.speedVary",
+      "depth": 2.9,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "interval",
+      "label": "Burst Interval",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 20.6897,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "count",
+      "label": "Burst Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 61.2903,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spread",
+      "label": "Spread",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 34.4828,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

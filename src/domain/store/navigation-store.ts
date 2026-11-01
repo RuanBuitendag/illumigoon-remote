@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-export type PageKind = 'looks' | 'schedules' | 'software' | 'lock' | 'take-back' | 'arrange' | 'add-light';
+export type PageKind = 'looks' | 'schedules' | 'software' | 'lock' | 'take-back' | 'arrange' | 'add-light' | 'editor';
 
 // A screen stays in the state after it closes, so it is still there while it slides away.
 type Navigation = {

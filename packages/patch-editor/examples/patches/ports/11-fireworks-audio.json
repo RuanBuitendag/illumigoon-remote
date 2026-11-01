@@ -1,0 +1,405 @@
+{
+  "name": "Audio Fireworks",
+  "notes": "Port of `fireworks_audio`, which is `fireworks` with the launch clock replaced by a beat. The previous port was one particle layer with no rocket at all.\n\nTHE WHOLE CHAIN IS ONE BEAT FANNED OUT. `audio_band` -> `threshold` is the beat; that edge then does three separate jobs:\n  - it triggers the rocket spawner directly;\n  - it RESTARTS a `sample_hold` LFO at rate 0 (LIFE-831), which is sample-and-hold proper -- a new height drawn on the hit and only on the hit, so the rocket's launch speed is set the moment it leaves;\n  - it enters a `delay` whose Time is the flight time, carrying that same height on its second wire. The delay's edge is the burst, and its value is where the burst goes.\n\nEVERY BEAT GETS ITS OWN BURST, and that is what the delay is for (LIFE-839). The first cut timed the flight with `envelope -> threshold`, and an envelope has one voice: a beat arriving mid-flight restarted it, and the rocket already in the air ran out its life with nothing left to explode it. At 120 BPM that was thirteen beats and zero bursts. A delay queues each edge on its own, so a new beat starts another flight instead of cancelling the one in the air. The carried height matters just as much: by the time beat 1's burst is due, beat 2 has already redrawn the `sample_hold`, so a burst reading it directly would land on the wrong rocket. What the delay publishes is the value it read when THAT beat arrived.\n\nTHE BURST LANDS WHERE THE ROCKET IS, by construction rather than by authoring, and the arithmetic is `05-fireworks`'s. A spawner with `acceleration` 0 and drag `d` asymptotes at `velocity / d`, so bursting at a fixed fraction `f` of that asymptote takes `-ln(1 - f) / d` seconds whatever the launch speed -- which is why ONE delay time is right for a low shot and a high one alike. Bursting at 60% keeps the shell moving at 40% of launch speed right up to the frame it goes, instead of creeping toward an apex it never reaches. So the burst zone [0.5, 0.9] -- this animation's `burst_min`/`burst_max`, higher than the unreactive one's -- means an asymptote of `(0.5 + 0.4h)/0.6`, hence velocity base 1.39 and depth 1.11 against drag 1.67, and a flight of `-ln(0.4)/1.67` = 0.549 s.\n\nTHE ROCKET IS STILL LIT WHEN IT BURSTS. `lifetime` 0.61 with `fadeOut` 0.1 starts the fade at 0.549 s, the burst frame, so the shell is at full weight up to the flash and dies into it over the next 60 ms. An earlier cut had the fade ENDING near the burst, which left a 6%-bright ember to explode and read as a rocket vanishing before its own sparks. `colouring: speed` against a `speedRef` that tracks the launch speed is exactly the animation's `brightness = speedFrac`. `maxAlive` is 4 because flights now overlap: at a fast tempo two or three rockets are in the air at once, and a cap of 2 would retire one that still had a burst on its way.\n\nWHERE IT DIVERGES, and it is the trigger rather than the look: the animation bursts every rocket in flight on the NEXT beat, or at the apex if that comes first, and this bursts each one a fixed flight-time after its own beat. Nothing in the engine turns \"this shape died\" into an edge -- the same gap `05-fireworks` records. The animation's flight is `sqrt(2*target/decel)`, 0.58-0.78 s; this one's 0.549 s is the nearest the velocity/drag geometry reaches with one fixed time. Where the animation cuts a rocket short on a fast beat, this lets it finish, so at a quick tempo there are more shells in the air at once than the animation would show.\n\n`beat_thresh` and `avg_decay` change UNITS here. The animation compares raw energy against a rolling EMA of itself and fires above `energy > avg * thresh`, a RATIO; `audio_band`'s auto-gain has already normalised the band against its own rolling maximum, so what is left is an absolute trip level in 0-1 and the knob sweeps that. `avg_decay` is that gain's release in seconds rather than an alpha.\n\n`beat_cooldown` has no equivalent -- `ThresholdSignal` re-arms on a LEVEL falling back through its hysteresis, not on a clock. With the delay it is no longer needed to keep bursts alive, which was the only thing going wrong without it.\n\nThe spark knobs are `05-fireworks`'s rows and rest on its tuned values for its reasons; `num_sparks` also stops at 32 rather than the animation's 40, because that is where `particles.count` stops.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "speed",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 1.39,
+          "acceleration": 0,
+          "drag": 1.67,
+          "length": 0.012,
+          "softness": 0.045,
+          "lifetime": 0.61,
+          "fadeOut": 0.1,
+          "speedRef": 1.39,
+          "maxAlive": 4
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "0a0806",
+            "8a7a60",
+            "ffeacc"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0.85,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "trigger": {
+          "src": 3,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.5,
+          "spread": 0,
+          "count": 4,
+          "speed": 0,
+          "speedVary": 0.9,
+          "acceleration": 0,
+          "drag": 1.8,
+          "bounce": 0,
+          "size": 0.004,
+          "sizeVary": 0.55,
+          "softness": 1,
+          "lifetime": 0.3,
+          "lifeVary": 0.5,
+          "fade": 1,
+          "maxAlive": 56
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0c8",
+            "ffff78",
+            "ff6400",
+            "b40000",
+            "280000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.015,
+          "softness": 0.05
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0d2"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 1,
+        "sensitivity": 0.1,
+        "smoothing": 0.02,
+        "squelch": 0,
+        "agcRelease": 0.1
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0,
+        "hysteresis": 0.2
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "source": 1,
+      "sourceOut": 0,
+      "params": {
+        "rate": 0
+      }
+    },
+    "3": {
+      "type": "delay",
+      "source": 1,
+      "sourceOut": 0,
+      "sourceB": 2,
+      "sourceOutB": 0,
+      "params": {
+        "time": 0.549
+      }
+    },
+    "4": {
+      "type": "envelope",
+      "shape": "linear",
+      "source": 3,
+      "sourceOut": 0,
+      "params": {
+        "attack": 0.01,
+        "decay": 0.11
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "bass_bins",
+      "label": "Bass Bins",
+      "params": {
+        "knob": 0.22580645161290322
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.1973244147157191
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "beat_thresh",
+      "label": "Beat Threshold",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "avg_decay",
+      "label": "Auto-Gain Release",
+      "params": {
+        "knob": 0.19597989949748745
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "num_sparks",
+      "label": "Spark Count",
+      "params": {
+        "knob": 0.5714285714285714
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "spark_life",
+      "label": "Spark Life",
+      "params": {
+        "knob": 0.2962962962962963
+      }
+    },
+    "11": {
+      "type": "macro",
+      "name": "spark_bloom",
+      "label": "Spark Bloom",
+      "params": {
+        "knob": 0.16666666666666666
+      }
+    },
+    "12": {
+      "type": "macro",
+      "name": "gravity",
+      "label": "Spark Gravity",
+      "params": {
+        "knob": 0.13333333333333333
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 2,
+      "dst": "L0.emitter.velocity",
+      "depth": 1.11,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.speedRef",
+      "depth": 1.11,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L1.emitter.origin",
+      "depth": 0.4,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L2.emitter.centre",
+      "depth": 0.4,
+      "bipolar": false
+    },
+    {
+      "src": 4,
+      "dst": "L2.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "bass_bins",
+      "dst": "M0.hi",
+      "depth": 31,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "beat_thresh",
+      "dst": "M1.level",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "avg_decay",
+      "dst": "M0.agcRelease",
+      "depth": 19.9,
+      "bipolar": true
+    },
+    {
+      "src": "num_sparks",
+      "dst": "L1.emitter.count",
+      "depth": 28,
+      "bipolar": true
+    },
+    {
+      "src": "spark_life",
+      "dst": "L1.emitter.lifetime",
+      "depth": 2.7,
+      "bipolar": true
+    },
+    {
+      "src": "spark_bloom",
+      "dst": "L1.emitter.size",
+      "depth": 0.036,
+      "bipolar": true
+    },
+    {
+      "src": "gravity",
+      "dst": "L1.emitter.acceleration",
+      "depth": -3,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "bass_bins",
+      "label": "Bass Bins",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 22.5806,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 19.7324,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "beat_thresh",
+      "label": "Beat Threshold",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "avg_decay",
+      "label": "Auto-Gain Release",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 19.598,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "num_sparks",
+      "label": "Spark Count",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 57.1429,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spark_life",
+      "label": "Spark Life",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 29.6296,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spark_bloom",
+      "label": "Spark Bloom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.6667,
+      "target": "M11.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "gravity",
+      "label": "Spark Gravity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 13.3333,
+      "target": "M12.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

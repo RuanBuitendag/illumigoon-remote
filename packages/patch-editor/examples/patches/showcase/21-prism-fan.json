@@ -1,0 +1,360 @@
+{
+  "name": "Prism Fan",
+  "notes": "`20-prism` with five clocks instead of one. Each line gets its own sine LFO at the same rate and a phase a fifth of a turn ahead of the one before it -- M0..M4 at 0.0, 0.2, 0.4, 0.6, 0.8 driving L0..L4 in order -- so the five sweeps run as one travelling wave rather than in unison. Identical rates are what keeps the stagger: the offsets are set once and never drift, because nothing pulls the rates apart.\n\nThe sweep is a `translate` warp, not the emitter's `centre`, and that is the load-bearing choice. `offset` has a base of ZERO, and a `multiply` row does `*= (1 + v * depth)` -- so a row multiplying an offset scales the swing and leaves the line's home alone. Multiplying `centre` would have dragged all five toward p=0 instead. The emitter centre is now only where a line lives; the warp is how far it travels.\n\n**A matrix row's `depth` has no address**, so no rack knob can reach the five of them, and `Macro::MAX_TARGETS` is 4 in any case -- the same wall that left `20-prism` with one knob. `M6` is the way round it: a `macro` signal is a plain 0..1 matrix SOURCE, so one rack control fans out to five multiply rows through a single target. The LFO rows carry 0.12 and the multiply rows 2.75, which puts the swing at 0.12 with the knob down and 0.45 -- `20-prism`'s figure -- with it up. Unity at zero is inherent to `1 + v*depth`, so a knob like this scales an amplitude the document chose; it cannot start one from nothing.\n\nAnd because the knob is a modulator parameter rather than a rack entry, the audio band can drive it: `M5` adds bass onto `M6.knob` and the whole fan opens on the beat, one knob upstream of five rows. A row reads its source before a later row writes it, so the bass lands a frame late -- 5 ms at 200 FPS.\n\n`screen` rather than `add`: five saturated lines at value 2.0 crossing under `add` spend their time clipped white, and the crossings are the point.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.25,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.75,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 2
+    },
+    "3": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.1,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 3
+    },
+    "4": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.9,
+          "length": 0.15,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001040",
+            "40c0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 4
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.35,
+        "phase": 0
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.2
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.4
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.6
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.35,
+        "phase": 0.8
+      }
+    },
+    "5": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 6,
+        "sensitivity": 0.1,
+        "smoothing": 0.08
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0.35
+      },
+      "name": "depth",
+      "label": "Sweep Depth"
+    },
+    "7": {
+      "type": "macro",
+      "name": "audio",
+      "label": "Audio Amount",
+      "params": {
+        "knob": 0.3277310924369748
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.warp0.offset",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L1.warp0.offset",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L2.warp0.offset",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L3.warp0.offset",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L4.warp0.offset",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": "depth",
+      "dst": "L0.warp0.offset",
+      "depth": 2.75,
+      "bipolar": true,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L1.warp0.offset",
+      "depth": 2.75,
+      "bipolar": true,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L2.warp0.offset",
+      "depth": 2.75,
+      "bipolar": true,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L3.warp0.offset",
+      "depth": 2.75,
+      "bipolar": true,
+      "op": "multiply"
+    },
+    {
+      "src": "depth",
+      "dst": "L4.warp0.offset",
+      "depth": 2.75,
+      "bipolar": true,
+      "op": "multiply"
+    },
+    {
+      "src": 5,
+      "dst": "M6.knob",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "audio",
+      "dst": "M5.sensitivity",
+      "depth": 11.9,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "depth",
+      "label": "Sweep Depth",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 35,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "audio",
+      "label": "Audio Amount",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 32.7731,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

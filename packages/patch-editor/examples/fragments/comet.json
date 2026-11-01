@@ -1,0 +1,76 @@
+{
+  "fragment": "layer",
+  "name": "Comet",
+  "notes": "A spawner on a periodic trigger, scrolled by a translate warp. The warp chain comes with it — a fragment is the whole layer, not just the emitter.\n\nLayer 0 of `showcase/02-comet.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "params": {
+          "origin": 0.05,
+          "velocity": 1.4,
+          "acceleration": -0.15,
+          "drag": 1.2,
+          "length": 0.02,
+          "softness": 0.07,
+          "lifetime": 3,
+          "fadeOut": 0.7,
+          "speedRef": 1.4,
+          "maxAlive": 6
+        },
+        "trigger": {
+          "src": 0,
+          "out": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "200040",
+            "4060ff",
+            "a0f0ff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0,
+      "warps": [
+        {
+          "type": "translate",
+          "params": {}
+        },
+        {
+          "type": "mirror",
+          "params": {}
+        }
+      ]
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "periodic",
+      "params": {
+        "period": 1.6
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.08
+      },
+      "wave": "ramp_up"
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "L0.warp0.offset",
+      "depth": 1
+    }
+  ]
+}

@@ -1,0 +1,308 @@
+{
+  "name": "Gradient Map",
+  "notes": "`index: \"position\"` IS a gradient map: the emitter is a `block` filled to 1.0, saying nothing but \"all of it, at full weight\", and every pixel's colour comes from where it sits. Geometry supplies coverage, position supplies the lookup.\n\nThe scroll is `paletteOffset` on a `ramp_up` at depth exactly 1.0 -- the offset wraps and the ramp is a full unipolar sweep, so the gradient leaves one end and returns at the other with no seam, and `wrap` is on because the palette has to be a ring for that to be true. The second layer is the SAME map at `paletteSpan` 2.4 under a `tile`, running the other way at a third of the speed, so the strip carries a slow wide gradient with a fast narrow one beating against it -- and because the two share a palette, the interference is in hue and brightness at once.\n\nThe palette is an ultraviolet analogous run with one sodium accent at the far end: four hues inside 45 degrees and a fifth 150 away, so most of the strip is one colour with depth in it and the gold arrives as an event rather than as a third of the spectrum. `M2` drives `M0.rate`, so the scroll surges and eases instead of ticking.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "3200ff",
+            "6e00ff",
+            "aa00ff",
+            "e600ff",
+            "ffc800"
+          ]
+        },
+        "params": {
+          "indexBias": -1
+        }
+      },
+      "blend": "add",
+      "opacity": 0.15,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "params": {
+          "paletteSpan": 2.4,
+          "indexBias": -1
+        },
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "3200ff",
+            "6e00ff",
+            "aa00ff",
+            "e600ff",
+            "ffc800"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "tile",
+          "params": {
+            "count": 3
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0.45,
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "ramp_down",
+      "params": {
+        "rate": 0.007
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.05
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "breathe",
+      "label": "Breathe",
+      "params": {
+        "knob": 0.13749999999999998
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "tilt",
+      "label": "Tilt",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "level",
+      "label": "Level",
+      "params": {
+        "knob": 1
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": false
+    },
+    {
+      "src": 1,
+      "dst": "L1.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "M0.rate",
+      "depth": 0.03,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L0.colour.paletteSpan",
+      "depth": 0.55,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp0.count",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.layer.opacity",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 0.11,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.04,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.4,
+      "bipolar": true
+    },
+    {
+      "src": "breathe",
+      "dst": "M3.rate",
+      "depth": 0.08,
+      "bipolar": true
+    },
+    {
+      "src": "tilt",
+      "dst": "L0.colour.indexBias",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "tilt",
+      "dst": "L1.colour.indexBias",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "level",
+      "dst": "L0.layer.opacity",
+      "depth": 0.85,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "breathe",
+      "label": "Breathe",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 13.75,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "tilt",
+      "label": "Tilt",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "level",
+      "label": "Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

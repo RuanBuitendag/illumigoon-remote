@@ -1,0 +1,470 @@
+{
+  "name": "Prism Line (3 band)",
+  "notes": "Port of `prism_line`. THREE LINES ON ONE SINE PATH, which is the entire animation and which the previous port did not have at all -- it pushed three centres apart with audio and never swung them.\n\nOne `lfo(sine)` is the path and every layer reads it, so the colours agree about WHEN to swing and disagree only about HOW FAR. Superimposed they sum toward white -- `add`, and not divided by the colour count, because an overlap is supposed to be bright -- and they separate into a spectrum as their amplitudes diverge. That is why the palette is primaries: red, green and blue at the same place are exactly white.\n\nEACH LAYER'S AMPLITUDE IS THREE ROWS ON ITS CENTRE, and they are three because a row has one source and an amplitude is a PRODUCT of the oscillator with a level:\n  `M4 * 0.02`         the swing that is there in silence -- `amp_min`\n  `M5 * 0.21`         `math(mul, sine, overall)`: every colour rides the overall level\n  `M6..8 * 0.12`      `math(mul, sine, own band)`: this colour rides its own slice\nSummed, that is `sin * (amp_min + overall*a + rel_i*b)` -- the animation's split blend with the loudness weighting held fixed. The animation makes the blend factor `overall * split_depth`, so how much the colours are ALLOWED to disagree itself depends on how loud it is; that is quadratic in the bands and would cost two more math nodes than the rack has room for. What survives is the part that reads: quiet is a narrow white line, loud is a wide fractured one.\n\n`split_depth` therefore lands on the three slice bands' `sensitivity` rather than on a blend factor. More gain on a colour's own band is more disagreement, which is the knob's meaning even though it is not its arithmetic.\n\nTEN BANDS BECOME THREE, the same gap `09-fft-bars` has: `SpectrumSignal` gives N outputs from one slot and is on no list in `SignalNodes`, so no document can build one (LIFE-675). The slices are the animation's own -- its ten log-spaced bands over bins 1-256 cut three ways, [0,2] [3,5] [6,9], which is bins 1-4, 5-27 and 28-256. Per-band auto-gain comes free: `audio_band` IS prism_line's gain staging, so each slice is normalised against its own rolling maximum and bass no longer swamps treble.\n\n`phase_spread` is 0, which is the animation at rest and what makes this one path rather than three. Above 0 it spreads the colours evenly around the cycle -- reachable only by giving each layer its own LFO at one rate with fixed phase offsets, which is what `showcase/21-prism-fan` is.\n\nWHAT HAS NO KNOB AND WHY: `len_max`, `amp_min`, `amp_max` and `freq_max` are row DEPTHS and a depth has no address; `brightness` is the glow row's depth for the same reason, so `floor` -- its base -- is the knob that pair gets. `fall` is the animation's asymmetric peak envelope, which `audio_band` has no attack/release split for. `band_low`/`band_high` would have to re-cut three slices from one pair of numbers. `split`, the on/off, is a toggle; `split_depth` at 0 is the same thing.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "00ff00"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "0000ff"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 2
+    }
+  },
+  "global": {
+    "opacity": 0
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 256,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "1": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 4,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "2": {
+      "type": "audio_band",
+      "params": {
+        "lo": 5,
+        "hi": 27,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "3": {
+      "type": "audio_band",
+      "params": {
+        "lo": 28,
+        "hi": 256,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0
+      }
+    },
+    "5": {
+      "type": "math",
+      "op": "mul",
+      "source": 4,
+      "sourceOut": 0,
+      "sourceB": 0,
+      "sourceOutB": 0,
+      "params": {}
+    },
+    "6": {
+      "type": "math",
+      "op": "mul",
+      "source": 4,
+      "sourceOut": 0,
+      "sourceB": 1,
+      "sourceOutB": 0,
+      "params": {}
+    },
+    "7": {
+      "type": "math",
+      "op": "mul",
+      "source": 4,
+      "sourceOut": 0,
+      "sourceB": 2,
+      "sourceOutB": 0,
+      "params": {}
+    },
+    "8": {
+      "type": "math",
+      "op": "mul",
+      "source": 4,
+      "sourceOut": 0,
+      "sourceB": 3,
+      "sourceOutB": 0,
+      "params": {}
+    },
+    "9": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "len_min",
+      "label": "Line Min Length",
+      "params": {
+        "knob": 0.08
+      }
+    },
+    "11": {
+      "type": "macro",
+      "name": "freq_min",
+      "label": "Swing Rate Min",
+      "params": {
+        "knob": 0.2
+      }
+    },
+    "12": {
+      "type": "macro",
+      "name": "floor",
+      "label": "Glow Floor",
+      "params": {
+        "knob": 0.1568627450980392
+      }
+    },
+    "13": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.046822742474916385
+      }
+    },
+    "14": {
+      "type": "macro",
+      "name": "split_depth",
+      "label": "Audio Split Depth",
+      "params": {
+        "knob": 0.7
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "M4.rate",
+      "depth": 14,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "G.opacity",
+      "depth": 0.8431372549019608,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L0.emitter.centre",
+      "depth": 0.02,
+      "bipolar": true
+    },
+    {
+      "src": 5,
+      "dst": "L0.emitter.centre",
+      "depth": 0.21,
+      "bipolar": true
+    },
+    {
+      "src": 6,
+      "dst": "L0.emitter.centre",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L0.emitter.length",
+      "depth": 0.16,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L1.emitter.centre",
+      "depth": 0.02,
+      "bipolar": true
+    },
+    {
+      "src": 5,
+      "dst": "L1.emitter.centre",
+      "depth": 0.21,
+      "bipolar": true
+    },
+    {
+      "src": 7,
+      "dst": "L1.emitter.centre",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.length",
+      "depth": 0.16,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L2.emitter.centre",
+      "depth": 0.02,
+      "bipolar": true
+    },
+    {
+      "src": 5,
+      "dst": "L2.emitter.centre",
+      "depth": 0.21,
+      "bipolar": true
+    },
+    {
+      "src": 8,
+      "dst": "L2.emitter.centre",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.length",
+      "depth": 0.16,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L1.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L2.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "len_min",
+      "dst": "L0.emitter.length",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "len_min",
+      "dst": "L1.emitter.length",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "len_min",
+      "dst": "L2.emitter.length",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "freq_min",
+      "dst": "M4.rate",
+      "depth": 20,
+      "bipolar": true
+    },
+    {
+      "src": "floor",
+      "dst": "G.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M1.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M2.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M3.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "split_depth",
+      "dst": "M1.sensitivity",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": "split_depth",
+      "dst": "M2.sensitivity",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": "split_depth",
+      "dst": "M3.sensitivity",
+      "depth": 3,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "len_min",
+      "label": "Line Min Length",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 8,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "freq_min",
+      "label": "Swing Rate Min",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 20,
+      "target": "M11.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "floor",
+      "label": "Glow Floor",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15.6863,
+      "target": "M12.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 4.6823,
+      "target": "M13.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "split_depth",
+      "label": "Audio Split Depth",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 70,
+      "target": "M14.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

@@ -24,6 +24,11 @@ export function ScreenStack({ home, room, page, isRoomOpen, isPageOpen }: Screen
   );
 }
 
+// The patch editor fills the screen and brings its own layout.
+export function EditorLayout({ children }: { children: ReactNode }) {
+  return <div className="editor-layout">{children}</div>;
+}
+
 type SearchLayoutProps = { strip: ReactNode; text: string; children?: ReactNode };
 
 export function SearchLayout({ strip, text, children }: SearchLayoutProps) {

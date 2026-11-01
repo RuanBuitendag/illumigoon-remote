@@ -2,7 +2,7 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "oxc", "import", "unicorn"],
   "categories": { "correctness": "error" },
-  "ignorePatterns": ["dist", "ios", "build", "src/domain/looks/engine"],
+  "ignorePatterns": ["dist", "ios", "build"],
   "rules": {
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "error",

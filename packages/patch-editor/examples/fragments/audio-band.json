@@ -1,0 +1,57 @@
+{
+  "fragment": "layer",
+  "name": "Audio Band",
+  "notes": "A noise field fed by an audio band. The simplest audio-reactive layer in the corpus.\n\nLayer 0 of `03-audio-band.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 3.2,
+          "evolve": 0.15
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "5a0000",
+            "dc2800",
+            "ff9628",
+            "ffe0a0"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "hi": 6,
+        "sensitivity": 4,
+        "smoothing": 0.12
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.7,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L0.palette.value",
+      "depth": 0.45,
+      "bipolar": false
+    }
+  ]
+}

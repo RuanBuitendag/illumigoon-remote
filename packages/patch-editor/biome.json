@@ -1,0 +1,16 @@
+{
+  "root": false,
+  "$schema": "../../node_modules/@biomejs/biome/configuration_schema.json",
+  "files": { "includes": ["src/**", "server/**", "!src/engine/generated/**", "!**/*.css"] },
+  "formatter": { "enabled": false },
+  "assist": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "rules": {
+      "recommended": false,
+      "complexity": {
+        "noExcessiveCognitiveComplexity": { "level": "error", "options": { "maxAllowedComplexity": 15 } }
+      }
+    }
+  }
+}

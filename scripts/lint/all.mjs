@@ -3,7 +3,7 @@
 
 import { spawnSync } from 'node:child_process';
 
-const checks = ['lint:code', 'lint:complexity', 'lint:types', 'lint:layers', 'lint:dupes', 'lint:unused', 'lint:rules'];
+const checks = ['lint:code', 'lint:complexity', 'lint:types', 'lint:layers', 'lint:dupes', 'lint:unused', 'lint:rules', 'lint:editor'];
 const failed = [];
 
 for (const check of checks) {

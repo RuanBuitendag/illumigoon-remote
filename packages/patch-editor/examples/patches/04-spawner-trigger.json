@@ -1,0 +1,139 @@
+{
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "age",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.1,
+          "acceleration": 0.9,
+          "length": 0.05,
+          "fadeOut": 0.3,
+          "lifetime": 3,
+          "maxAlive": 24
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ff6000",
+            "300000"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 5,
+        "sensitivity": 0.5
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0.1,
+        "hysteresis": 0.15
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3103448275862069
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "threshold",
+      "label": "Threshold",
+      "params": {
+        "knob": 0.5625
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Launch Speed",
+      "params": {
+        "knob": 0.2105263157894737
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 14.5,
+      "bipolar": true
+    },
+    {
+      "src": "threshold",
+      "dst": "M1.level",
+      "depth": 0.8,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "L0.emitter.velocity",
+      "depth": 1.9,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Launch Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 21.0526,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.0345,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "threshold",
+      "label": "Threshold",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 56.25,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

@@ -1,0 +1,370 @@
+{
+  "name": "Chromatic Aberration",
+  "notes": "The lens fault, built the way the fault is: ONE shape drawn three times, each copy displaced, each carrying one channel. Three `line` emitters share a centre driven by the same LFO and differ only in the `translate` under two of them, so the bar moves as one object and its edges separate. `screen` rather than `add` -- three saturated channels at full weight under add spend their time clipped, and the whole point is the fringes.\n\nNot R/G/B. A split complement -- cerise at 315 degrees, cobalt at 220, and acid lime at 78 as the odd one out -- so the fringes are a colour relationship rather than a test card, and the lime lands on one edge only.\n\nTwo chains. `M2` drives `M1.rate`, so the split does not sweep at a constant speed: the separation races and stalls on a noise clock, which is what an optical fault looks like as a lens moves. And `M7` is a `macro` signal, not a rack knob -- its `knob` is a plain 0..1 matrix source, so ONE rack control fans out to three rates at three different depths and the detuning between them survives the sweep. A rack knob with four targets would have had to set them equal. `M6` does the same for hue, with OPPOSITE signs on the three layers, so turning Colour walks the three channels through analogous, split and complementary rather than rotating all three together.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.02,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "ff00c8"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": -0.02
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0.15,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.02,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "b4ff00"
+          ]
+        }
+      },
+      "blend": "screen",
+      "opacity": 0.15,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.02,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "0050ff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0.02
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0.15,
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.023
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "triangle",
+      "params": {
+        "rate": 0.008
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.035
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "width",
+      "label": "Width",
+      "params": {
+        "knob": 0.2558139534883721
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "breathe",
+      "label": "Breathe",
+      "params": {
+        "knob": 0.075
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "level",
+      "label": "Level",
+      "params": {
+        "knob": 1
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.centre",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.centre",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.warp0.offset",
+      "depth": -0.06,
+      "bipolar": false
+    },
+    {
+      "src": 1,
+      "dst": "L2.warp0.offset",
+      "depth": 0.06,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "M1.rate",
+      "depth": 0.05,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L0.emitter.softness",
+      "depth": 0.13,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L1.emitter.softness",
+      "depth": 0.13,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L2.emitter.softness",
+      "depth": 0.13,
+      "bipolar": false
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 0.135,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.047,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.21,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.55,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L2.palette.hueShift",
+      "depth": 0.32,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "L0.emitter.length",
+      "depth": 0.43,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "L1.emitter.length",
+      "depth": 0.43,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "L2.emitter.length",
+      "depth": 0.43,
+      "bipolar": true
+    },
+    {
+      "src": "breathe",
+      "dst": "M3.rate",
+      "depth": 0.12,
+      "bipolar": true
+    },
+    {
+      "src": "level",
+      "dst": "L0.layer.opacity",
+      "depth": 0.85,
+      "bipolar": true
+    },
+    {
+      "src": "level",
+      "dst": "L1.layer.opacity",
+      "depth": 0.85,
+      "bipolar": true
+    },
+    {
+      "src": "level",
+      "dst": "L2.layer.opacity",
+      "depth": 0.85,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "width",
+      "label": "Width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 25.5814,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "breathe",
+      "label": "Breathe",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 7.5,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "level",
+      "label": "Level",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

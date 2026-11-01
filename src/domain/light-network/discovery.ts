@@ -9,14 +9,35 @@ type DiscoveryEvents = {
   onLost: (name: string) => void;
 };
 
-// A browser has no Bonjour, so on localhost the addresses come from ?light=<address> in the URL.
-function discoverFromUrl({ onFound }: DiscoveryEvents) {
+type FoundDevice = { name: string; addresses: string[] };
+
+const HELPER_POLL_MS = 3000;
+
+// A page has no Bonjour, so on a laptop the helper process finds the lights. ?light=<address> adds one by hand.
+function discoverFromHelper({ onFound, onLost }: DiscoveryEvents) {
   for (const address of new URLSearchParams(location.search).getAll('light')) onFound(address, address);
+  const known = new Set<string>();
+  const poll = async () => {
+    const reply = await fetch('/api/devices').catch(() => null);
+    if (!reply?.ok) return;
+    const { devices } = (await reply.json()) as { devices: FoundDevice[] };
+    const names = new Set(devices.map(({ name }) => name));
+    for (const name of known) if (!names.has(name)) onLost(name);
+    known.clear();
+    for (const { name, addresses } of devices) {
+      const address = addresses[0];
+      if (!address) continue;
+      known.add(name);
+      onFound(name, address);
+    }
+  };
+  void poll();
+  window.setInterval(() => void poll(), HELPER_POLL_MS);
 }
 
 export function startDiscovery(events: DiscoveryEvents) {
   if (!Capacitor.isNativePlatform()) {
-    discoverFromUrl(events);
+    discoverFromHelper(events);
     return;
   }
   for (const type of SERVICE_TYPES) {

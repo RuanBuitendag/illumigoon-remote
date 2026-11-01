@@ -1,0 +1,356 @@
+{
+  "name": "Perlin Audio",
+  "notes": "Port of `perlin_audio`, which is TWO noise fields crossfaded -- the previous port had one layer and so was not the animation at all.\n\nLayer 0 is the still field at its own speed. Layer 1 is the reactive one, `over` at the blend amount, and its `evolve` is the audio band: the animation's L2 speed is `l2_min_speed + level * (l2_max_speed - l2_min_speed)` and is reactive whether or not any `react_*` toggle is set, which is the one thing about that animation worth reading twice.\n\nThe `react_brightness`, `react_scale` and `react_blend` toggles do not port. A toggle picks between a constant and a lerp, and a matrix row is always the lerp -- so the choice a toggle makes is made here by a depth of zero, which is not a knob. Their defaults are all false, so this port takes the constant each of them selects: brightness at `l2_max`, scale at `l2_max`, blend at `l2_max`. `l2_max_speed` is the audio row's depth and has no address for the same reason.\n\nIt inherits `02-aurora`'s divergence: a perlin emitter's density and its `u` are one number, so `palette(u)` arrives already scaled by that noise where the animation looks the palette up at full brightness. Both scale knobs are capped at 40 by the node against the animation's 50, and `l1_speed` at 5 against its 10 -- `perlin.evolve` stops there.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.1,
+          "evolve": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "003296",
+            "00b464",
+            "6400c8"
+          ],
+          "params": {
+            "hueShift": -1,
+            "value": 0
+          }
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.1,
+          "evolve": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ff3200",
+            "ffc800",
+            "ff0064"
+          ],
+          "params": {
+            "hueShift": -1,
+            "value": 0.8627450980392157
+          }
+        }
+      },
+      "blend": "over",
+      "opacity": 0,
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 1,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "l1_speed",
+      "label": "L1 Speed",
+      "params": {
+        "knob": 0.04
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "l1_scale",
+      "label": "L1 Noise Scale",
+      "params": {
+        "knob": 0.047619047619047616
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "l2_scale",
+      "label": "L2 Noise Scale",
+      "params": {
+        "knob": 0.1979949874686717
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "blend",
+      "label": "L2 Blend",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "l1_brightness",
+      "label": "L1 Brightness",
+      "params": {
+        "knob": 0.7843137254901961
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.1638795986622074
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "smoothing",
+      "label": "Smoothing",
+      "params": {
+        "knob": 0.16666666666666666
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "squelch",
+      "label": "Squelch",
+      "params": {
+        "knob": 0.02
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "bin_end",
+      "label": "Bin End",
+      "params": {
+        "knob": 0.03718199608610567
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.emitter.evolve",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L1.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "l1_speed",
+      "dst": "L0.emitter.evolve",
+      "depth": 5,
+      "bipolar": true
+    },
+    {
+      "src": "l1_scale",
+      "dst": "L0.emitter.scale",
+      "depth": 39.9,
+      "bipolar": true
+    },
+    {
+      "src": "l2_scale",
+      "dst": "L1.emitter.scale",
+      "depth": 39.9,
+      "bipolar": true
+    },
+    {
+      "src": "blend",
+      "dst": "L1.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "l1_brightness",
+      "dst": "L0.palette.value",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M0.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M0.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "bin_end",
+      "dst": "M0.hi",
+      "depth": 511,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "l1_speed",
+      "label": "L1 Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 4,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "l1_scale",
+      "label": "L1 Noise Scale",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 4.7619,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "l2_scale",
+      "label": "L2 Noise Scale",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 19.7995,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "blend",
+      "label": "L2 Blend",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "l1_brightness",
+      "label": "L1 Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 78.4314,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.388,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.6667,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "squelch",
+      "label": "Squelch",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 2,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bin_end",
+      "label": "Bin End",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 3.7182,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

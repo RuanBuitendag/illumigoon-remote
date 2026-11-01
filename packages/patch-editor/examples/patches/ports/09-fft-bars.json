@@ -1,0 +1,471 @@
+{
+  "name": "FFT Spectrogram (6 band)",
+  "notes": "Port of `fft`. The animation maps every LED to a log-spaced FFT bin and colours it by that bin's level; this is the same thing at six bins instead of 512, because `SpectrumSignal` gives N outputs from one modulator slot and is on no list in `SignalNodes`, so no document can build one (LIFE-675). Six bands is what six of sixteen slots buys.\n\nColour by LEVEL is `paletteSpan` 0: the index collapses, `t = paletteOffset`, and one row per band paints its whole segment a single colour off the black-green-yellow-red ramp. That is the animation's palette exactly, and it is why this is the one port with no hue knob -- rotating the hue of a meter whose colours MEAN something is not a control anybody wants.\n\n`brightness` is `G.opacity`, the global stage. Six layers would otherwise need six rows for one knob, and the animation's brightness really is a property of the whole picture rather than of any band.\n\nBand edges are the animation's own: log-spaced from bin 2 to bin 486, which is its `minFreqBin` and `numBins * 0.95`.\n\n`log_scale` does not port. It is a toggle that rewrites each bin as dB before the gain stage, and a toggle is a structural choice no knob reaches; `audio_band` has no dB mode. `sensitivity` is capped too -- the animation declares 0.1-100 and the node stops at 30.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.08333333333333333,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.25,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.4166666666666667,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 2
+    },
+    "3": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5833333333333334,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 3
+    },
+    "4": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.75,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 4
+    },
+    "5": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.9166666666666666,
+          "length": 0.16666666666666666,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "000000",
+            "00ff00",
+            "ffff00",
+            "ff0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 5
+    }
+  },
+  "global": {
+    "opacity": 0
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 2,
+        "hi": 4,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "1": {
+      "type": "audio_band",
+      "params": {
+        "lo": 5,
+        "hi": 11,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "2": {
+      "type": "audio_band",
+      "params": {
+        "lo": 12,
+        "hi": 30,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "3": {
+      "type": "audio_band",
+      "params": {
+        "lo": 31,
+        "hi": 77,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "4": {
+      "type": "audio_band",
+      "params": {
+        "lo": 78,
+        "hi": 194,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "5": {
+      "type": "audio_band",
+      "params": {
+        "lo": 195,
+        "hi": 485,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "brightness",
+      "label": "Brightness",
+      "params": {
+        "knob": 1
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "smoothing",
+      "label": "Smoothing",
+      "params": {
+        "knob": 0.12499999999999999
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3311036789297659
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "squelch",
+      "label": "Squelch",
+      "params": {
+        "knob": 0.02
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L1.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L2.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L3.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L4.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 5,
+      "dst": "L5.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "brightness",
+      "dst": "G.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M0.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M0.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M1.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M1.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M1.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M2.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M2.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M2.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M3.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M3.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M3.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M4.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M4.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M4.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M5.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M5.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M5.squelch",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 12.5,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 33.1104,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "squelch",
+      "label": "Squelch",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 2,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

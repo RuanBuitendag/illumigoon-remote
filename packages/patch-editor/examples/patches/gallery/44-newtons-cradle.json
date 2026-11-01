@@ -1,0 +1,335 @@
+{
+  "name": "Newton's Cradle",
+  "notes": "`collide` at 1.0, which `nodes.h` names exactly: a restitution of 1 is a Newton's cradle and 0 is a clump. At 1 the solver passes momentum through a stack of touching bodies intact, so a kick at one end travels through five stationary ones and comes out the far side while the middle never moves. That is the whole demonstration, and it needs nothing but the number.\n\n`gravity` is small and negative and `drag` is nearly zero, so the bodies settle into contact and stay there between kicks -- a cradle only works if the balls are touching. `spread` 0.55 with `sizeVary` 0 puts them in a tight even row. `kickVary` at 0.15 rather than 0 is the deliberate imperfection: with it at 0 every kick is identical and the cradle is a loop, and at 0.15 the energy arriving at the far end differs slightly each time, so the pattern drifts the way a real one does.\n\nThe chain is the clock and the force from one source at different depths -- `M1` drives both `M0.period` and `kick`, so a fast sequence of kicks is also a WEAK sequence and a slow one lands hard. That is the difference between a metronome and someone playing it. `colouring: \"speed\"` means the travelling impulse is the only lit thing; the resting bodies sit at the cold end. Sodium and gold for the moving ball, cobalt for the ones at rest.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "bodies",
+        "colouring": "speed",
+        "trigger": {
+          "src": 0,
+          "out": 0
+        },
+        "params": {
+          "count": 2,
+          "origin": 0.5,
+          "spread": 0.55,
+          "size": 0.02,
+          "sizeVary": 0,
+          "softness": 0.25,
+          "gravity": -0.35,
+          "drag": 0.02,
+          "bounce": 0.98,
+          "collide": 0.5,
+          "kick": 1.1,
+          "kickVary": 0,
+          "speedRef": 1.4
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "001e50",
+            "0064ff",
+            "ffaa00",
+            "ffe600"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "scale",
+          "params": {
+            "zoom": 1,
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.7,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "0064ff",
+            "ffaa00"
+          ]
+        }
+      },
+      "blend": "screen",
+      "opacity": 0.18,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "periodic",
+      "params": {
+        "period": 2.4
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.011
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.03
+      }
+    },
+    "3": {
+      "type": "envelope",
+      "source": 0,
+      "shape": "expo_out",
+      "params": {
+        "attack": 0.003,
+        "decay": 0.6
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "count",
+      "label": "Balls",
+      "params": {
+        "knob": 0.4
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "size",
+      "label": "Ball Size",
+      "params": {
+        "knob": 0.30000000000000004
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "elastic",
+      "label": "Elasticity",
+      "params": {
+        "knob": 1
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "vary",
+      "label": "Kick Vary",
+      "params": {
+        "knob": 0.15
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "L0.warp0.zoom",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "M0.period",
+      "depth": 2.6,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.kick",
+      "depth": -0.7,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.spread",
+      "depth": 0.25,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.layer.opacity",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.gravity",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L0.colour.paletteSpan",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.035,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.09,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.5,
+      "bipolar": true
+    },
+    {
+      "src": "count",
+      "dst": "L0.emitter.count",
+      "depth": 10,
+      "bipolar": true
+    },
+    {
+      "src": "size",
+      "dst": "L0.emitter.size",
+      "depth": 0.09999999999999999,
+      "bipolar": true
+    },
+    {
+      "src": "elastic",
+      "dst": "L0.emitter.collide",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "vary",
+      "dst": "L0.emitter.kickVary",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "count",
+      "label": "Balls",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 40,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "size",
+      "label": "Ball Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 30,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "elastic",
+      "label": "Elasticity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "vary",
+      "label": "Kick Vary",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

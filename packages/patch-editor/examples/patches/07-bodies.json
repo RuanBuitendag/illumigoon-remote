@@ -1,0 +1,137 @@
+{
+  "name": "Bodies",
+  "notes": "The `bodies` emitter: five balls that fall to one end, bounce with a restitution below 1 so they settle, and cannot pass through each other. A periodic trigger kicks all five away from the floor. This is the emitter that OCCUPIES SPACE -- `particles` and `spawner` both pass straight through each other and through the ends. Coloured by `index`, which is keyed on a body's stable id rather than its place in the sorted array, so two balls that touch do not swap colours; five palette entries means one each. Turn `collide` to 1 for a Newton's cradle and to 0 to make them clump and travel as one.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "bodies",
+        "colouring": "index",
+        "trigger": {
+          "src": 0,
+          "out": 0
+        },
+        "params": {
+          "count": 5,
+          "origin": 0.5,
+          "spread": 0.85,
+          "size": 0.04,
+          "sizeVary": 0.35,
+          "softness": 0.35,
+          "gravity": -4,
+          "drag": 0.12,
+          "bounce": 0,
+          "collide": 0.95,
+          "kick": 0,
+          "kickVary": 0.45
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ff2050",
+            "ff9000",
+            "ffe000",
+            "20c060",
+            "3060ff"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "periodic",
+      "params": {
+        "period": 2.2
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "kick",
+      "label": "Kick",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "gravity",
+      "label": "Gravity",
+      "params": {
+        "knob": 0.6842105263157895
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "bounce",
+      "label": "Bounce",
+      "params": {
+        "knob": 0.75
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "kick",
+      "dst": "L0.emitter.kick",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": "gravity",
+      "dst": "L0.emitter.gravity",
+      "depth": 3.8,
+      "bipolar": true
+    },
+    {
+      "src": "bounce",
+      "dst": "L0.emitter.bounce",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "kick",
+      "label": "Kick",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "gravity",
+      "label": "Gravity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 68.4211,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bounce",
+      "label": "Bounce",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 75,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

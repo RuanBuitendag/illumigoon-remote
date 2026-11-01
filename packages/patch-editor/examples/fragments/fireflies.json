@@ -1,0 +1,63 @@
+{
+  "fragment": "layer",
+  "name": "Fireflies",
+  "notes": "Particles that do not move, breathing through the palette. The LFO drives the palette rather than the emitter.\n\nLayer 0 of `showcase/16-fireflies.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "spread": 1,
+          "count": 0,
+          "rate": 2.5,
+          "speedVary": 0.02,
+          "acceleration": 0,
+          "drag": 0,
+          "size": 0.02,
+          "sizeVary": 0.6,
+          "softness": 1,
+          "lifetime": 5,
+          "lifeVary": 0.7,
+          "fade": 0,
+          "maxAlive": 32
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "0a2800",
+            "3f9010",
+            "9fff40",
+            "e8ff90",
+            "6f9020",
+            "0a1400",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.04
+      },
+      "wave": "perlin"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.rate",
+      "depth": 2
+    }
+  ]
+}

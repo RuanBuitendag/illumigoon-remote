@@ -1,5 +1,4 @@
-// Types for engine.mjs. Both files come from smart-lighting-firmware/tools/patch-editor:
-// run `npm run engine:build` there and copy src/engine/generated/ here.
+// Types for engine.mjs, which the firmware headers compile to. The app previews use it too.
 export type EngineModule = {
   HEAPU8: Uint8Array;
   stringToNewUTF8: (text: string) => number;

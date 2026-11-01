@@ -1,0 +1,208 @@
+{
+  "name": "Ball Pit",
+  "notes": "Objects a room can knock about. Eight balls of varying size sit at the bottom of a dim tube; a bass hit kicks the lot of them, they collide on the way up and on the way down, and they settle again on their own -- nothing has to keep telling them to. The band drives `kick` as well as firing it, so a soft hit lifts them a little and a loud one throws them at the far end. Mass is the radius, so the big ones plough through the small ones rather than trading places with them. The `L1` block underneath is not decoration: without a lit tube the balls read as sparks in the dark instead of as things in a container.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "bodies",
+        "colouring": "index",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "count": 8,
+          "origin": 0.5,
+          "spread": 0.9,
+          "size": 0.032,
+          "sizeVary": 0.6,
+          "softness": 0.3,
+          "gravity": -5,
+          "drag": 0.1,
+          "bounce": 0,
+          "collide": 0.92,
+          "kick": 0,
+          "kickVary": 0.5
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ff3060",
+            "ff8020",
+            "ffd800",
+            "60e040",
+            "20c0d0",
+            "4060ff",
+            "9040e0",
+            "ff40b0"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "palette": {
+          "entries": [
+            "141420",
+            "0a0a14"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 6,
+        "sensitivity": 0.5,
+        "smoothing": 0.06,
+        "squelch": 0.08
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0.5,
+        "hysteresis": 0.15
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3103448275862069
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "kick",
+      "label": "Kick",
+      "params": {
+        "knob": 0.3
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "gravity",
+      "label": "Gravity",
+      "params": {
+        "knob": 0.6808510638297872
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "bounce",
+      "label": "Bounce",
+      "params": {
+        "knob": 0.72
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.kick",
+      "depth": 1.6,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 14.5,
+      "bipolar": true
+    },
+    {
+      "src": "kick",
+      "dst": "L0.emitter.kick",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": "gravity",
+      "dst": "L0.emitter.gravity",
+      "depth": 4.7,
+      "bipolar": true
+    },
+    {
+      "src": "bounce",
+      "dst": "L0.emitter.bounce",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.0345,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "kick",
+      "label": "Kick",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 30,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "gravity",
+      "label": "Gravity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 68.0851,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bounce",
+      "label": "Bounce",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 72,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

@@ -1,0 +1,199 @@
+{
+  "name": "Confetti Cannon",
+  "notes": "Two cannons that are one cannon. The burst is fired at 0.25 and a MIRROR at 0.5 folds the far half back, so a single emitter costs one slot and reads as a pair firing at each other -- the warp is not a property of the burst and the emitter never hears about it. Coloured `random`, which is the option a spawner cannot have: each piece draws once at birth and holds it, so a burst lands as a spread of colours off an eight-hue wheel rather than a dozen of the same. A random draw does not need many stops -- the palette is reconstructed continuously, so a draw lands BETWEEN two hues as readily as on one. `colour.wrap` is on because the palette is a wheel here and a random draw lands anywhere on it, seam included. Audio drives `count` rather than brightness, so a loud hit throws MORE paper -- and because `count` is read on the trigger frame, the level at the moment of the beat is what sizes that burst.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "random",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.25,
+          "spread": 0.03,
+          "count": 1,
+          "rate": 0,
+          "speed": 0,
+          "speedVary": 0.2,
+          "acceleration": -0.5,
+          "drag": 1.8,
+          "size": 0.011,
+          "sizeVary": 0.5,
+          "softness": 0.5,
+          "lifetime": 1.8,
+          "lifeVary": 0.6,
+          "fade": 0.9,
+          "maxAlive": 120
+        }
+      },
+      "colour": {
+        "index": "u",
+        "wrap": true,
+        "palette": {
+          "entries": [
+            "ff0000",
+            "ffbf00",
+            "80ff00",
+            "00ff40",
+            "00ffff",
+            "0040ff",
+            "8000ff",
+            "ff00bf"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 8,
+        "sensitivity": 0.5,
+        "smoothing": 0.05,
+        "squelch": 0.08
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0.5,
+        "hysteresis": 0.15
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3103448275862069
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "count",
+      "label": "Confetti",
+      "params": {
+        "knob": 0.2903225806451613
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "spread",
+      "label": "Spread",
+      "params": {
+        "knob": 0.3157894736842105
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "fold",
+      "label": "Fold Point",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.count",
+      "depth": 18,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 14.5,
+      "bipolar": true
+    },
+    {
+      "src": "count",
+      "dst": "L0.emitter.count",
+      "depth": 31,
+      "bipolar": true
+    },
+    {
+      "src": "spread",
+      "dst": "L0.emitter.speedVary",
+      "depth": 3.8,
+      "bipolar": true
+    },
+    {
+      "src": "fold",
+      "dst": "L0.warp0.centre",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.0345,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "count",
+      "label": "Confetti",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 29.0323,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spread",
+      "label": "Spread",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.5789,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "fold",
+      "label": "Fold Point",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

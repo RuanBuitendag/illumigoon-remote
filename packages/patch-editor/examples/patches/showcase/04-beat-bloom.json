@@ -1,0 +1,176 @@
+{
+  "name": "Beat Bloom",
+  "notes": "The whole converter chain in one patch: continuous in, edge in the middle, continuous out. audio_band gives a level; threshold turns it into a trigger with hysteresis so it does not chatter; envelope turns that trigger back into a shaped ramp. The envelope then drives a SCALE warp, so the shape does not get longer -- the space it lives in gets bigger, and it blooms outward from the centre and settles. `expo_out` is what makes it snap rather than swell. Nothing in the flat animation set can do this, because none of them has a stage between the band and the shape.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.02,
+          "softness": 0.09
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "0c0018",
+            "6000c0",
+            "ff40e0",
+            "ffe0ff"
+          ],
+          "params": {
+            "value": 0.5
+          }
+        }
+      },
+      "warps": [
+        {
+          "type": "scale",
+          "params": {
+            "zoom": 1,
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 0.5,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 6,
+        "sensitivity": 0.5,
+        "smoothing": 0.04,
+        "squelch": 0.08
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0.5,
+        "hysteresis": 0.15
+      }
+    },
+    "2": {
+      "type": "envelope",
+      "source": 1,
+      "sourceOut": 0,
+      "shape": "expo_out",
+      "params": {
+        "attack": 0.006,
+        "decay": 0.05
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3103448275862069
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "decay",
+      "label": "Decay",
+      "params": {
+        "knob": 0.25641025641025644
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "size",
+      "label": "Size",
+      "params": {
+        "knob": 0.25000000000000006
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 2,
+      "dst": "L0.warp0.zoom",
+      "depth": 2.5,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.palette.value",
+      "depth": 0.9,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.layer.opacity",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 14.5,
+      "bipolar": true
+    },
+    {
+      "src": "decay",
+      "dst": "M2.decay",
+      "depth": 1.95,
+      "bipolar": true
+    },
+    {
+      "src": "size",
+      "dst": "L0.emitter.length",
+      "depth": 0.48,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 31.0345,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "decay",
+      "label": "Decay",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 25.641,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "size",
+      "label": "Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 25,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

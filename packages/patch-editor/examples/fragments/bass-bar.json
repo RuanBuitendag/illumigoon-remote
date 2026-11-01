@@ -1,0 +1,59 @@
+{
+  "fragment": "layer",
+  "name": "Bass Bar",
+  "notes": "Audio-reactive: a bass band stretches the line while an LFO moves it. Brings its own `audio_band`, so the patch it lands in starts asking the DSP task for frames.\n\nLayer 0 of `ports/08-sine-bass.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.05,
+          "softness": 0.04
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "200030",
+            "a020ff",
+            "ffe0ff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.45
+      }
+    },
+    "1": {
+      "type": "audio_band",
+      "params": {
+        "sensitivity": 4,
+        "squelch": 0.06,
+        "smoothing": 0.09
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.35
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.length",
+      "depth": 0.45
+    }
+  ]
+}

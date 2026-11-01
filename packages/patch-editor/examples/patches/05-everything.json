@@ -1,0 +1,259 @@
+{
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.5
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "000820",
+            "0a3060",
+            "20a0c0"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0.8,
+      "order": 0
+    },
+    "3": {
+      "emitter": {
+        "type": "wave",
+        "params": {
+          "freq": 5
+        }
+      },
+      "colour": {
+        "index": "position",
+        "palette": {
+          "entries": [
+            "ff00a0",
+            "00ffd0"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true
+        },
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0.6,
+      "order": 1
+    },
+    "5": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "speed",
+        "trigger": {
+          "src": 3,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.5,
+          "velocity": 0.8,
+          "acceleration": -0.4,
+          "length": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ffe080"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "triangle",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "1": {
+      "type": "audio_band",
+      "params": {
+        "lo": 8,
+        "hi": 40,
+        "sensitivity": 0.5
+      }
+    },
+    "2": {
+      "type": "envelope",
+      "source": 3,
+      "sourceOut": 0,
+      "shape": "expo_out",
+      "params": {
+        "attack": 0.005,
+        "decay": 0.6
+      }
+    },
+    "3": {
+      "type": "periodic",
+      "params": {
+        "period": 0.2
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "drift",
+      "label": "Drift Rate",
+      "params": {
+        "knob": 0.1020408163265306
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.3793103448275862
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "interval",
+      "label": "Burst Interval",
+      "params": {
+        "knob": 0.23076923076923078
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "texture",
+      "label": "Texture",
+      "params": {
+        "knob": 0.2608695652173913
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.offset",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L3.emitter.freq",
+      "depth": 8,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "L3.layer.opacity",
+      "depth": 0.4,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L3.warp0.offset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.palette.hueShift",
+      "depth": 0.25,
+      "bipolar": false
+    },
+    {
+      "src": "drift",
+      "dst": "M0.rate",
+      "depth": 0.98,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M1.sensitivity",
+      "depth": 14.5,
+      "bipolar": true
+    },
+    {
+      "src": "interval",
+      "dst": "M3.period",
+      "depth": 7.8,
+      "bipolar": true
+    },
+    {
+      "src": "texture",
+      "dst": "L0.emitter.scale",
+      "depth": 11.5,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "drift",
+      "label": "Drift Rate",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 10.2041,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 37.931,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "interval",
+      "label": "Burst Interval",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 23.0769,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "texture",
+      "label": "Texture",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 26.087,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

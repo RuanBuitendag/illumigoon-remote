@@ -1,0 +1,325 @@
+{
+  "name": "Black Hole",
+  "notes": "Two bodies drift toward each other on opposed LFOs and detonate when they touch. What makes it possible is that the separation is read off the SHAPES -- `math abs_diff` on `L0.emitter.centre` and `L1.emitter.centre` -- rather than off the oscillators driving them. So the glow answers to where the bodies actually are, and it keeps answering if you grab the drift macro and move them by hand, which a patch built on the LFO outputs could not do. M4 is the contact: `lt` against the merge distance, latching with hysteresis so a graze fires once rather than stuttering, and firing an EDGE so it can kick the particles directly without a threshold node in between. M6 adds the two centres and the row halves it, so the burst happens at the midpoint and travels with it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.3,
+          "length": 0.05,
+          "softness": 0.035
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "0a1030",
+            "3050ff",
+            "a0d0ff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.7,
+          "length": 0.05,
+          "softness": 0.035
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "300804",
+            "ff4020",
+            "ffc080"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.45,
+          "softness": 0.4
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "100024",
+            "8040ff",
+            "ffffff"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "blend": "screen",
+      "opacity": 0,
+      "order": 0
+    },
+    "3": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "trigger": {
+          "src": 4,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "spread": 0.03,
+          "count": 4,
+          "speed": 0,
+          "speedVary": 1.4,
+          "acceleration": 0,
+          "drag": 2.2,
+          "size": 0.012,
+          "sizeVary": 0.6,
+          "softness": 0.6,
+          "lifetime": 1.1,
+          "lifeVary": 0.5,
+          "fade": 0.85,
+          "maxAlive": 64
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ffd080",
+            "ff4000",
+            "200000"
+          ],
+          "params": {
+            "saturation": 2,
+            "value": 2
+          }
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 3
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.02,
+        "phase": 0
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.02,
+        "phase": 0.5
+      }
+    },
+    "2": {
+      "type": "math",
+      "op": "abs_diff",
+      "source": "L0.emitter.centre",
+      "sourceB": "L1.emitter.centre",
+      "params": {
+        "slew": 0.05
+      }
+    },
+    "3": {
+      "type": "macro",
+      "params": {
+        "knob": 0.08
+      },
+      "name": "merge",
+      "label": "Merge Distance"
+    },
+    "4": {
+      "type": "math",
+      "op": "lt",
+      "source": "M2",
+      "sourceB": "M3",
+      "params": {
+        "hysteresis": 0.06
+      }
+    },
+    "5": {
+      "type": "envelope",
+      "source": 4,
+      "sourceOut": 0,
+      "shape": "expo_out",
+      "params": {
+        "attack": 0.02,
+        "decay": 0.9
+      }
+    },
+    "6": {
+      "type": "math",
+      "op": "add",
+      "source": "L0.emitter.centre",
+      "sourceB": "L1.emitter.centre"
+    },
+    "7": {
+      "type": "macro",
+      "name": "drift",
+      "label": "Approach Speed",
+      "params": {
+        "knob": 0.15517241379310345
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "burst",
+      "label": "Burst Size",
+      "params": {
+        "knob": 0.5333333333333333
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "glow",
+      "label": "Glow",
+      "params": {
+        "knob": 0.6
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.22,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L1.emitter.centre",
+      "depth": 0.22,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L2.layer.opacity",
+      "depth": -1.4,
+      "bipolar": true
+    },
+    {
+      "src": 5,
+      "dst": "L2.palette.value",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 6,
+      "dst": "L3.emitter.origin",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "drift",
+      "dst": "M0.rate",
+      "depth": 0.58,
+      "bipolar": true
+    },
+    {
+      "src": "drift",
+      "dst": "M1.rate",
+      "depth": 0.58,
+      "bipolar": true
+    },
+    {
+      "src": "burst",
+      "dst": "L3.emitter.count",
+      "depth": 60,
+      "bipolar": true
+    },
+    {
+      "src": "glow",
+      "dst": "L2.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "merge",
+      "label": "Merge Distance",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 8,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "drift",
+      "label": "Approach Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15.5172,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "burst",
+      "label": "Burst Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 53.3333,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "glow",
+      "label": "Glow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 60,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

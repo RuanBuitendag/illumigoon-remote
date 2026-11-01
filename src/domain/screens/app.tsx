@@ -3,6 +3,7 @@ import { ScreenStack } from '../../composites';
 import { closePage, closeRoom, useNavigation, type PageKind } from '../store/navigation-store';
 import { useRooms, type Room } from '../store/rooms';
 import { AddLightPage } from './add-light-page';
+import { EditorPage } from './editor-page';
 import { HomeScreen } from './home-screen';
 import { LightSoftwarePage } from './light-software-page';
 import { LooksPage } from './looks-page';
@@ -18,13 +19,14 @@ const ROOM_PAGES = {
   lock: LockPage,
   'take-back': TakeBackPage,
   arrange: ArrangePage,
-} satisfies Record<Exclude<PageKind, 'add-light'>, (props: { room: Room }) => ReactNode>;
+} satisfies Record<Exclude<PageKind, 'add-light' | 'editor'>, (props: { room: Room }) => ReactNode>;
 
 function OpenPage({ rooms }: { rooms: Room[] }) {
   const page = useNavigation((navigation) => navigation.page);
   const roomId = useNavigation((navigation) => navigation.pageRoomId);
   if (page === 'add-light') return <AddLightPage rooms={rooms} />;
   const room = rooms.find(({ id }) => id === roomId);
+  if (page === 'editor') return <EditorPage room={room} />;
   if (!page || !room) return null;
   const Page = ROOM_PAGES[page];
   return <Page room={room} />;

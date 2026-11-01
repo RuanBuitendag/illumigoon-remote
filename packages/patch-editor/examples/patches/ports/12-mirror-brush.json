@@ -1,0 +1,293 @@
+{
+  "name": "Mirror Brush",
+  "notes": "Port of `mirror_brush`: a brush that paints while the room is loud, and whatever it painted scrolls outward from the centre, mirrored. The previous port was one line under a mirror on a triangle LFO, which is a shape bouncing rather than a trail being laid down.\n\nA STROKE IS ONE SUSTAINED SPAWN. The animation keeps a segment per stroke: its outer edge is where the scroll stood when the brush went down, and its inner edge is re-pinned to the centre every frame the brush stays down, then released when it lifts. That is `spawner.sustain` exactly -- the leading end launches on the threshold's rising edge, the trailing end holds at the origin while the threshold is `held()`, and the dip lets it go. So a loud bar paints one unbroken band rather than a row of dots, and a gap in the music is a gap in the trail. An earlier revision of this port streamed `particles` at a rate the band drove, which painted density rather than strokes.\n\n`threshold` is the trip level of a `threshold` node on the band, with hysteresis 0 because the animation compares `smoothed > threshold` with none. The band's own squelch stays at 0 so the two are not stacked.\n\n`mirror` maps a screen position to `|pos - centre| * 2`, so the emitter works in a half-strip where source 0 is the middle and source 1 is both ends. Every distance doubles with it: the animation's `min_speed` of 0.15 strip/s is a Launch Speed of 0.3 in this space, and the knob's ends are its declared 0.01-2 doubled. Acceleration and drag are 0 because the animation scrolls at a constant speed, so a released stroke keeps its length. Lifetime 0 retires a stroke once it has left the end, which is the animation's `scroll - endScroll > 0.5 + bloom`. The animation's own comment says it folds with `abs(pos - 0.5)`; this is that fold as a warp.\n\n`colors` cycling one entry per stroke becomes `colouring: index`, which also advances once per stroke and in a fixed rotation. It walks eight steps along the palette gradient rather than landing on each entry, so a three-colour palette shows its blends between strokes.\n\n`react_speed` and `react_brightness` are toggles and do not port, for the reason `10-perlin-audio` gives -- both default false, so this takes the constant each selects. `max_speed` is then the depth of a row that is not there. `bloom` is the animation's falloff either side of a painted segment, and here it is the spawner's Softness, doubled like every other distance.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "index",
+        "sustain": true,
+        "trigger": {
+          "src": 9,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.02,
+          "acceleration": 0,
+          "drag": 0,
+          "length": 0,
+          "softness": 0,
+          "lifetime": 0,
+          "fadeOut": 0,
+          "maxAlive": 64
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "00c8ff",
+            "ff32c8",
+            "ffc800"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 1,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "min_speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.07035175879396985
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "bloom",
+      "label": "Bloom",
+      "params": {
+        "knob": 0.19999999999999998
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "bin_start",
+      "label": "Bin Start",
+      "params": {
+        "knob": 0
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "bin_end",
+      "label": "Bin End",
+      "params": {
+        "knob": 0.07632093933463796
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.1973244147157191
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "threshold",
+      "label": "Threshold",
+      "params": {
+        "knob": 0.1
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "smoothing",
+      "label": "Smoothing",
+      "params": {
+        "knob": 0.24999999999999997
+      }
+    },
+    "9": {
+      "type": "threshold",
+      "source": 0,
+      "sourceOut": 0,
+      "params": {
+        "level": 0,
+        "hysteresis": 0
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "min_speed",
+      "dst": "L0.emitter.velocity",
+      "depth": 3.98,
+      "bipolar": true
+    },
+    {
+      "src": "bloom",
+      "dst": "L0.emitter.softness",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "bin_start",
+      "dst": "M0.lo",
+      "depth": 511,
+      "bipolar": true
+    },
+    {
+      "src": "bin_end",
+      "dst": "M0.hi",
+      "depth": 511,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "threshold",
+      "dst": "M9.level",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M0.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "min_speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 7.0352,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bloom",
+      "label": "Bloom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 20,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bin_start",
+      "label": "Bin Start",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bin_end",
+      "label": "Bin End",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 7.6321,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 19.7324,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "threshold",
+      "label": "Threshold",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 10,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 25,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

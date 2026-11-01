@@ -1,0 +1,344 @@
+{
+  "name": "Magma Vein",
+  "notes": "A crack with fire behind it. This is `showcase/18-lava-lamp`'s thresholded noise turned inside out and done in colour rather than in black: instead of dark entries switching the field off, a `paletteSpan` of 3.2 with `wrap` off runs the index far past both ends, so most of the field CLAMPS to the first entry -- deep cobalt -- and only the crests climb through the ember run to gold. The threshold is `indexBias`, and moving it is the difference between a hairline crack and a strip that is mostly molten.\n\nThat matters because it keeps the dark part of the image a saturated colour rather than an absence. A blue-black crust reads as cold rock; actual black reads as a broken LED.\n\nThe chain is the crust moving independently of what is behind it. `M2` drives `M0.rate` -- the vein's opening and closing accelerates on a noise clock -- while the crust layer above scrolls on its own and is blended `multiply`, so it removes red where it is dense and the fire only shows through where the rock is thin. Premultiplied multiply is `(1 - alpha) + src`, so a cobalt crust at 0.6 opacity leaves the green and blue and eats the red, which is exactly what a shadow over a fire should do. Ember run 350 to 42 degrees, crust at 220.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.8,
+          "evolve": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {
+          "paletteSpan": 3.2,
+          "indexBias": -0.55
+        },
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "0028ff",
+            "ff0028",
+            "ff5000",
+            "ffaa00",
+            "ffe600"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 2,
+          "evolve": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "0028ff",
+            "0064ff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        },
+        {
+          "type": "scale",
+          "params": {
+            "zoom": 1,
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "multiply",
+      "opacity": 0.6,
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.024
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.009
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.03
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.005
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "vein",
+      "label": "Vein Scale",
+      "params": {
+        "knob": 0.26086956521739135
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "crust",
+      "label": "Crust Drift",
+      "params": {
+        "knob": 0.125
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "heat",
+      "label": "Heat",
+      "params": {
+        "knob": 0.16
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "grain",
+      "label": "Rock Grain",
+      "params": {
+        "knob": 0.32142857142857145
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.indexBias",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "M0.rate",
+      "depth": 0.03,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.warp0.offset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp0.offset",
+      "depth": -0.6,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp1.zoom",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L1.layer.opacity",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.colour.paletteSpan",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 0.07,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.03,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.5,
+      "bipolar": true
+    },
+    {
+      "src": "vein",
+      "dst": "L0.emitter.scale",
+      "depth": 9.2,
+      "bipolar": true
+    },
+    {
+      "src": "crust",
+      "dst": "L1.emitter.evolve",
+      "depth": 0.4,
+      "bipolar": true
+    },
+    {
+      "src": "heat",
+      "dst": "L0.emitter.evolve",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "grain",
+      "dst": "L1.emitter.scale",
+      "depth": 14,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "vein",
+      "label": "Vein Scale",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 26.087,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "crust",
+      "label": "Crust Drift",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 12.5,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "heat",
+      "label": "Heat",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "grain",
+      "label": "Rock Grain",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 32.1429,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

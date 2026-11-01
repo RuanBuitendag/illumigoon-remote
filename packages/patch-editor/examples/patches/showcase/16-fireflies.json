@@ -1,0 +1,210 @@
+{
+  "name": "Fireflies",
+  "notes": "PARTICLES THAT DO NOT MOVE, and the palette doing the work `fade` cannot. `fade` only fades OUT -- a particle is born at full weight -- so a firefly built on it would pop in and then dim, which is exactly the wrong half. So `fade` is 0 here and the envelope lives in the COLOUR: the index is age, and the palette runs black -> dim green -> bright -> amber -> black, so a particle's whole life is one traverse of it and it glows up as well as down. That is the point of `u` being the emitter's own coordinate rather than its brightness. `wrap` stays OFF, because this palette is a gradient with two ends and both of them are black -- turning it on would join them and the fade would never complete. Everything else is a near-absence of physics: `speedVary` 0.02 and no gravity, so they hang where they are born. `rate` is driven by a PERLIN LFO rather than a sine, so the field clusters and thins the way a real one does instead of breathing on a metronome.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "params": {
+          "origin": 0.5,
+          "spread": 1,
+          "count": 0,
+          "rate": 0.2,
+          "speed": 0,
+          "speedVary": 0.02,
+          "acceleration": 0,
+          "drag": 0,
+          "size": 0.005,
+          "sizeVary": 0.6,
+          "softness": 1,
+          "lifetime": 1,
+          "lifeVary": 0.7,
+          "fade": 0,
+          "maxAlive": 32
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "000000",
+            "0a2800",
+            "3f9010",
+            "9fff40",
+            "e8ff90",
+            "6f9020",
+            "0a1400",
+            "000000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 1.8,
+          "time": 0,
+          "offset": 0
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "000000",
+            "020a06",
+            "05140a"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.04
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.011
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "flies",
+      "label": "Flies",
+      "params": {
+        "knob": 0.23469387755102036
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "life",
+      "label": "Lifetime",
+      "params": {
+        "knob": 0.36363636363636365
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "size",
+      "label": "Size",
+      "params": {
+        "knob": 0.2727272727272727
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "glow",
+      "label": "Glow",
+      "params": {
+        "knob": 1
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.rate",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L1.emitter.offset",
+      "depth": 2.5,
+      "bipolar": true
+    },
+    {
+      "src": "flies",
+      "dst": "L0.emitter.rate",
+      "depth": 9.8,
+      "bipolar": true
+    },
+    {
+      "src": "life",
+      "dst": "L0.emitter.lifetime",
+      "depth": 11,
+      "bipolar": true
+    },
+    {
+      "src": "size",
+      "dst": "L0.emitter.size",
+      "depth": 0.055,
+      "bipolar": true
+    },
+    {
+      "src": "glow",
+      "dst": "L1.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "flies",
+      "label": "Flies",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 23.4694,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "life",
+      "label": "Lifetime",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 36.3636,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "size",
+      "label": "Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 27.2727,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "glow",
+      "label": "Glow",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

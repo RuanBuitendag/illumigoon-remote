@@ -1,0 +1,373 @@
+{
+  "name": "Arpeggio",
+  "notes": "A note jumps between positions and its COLOUR comes from where it landed, not from anything about the note. That is `index: \"position\"` used as a keyboard -- the palette is laid once along the strip and a line stepping through it plays it like a scale. The line carries no colour of its own; it reveals one already there, which is the distinction `showcase/05-ladder` draws between Position and U, put to work.\n\nThe steps are a `sample_hold` at a small non-zero `slew`: 0.03 s is about six frames at 200 FPS, fast enough to still read as a step and slow enough that the eye follows it.\n\nTwo chains stack. The draw drives `M2.rate` -- a second, slower sequencer whose tempo is set by the last note. Note what LIFE-698 means here: `LfoSignal::seed` is not in the document, so both `sample_hold` sources draw the IDENTICAL sequence. They are not two independent players. Because the second runs at a rate the first is setting, it plays the same notes at a different and continually changing speed, which is a canon rather than a counterpoint -- deliberate here, and worth knowing before copying this shape somewhere it would be wrong. And `M3` drives `M0.rate`, walking the arpeggio's tempo through a factor of four on a slow noise clock, which is the thing a fixed sequencer cannot do. The two voices run OPPOSITE directions from the same source, so they cross in the middle of the strip on beats nobody scheduled. Split complement: cerise and violet 25 degrees apart with acid lime 200 away, and the lime lives at one end of the keyboard so only the highest notes reach it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.3,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "ff00aa",
+            "dc00ff",
+            "9600ff",
+            "b4ff00"
+          ]
+        }
+      },
+      "blend": "screen",
+      "opacity": 0,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.015,
+          "softness": 0.015
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "ff00aa",
+            "dc00ff",
+            "9600ff",
+            "b4ff00"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 1,
+      "order": 2
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.035,
+          "softness": 0.01
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "params": {
+          "paletteSpan": 1.5,
+          "indexBias": 0.3
+        },
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "9600ff",
+            "b4ff00"
+          ]
+        }
+      },
+      "blend": "screen",
+      "opacity": 0.75,
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 3.6,
+        "slew": 0
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.014
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 1.1,
+        "slew": 0
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.03
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "glide",
+      "label": "Glide",
+      "params": {
+        "knob": 0.03
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "note",
+      "label": "Note Size",
+      "params": {
+        "knob": 0.21621621621621623
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "trail",
+      "label": "Trail",
+      "params": {
+        "knob": 0.44
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "second",
+      "label": "Second Voice Glide",
+      "params": {
+        "knob": 0.1
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "L1.warp0.centre",
+      "depth": 0.25,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.46,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.centre",
+      "depth": 0.46,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "M2.rate",
+      "depth": 1.6,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L2.emitter.centre",
+      "depth": -0.44,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "M0.rate",
+      "depth": 3,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L1.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L2.layer.opacity",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 7,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M3.rate",
+      "depth": 0.09,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L2.palette.hueShift",
+      "depth": -0.55,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": "glide",
+      "dst": "M0.slew",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "note",
+      "dst": "L1.emitter.length",
+      "depth": 0.185,
+      "bipolar": true
+    },
+    {
+      "src": "trail",
+      "dst": "L0.layer.opacity",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "second",
+      "dst": "M2.slew",
+      "depth": 1.2,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "glide",
+      "label": "Glide",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 3,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "note",
+      "label": "Note Size",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 21.6216,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "trail",
+      "label": "Trail",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 44,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "second",
+      "label": "Second Voice Glide",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 10,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

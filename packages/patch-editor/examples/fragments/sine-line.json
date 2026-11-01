@@ -1,0 +1,46 @@
+{
+  "fragment": "layer",
+  "name": "Sine Line",
+  "notes": "A line and the LFO that swings it. The one that does not exist as a node: `line` has a position, not a phase, so a sine line is always an emitter plus a modulator plus a row into `centre`.\n\nLayer 0 of `ports/03-sine-line.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.12,
+          "softness": 0.05
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "001830",
+            "40b0ff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.4
+    }
+  ]
+}

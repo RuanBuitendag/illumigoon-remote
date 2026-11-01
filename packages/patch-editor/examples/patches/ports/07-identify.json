@@ -1,0 +1,103 @@
+{
+  "name": "Identify",
+  "notes": "Port of `identify`: the whole strip in one colour, either solid or breathing at 0.35 Hz between a floor of 0.15 and full.\n\nThe breathe is exact rather than approximate. The animation's level is `floor + (1-floor) * 0.5 * (1 - cos(2*pi*phase))`; a sine row folded unipolar gives `0.5 + 0.5*sin`, so base opacity 0.15 with depth 0.85 and `bipolar: false` is the same curve, and the LFO's `phase` chooses where in it the strip starts.\n\n`effect` IS A SELECT AND A MACRO IS A SCALAR, so it becomes the breathe RATE: 0 is `solid` and anything above it is `breathe` at that speed. That is strictly more than the select offered, and it is why the LFO starts at phase 0.25 rather than 0 -- at rate 0 the wave must hold at its PEAK for `solid` to mean full brightness, and phase 0.25 is where a sine peaks. The cost is that the breathe begins at the top of the cycle and dips, where the animation begins at the floor and rises. Phase at boot is arbitrary either way.\n\nNot room-phase-locked, and deliberately: the animation's own comment says a slot offset would stagger the room into a chase, which reads as one light moving along a wall rather than several identifying themselves.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "ffffff"
+          ]
+        }
+      },
+      "blend": "over",
+      "opacity": 0.15,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0,
+        "phase": 0.25
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "effect",
+      "label": "Breathe",
+      "params": {
+        "knob": 1
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.layer.opacity",
+      "depth": 0.85,
+      "bipolar": false
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "effect",
+      "dst": "M0.rate",
+      "depth": 0.35,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "effect",
+      "label": "Breathe",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

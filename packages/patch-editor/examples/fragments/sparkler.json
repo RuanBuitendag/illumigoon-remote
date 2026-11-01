@@ -1,0 +1,59 @@
+{
+  "fragment": "layer",
+  "name": "Sparkler",
+  "notes": "Particles thrown from a source that moves. The LFO driving the spawn origin is shared with the bright tip in the patch this came from; capture takes the modulator and leaves the other layer behind.\n\nLayer 1 of `showcase/12-sparkler.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "params": {
+          "spread": 0.012,
+          "count": 0,
+          "rate": 90,
+          "speedVary": 0.3,
+          "acceleration": -0.45,
+          "drag": 2.4,
+          "size": 0.007,
+          "sizeVary": 0.7,
+          "softness": 0.9,
+          "lifetime": 0.85,
+          "lifeVary": 0.55,
+          "fade": 1,
+          "maxAlive": 140
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "fff4d0",
+            "ffc850",
+            "ff5000",
+            "1a0000"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.19
+      },
+      "wave": "triangle"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.origin",
+      "depth": 0.48
+    }
+  ]
+}

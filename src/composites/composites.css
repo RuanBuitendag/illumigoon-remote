@@ -6,6 +6,7 @@
 .screen-room, .screen-page { transform: translateX(102%); z-index: 2; }
 .screen-page { z-index: 3; overflow-y: auto; padding: max(54px, env(safe-area-inset-top)) 24px 60px; }
 .screen-room[data-open='true'], .screen-page[data-open='true'] { transform: none; box-shadow: var(--push-shadow); }
+.editor-layout { position: fixed; inset: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
 
 /* Home */
 

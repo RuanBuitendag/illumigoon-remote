@@ -1,6 +1,14 @@
-# Illumigoon remote
+# Illumigoon
 
-The iPhone app for the Illumigoon lights. Capacitor, React, zustand, Base UI.
+One app for the Illumigoon lights: control and patch editing, on the iPhone and on the laptop. Capacitor, Electron,
+React, zustand, Base UI.
+
+One web build runs in two shells. `electron/main.mjs` is the laptop shell, and it starts the helper process in
+`packages/patch-editor/server` that finds lights and holds files. On the iPhone the same `/api` paths are answered in
+the page, by `packages/patch-editor/src/phone`, from the same `server/library.mjs`.
+
+`packages/patch-editor` is the editor (LIFE-1885). It has its own lint gate, and the domain is the only layer that
+imports it. Its parts move into the three layers below one at a time.
 
 ## Layers
 
@@ -20,7 +28,7 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 
 ## Checks
 
-`npm run lint` runs seven checks and reports every failure in one run. CI runs it before each build.
+`npm run lint` runs eight checks and reports every failure in one run. CI runs it before each build.
 
 | Script | Tool | Catches |
 | -- | -- | -- |
@@ -31,6 +39,7 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 | `lint:dupes` | jscpd | copied blocks |
 | `lint:unused` | knip | unused files, exports and dependencies |
 | `lint:rules` | `scripts/lint/rules.mjs` | files outside the layers, a look in the domain, raw colours and controls |
+| `lint:editor` | the package gate | the same tools over `packages/patch-editor` |
 
 Fix the code when a check fails. Do not weaken a rule, and do not add an exception for one file.
-`src/domain/looks/engine` is a generated WebAssembly build, so the checks skip it.
+`packages/patch-editor/src/engine/generated` is a generated WebAssembly build, so the checks skip it.

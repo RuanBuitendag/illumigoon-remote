@@ -1,0 +1,190 @@
+{
+  "name": "Comet",
+  "notes": "A warp chain doing work the emitter never hears about. The spawner throws one slow, heavily-dragged shape every 1.6 s; a translate warp then scrolls the entire field underneath it, and a mirror folds the result. Neither warp is a property of the comet -- take the mirror away and it is one comet, take the translate away and it stops travelling, and the spawner is unchanged either way. `offset` is the only Wrap parameter on a warp, which is what makes the scroll endless rather than something that leaves. Coloured by SPEED, so each shape reddens as drag bleeds it off.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "speed",
+        "trigger": {
+          "src": 0,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.05,
+          "velocity": 1.4,
+          "acceleration": -0.15,
+          "drag": 1.2,
+          "length": 0.02,
+          "softness": 0.07,
+          "lifetime": 3,
+          "fadeOut": 0,
+          "speedRef": 1.4,
+          "maxAlive": 6
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "200040",
+            "4060ff",
+            "a0f0ff",
+            "ffffff"
+          ]
+        }
+      },
+      "warps": [
+        {
+          "type": "translate",
+          "wrap": true,
+          "params": {
+            "offset": 0
+          }
+        },
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "periodic",
+      "params": {
+        "period": 0.3
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.005
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "interval",
+      "label": "Fire Interval",
+      "params": {
+        "knob": 0.22807017543859648
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "scroll",
+      "label": "Scroll",
+      "params": {
+        "knob": 0.15151515151515152
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "tail",
+      "label": "Tail",
+      "params": {
+        "knob": 0.7
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "fold",
+      "label": "Fold Point",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 1,
+      "dst": "L0.warp0.offset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "interval",
+      "dst": "M0.period",
+      "depth": 5.7,
+      "bipolar": true
+    },
+    {
+      "src": "scroll",
+      "dst": "M1.rate",
+      "depth": 0.495,
+      "bipolar": true
+    },
+    {
+      "src": "tail",
+      "dst": "L0.emitter.fadeOut",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "fold",
+      "dst": "L0.warp1.centre",
+      "depth": 1,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "interval",
+      "label": "Fire Interval",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 22.807,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "scroll",
+      "label": "Scroll",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 15.1515,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "tail",
+      "label": "Tail",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 70,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "fold",
+      "label": "Fold Point",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "$schema": "../../node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "oxc", "import", "unicorn"],
+  "categories": { "correctness": "error" },
+  "ignorePatterns": ["src/engine/generated"],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "error",
+    "react/jsx-key": "error",
+    "import/no-cycle": "error",
+    "import/no-self-import": "error",
+    "import/no-duplicates": "error",
+    "no-console": ["error", { "allow": ["warn", "error"] }],
+    "max-lines": ["error", { "max": 600, "skipBlankLines": true, "skipComments": true }],
+    "max-lines-per-function": ["error", { "max": 150, "skipBlankLines": true, "skipComments": true, "IIFEs": true }],
+    "complexity": ["error", 25],
+    "max-depth": ["error", 4],
+    "max-params": ["error", 4],
+    "max-nested-callbacks": ["error", 4]
+  },
+  "overrides": [
+    {
+      "files": ["scripts/**"],
+      "rules": { "max-lines": "off", "max-lines-per-function": "off", "complexity": "off", "max-nested-callbacks": "off", "max-depth": "off", "max-params": "off", "no-console": "off" }
+    }
+  ]
+}

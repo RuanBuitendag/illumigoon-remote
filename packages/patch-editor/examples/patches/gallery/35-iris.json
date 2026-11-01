@@ -1,0 +1,355 @@
+{
+  "name": "Iris",
+  "notes": "An aperture built out of blades, not out of noise. `tile` on a single `line` IS a set of blades -- one shape repeated N times across the strip -- and driving the tile `count` between two and nine opens and closes the leaf count while the `mirror` under it makes the whole assembly symmetric about a wandering centre. The `scale` on top zooms the finished aperture. Three warps, all moving, on one emitter that never moves at all: `centre` stays at 0.5 for the entire patch and everything you see is the space being deformed.\n\nThat is worth reading beside `08-liquify`, which warps a stream of objects. Here the object is stationary and the warp chain is the entire animation, which is the cheapest possible way to get complex motion -- one `line` costs one trapezoid integration per pixel however many blades the tile makes of it.\n\nThe breathing is a two-stage chain over a period of nearly three minutes: `M3` drives `M1.rate`, and `M1` drives the zoom, so the aperture's pulse is a rate that is itself rising and falling. `M3` also drives the blade width and the layer opacity together, so a slow breath is dimmer AND thinner-bladed than a fast one. Ultraviolet run with a single acid lime almost exactly opposite, and the lime sits at the end of the palette so only the blade edges catch it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.09,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "position",
+        "wrap": true,
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "3200ff",
+            "6e00ff",
+            "aa00ff",
+            "e600ff",
+            "b4ff00"
+          ]
+        },
+        "params": {
+          "indexBias": -0.6
+        }
+      },
+      "warps": [
+        {
+          "type": "tile",
+          "params": {
+            "count": 4
+          }
+        },
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        },
+        {
+          "type": "scale",
+          "params": {
+            "zoom": 1,
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 0.75,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.55,
+          "softness": 0.5
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "saturation": 2,
+            "value": 2
+          },
+          "entries": [
+            "3200ff",
+            "b4ff00"
+          ]
+        }
+      },
+      "blend": "screen",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.011
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.07
+      }
+    },
+    "2": {
+      "type": "lfo",
+      "wave": "triangle",
+      "params": {
+        "rate": 0.024
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.001
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "perlin",
+      "params": {
+        "rate": 0.04
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "breathe",
+      "label": "Breathe",
+      "params": {
+        "knob": 0.12820512820512822
+      }
+    },
+    "6": {
+      "type": "macro",
+      "params": {
+        "knob": 0
+      },
+      "name": "colour",
+      "label": "Colour"
+    },
+    "7": {
+      "type": "macro",
+      "params": {
+        "knob": 0.5
+      },
+      "name": "speed",
+      "label": "Speed"
+    },
+    "8": {
+      "type": "macro",
+      "name": "edge",
+      "label": "Blade Edge",
+      "params": {
+        "knob": 0.07
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "halo",
+      "label": "Halo",
+      "params": {
+        "knob": 0.4285714285714286
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "bias",
+      "label": "Aperture",
+      "params": {
+        "knob": 0.5
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 3,
+      "dst": "M1.rate",
+      "depth": 0.09,
+      "bipolar": false
+    },
+    {
+      "src": 1,
+      "dst": "L0.warp2.zoom",
+      "depth": 1.4,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L0.warp0.count",
+      "depth": 3.5,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.warp1.centre",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L0.emitter.length",
+      "depth": 0.07,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L0.layer.opacity",
+      "depth": 0.25,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L1.emitter.length",
+      "depth": 0.4,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M1.rate",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 0.04,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M2.rate",
+      "depth": 0.08,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L0.palette.hueShift",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "colour",
+      "dst": "L1.palette.hueShift",
+      "depth": -0.45,
+      "bipolar": true
+    },
+    {
+      "src": "breathe",
+      "dst": "M3.rate",
+      "depth": 0.039,
+      "bipolar": true
+    },
+    {
+      "src": "edge",
+      "dst": "L0.emitter.softness",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": "halo",
+      "dst": "L1.layer.opacity",
+      "depth": 0.7,
+      "bipolar": true
+    },
+    {
+      "src": "bias",
+      "dst": "L0.colour.indexBias",
+      "depth": 1.2,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "colour",
+      "label": "Colour",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 0,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "breathe",
+      "label": "Breathe",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 12.8205,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "edge",
+      "label": "Blade Edge",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 7,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "halo",
+      "label": "Halo",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 42.8571,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bias",
+      "label": "Aperture",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

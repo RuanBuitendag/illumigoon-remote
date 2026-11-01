@@ -1,0 +1,171 @@
+{
+  "name": "Sine Line",
+  "notes": "Port of `sine_line`: a line swung across the strip by a sine, `pos = 0.5 + sin * (0.5 - len/2)`.\n\nTHE TRAVEL TERM IS THE WHOLE OF WHAT WAS MISSING. `0.5 - len/2` keeps the line's ENDS inside the strip rather than its centre, so a long line swings less far -- and it is a product of the oscillator and a parameter, which a row's fixed depth cannot express. It is two rows on one target: `M0 * 0.5` plus `math(mul, M0, L0.emitter.length) * -0.5`, which sums to `sin * (0.5 - len/2)` exactly. A parameter is a SOURCE, so the math node reads the length the `len` knob is currently asking for; the reading is one frame stale and the length changes only when a thumb moves it.\n\n`08-sine-bass` uses the identical pair for the identical reason, and there the length is moving every frame.\n\nNOT ROOM-LOCKED, and the original is: `sine_line` is the animation `trackRoomPhase()` was written for. `LfoSignal::phase` is writable precisely so a room clock could drive it and nothing wires MeshClock to it -- LIFE-676. Two strips running this drift apart.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.05,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1
+          },
+          "entries": [
+            "ffffff"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.1
+      }
+    },
+    "1": {
+      "type": "math",
+      "op": "mul",
+      "source": 0,
+      "sourceOut": 0,
+      "sourceB": "L0.emitter.length",
+      "params": {}
+    },
+    "2": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "brightness",
+      "label": "Brightness",
+      "params": {
+        "knob": 1
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "len",
+      "label": "Length",
+      "params": {
+        "knob": 0.33333333333333337
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "freq",
+      "label": "Speed",
+      "params": {
+        "knob": 0.08163265306122448
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.centre",
+      "depth": -0.5,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "brightness",
+      "dst": "L0.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "len",
+      "dst": "L0.emitter.length",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": "freq",
+      "dst": "M0.rate",
+      "depth": 4.9,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "len",
+      "label": "Length",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 33.3333,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "freq",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 8.1633,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

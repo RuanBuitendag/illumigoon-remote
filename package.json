@@ -3,6 +3,27 @@
   "private": true,
   "version": "0.0.1",
   "description": "iPhone app to control the lights (LIFE-1845).",
+  "type": "module",
+  "main": "electron/main.mjs",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -n sidecar,ui \"node scripts/sidecar.mjs\" \"vite --port 5173 --strictPort\"",
+    "build": "tsc --noEmit && vite build",
+    "lint": "node scripts/lint/all.mjs",
+    "lint:types": "tsc --noEmit",
+    "lint:code": "oxlint --deny-warnings src scripts electron",
+    "lint:complexity": "biome lint --max-diagnostics=none",
+    "lint:layers": "depcruise src --config .dependency-cruiser.cjs --output-type err",
+    "lint:dupes": "jscpd --min-tokens 50 --min-lines 5 --threshold 0 --exitCode 1 --reporters console --format typescript,tsx src",
+    "lint:unused": "knip",
+    "lint:rules": "node scripts/lint/rules.mjs",
+    "dev:laptop": "concurrently -n sidecar,ui,laptop \"node scripts/sidecar.mjs\" \"vite --port 5173 --strictPort\" \"electron . --dev\"",
+    "dist:laptop": "npm run build && electron-builder --win --config electron-builder.config.mjs",
+    "release:laptop": "npm run dist:laptop -- --publish always && node scripts/promote-release.mjs",
+    "lint:editor": "npm run lint --workspace @illumigoon/patch-editor"
+  },
   "dependencies": {
     "@base-ui/react": "^1.9.0",
     "@capacitor/core": "8.5.3",
@@ -10,7 +31,9 @@
     "@capgo/capacitor-updater": "8.54.0",
     "@fontsource/geist": "^5.3.0",
     "@fontsource/geist-mono": "^5.3.0",
+    "@illumigoon/patch-editor": "*",
     "@mhaberler/capacitor-zeroconf-nsd": "5.1.0",
+    "electron-updater": "6.8.9",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "zustand": "^5.0.16"
@@ -18,27 +41,18 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.15",
     "@capacitor/cli": "8.5.3",
+    "@types/path-browserify": "^1.0.3",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^9.1.0",
     "dependency-cruiser": "^18.7.0",
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3",
     "jscpd": "^4.3.0",
     "knip": "^6.44.0",
     "oxlint": "^1.90.0",
     "typescript": "~6.0.2",
     "vite": "^8.3.5"
-  },
-  "scripts": {
-    "dev": "vite --port 5173 --strictPort",
-    "build": "tsc --noEmit && vite build",
-    "lint": "node scripts/lint/all.mjs",
-    "lint:types": "tsc --noEmit",
-    "lint:code": "oxlint --deny-warnings src scripts",
-    "lint:complexity": "biome lint --max-diagnostics=none",
-    "lint:layers": "depcruise src --config .dependency-cruiser.cjs --output-type err",
-    "lint:dupes": "jscpd --min-tokens 50 --min-lines 5 --threshold 0 --exitCode 1 --reporters console --format typescript,tsx --ignore \"**/looks/engine/**\" src",
-    "lint:unused": "knip",
-    "lint:rules": "node scripts/lint/rules.mjs"
-  },
-  "type": "module"
+  }
 }

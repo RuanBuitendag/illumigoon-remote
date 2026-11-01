@@ -1,0 +1,108 @@
+{
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "scale": 0.5,
+          "evolve": 0.15
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "000000",
+            "5a0000",
+            "dc2800",
+            "ff9628",
+            "ffe0a0"
+          ]
+        }
+      },
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 6,
+        "sensitivity": 0.5,
+        "smoothing": 0.12
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.30434782608695654
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "texture",
+      "label": "Texture",
+      "params": {
+        "knob": 0.23478260869565218
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.evolve",
+      "depth": 0.7,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L0.palette.value",
+      "depth": 0.45,
+      "bipolar": false
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M0.sensitivity",
+      "depth": 11.5,
+      "bipolar": true
+    },
+    {
+      "src": "texture",
+      "dst": "L0.emitter.scale",
+      "depth": 11.5,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 30.4348,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "texture",
+      "label": "Texture",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 23.4783,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

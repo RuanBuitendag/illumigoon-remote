@@ -1,0 +1,86 @@
+{
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0,
+          "length": 0.02,
+          "softness": 0.05
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "ff4000",
+            "ffd080"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "macro",
+      "name": "position",
+      "label": "Position",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "width",
+      "label": "Width",
+      "params": {
+        "knob": 0.3965517241379311
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": "position",
+      "dst": "L0.emitter.centre",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "width",
+      "dst": "L0.emitter.length",
+      "depth": 0.58,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "position",
+      "label": "Position",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M0.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "width",
+      "label": "Width",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 39.6552,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

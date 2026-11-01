@@ -1,0 +1,302 @@
+{
+  "name": "Bass Sine",
+  "notes": "Port of `sine_bass`: a line swung by a sine, with bass driving its length and its brightness together.\n\nThe swing is `03-sine-line`'s pair of rows -- `M0 * 0.5` plus `math(mul, M0, L0.emitter.length) * -0.5` summing to `sin * (0.5 - len/2)` -- and here it earns its keep, because the length is moving on every beat rather than only when a thumb moves it. A fixed depth would let a loud passage swing the line's ENDS off the strip.\n\n`brightness` is `palette.value` and not `layer.opacity`, because opacity is already carrying the bass: the animation's brightness is `peak * bass`, a product, and two rows on one target sum rather than multiply. Splitting them puts the bass on opacity and the peak on the colour, which is the same product and leaves both addressable.\n\n`max_len` is the bass row's DEPTH and a depth has no address, so it is the one parameter with no knob. `min_len` is the length's base and is fine.\n\nTWO UNITS DIFFER, both knowingly. `smoothing` here is a time constant in seconds where the animation's is a per-frame alpha -- LIFE-651, and the seconds are the better unit because an alpha means something different at 60 FPS than at 200. `squelch` here is relative and applied AFTER the auto-gain, where the animation's is absolute and applied before; the audio_band node is prism_line's gain staging, which is the version that thought it through, and the other five animations are a degenerate configuration of it.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.01,
+          "softness": 0
+        }
+      },
+      "colour": {
+        "index": "density",
+        "palette": {
+          "params": {
+            "hueShift": -1,
+            "value": 0
+          },
+          "entries": [
+            "00b4ff"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 0.1
+      }
+    },
+    "1": {
+      "type": "audio_band",
+      "params": {
+        "lo": 1,
+        "hi": 1,
+        "sensitivity": 0.1,
+        "smoothing": 0,
+        "squelch": 0
+      }
+    },
+    "2": {
+      "type": "math",
+      "op": "mul",
+      "source": 0,
+      "sourceOut": 0,
+      "sourceB": "L0.emitter.length",
+      "params": {}
+    },
+    "3": {
+      "type": "macro",
+      "name": "hue",
+      "label": "Hue",
+      "params": {
+        "knob": 0.5
+      }
+    },
+    "4": {
+      "type": "macro",
+      "name": "brightness",
+      "label": "Brightness",
+      "params": {
+        "knob": 1
+      }
+    },
+    "5": {
+      "type": "macro",
+      "name": "min_len",
+      "label": "Min Length",
+      "params": {
+        "knob": 0.04255319148936171
+      }
+    },
+    "6": {
+      "type": "macro",
+      "name": "freq",
+      "label": "Speed",
+      "params": {
+        "knob": 0.08163265306122448
+      }
+    },
+    "7": {
+      "type": "macro",
+      "name": "sensitivity",
+      "label": "Sensitivity",
+      "params": {
+        "knob": 0.2642140468227425
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "smoothing",
+      "label": "Smoothing",
+      "params": {
+        "knob": 0.16666666666666666
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "squelch",
+      "label": "Squelch",
+      "params": {
+        "knob": 0.02
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "bass_bins",
+      "label": "Bass Bins",
+      "params": {
+        "knob": 0.16129032258064516
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.5,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L0.emitter.centre",
+      "depth": -0.5,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.length",
+      "depth": 0.4,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "hue",
+      "dst": "L0.palette.hueShift",
+      "depth": 2,
+      "bipolar": true
+    },
+    {
+      "src": "brightness",
+      "dst": "L0.palette.value",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "min_len",
+      "dst": "L0.emitter.length",
+      "depth": 0.94,
+      "bipolar": true
+    },
+    {
+      "src": "freq",
+      "dst": "M0.rate",
+      "depth": 4.9,
+      "bipolar": true
+    },
+    {
+      "src": "sensitivity",
+      "dst": "M1.sensitivity",
+      "depth": 29.9,
+      "bipolar": true
+    },
+    {
+      "src": "smoothing",
+      "dst": "M1.smoothing",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "squelch",
+      "dst": "M1.squelch",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": "bass_bins",
+      "dst": "M1.hi",
+      "depth": 31,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "hue",
+      "label": "Hue",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 50,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "brightness",
+      "label": "Brightness",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 100,
+      "target": "M4.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "min_len",
+      "label": "Min Length",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 4.2553,
+      "target": "M5.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "freq",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 8.1633,
+      "target": "M6.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "sensitivity",
+      "label": "Sensitivity",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 26.4214,
+      "target": "M7.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "smoothing",
+      "label": "Smoothing",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.6667,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "squelch",
+      "label": "Squelch",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 2,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "bass_bins",
+      "label": "Bass Bins",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.129,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

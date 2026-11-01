@@ -1,6 +1,28 @@
 {
   "$schema": "https://unpkg.com/knip@6/schema.json",
-  "entry": ["scripts/lint/*.mjs"],
-  "project": ["src/**/*.{ts,tsx}", "scripts/**/*.mjs", "!src/domain/looks/engine/**"],
-  "ignoreExportsUsedInFile": true
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    ".": {
+      "entry": [
+        "scripts/lint/*.mjs",
+        "electron-builder.config.mjs"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "scripts/**/*.mjs",
+        "electron/**/*.mjs"
+      ]
+    },
+    "packages/patch-editor": {
+      "entry": [
+        "src/domain/rules.ts",
+        "src/domain/statehash.ts"
+      ],
+      "project": [
+        "src/**/*.{ts,tsx}",
+        "server/**/*.mjs",
+        "!src/engine/generated/**"
+      ]
+    }
+  }
 }

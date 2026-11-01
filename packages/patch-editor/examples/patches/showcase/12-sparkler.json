@@ -1,0 +1,172 @@
+{
+  "name": "Sparkler",
+  "notes": "A SOURCE THAT MOVES. Every generative patch before this one emits from a fixed point; here one LFO drives both the bright tip (L0, a tiny line) and the particle stream's `origin` (L1) off the same row, so they are one object rather than two things that happen to agree. The sparks are left behind because they are born where the tip WAS -- nothing draws a trail, the trail is just history. Heavy drag (2.4) and a short life mean each spark barely travels before it dies, which is what keeps the trail tight to the path instead of smearing into fog. `rate` and no `count`: this is the stream form of `particles`, not the burst form, and there is no trigger anywhere in the patch. Turn `speedVary` up and it becomes a welding torch.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.008,
+          "softness": 0.03
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff4c0",
+            "ffffff",
+            "fff4c0"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "params": {
+          "origin": 0.5,
+          "spread": 0.012,
+          "count": 0,
+          "rate": 10,
+          "speed": 0,
+          "speedVary": 0.3,
+          "acceleration": -0.45,
+          "drag": 2.4,
+          "size": 0.007,
+          "sizeVary": 0.7,
+          "softness": 0.9,
+          "lifetime": 0.2,
+          "lifeVary": 0.55,
+          "fade": 1,
+          "maxAlive": 140
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff4d0",
+            "ffc850",
+            "ff5000",
+            "1a0000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "triangle",
+      "params": {
+        "rate": 0.02
+      }
+    },
+    "1": {
+      "type": "macro",
+      "name": "speed",
+      "label": "Speed",
+      "params": {
+        "knob": 0.11486486486486487
+      }
+    },
+    "2": {
+      "type": "macro",
+      "name": "spray",
+      "label": "Spray",
+      "params": {
+        "knob": 0.34782608695652173
+      }
+    },
+    "3": {
+      "type": "macro",
+      "name": "life",
+      "label": "Spark Life",
+      "params": {
+        "knob": 0.23214285714285712
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.48,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.origin",
+      "depth": 0.48,
+      "bipolar": true
+    },
+    {
+      "src": "speed",
+      "dst": "M0.rate",
+      "depth": 1.48,
+      "bipolar": true
+    },
+    {
+      "src": "spray",
+      "dst": "L1.emitter.rate",
+      "depth": 230,
+      "bipolar": true
+    },
+    {
+      "src": "life",
+      "dst": "L1.emitter.lifetime",
+      "depth": 2.8,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 11.4865,
+      "target": "M1.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spray",
+      "label": "Spray",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 34.7826,
+      "target": "M2.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "life",
+      "label": "Spark Life",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 23.2143,
+      "target": "M3.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

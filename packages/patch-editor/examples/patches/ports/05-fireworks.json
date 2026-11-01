@@ -1,0 +1,511 @@
+{
+  "name": "Fireworks",
+  "notes": "Port of `fireworks`. THE BURST LANDS WHERE THE ROCKET STOPPED, and that is not authored: a spawner with `acceleration` 0 and drag d covers `velocity / d`, so ONE sample_hold LFO drives the rocket's `velocity` AND the burst's `origin` and the two agree by construction. Each shot picks its own height in [0.2, 0.8], which is `burst_min`/`burst_max`. What makes a fixed clock offset legal: the time to reach a given FRACTION of that distance depends on d alone and not on the launch speed, so the burst fires 0.55 s after the launch whether the shot went low or high. IT BURSTS AT 60% AND NOT AT THE TOP, which is the correction that matters most: the original decelerates LINEARLY and stops dead, while drag is exponential and only ever asymptotes, so a rocket allowed to run to its apex creeps for half a second at nearly nothing and reads as a smear drifting up the strip. Bursting early keeps it moving at 40% of launch speed right up to the frame it dies, and `lifetime` 0.56 cuts it on that frame rather than fading it into the burst. THE SECOND THING THAT HAD TO BE TUNED BY EYE IS THE FLIGHT TIME. Drag is what sets it, and at 2.6 the rocket crossed half the strip in a third of a second and read as a flick rather than a launch; 1.67 puts it at 0.55 s, inside the 0.36-0.7 s the original's `decel` 3.0 gives. `speedRef` rides the same held number as `velocity`, which is the original's `speedFrac = |vel| / launchSpeed` exactly -- normalised against ITS OWN launch speed, so a low shot is dim from slowing rather than from never having been fast. `flicker` is M6/M7 on the rocket layers' opacity, 0.8 +/- 0.2, which is the original's `1 - flicker + flicker * (0.5 + 0.5 sin)` at its default 0.4 -- and it is honest here only because `maxAlive` is 2, so a LAYER-wide flicker is a per-rocket flicker. Two rates rather than one so the pair does not pulse together. TWO LAUNCHERS, opposite ends, 0.33 and 0.40 Hz -- the original picks an end at random and one clock cannot, and the incommensurate rates stop the pair beating into a rhythm. Slow on purpose: the sky has to be dark for a firework to be an event. The flash is `flash_size`, a 0.12 s bloom whose opacity is a linear envelope fired by the burst clock, sitting on the same held number as the burst. SPARKS ARE THIN AND WIDE, and that pairing is the whole of it. `PointSet::sample` CLAMPS summed density at 1 and blends the `u` of everything overlapping, where the original sums colours -- so two overlapping sparks here become one saturated blob of averaged colour rather than a brighter pair. The original's own numbers (bloom 0.03, 16 sparks) therefore do not port: at 90 LEDs that is a 2.7-LED spark and a burst arrives as a solid bar. Thin enough to be one LED and fast enough to separate immediately is what reads as sparks -- and shrinking the FAN instead of the spark, which was the first thing tried, only turns the burst into a blob. WHAT IS STILL MISSING: `twinkle`, the stochastic dim over the last 40% of life, has no equivalent -- nothing draws per-frame randomness per shape, and it is more load-bearing than it looks, since it is what stops the original's late sparks smearing. And `LfoSignal::seed` is not in the document (LIFE-698), so both sample_holds run one hash sequence and launcher B tends to reuse a height launcher A had a shot ago.\n\nTHE RACK IS THE ANIMATION'S PARAMETER LIST, as far as an address exists for one. Seven of `fireworks`'s seventeen are here under their own keys. Of the ten that are not: `flicker` and `spark_drag`'s companion `max_len`-style pairings are row DEPTHS and a depth has no address; `twinkle` and `white_core` have no equivalent at all; `burst_min` and `burst_max` are the base and depth of the held-height rows and moving either would break the agreement between where the rocket stops and where the burst lands.\n\nAND `launch_rate` IS DELIBERATELY ABSENT, which is the one worth knowing. The burst clock is the launch clock at the same rate with a phase OFFSET, and a phase offset is a fraction of a cycle -- while the flight time it has to match is fixed in SECONDS by drag alone. A rate knob would rescale the delay and leave the flight time where it was, so at the top of the sweep every rocket would burst before it had gone anywhere. Two clocks that must stay a fixed number of seconds apart cannot both hang off one rate here.\n\nWhere a knob rests is this port's tuned value rather than the animation's default wherever the two disagree -- `spark_bloom` above all, for the reason the paragraph on PointSet density clamping gives. The knob's ENDS are still the animation's declared range, except where a node's own spec is narrower -- `particles.count` stops at 32 against `num_sparks`'s 40.\n\nAND THE RACK IS CAPPED AT FIVE BY THE PASTE, not by taste. This patch is two mirrored halves in six layers, and 'paste to put it back' is the editor's only undo -- so lifting a spark layer out has to leave enough free modulator slots to drop it in again. Each knob reaching the spark layers costs one of those slots twice over, once per half, and the patch stops being undoable above thirteen modulators. `spark_speed` and `gravity` are therefore folded into the emitters rather than exposed; both are still one row away in the editor. A layer GROUP (LIFE-708) would collapse the two halves and give the slots back.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "speed",
+        "trigger": {
+          "src": 0,
+          "out": 0
+        },
+        "params": {
+          "origin": 0,
+          "velocity": 0.56,
+          "acceleration": 0,
+          "drag": 1.67,
+          "length": 0.012,
+          "softness": 0.01,
+          "lifetime": 0.56,
+          "fadeOut": 0.15,
+          "speedRef": 0.56,
+          "maxAlive": 2
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "0a0806",
+            "8a7a60",
+            "ffeacc"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0.8,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "trigger": {
+          "src": 1,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.2,
+          "spread": 0,
+          "count": 4,
+          "speed": 0,
+          "speedVary": 0.9,
+          "acceleration": -0.4,
+          "drag": 1.8,
+          "bounce": 0,
+          "size": 0.004,
+          "sizeVary": 0.55,
+          "softness": 1,
+          "lifetime": 0.3,
+          "lifeVary": 0.5,
+          "fade": 1,
+          "maxAlive": 56
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0c8",
+            "ffff78",
+            "ff6400",
+            "b40000",
+            "280000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.2,
+          "length": 0,
+          "softness": 0.05
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0d2"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 2
+    },
+    "3": {
+      "emitter": {
+        "type": "spawner",
+        "colouring": "speed",
+        "trigger": {
+          "src": 3,
+          "out": 0
+        },
+        "params": {
+          "origin": 1,
+          "velocity": -0.56,
+          "acceleration": 0,
+          "drag": 1.67,
+          "length": 0.012,
+          "softness": 0.01,
+          "lifetime": 0.56,
+          "fadeOut": 0.15,
+          "speedRef": 0.56,
+          "maxAlive": 2
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "0a0806",
+            "8a7a60",
+            "ffeacc"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0.8,
+      "order": 3
+    },
+    "4": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "trigger": {
+          "src": 4,
+          "out": 0
+        },
+        "params": {
+          "origin": 0.8,
+          "spread": 0,
+          "count": 4,
+          "speed": 0,
+          "speedVary": 0.9,
+          "acceleration": -0.4,
+          "drag": 1.8,
+          "bounce": 0,
+          "size": 0.004,
+          "sizeVary": 0.55,
+          "softness": 1,
+          "lifetime": 0.3,
+          "lifeVary": 0.5,
+          "fade": 1,
+          "maxAlive": 56
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0c8",
+            "ffff78",
+            "ff6400",
+            "b40000",
+            "280000"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 4
+    },
+    "5": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.8,
+          "length": 0,
+          "softness": 0.05
+        }
+      },
+      "colour": {
+        "index": "u",
+        "palette": {
+          "entries": [
+            "fff0d2"
+          ]
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 5
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 0.33,
+        "phase": 0.9
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.33,
+        "phase": 0.719
+      }
+    },
+    "2": {
+      "type": "envelope",
+      "shape": "linear",
+      "source": 1,
+      "sourceOut": 0,
+      "params": {
+        "attack": 0.01,
+        "decay": 0.11
+      }
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 0.4,
+        "phase": 0.8
+      }
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "ramp_up",
+      "params": {
+        "rate": 0.4,
+        "phase": 0.58
+      }
+    },
+    "5": {
+      "type": "envelope",
+      "shape": "linear",
+      "source": 4,
+      "sourceOut": 0,
+      "params": {
+        "attack": 0.01,
+        "decay": 0.11
+      }
+    },
+    "6": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 4.5
+      }
+    },
+    "7": {
+      "type": "lfo",
+      "wave": "sine",
+      "params": {
+        "rate": 5.3
+      }
+    },
+    "8": {
+      "type": "macro",
+      "name": "num_sparks",
+      "label": "Spark Count",
+      "params": {
+        "knob": 0.42857142857142855
+      }
+    },
+    "9": {
+      "type": "macro",
+      "name": "spark_life",
+      "label": "Spark Life",
+      "params": {
+        "knob": 0.2962962962962963
+      }
+    },
+    "10": {
+      "type": "macro",
+      "name": "spark_bloom",
+      "label": "Spark Bloom",
+      "params": {
+        "knob": 0.16666666666666666
+      }
+    },
+    "11": {
+      "type": "macro",
+      "name": "flash_size",
+      "label": "Burst Flash",
+      "params": {
+        "knob": 0.05
+      }
+    },
+    "12": {
+      "type": "macro",
+      "name": "rocket_bloom",
+      "label": "Rocket Bloom",
+      "params": {
+        "knob": 0.18421052631578946
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.velocity",
+      "depth": 1.67,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L0.emitter.speedRef",
+      "depth": 1.67,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.origin",
+      "depth": 0.6,
+      "bipolar": false
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.centre",
+      "depth": 0.6,
+      "bipolar": false
+    },
+    {
+      "src": 2,
+      "dst": "L2.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L3.emitter.velocity",
+      "depth": -1.67,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L3.emitter.speedRef",
+      "depth": 1.67,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L4.emitter.origin",
+      "depth": -0.6,
+      "bipolar": false
+    },
+    {
+      "src": 3,
+      "dst": "L5.emitter.centre",
+      "depth": -0.6,
+      "bipolar": false
+    },
+    {
+      "src": 5,
+      "dst": "L5.layer.opacity",
+      "depth": 1,
+      "bipolar": true
+    },
+    {
+      "src": 6,
+      "dst": "L0.layer.opacity",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": 7,
+      "dst": "L3.layer.opacity",
+      "depth": 0.2,
+      "bipolar": true
+    },
+    {
+      "src": "num_sparks",
+      "dst": "L1.emitter.count",
+      "depth": 28,
+      "bipolar": true
+    },
+    {
+      "src": "num_sparks",
+      "dst": "L4.emitter.count",
+      "depth": 28,
+      "bipolar": true
+    },
+    {
+      "src": "spark_life",
+      "dst": "L1.emitter.lifetime",
+      "depth": 2.7,
+      "bipolar": true
+    },
+    {
+      "src": "spark_life",
+      "dst": "L4.emitter.lifetime",
+      "depth": 2.7,
+      "bipolar": true
+    },
+    {
+      "src": "spark_bloom",
+      "dst": "L1.emitter.size",
+      "depth": 0.036000000000000004,
+      "bipolar": true
+    },
+    {
+      "src": "spark_bloom",
+      "dst": "L4.emitter.size",
+      "depth": 0.036000000000000004,
+      "bipolar": true
+    },
+    {
+      "src": "flash_size",
+      "dst": "L2.emitter.length",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "flash_size",
+      "dst": "L5.emitter.length",
+      "depth": 0.3,
+      "bipolar": true
+    },
+    {
+      "src": "rocket_bloom",
+      "dst": "L0.emitter.softness",
+      "depth": 0.19,
+      "bipolar": true
+    },
+    {
+      "src": "rocket_bloom",
+      "dst": "L3.emitter.softness",
+      "depth": 0.19,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "num_sparks",
+      "label": "Spark Count",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 42.8571,
+      "target": "M8.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spark_life",
+      "label": "Spark Life",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 29.6296,
+      "target": "M9.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "spark_bloom",
+      "label": "Spark Bloom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 16.6667,
+      "target": "M10.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "flash_size",
+      "label": "Burst Flash",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 5,
+      "target": "M11.knob",
+      "lo": 0,
+      "hi": 1
+    },
+    {
+      "key": "rocket_bloom",
+      "label": "Rocket Bloom",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "default": 18.4211,
+      "target": "M12.knob",
+      "lo": 0,
+      "hi": 1
+    }
+  ]
+}

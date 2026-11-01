@@ -1,5 +1,5 @@
 import { LED_COUNT } from '../../design-system';
-import type { EngineModule } from './engine/engine.mjs';
+import type { EngineModule } from '@illumigoon/patch-editor/engine';
 import { withPositions } from './looks';
 
 // The patch engine as the firmware builds it, compiled to WebAssembly, so a preview shows what the
@@ -12,7 +12,7 @@ const TICK_SECONDS = 0.005;
 let engine: Promise<EngineModule> | null = null;
 
 function loadEngine() {
-  engine ??= import('./engine/engine.mjs').then(({ default: createEngine }) => createEngine());
+  engine ??= import('@illumigoon/patch-editor/engine').then(({ default: createEngine }) => createEngine());
   return engine;
 }
 

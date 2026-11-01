@@ -1,0 +1,45 @@
+{
+  "fragment": "layer",
+  "name": "Searchlight",
+  "notes": "An ERASE layer: it removes light rather than adding it, so it needs something lit underneath to be visible at all. Drop it on top of a bright patch.\n\nLayer 1 of `showcase/06-searchlight.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "length": 0.16,
+          "softness": 0.1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "erase",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.2
+      },
+      "wave": "triangle"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.emitter.centre",
+      "depth": 0.45
+    }
+  ]
+}

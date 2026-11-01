@@ -1,0 +1,32 @@
+{
+  "fragment": "layer",
+  "name": "Aurora",
+  "notes": "A Perlin field drifting through a palette. `evolve` is what makes the noise boil rather than sit still, and it needs no modulator -- which is why this fragment has none.\n\nLayer 0 of `ports/02-aurora.json`.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "evolve": 0.2
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ff0000",
+            "00ff00",
+            "0000ff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {},
+  "matrix": []
+}
