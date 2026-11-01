@@ -15,7 +15,6 @@ type PatchEditorProps = {
   isOpen: boolean;
   section: EditorSection;
   isSaving: boolean;
-  withChrome: boolean;
   onSaveOpen(): void;
   onSaveClosed(): void;
   onSection(section: EditorSection): void;

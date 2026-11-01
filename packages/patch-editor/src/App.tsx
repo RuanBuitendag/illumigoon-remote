@@ -1,11 +1,10 @@
 /** The Edit page: the live strip and the sections, for one light. */
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Defs } from './ui/bits';
 import type { Chosen } from './ui/PatchRail';
 import { useLatest } from './ui/useLatest';
-import { documentOf, type Arrival } from './domain/house';
-import { ChromedApp } from './app/ChromedApp';
+import { documentOf } from './domain/house';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
 import { useEditor, type OpenLight } from './app/useEditor';
@@ -21,7 +20,6 @@ type AppProps = {
   /** Below 900 px only. */
   section: EditorSection;
   isSaving: boolean;
-  withChrome: boolean;
   onSaveOpen(): void;
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
@@ -31,12 +29,10 @@ type AppProps = {
   onClose(): void;
 };
 
-function EditPage(props: Omit<AppProps, 'withChrome'>) {
+export default function App(props: AppProps) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
   const { onSection, onName, onSendLook, onLeave, onClose } = props;
-  // No choice to read: the look arrives the way the light's own transition says.
-  const arrivalRef = useRef<Arrival>(null);
-  const editor = useEditor(light, arrivalRef);
+  const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
   const [chosen, setChosen] = useState<Chosen | null>(null);
@@ -73,7 +69,6 @@ function EditPage(props: Omit<AppProps, 'withChrome'>) {
           master={draft.master}
           audio={audioFeed}
           onRecallMaster={editor.masterActs.recallMasterPalette}
-          previewShut={false}
           section={section}
           info={info}
           hb={hb}
@@ -118,10 +113,3 @@ function EditPage(props: Omit<AppProps, 'withChrome'>) {
   );
 }
 
-export default function App({ withChrome, ...page }: AppProps) {
-  return withChrome ? (
-    <ChromedApp light={page.light} onClose={page.onClose} />
-  ) : (
-    <EditPage {...page} />
-  );
-}

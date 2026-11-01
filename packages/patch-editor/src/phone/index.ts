@@ -1,1 +1,1 @@
-export { phoneHost, type House } from './phone-host';
+export { phoneHost } from './phone-host';

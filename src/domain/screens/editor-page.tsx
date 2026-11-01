@@ -90,7 +90,6 @@ export function EditorPage({ room }: { room: Room | undefined }) {
             isOpen={isOpen}
             section={section}
             isSaving={isSaving}
-            withChrome={false}
             onSaveOpen={() => setSaving(true)}
             onSaveClosed={() => setSaving(false)}
             onSection={setSection}

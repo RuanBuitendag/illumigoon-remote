@@ -95,9 +95,6 @@
 
 .patch-editor .app { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 
-.patch-editor .topbar { height: 52px; flex-shrink: 0; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; border-bottom: 1px solid var(--track); position: relative; z-index: 3; }
-.patch-editor .editor-wordmark { font: 500 11px/1.3 var(--mono); letter-spacing: 0.22em; color: var(--text-4); }
-
 .patch-editor .livedot { width: 12px; height: 2.5px; background: var(--thumb-off); flex-shrink: 0; }
 .patch-editor .livedot[data-on='true'] { background: rgb(var(--tint)); box-shadow: 0 0 6px rgba(var(--tint), 0.7); }
 .patch-editor .livedot[data-warn='true'] { background: var(--warn); }
@@ -491,35 +488,9 @@
    The house view: the house in the middle, Scenes on the right, the patch rail on the left
    (LIFE-863). Built from the same elevation ladder as the editor: the send bar is the one raised
    thing in the middle, a chosen light is `raise-hi`, everything else sits flat. */
-
-.patch-editor .housebody { flex-grow: 1; min-height: 0; display: flex; }
-.patch-editor .houserail { width: 292px; flex-shrink: 0; }
+.patch-editor .library { flex: 1; width: 100%; border-right: 0; }
 .patch-editor .savesheet { width: 460px; height: 84vh; }
-.patch-editor .savesheet .houserail { flex: 1; width: 100%; border-right: 0; }
-.patch-editor .houserail.right { width: 300px; }
-.patch-editor .houselist { flex-grow: 1; padding: 10px; gap: 6px; }
-.patch-editor .housecentre {
-  flex-grow: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 26px;
-  padding: 24px 28px 40px;
-  overflow-y: auto;
-}
-.patch-editor .topsep { width: 1px; height: 15px; background: var(--track); flex-shrink: 0; }
-.patch-editor .housenotice {
-  font: 400 11px/1 var(--sans);
-  color: var(--text-3);
-  letter-spacing: 0.02em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-}
-.patch-editor .addr { display: flex; align-items: center; gap: 2px; width: 220px; padding: 9px 12px; }
-.patch-editor .addr input { font: 400 11px/1 var(--mono); color: var(--text-1); flex-grow: 1; min-width: 0; }
-.patch-editor .addr input::placeholder { color: var(--text-5); }
+.patch-editor .librarylist { flex-grow: 1; padding: 10px; gap: 6px; }
 
 .patch-editor .patchrow {
   display: flex;
@@ -541,67 +512,11 @@
   white-space: nowrap;
 }
 .patch-editor .patchrow.raise-hi .patchname { color: var(--text-1); }
-
-.patch-editor .sendbar { display: flex; align-items: center; gap: 22px; padding: 16px 18px; flex-shrink: 0; }
-.patch-editor .sendbar > .vr { align-self: stretch; }
-.patch-editor .sendname {
-  font: 400 15px/1 var(--sans);
-  letter-spacing: 0.01em;
-  color: var(--text-1);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.patch-editor .sendname.none { color: var(--text-5); }
 /* A native select, like the blend chip, so the menu is the platform's. */
-.patch-editor .arrivalpick {
-  appearance: none;
-  -webkit-appearance: none;
-  border: 0;
-  outline: 0;
-  padding: 8px 28px 8px 11px;
-  border-radius: 2px;
-  font: 400 11px/1 var(--sans);
-  color: var(--text-1);
-  cursor: pointer;
-  background: var(--wash) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='9' height='6'%3E%3Cpath d='M1 1.5l3.5 3L8 1.5' fill='none' stroke='%237c7d80' stroke-width='1.2' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 10px center;
-}
-.patch-editor .arrivalpick option { background: var(--background); color: var(--text-1); }
-.patch-editor .msfield { display: flex; align-items: center; gap: 6px; padding: 7px 10px; }
-.patch-editor .msfield input { width: 46px; font: 400 12px/1 var(--mono); color: var(--text-1); text-align: right; }
-.patch-editor .msfield input::-webkit-inner-spin-button,
-.patch-editor .msfield input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 
 .patch-editor .rooms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 18px; }
 .patch-editor .room { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.patch-editor .roomhead { display: flex; align-items: center; gap: 11px; height: 22px; cursor: pointer; }
-.patch-editor .roomname { font: 400 14px/1 var(--sans); letter-spacing: 0.01em; color: var(--text-1); white-space: nowrap; }
 .patch-editor .roomrule { flex-grow: 1; height: 1px; background: var(--track); }
-.patch-editor .tiles { display: grid; gap: 8px; }
-
-.patch-editor .tile {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 13px 12px 14px;
-  position: relative;
-  cursor: pointer;
-  min-width: 0;
-}
-.patch-editor .tile[data-dead='true'] { cursor: default; background: var(--wash); }
-.patch-editor .tilename {
-  font: 400 13px/1 var(--sans);
-  color: var(--text-1);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.patch-editor .tile[data-dead='true'] .tilename { color: var(--text-4); }
-.patch-editor .tileline { display: flex; align-items: center; gap: 8px; min-height: 24px; }
-.patch-editor .tileline > .lab { width: 34px; flex-shrink: 0; color: var(--text-5); }
-.patch-editor .tileline > .lab.mid { color: var(--text-3); }
-.patch-editor .tileline > .led { flex-grow: 1; }
 .patch-editor .tilenote {
   font: 400 10px/1 var(--sans);
   color: var(--text-5);
@@ -636,77 +551,7 @@
 .patch-editor .led.dim canvas { opacity: 0.45; }
 .patch-editor .led.silent { outline: 1px dashed var(--text-5); outline-offset: -1px; }
 
-.patch-editor .scenesave { display: flex; flex-direction: column; gap: 10px; padding: 12px 14px; flex-shrink: 0; }
-.patch-editor .scenesave input { font: 400 13px/1 var(--sans); color: var(--text-1); padding: 10px 11px; border-radius: 2px; }
-.patch-editor .scenecard { display: flex; flex-direction: column; gap: 12px; padding: 14px 14px 14px 16px; flex-shrink: 0; }
-.patch-editor .scenename {
-  font: 400 13px/1 var(--sans);
-  letter-spacing: 0.01em;
-  color: var(--text-1);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.patch-editor .sceneroom { display: flex; align-items: center; gap: 10px; }
-.patch-editor .sceneroom > .lab {
-  width: 72px;
-  flex-shrink: 0;
-  font-size: 10px;
-  color: var(--text-5);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.patch-editor .sceneroom > .leds { flex-grow: 1; display: flex; gap: 3px; min-width: 0; }
-.patch-editor .sceneroom .led { flex: 1; }
-
-/* ------------------------------------------------------------- shell
-
-   One top bar, the patch rail down the left, the view beside it (Shell.tsx). */
-
-.patch-editor .shellbody { flex-grow: 1; min-height: 0; display: flex; }
-.patch-editor .shellmain { flex-grow: 1; min-width: 0; min-height: 0; display: flex; flex-direction: column; }
-.patch-editor .trail { gap: 10px; min-width: 0; }
-.patch-editor .crumb { font: 400 12px/1 var(--sans); letter-spacing: 0.02em; color: var(--text-3); padding: 6px 2px; white-space: nowrap; }
-.patch-editor button.crumb:hover { color: var(--text-1); }
-.patch-editor .crumb.on { color: var(--text-1); }
-.patch-editor .crumb.pending { color: var(--text-4); }
-.patch-editor .crumbsep { font: 400 14px/1 var(--sans); color: var(--text-5); }
-.patch-editor .switcher { position: relative; }
-.patch-editor .switchchip { gap: 10px; padding: 6px 10px 6px 12px; }
-.patch-editor .switchname { font: 400 12px/1 var(--sans); letter-spacing: 0.02em; white-space: nowrap; }
-.patch-editor .switchmenu {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 0;
-  z-index: 60;
-  min-width: 240px;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 8px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.patch-editor .switchroom { padding: 6px 10px 2px; }
-.patch-editor .switchrow {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 10px;
-  border-radius: 2px;
-  text-align: left;
-  font: 400 12px/1 var(--sans);
-  color: var(--text-1);
-}
-.patch-editor .switchrow:hover:not(:disabled) { background: var(--wash-strong); }
-.patch-editor .switchrow:disabled { color: var(--text-4); cursor: default; }
-.patch-editor .switchrow[data-on='true'] { background: var(--wash-strong); }
-
-/* The rail as the library: shelves, a save box, groups, and the chosen row's actions. */
-/* `.panel` sets display, which beats the browser's own rule for [hidden]. */
-.patch-editor .houserail[hidden] { display: none; }
+/* The library in the Save sheet: shelves, a save box, groups, and the chosen row's actions. */
 .patch-editor .railhead { height: 40px; gap: 8px; padding: 0 8px 0 12px; }
 .patch-editor .railsave { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px; flex-shrink: 0; }
 .patch-editor .railsave input {
@@ -735,18 +580,8 @@
 .patch-editor .railfoot textarea { height: 84px; padding: 9px 10px; font: 400 11px/1.5 var(--mono); color: var(--text-1); resize: none; }
 
 /* A room's master, as a mark beside the name rather than a word that took the name's room. */
-.patch-editor .masterdot {
-  width: 5px;
-  height: 5px;
-  border-radius: 0;
-  flex-shrink: 0;
-  box-shadow: inset 0 0 0 1px var(--text-3);
-}
 
 /* The arrival picker where the editor's top bar has room for it (ui/arrival.tsx). */
-.patch-editor .arrivalpick.compact { padding: 6px 24px 6px 9px; font-size: 11px; max-width: 150px; }
-.patch-editor .msfield.compact { padding: 5px 8px; }
-.patch-editor .msfield.compact input { width: 38px; font-size: 11px; }
 
 /* The graph under an audio band's knobs (BandScope.tsx): two wells, the captions inside them. */
 .patch-editor .scope { gap: 8px; }
@@ -1085,11 +920,6 @@
    so no panel keeps a scroll of its own, and a sheet takes the whole screen while it is open. */
 
 @media (max-width: 899px) {
-  .patch-editor .topbar { height: auto; flex-wrap: wrap; gap: 8px 12px; padding: 8px 12px; }
-  .patch-editor .topbar > .row { min-width: 0; max-width: 100%; }
-  .patch-editor .topbar > .row:first-child { flex-wrap: wrap; row-gap: 6px; }
-  .patch-editor .topbar > .row:last-child { width: 100%; overflow-x: auto; flex-shrink: 1; scrollbar-width: none; }
-  .patch-editor .topbar .editor-wordmark, .patch-editor .topbar .topsep { display: none; }
   .patch-editor { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .patch-editor input, .patch-editor textarea { -webkit-user-select: text; user-select: text; }
 
@@ -1117,15 +947,12 @@
   .patch-editor .slotrow { flex-wrap: wrap; overflow: visible; }
   .patch-editor .modslot { width: calc(50% - 5px); }
 
-  .patch-editor .shellbody:has(> .houserail:not([hidden])) > .shellmain { display: none; }
-  .patch-editor .houserail { flex: 1; width: 100%; border-right: 0; }
-
   .patch-editor [data-section]:not([data-open='true']) { display: none; }
   .patch-editor .sidetabs { display: none; }
-  .patch-editor .shellmain, .patch-editor .editscroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .patch-editor .shellmain > *, .patch-editor .editscroll > * { flex: none; }
-  .patch-editor .body, .patch-editor .housebody { flex-direction: column; }
-  .patch-editor .body .sectionpart > *, .patch-editor .housebody > * { width: 100% !important; flex: none; }
+  .patch-editor .editscroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .patch-editor .editscroll > * { flex: none; }
+  .patch-editor .body { flex-direction: column; }
+  .patch-editor .body .sectionpart > * { width: 100% !important; flex: none; }
   .patch-editor .body .vr { display: none; }
   .patch-editor .body .panel { border-right: 0; border-bottom: 1px solid var(--track); }
   .patch-editor .body .scroll, .patch-editor .centre { overflow: visible; max-height: none; }
@@ -1146,12 +973,8 @@
   .patch-editor .modeditor > * { width: 100% !important; }
 
   /* The house: what is being sent, then the rooms one above the other. */
-  .patch-editor .sendbar { flex-wrap: wrap; gap: 14px; }
-  .patch-editor .sendbar > .col { width: 100% !important; }
-  .patch-editor .sendbar > .vr, .patch-editor .sendbar > .grow { display: none; }
   .patch-editor .rooms { grid-template-columns: minmax(0, 1fr); }
   .patch-editor .room { grid-column: auto !important; }
-  .patch-editor .tiles { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
 
   /* The heading of the selected layer: its name, then the signal chain on a line of its own. */
   .patch-editor .centre > .row:first-child { height: auto !important; flex-wrap: wrap; gap: 8px 14px; padding: 12px 16px !important; }

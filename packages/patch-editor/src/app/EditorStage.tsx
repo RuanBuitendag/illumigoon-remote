@@ -6,17 +6,14 @@ import { drawable, type Ready } from '../domain/connection';
 import type { Patch } from '../domain/patch';
 import type { MasterColour } from '../domain/masterColour';
 import type { AudioFeed } from '../domain/scope';
-import type { DeviceInfo, Heartbeat, Wire } from '../device/wire';
+import type { DeviceInfo, Heartbeat } from '../device/wire';
 import { Boundary } from '../ui/Boundary';
-import { ArrivalPick, type useArrivalChoice } from '../ui/arrival';
 import { PatchRail, type Chosen } from '../ui/PatchRail';
-import { AddressOpen, Trail } from '../ui/Shell';
-import type { HouseFeed } from '../ui/houseFeed';
 import type { Preset } from '../library/presets';
 import { SurfaceMenu, UserSurface } from '../ui/Surface';
 import { ControlEditor } from '../ui/controlEditor';
 import { BUDGET } from '../domain/catalog';
-import { Budget, Blurb, Hr, Ico, Lab, ModIcon, Mono, Vr } from '../ui/bits';
+import { Budget, Blurb, Hr, Ico, Lab, ModIcon, Vr } from '../ui/bits';
 import { Inspector, SideColumn } from '../ui/inspector';
 import { LayerPanel } from '../ui/LayerStack';
 import { MacroRack } from '../ui/Macros';
@@ -39,47 +36,10 @@ import { sectionOfSide, type EditorSection } from './useSection';
 /** How full a look gets before the size meter shows. */
 const NEAR_FULL = 0.8;
 
-/** Where the person is, and the lights they can go to from there. */
-export function LightTrail({ inHouse, feed, wire, info, hb, label, onHouse, onLight }: {
-  inHouse: boolean;
-  feed: HouseFeed;
-  wire: Wire | null;
-  info: DeviceInfo | null;
-  hb: Heartbeat | null;
-  label: string;
-  onHouse(): void;
-  onLight(url: string, name: string): void;
-}) {
-  // The feed names lights by MAC; a light opened by address is still found by its URL.
-  const current = feed.lights.find(l => l.id === info?.device_id || l.url === wire?.url);
-  return (
-    <Trail view={inHouse ? 'house' : 'light'} feed={feed} currentId={current?.id ?? null}
-           label={hb?.device_name ?? label} onHouse={onHouse} onLight={l => onLight(l.url, l.name)}
-           extra={
-             <div className="row" style={{ gap: 8 }}>
-               {hb?.is_master && <Lab className="dim">MASTER</Lab>}
-               {hb?.firmware_version && <Mono className="dim sm">fw {hb.firmware_version}</Mono>}
-             </div>
-           } />
-  );
-}
-
-/** The patch rail: browsing in the house, and saving and loading with a light open. */
-export function LibraryRail({
-  inHouse,
-  canEdit,
-  draft,
-  chosen,
-  onChoose,
-  onLoad,
-  onSend,
-  say,
-  shut,
-  onShut,
-  saveNudge,
+/** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
+export function SaveSheet({
+  draft, chosen, onChoose, onLoad, onSend, say, saveNudge, onClose,
 }: {
-  inHouse: boolean;
-  canEdit: boolean;
   draft: Pick<
     PatchDraft,
     'patch' | 'patchName' | 'patchNotes' | 'patchNameRef' | 'setPatchName' | 'setPatchNotes'
@@ -87,49 +47,12 @@ export function LibraryRail({
   chosen: Chosen | null;
   onChoose(chosen: Chosen | null): void;
   onLoad(preset: Preset, from: string): void;
-  onSend?(preset: Preset, name: string): void;
+  onSend(preset: Preset, name: string): void;
   say(message: string): void;
-  shut: boolean;
-  onShut?(): void;
   saveNudge: number;
+  onClose(): void;
 }) {
   const { patch, patchName, patchNotes, patchNameRef, setPatchName, setPatchNotes } = draft;
-  return (
-    <PatchRail
-      mode={inHouse ? 'house' : 'light'}
-      chosen={chosen?.key ?? null}
-      onChoose={onChoose}
-      onLoad={canEdit ? onLoad : undefined}
-      onSend={onSend}
-      save={
-        canEdit
-          ? {
-              patch,
-              name: patchName,
-              notes: patchNotes,
-              onName: (n: string) => {
-                patchNameRef.current = n;
-                setPatchName(n);
-              },
-              onNotes: setPatchNotes,
-            }
-          : undefined
-      }
-      say={say}
-      shut={shut}
-      onShut={onShut}
-      saveNudge={saveNudge}
-    />
-  );
-}
-
-/** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
-export function SaveSheet({
-  draft, chosen, onChoose, onLoad, onSend, say, saveNudge, onClose,
-}: Pick<
-  Parameters<typeof LibraryRail>[0],
-  'draft' | 'chosen' | 'onChoose' | 'onLoad' | 'onSend' | 'say' | 'saveNudge'
-> & { onClose(): void }) {
   // Not `Overlay`: that holds the frame loop, and a row's strip here has to move.
   return (
     <div className="editor-overlay" onClick={onClose}>
@@ -137,154 +60,27 @@ export function SaveSheet({
         <SheetHead icon={<Ico.Rail c="var(--text-3)" />} title="SAVE OR LOAD" onClose={onClose}>
           {null}
         </SheetHead>
-        <LibraryRail
-          inHouse={false}
-          canEdit
-          draft={draft}
-          chosen={chosen}
+        <PatchRail
+          chosen={chosen?.key ?? null}
           onChoose={onChoose}
           onLoad={onLoad}
           onSend={onSend}
+          save={{
+            patch,
+            name: patchName,
+            notes: patchNotes,
+            onName: (n: string) => {
+              patchNameRef.current = n;
+              setPatchName(n);
+            },
+            onNotes: setPatchNotes,
+          }}
           say={say}
-          shut={false}
           saveNudge={saveNudge}
         />
       </div>
     </div>
   );
-}
-
-/*
- * WHAT IS IN THIS BAR, and the rule that decided it: a thing here is either something you press
- * or something you have to know to press it. `State` was neither — an amber badge whose only
- * move the heartbeat now makes on its own. `Bright` was a number with no control under it;
- * brightness is a layer's opacity in this editor. See LIFE-783.
- *
- * Flash and power stay whatever the editor below managed to render: finding which strip this is,
- * and switching one off left mid-edit, have to work before anything else has (LIFE-865).
- */
-function LightTools({
-  canEdit,
-  patch,
-  ready,
-  previewShut,
-  onPreview,
-  onFragments,
-  arrival,
-  transitions,
-  hb,
-  wire,
-}: {
-  canEdit: boolean;
-  patch: Patch;
-  ready: Ready;
-  previewShut: boolean;
-  onPreview(): void;
-  onFragments(): void;
-  arrival: ReturnType<typeof useArrivalChoice>;
-  transitions: HouseFeed['transitions'];
-  hb: Heartbeat | null;
-  wire: Wire | null;
-}) {
-  // `serialise` reads LIMITS(), so this cannot run before the device has described
-  // itself. The patch is empty until then and its size is not a number worth showing.
-  const size = useMemo(() => (drawable(ready) ? serialisedSize(patch) : 0), [patch, ready]);
-  const on = hb?.is_on;
-  return (
-    <>
-      {canEdit && (
-        <EditorTools
-          bytes={size}
-          previewShut={previewShut}
-          onPreview={onPreview}
-          onFragments={onFragments}
-          arrival={arrival}
-          transitions={transitions}
-        />
-      )}
-      <button
-        className="iconbtn raise"
-        title="Flash this light — a few seconds of white, then back"
-        onClick={() => wire?.flash()}
-      >
-        <Ico.Flash c="var(--text-3)" />
-      </button>
-      <button
-        className="iconbtn raise"
-        title={on ? 'Power off' : 'Power on'}
-        onClick={() => wire?.setPower(!(on ?? true))}
-      >
-        <Ico.Power c={on ? 'var(--text-1)' : 'var(--text-5)'} />
-      </button>
-    </>
-  );
-}
-
-function EditorTools({ bytes, previewShut, onPreview, onFragments, arrival, transitions }: {
-  bytes: number;
-  previewShut: boolean;
-  onPreview(): void;
-  onFragments(): void;
-  arrival: ReturnType<typeof useArrivalChoice>;
-  transitions: HouseFeed['transitions'];
-}) {
-  return (
-    <>
-      <button
-        className="row raise"
-        style={{ gap: 9, padding: '6px 12px' }}
-        title="Save this layer as a fragment, or pull one into the patch"
-        onClick={onFragments}
-      >
-        <Ico.Copy />
-        <Lab className="mid">Fragments</Lab>
-      </button>
-      {/* Up here rather than on the strip itself, so hiding it takes its whole height back
-          and the way to bring it back is always where it was left. */}
-      <button
-        className="row raise"
-        style={{ gap: 9, padding: '6px 12px' }}
-        title={
-          previewShut
-            ? 'Show the preview strip — this patch, rendered by the firmware engine in the browser'
-            : 'Hide the preview strip'
-        }
-        onClick={onPreview}
-      >
-        <span className="livedot" data-on={String(!previewShut)} />
-        <Lab className="mid">Preview</Lab>
-      </button>
-      {/* Something you have to know before you load or roll: how the next look arrives. */}
-      <ArrivalPick
-        compact
-        choice={arrival}
-        transitions={transitions}
-        title="How a load from the library, or a roll with nothing kept, arrives on the light"
-      />
-      <Budget bytes={bytes} />
-      <span className="topsep" />
-    </>
-  );
-}
-
-function HouseTools({ onOpen }: { onOpen(url: string, name: string): void }) {
-  return (
-    <>
-      <AddressOpen onOpen={onOpen} />
-      <span className="topsep" />
-      {/* Which firmware this build's engine was compiled from. The one fact a "the
-          preview disagrees with the light" report needs, so it is on the first view. */}
-      <Mono className="dim sm">{__EDITOR_BUILD__}</Mono>
-    </>
-  );
-}
-
-/** What the top bar offers, which is a different thing in the house and on a light. */
-export function TopTools({ inHouse, onOpen, ...light }: Parameters<typeof LightTools>[0] & {
-  inHouse: boolean;
-  onOpen(url: string, name: string): void;
-}) {
-  return inHouse ? <HouseTools onOpen={onOpen} /> : <LightTools {...light} />;
 }
 
 /** Connected, but the vocabulary has not arrived. */
@@ -445,16 +241,15 @@ function SizeMeter({ patch }: { patch: Patch }) {
 /** One part of the editor. Stays mounted while another section shows, so nothing is lost. */
 function Part({ id, section, children }: {
   id: EditorSection;
-  section: EditorSection | undefined;
+  section: EditorSection;
   children: ReactNode;
 }) {
-  const isOpen = section === undefined || section === id;
-  return <div className="sectionpart" data-section={id} data-open={isOpen}>{children}</div>;
+  return <div className="sectionpart" data-section={id} data-open={section === id}>{children}</div>;
 }
 
 export function EditorStage({
   ctl, nav, rolled, dialogs, patch, master, audio, onRecallMaster,
-  previewShut, section, info, hb, label, onLeave, onSave,
+  section, info, hb, label, onLeave, onSave,
 }: {
   ctl: Ctl;
   nav: Navigation;
@@ -464,8 +259,7 @@ export function EditorStage({
   master: MasterColour | null;
   audio: AudioFeed;
   onRecallMaster(entries: string[]): Reached;
-  previewShut: boolean;
-  section?: EditorSection;
+  section: EditorSection;
   info: DeviceInfo | null;
   hb: Heartbeat | null;
   label: string;
@@ -480,20 +274,13 @@ export function EditorStage({
   return (
     <>
       {/* Outside the boundary: it draws from the engine, not the catalog, so a light the
-          editor cannot render controls for can still be watched. Hidden means unmounted, so
-          its frame loop stops with it; the `sent` tap keeps feeding the engine regardless, so
-          showing it again picks up the patch as it now is. */}
-      {!previewShut && (
-        <Strip deviceCatalogHash={info?.catalog_hash} meter={<SizeMeter patch={patch} />} />
-      )}
+          editor cannot render controls for can still be watched. */}
+      <Strip deviceCatalogHash={info?.catalog_hash} meter={<SizeMeter patch={patch} />} />
 
       {/*
-       * BELOW THE TOP BAR, and only below it. Every control down here is built from the
-       * node catalog the light published, so a light one build behind can throw during
-       * render — which unmounts the whole tree and leaves a white page. The bar above
-       * stays outside on purpose: it carries the name, the room and the firmware version,
-       * which are the three facts somebody needs to act on that, and its power button
-       * stays live so a strip left mid-edit can still be switched off.
+       * Every control down here is built from the node catalog the light published, so a light
+       * one build behind can throw during render — which unmounts the whole tree and leaves a
+       * white page. The app's own Edit header stays outside it, so Back still works.
        *
        * Keyed on the light, so arriving at a different one clears a verdict about the
        * last. See LIFE-702.

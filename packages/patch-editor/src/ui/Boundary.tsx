@@ -12,10 +12,9 @@
  * `componentDidCatch` have no function equivalent, and the one place in this codebase that
  * needs a class is the one React has never given a hook.
  *
- * IT WRAPS THE BODY, NOT THE WHOLE EDITOR. The top bar stays outside on purpose: it carries
- * the light's name, its room and its firmware version, which are exactly the three facts
- * somebody needs to act on this, and the power button stays live so a strip left mid-edit
- * can still be switched off.
+ * IT WRAPS THE BODY, NOT THE WHOLE EDITOR. The app's Edit header stays outside it, so Back
+ * still works, and this says the light's name and firmware version, which are the facts somebody
+ * needs to act on it.
  *
  * It does not offer to retry. Nothing about the light changes by rendering again, so a retry
  * button would either do nothing or loop; the honest options are to go and flash it, or to
@@ -28,7 +27,7 @@ import { Lab, Mono } from './bits';
 
 interface Props {
   children: ReactNode;
-  /** The light this is about, as the top bar names it. */
+  /** The light this is about, as Edit names it. */
   label: string;
   /** What it says it is running, when it has said. */
   firmware?: string;

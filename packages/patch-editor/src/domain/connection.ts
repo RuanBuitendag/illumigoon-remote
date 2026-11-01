@@ -182,7 +182,7 @@ export function readyStep(s: Ready, e: ReadyEvent): Ready {
  * JSON forwarded verbatim — so the envelope still says the ORIGINATING Device's MAC
  * (`bridge_manager.cpp:59-71`, `heartbeat_service.cpp:94`).
  *
- * Attributing that to the socket is how the top bar comes to show another light's name,
+ * Attributing that to the socket is how the editor comes to show another light's name,
  * room, power and brightness, and how a foreign `state_hash` gets fed to the watch that
  * decides whether somebody else has been editing. The editor is not a fleet tool and does
  * not want the neighbour's telemetry at all; it only has to not mistake it for its own.

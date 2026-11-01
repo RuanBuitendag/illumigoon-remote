@@ -206,8 +206,8 @@ export const StructField = ({ node, field, value, onChange }: {
 /**
  * The two thresholds, in one place.
  *
- * Both the top bar and every library row read a size against them, and a row that agreed
- * with the bar about the bytes but not about the colour would be worse than no colour at
+ * Both the strip's meter and every library row read a size against them, and a row that agreed
+ * with the meter about the bytes but not about the colour would be worse than no colour at
  * all — 4 KB is exactly the line between a patch that comes back after a power cut and one
  * that does not.
  */

@@ -265,9 +265,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
 }
 
 /**
- * What the editor calls the whole mix. One place, because the top bar already says MASTER when
- * a light is the mesh master -- two unrelated meanings on one screen -- and if that reads badly
- * in use, renaming it should be this line.
+ * What the editor calls the whole mix. One place, so renaming it is this line.
  */
 export const MASTER_NAME = 'Master';
 

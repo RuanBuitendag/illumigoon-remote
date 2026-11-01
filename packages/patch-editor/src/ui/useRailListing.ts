@@ -2,7 +2,7 @@
  * What the patch rail lists: the shelf on show, the folder behind Mine, and the patch server.
  */
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { documentOf, usesAudio, type Animation } from '../domain/house';
 import {
   listExamples, listLibrary, listPresets, readPreset, serverLibrary,
@@ -25,7 +25,6 @@ export interface Loaded {
 
 export function useRailListing(
   shelf: Shelf,
-  canSave: boolean,
   setProblem: (message: string | null) => void,
 ) {
   const [rows, setRows] = useState<LibraryEntry[] | null>(null);
@@ -43,9 +42,6 @@ export function useRailListing(
    */
   const [server, setServer] = useState<ServerLibrary>({ reached: false, patches: [], presets: [] });
   const [loaded, setLoaded] = useState<Record<string, Loaded>>({});
-  // Through a ref: a light opening or closing must not re-list the shelf and blank it for a poll.
-  const saving = useRef(false);
-  saving.current = canSave;
 
   const list = useCallback(async () => {
     try {
@@ -60,7 +56,7 @@ export function useRailListing(
         const l = await listExamples();
         setRows(l.patches.filter(p => (shelf === 'gallery') === (p.group === 'gallery')));
         // Mine is read anyway while a patch can be saved, so the button can say REPLACE.
-        if (saving.current) setMine((await listLibrary()).patches);
+        setMine((await listLibrary()).patches);
       }
       setProblem(null);
     } catch (e) {

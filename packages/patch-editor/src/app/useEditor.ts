@@ -5,9 +5,7 @@
  */
 
 import { useEffect, useRef } from 'react';
-import type { RefObject } from 'react';
 import { drawable } from '../domain/connection';
-import type { Arrival } from '../domain/house';
 import { useBindGesture, type Gesture } from './useBindGesture';
 import { useConnection } from './useConnection';
 import { useCtl } from './useCtl';
@@ -24,7 +22,7 @@ import { useToast } from './useToast';
 /** A light to open: its socket address, what to call it, and the look the app last saw on it. */
 export type OpenLight = { url: string; name: string; lookName?: string };
 
-export function useEditor(light: OpenLight | undefined, arrivalRef: RefObject<Arrival>) {
+export function useEditor(light: OpenLight | undefined) {
   const { toast, say } = useToast();
 
   /** The in-flight gesture, held in a ref so pointerup reads the target the last move set. */
@@ -33,7 +31,7 @@ export function useEditor(light: OpenLight | undefined, arrivalRef: RefObject<Ar
   const draft = usePatchDraft();
   const connection = useConnection({ ...draft, say, dragRef });
   const { wire, link, hb, ready, open } = connection;
-  const writes = usePatchWrites({ ...draft, wire, arrivalRef });
+  const writes = usePatchWrites({ ...draft, wire });
   const nav = useNavigation(draft.patch);
   const masterActs = useMasterPalette({ ...draft, ...writes, wire, sel: nav.sel });
   const applyPreset = usePresetLoad({ ...draft, ...writes, ...nav, link, say });

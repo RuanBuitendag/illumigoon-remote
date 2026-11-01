@@ -13,7 +13,6 @@ import {
 } from '../domain/connection';
 import { Pending, type Answer } from './pending';
 import { sourceId } from './source';
-import { FLASH } from '../domain/house';
 
 export interface Heartbeat {
   uptime: number;
@@ -711,18 +710,6 @@ export class Wire {
   sendEdits(ops: unknown[]) {
     if (!ops.length) return false;
     return this.send('light_patch_edit', { ops });
-  }
-
-  setPower(on: boolean) {
-    return this.send('device_set_power', { on });
-  }
-
-  /**
-   * A few seconds of white breathing, so the strip on the wall answers for this socket's name
-   * (LIFE-865). `light_identify` never persists and ends on its own, so nothing follows it.
-   */
-  flash() {
-    return this.send(FLASH.type, FLASH.payload);
   }
 
   private audioListeners = 0;

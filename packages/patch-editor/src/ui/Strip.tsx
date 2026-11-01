@@ -1,7 +1,7 @@
 /**
  * The light, drawn beside the knobs: one cell per LED, rendered by the real patch engine.
  *
- * Full width under the top bar, because it stands for the strip -- the thing every control
+ * Full width under the Edit header, because it stands for the strip -- the thing every control
  * below it is changing -- and a strip is long and thin. Lit tape from `ledPaint.ts`, like the
  * phone's large strip.
  *

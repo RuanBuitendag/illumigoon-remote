@@ -127,7 +127,7 @@ export function useRailPublish({
    * version.
    */
   const doPublish = async (kind: PublishKind) => {
-    if (!save || !save.name.trim() || publishing) return;
+    if (!save.name.trim() || publishing) return;
     setPublishing(true);
     setProblem(null);
     try {

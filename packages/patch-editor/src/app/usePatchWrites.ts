@@ -5,12 +5,10 @@
  */
 
 import { useCallback, useRef } from 'react';
-import type { RefObject } from 'react';
 import { writePath, type Patch } from '../domain/patch';
 import { serialise } from '../domain/patchDocument';
 import { diffOps, opsWorthSending, rowsAreSendable } from '../domain/edits';
 import { enforce } from '../domain/masterColour';
-import type { Arrival } from '../domain/house';
 import { Wire } from '../device/wire';
 import type { Reached } from '../ui/ctl';
 import type { PatchDraft } from './usePatchDraft';
@@ -23,13 +21,11 @@ export function usePatchWrites({
   putMaster,
   setPatch,
   hasEditedRef,
-  arrivalRef,
 }: Pick<
   PatchDraft,
   'patchRef' | 'patchNameRef' | 'masterRef' | 'putMaster' | 'setPatch' | 'hasEditedRef'
 > & {
   wire: Wire | null;
-  arrivalRef: RefObject<Arrival>;
 }) {
   /**
    * Mutate the patch, and return what it became.
@@ -97,17 +93,9 @@ export function usePatchWrites({
     (inPlace = true) => {
       // The whole patch as it now stands, so a sample still waiting is already in it.
       cancelSample();
-      // A replaced look carries the chosen arrival; an edit to the running one never does -- the
-      // light keeps that patch running, so there is nothing to arrive over (LIFE-864).
-      const arrival = inPlace ? null : arrivalRef.current;
-      return !!wire?.sendPatch(
-        patchRef.current,
-        arrival ? { transition: arrival } : {},
-        inPlace,
-        patchNameRef.current,
-      );
+      return !!wire?.sendPatch(patchRef.current, {}, inPlace, patchNameRef.current);
     },
-    [wire, cancelSample, arrivalRef, patchRef, patchNameRef],
+    [wire, cancelSample, patchRef, patchNameRef],
   );
 
   /**

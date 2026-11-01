@@ -13,11 +13,10 @@ import type { Shelf, useRailListing } from './useRailListing';
 import type { useRailVerdict } from './useRailVerdict';
 
 export interface RailContext {
-  mode: 'house' | 'light';
-  onLoad?(doc: Preset, from: string): void;
+  onLoad(doc: Preset, from: string): void;
   onChoose(c: Chosen): void;
   say(message: string): void;
-  save?: RailSave;
+  save: RailSave;
   file: string;
   shelf: Shelf;
   setShelf(shelf: Shelf): void;
@@ -27,7 +26,7 @@ export interface RailContext {
 }
 
 export function useRailActs({
-  mode, onLoad, onChoose, say, save, file, shelf, setShelf, setProblem, listing,
+  onLoad, onChoose, say, save, file, shelf, setShelf, setProblem, listing,
 }: RailContext) {
   const { loaded, keyOf, list } = listing;
   /** The file whose delete is one more click away. */
@@ -41,8 +40,7 @@ export function useRailActs({
     try {
       const doc = r
         ? await docFor(r)
-        : save && toPreset(save.patch, save.name || 'Untitled', save.notes);
-      if (!doc) return;
+        : toPreset(save.patch, save.name || 'Untitled', save.notes);
       await navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
       say('copied as JSON');
     } catch {
@@ -74,7 +72,7 @@ export function useRailActs({
    * left something, which must not require a server to be awake.
    */
   const doCapture = async () => {
-    if (!save || !save.name.trim()) return;
+    if (!save.name.trim()) return;
     const values = positionsNow(save.patch);
     if (!Object.keys(values).length) {
       setProblem('this patch exposes no controls, so there are no positions to save');
@@ -101,25 +99,15 @@ export function useRailActs({
     }
   };
 
-  const take = (doc: Preset, from: string) => {
-    if (mode === 'light' && onLoad) onLoad(doc, from);
-    else
-      onChoose({
-        key: `outside:${from}`,
-        name: typeof doc.name === 'string' ? doc.name : from,
-        doc,
-      });
-  };
-
   const importFile = async (f: File | undefined) => {
     if (!f) return;
-    try { take(await readPresetFile(f), f.name); } catch (e) { setProblem((e as Error).message); }
+    try { onLoad(await readPresetFile(f), f.name); } catch (e) { setProblem((e as Error).message); }
   };
 
   const takePaste = () => {
     if (paste === null) return;
     try {
-      take(parsePreset(paste, 'the pasted text'), 'pasted patch');
+      onLoad(parsePreset(paste, 'the pasted text'), 'pasted patch');
       setPaste(null);
     } catch (e) {
       setProblem((e as Error).message);
@@ -127,7 +115,7 @@ export function useRailActs({
   };
 
   const doSave = async () => {
-    if (!save || !save.name.trim()) return;
+    if (!save.name.trim()) return;
     try {
       const preset = toPreset(save.patch, save.name, save.notes);
       await writePreset(file, preset);

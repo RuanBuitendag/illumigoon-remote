@@ -18,7 +18,7 @@ export function usePatchDraft() {
   const [master, setMasterState] = useState<MasterColour | null>(null);
 
   // What this patch is called, and the note that rides along with it. Held here rather than
-  // in the library sheet so the top bar can say what is loaded, and so closing the sheet
+  // in the library sheet so the Edit header can say what is loaded, and so closing the sheet
   // does not forget the name you just saved under.
   const [patchName, setPatchName] = useState('');
   const [patchNotes, setPatchNotes] = useState('');

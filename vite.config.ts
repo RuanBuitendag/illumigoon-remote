@@ -8,7 +8,6 @@ const NODE_SHIMS = fileURLToPath(new URL('./packages/patch-editor/src/phone/node
 export default defineConfig({
   plugins: [react()],
   base: './',
-  define: { __EDITOR_BUILD__: JSON.stringify(process.env.npm_package_version ?? 'dev') },
   resolve: {
     alias: {
       'node:fs': NODE_SHIMS,

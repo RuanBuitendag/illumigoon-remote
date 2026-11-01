@@ -92,9 +92,6 @@ function starterPatch(): Patch {
   return p;
 }
 
-/** The socket has given up, or is about to try again. */
-export const linkFailed = (link: Link | null) => link?.at === 'backoff' || link?.at === 'gone';
-
 /** What a `light_state_res` reports. */
 function lookIn(payload: Record<string, any>): { type: string; params: Record<string, any> } {
   // The light reports `{ animation: { type, params } }`; older shapes put the animation

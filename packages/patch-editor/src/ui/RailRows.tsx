@@ -82,7 +82,6 @@ title={p.authored
 function PatchRowActions({
   r,
   got,
-  canLoad,
   deletable,
   armed,
   onLoad,
@@ -93,40 +92,35 @@ function PatchRowActions({
 }: {
   r: LibraryEntry;
   got: Loaded | undefined;
-  canLoad: boolean;
   deletable: boolean;
   armed: string | null;
-  onLoad?(doc: Preset, from: string): void;
-  onSend?(doc: Preset, name: string): void;
+  onLoad(doc: Preset, from: string): void;
+  onSend(doc: Preset, name: string): void;
   onCopy(r: LibraryEntry): void;
   onExport(r: LibraryEntry): void;
   onRemove(r: LibraryEntry): void;
 }) {
   return (
     <div className="row" style={{ gap: 6 }} onClick={e => e.stopPropagation()}>
-      {canLoad && (
-        <button
-          className="pill"
-          data-primary="true"
-          style={{ padding: '7px 12px' }}
-          disabled={!got}
-          onClick={() => got && onLoad?.(got.doc, r.name)}
-          title="Put this on the light, over what is there"
-        >
-          LOAD
-        </button>
-      )}
-      {onSend && (
-        <button
-          className="pill"
-          style={{ padding: '7px 12px' }}
-          disabled={!got}
-          onClick={() => got && onSend(got.doc, r.name)}
-          title="Send this to other lights, and pick which"
-        >
-          SEND
-        </button>
-      )}
+      <button
+        className="pill"
+        data-primary="true"
+        style={{ padding: '7px 12px' }}
+        disabled={!got}
+        onClick={() => got && onLoad(got.doc, r.name)}
+        title="Put this on the light, over what is there"
+      >
+        LOAD
+      </button>
+      <button
+        className="pill"
+        style={{ padding: '7px 12px' }}
+        disabled={!got}
+        onClick={() => got && onSend(got.doc, r.name)}
+        title="Send this to other lights, and pick which"
+      >
+        SEND
+      </button>
       <span className="grow" />
       <button className="iconbtn sm" title="Copy as JSON" onClick={() => onCopy(r)}>
         <Ico.Copy />
@@ -149,7 +143,7 @@ function PatchRowActions({
 }
 
 export function PatchRow({
-  r, rowKey, got, on, live, presets, canLoad, deletable, armed,
+  r, rowKey, got, on, live, presets, deletable, armed,
   onHover, onChoose, onLoad, onSend, onRemovePreset, onCopy, onExport, onRemove,
 }: {
   r: LibraryEntry;
@@ -158,13 +152,12 @@ export function PatchRow({
   on: boolean;
   live: boolean;
   presets: PresetRow[];
-  canLoad: boolean;
   deletable: boolean;
   armed: string | null;
   onHover(over: boolean): void;
   onChoose(c: Chosen): void;
-  onLoad?(doc: Preset, from: string): void;
-  onSend?(doc: Preset, name: string): void;
+  onLoad(doc: Preset, from: string): void;
+  onSend(doc: Preset, name: string): void;
   onRemovePreset(file: string): void;
   onCopy(r: LibraryEntry): void;
   onExport(r: LibraryEntry): void;
@@ -180,7 +173,7 @@ export function PatchRow({
       onMouseLeave={() => onHover(false)}
       onClick={() => got && onChoose({ key: rowKey, name: r.name, doc: got.doc })}
       onDoubleClick={() => {
-        if (got && canLoad) onLoad?.(got.doc, r.name)
+        if (got) onLoad(got.doc, r.name)
       }}
     >
       {on && <span className="selrule" />}
@@ -229,7 +222,6 @@ export function PatchRow({
           <PatchRowActions
             r={r}
             got={got}
-            canLoad={canLoad}
             deletable={deletable}
             armed={armed}
             onLoad={onLoad}
@@ -305,11 +297,9 @@ export function PublishedElsewhere({ groups, fetching, onFetch }: {
   );
 }
 
-export function RailFoot({ paste, setPaste, canLoad, canCopy, onTakePaste, onCopy, onImport }: {
+export function RailFoot({ paste, setPaste, onTakePaste, onCopy, onImport }: {
   paste: string | null;
   setPaste(update: string | null | ((was: string | null) => string | null)): void;
-  canLoad: boolean;
-  canCopy: boolean;
   onTakePaste(): void;
   onCopy(): void;
   onImport(file: File | undefined): void;
@@ -337,7 +327,7 @@ export function RailFoot({ paste, setPaste, canLoad, canCopy, onTakePaste, onCop
               disabled={!paste.trim()}
               onClick={onTakePaste}
             >
-              {canLoad ? 'LOAD' : 'CHOOSE'}
+              LOAD
             </button>
           </div>
         </>
@@ -347,7 +337,7 @@ export function RailFoot({ paste, setPaste, canLoad, canCopy, onTakePaste, onCop
           className="pill"
           style={{ padding: '7px 9px' }}
           onClick={() => fileInput.current?.click()}
-          title={canLoad ? 'Load a .json onto the light' : 'Choose a .json to send'}
+          title="Load a .json onto the light"
         >
           <span className="row" style={{ gap: 6 }}>
             <Ico.Up />
@@ -361,19 +351,17 @@ export function RailFoot({ paste, setPaste, canLoad, canCopy, onTakePaste, onCop
         >
           PASTE
         </button>
-        {canCopy && (
-          <button
-            className="pill"
-            style={{ padding: '7px 9px' }}
-            onClick={() => onCopy()}
-            title="Copy the patch on the light as JSON"
-          >
-            <span className="row" style={{ gap: 6 }}>
-              <Ico.Copy />
-              COPY
-            </span>
-          </button>
-        )}
+        <button
+          className="pill"
+          style={{ padding: '7px 9px' }}
+          onClick={() => onCopy()}
+          title="Copy the patch on the light as JSON"
+        >
+          <span className="row" style={{ gap: 6 }}>
+            <Ico.Copy />
+            COPY
+          </span>
+        </button>
       </div>
       <input
         ref={fileInput}
