@@ -10,7 +10,7 @@ import {
 } from '../domain/layerops';
 import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Ico } from './bits';
+import { Hr, Lab, Mono, Ico, RowGrip } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
@@ -355,6 +355,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
       data-muted={L.muted || undefined}
       data-dragover={over || undefined}
       data-lit={lit || undefined}
+      data-row-drop
       draggable
       onDragStart={onGrab}
       onDragOver={e => {
@@ -370,7 +371,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
     >
       {selected && <span className="selrule" />}
       <div className="row" style={{ gap: 9 }}>
-        <Ico.Grip />
+        <RowGrip />
         <span
           style={{
             width: 16,

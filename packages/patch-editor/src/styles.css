@@ -188,6 +188,8 @@
 .patch-editor .layerrow.raise-hi .rowmeta { display: none; }
 .patch-editor .layerrow:hover .rowacts,
 .patch-editor .layerrow.raise-hi .rowacts { display: flex; }
+.patch-editor .rowgrip { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; touch-action: none; }
+.patch-editor [data-lifted='true'] { opacity: 0.5; }
 .patch-editor .selrule { position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; background: var(--text-1); }
 
 .patch-editor .tog {
@@ -1107,6 +1109,8 @@
   .patch-editor .swrow { height: auto; min-height: 52px; }
   .patch-editor .flatcard, .patch-editor .ctlhead, .patch-editor .ghostrow { height: auto; min-height: 44px; }
   .patch-editor .rackrow { min-height: 44px; }
+  .patch-editor .rowgrip { min-width: 44px; min-height: 44px; margin: -6px -8px -6px -10px; }
+  .patch-editor .ctlend { height: 16px; }
   .patch-editor .blurb { min-width: 0; }
   .patch-editor .rackhead { height: auto !important; flex-wrap: wrap; gap: 4px 14px; padding-top: 6px !important; padding-bottom: 6px !important; }
   .patch-editor .rackhead > .row { flex-wrap: wrap; row-gap: 4px; }

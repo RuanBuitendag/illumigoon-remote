@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from 'react';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
 import { suspend } from './live';
+import { useRowDrag } from './useRowDrag';
 
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
@@ -293,6 +294,11 @@ export function RackToggle({ shut, onToggle, children }: {
       <Lab className="head">{children}</Lab>
     </button>
   );
+}
+
+/** The grip of a row in an ordered list. A finger presses this, so a list scrolls by the rest. */
+export function RowGrip() {
+  return <span {...useRowDrag()}><Ico.Grip /></span>;
 }
 
 export const Ico = {

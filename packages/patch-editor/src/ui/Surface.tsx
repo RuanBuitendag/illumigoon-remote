@@ -32,7 +32,7 @@ import {
   whyDropped,
 } from '../domain/surface';
 import { type Control } from '../domain/control';
-import { Blurb, Hr, Ico, Lab, Mono } from './bits';
+import { Blurb, Hr, Ico, Lab, Mono, RowGrip } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 
 // ---------------------------------------------------------------- exposing
@@ -237,6 +237,7 @@ function SectionHead({
   return (
     <div
       className="row ctlhead"
+      data-row-drop
       data-dragover={drag.over === `section:${rowKey}` || undefined}
       draggable={name !== null && renaming?.from !== name}
       onDragStart={() => name !== null && drag.setDragging({ kind: 'section', name })}
@@ -250,7 +251,7 @@ function SectionHead({
       }}
       onDrop={e => drag.dropOn(e, name, firstKey, name)}
     >
-      {name !== null ? <Ico.Grip /> : <span style={{ width: 10 }} />}
+      {name !== null ? <RowGrip /> : <span style={{ width: 10 }} />}
       <SectionName name={name} renaming={renaming} setRenaming={setRenaming} onRename={onRename} />
       {name !== null && empty && <Mono className="dim sm">empty · this session only</Mono>}
       {name !== null && (
@@ -281,6 +282,7 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
   return (
     <div
       className="row ctlrow flatcard"
+      data-row-drop
       data-dead={why ? true : undefined}
       data-dragover={drag.over === `control:${c.key}` || undefined}
       title={why ? `The light will not keep this: ${why}` : 'Click to edit · drag to reorder'}
@@ -303,7 +305,7 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
         onEdit(c, box.left - 320, box.top);
       }}
     >
-      <Ico.Grip />
+      <RowGrip />
       <span className="ctlglyph">{GLYPH[c.type] ?? '?'}</span>
       <div className="col grow" style={{ gap: 5, minWidth: 0 }}>
         <span className="ctllabel">{c.label}</span>
@@ -549,6 +551,7 @@ function SurfaceSection({
         {/* The end of a section takes a drop too, or nothing could be moved to its end. */}
         <div
           className="ctlend"
+          data-row-drop
           data-dragover={drag.over === `end:${rowKey}` || undefined}
           onDragOver={e => {
             e.preventDefault();

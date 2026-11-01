@@ -4,7 +4,7 @@ import { useState, type DragEvent, type HTMLAttributes, type ReactNode } from 'r
 import { LIMITS, nodeById, requireParam, globalParam, GLOBAL_NODE } from '../domain/catalog';
 import { makeWarp, pathOf, type Layer, type Warp } from '../domain/patch';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Tabs, Ico, Switch, Blurb, RackToggle } from './bits';
+import { Hr, Lab, Mono, Tabs, Ico, Switch, Blurb, RackToggle, RowGrip } from './bits';
 import { Stages } from './Stages';
 import { useCollapsed } from './collapsed';
 import { unlessReached, type Ctl, type Tab } from './ctl';
@@ -225,6 +225,7 @@ function Chain({ ctl, host, top }: {
   /** What makes rack row @p index something to drag, and somewhere to drop. */
   const dragRow = (index: number): RowDrag => ({
     draggable: true,
+    'data-row-drop': true,
     'data-dragover': over === index || undefined,
     onDragStart: () => setDragFrom(index),
     onDragOver: (e: DragEvent) => { e.preventDefault(); setOver(index); },
@@ -464,7 +465,11 @@ export function MasterPanel({ ctl, tab, onTab }: { ctl: Ctl; tab: Tab; onTab(tab
 }
 
 /** The drag-and-drop half of a rack row, spread onto it. */
-type RowDrag = HTMLAttributes<HTMLDivElement> & { draggable?: boolean; 'data-dragover'?: true };
+type RowDrag = HTMLAttributes<HTMLDivElement> & {
+  draggable?: boolean;
+  'data-row-drop'?: true;
+  'data-dragover'?: true;
+};
 
 function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, expose }: {
   i: number; warp?: { type: string; bypass: boolean }; sel: boolean; drag: RowDrag;
@@ -503,7 +508,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       onClick={onSelect}
     >
       {sel && <span className="selrule" style={{ top: 7, bottom: 7 }} />}
-      <Ico.Grip />
+      <RowGrip />
       <span onClick={e => e.stopPropagation()} {...expose}>
         <Switch
           on={!warp.bypass}
@@ -586,7 +591,7 @@ function ColourSlot({ layer, sel, drag, fromMaster, onSelect }: {
   layer: Layer; sel: boolean; drag: RowDrag; fromMaster: boolean; onSelect(): void;
 }) {
   return (
-    <ColourRow sel={sel} lead={<Ico.Grip />} row={{ ...drag, onClick: onSelect }}
+    <ColourRow sel={sel} lead={<RowGrip />} row={{ ...drag, onClick: onSelect }}
                gradient={gradientOf(layer.colour.palette.entries, layer.colour.wrap)}
                title={fromMaster
            ? 'Palette from Master. Drag it to move it; select it for the rest of the colour'
