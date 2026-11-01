@@ -3,16 +3,15 @@ import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from 
 import { AddKey, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
 import { removeSchedule, setScheduleEnabled, writeSchedule } from '../store/fleet-store';
 import type { ScheduleChange } from '../light-network/protocol';
-import { useHousehold } from '../store/household-store';
+import { useLibrary } from '../store/library-store';
 import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import {
-  changeOfScene,
+  changesOfScene,
   clockMinutes,
   clockText,
   dailyEntry,
   DAYS_IN_ORDER,
-  fitsSchedule,
   hasScheduleSpace,
   roomSchedules,
   timerEntry,
@@ -56,13 +55,13 @@ function TimeField({ label, value, onChange }: { label: string; value: number; o
 }
 
 function useSceneChoices(room: Room) {
-  const scenes = useHousehold((household) => household.scenes);
-  const changes = new Map<string, ScheduleChange>();
+  const scenes = useLibrary((library) => library.scenes);
+  const changes = new Map<string, Map<string, ScheduleChange>>();
   for (const scene of scenes) {
-    const state = scene.rooms[room.id];
-    if (state?.isOn && fitsSchedule(changeOfScene(state))) changes.set(scene.id, changeOfScene(state));
+    const ofLights = changesOfScene(scene, room.lights);
+    if (ofLights.size > 0) changes.set(scene.file, ofLights);
   }
-  const options = scenes.filter(({ id }) => changes.has(id)).map(({ id, name }) => ({ value: id, name }));
+  const options = scenes.filter(({ file }) => changes.has(file)).map(({ file, name }) => ({ value: file, name }));
   return { options: [{ value: AS_IT_WAS, name: 'As it was' }, ...options], changes };
 }
 
@@ -75,17 +74,22 @@ function ScheduleForm({ room, onDone }: { room: Room; onDone: () => void }) {
   const [sceneId, setSceneId] = useState(AS_IT_WAS);
   const { options, changes } = useSceneChoices(room);
   const lights = room.writableLights.filter((light) => light.canSchedule);
-  const start = changes.get(sceneId) ?? TURN_ON;
+  const sceneChanges = kind === 'on' || kind === 'between' ? changes.get(sceneId) : undefined;
 
   const entries = {
-    on: () => dailyEntry(at, days, start),
+    on: () => dailyEntry(at, days, TURN_ON),
     off: () => dailyEntry(at, days, TURN_OFF),
-    between: () => windowEntry({ at, until }, days, start),
+    between: () => windowEntry({ at, until }, days, TURN_ON),
     timer: () => timerEntry(timer),
   };
 
+  // One entry id across the room, with the state each light takes in the scene.
   const save = () => {
-    writeSchedule(lights, entries[kind]());
+    const entry = entries[kind]();
+    for (const light of lights) {
+      const state = sceneChanges ? sceneChanges.get(light.address) : entry.state;
+      if (state) writeSchedule([light], { ...entry, state });
+    }
     onDone();
   };
 

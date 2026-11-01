@@ -3,7 +3,7 @@ import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow } 
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, setBrightness, setPower } from '../store/fleet-store';
-import type { Scene } from '../store/household-store';
+import type { SceneEntry } from '../store/library-store';
 import { openPage } from '../store/navigation-store';
 import { highestBrightness, isAnyOn, type Room } from '../store/rooms';
 import { RoomSummary } from './room-summary';
@@ -45,7 +45,7 @@ function UpdateNotice({ rooms }: { rooms: Room[] }) {
   return <BottomNotice text="The update failed." actionLabel="Retry" onAction={checkForUpdate} />;
 }
 
-type SceneSheet = { renaming: Scene | null };
+type SceneSheet = { renaming: SceneEntry | null };
 
 export function HomeScreen({ rooms }: { rooms: Room[] }) {
   const [showsVersion, setShowsVersion] = useState(false);

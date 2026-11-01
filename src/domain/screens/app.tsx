@@ -1,4 +1,5 @@
 import { useEffect, type ReactNode } from 'react';
+import { startLibrary } from '../store/library-store';
 import { ScreenStack } from '../../composites';
 import { closePage, closeRoom, useNavigation, type PageKind } from '../store/navigation-store';
 import { useRooms, type Room } from '../store/rooms';
@@ -39,6 +40,10 @@ export function App() {
   const isPageOpen = useNavigation((navigation) => navigation.isPageOpen);
   const pageVisit = useNavigation((navigation) => navigation.pageVisit);
   const room = rooms.find(({ id }) => id === roomId);
+
+  useEffect(() => {
+    void startLibrary();
+  }, []);
 
   // A room can vanish under an open screen when its lights change room.
   useEffect(() => {

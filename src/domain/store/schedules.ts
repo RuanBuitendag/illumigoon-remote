@@ -1,6 +1,6 @@
 import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
 import type { Light } from './fleet-store';
-import type { SceneRoom } from './household-store';
+import { lightIdOf, type Scene, type SceneLight } from './library-store';
 
 // A light refuses a whole entry over a change above this size, and it tells nobody.
 const MAX_CHANGE_BYTES = 512;
@@ -30,13 +30,26 @@ export function clockMinutes(clock: string) {
   return hours * 60 + minutes;
 }
 
-export const changeOfScene = ({ isOn, brightness, animation }: SceneRoom): ScheduleChange => ({
+const changeOfSceneLight = ({ is_on: isOn, brightness, animation }: SceneLight): ScheduleChange => ({
   is_on: isOn,
   brightness,
-  ...(animation && { animation }),
+  animation: { params: {}, ...animation },
 });
 
 export const fitsSchedule = (change: ScheduleChange) => JSON.stringify(change).length <= MAX_CHANGE_BYTES;
+// What a scene starts on each light of a room, by address. A scene that leaves a light off, or that
+// a light would refuse, has no entry for it.
+export function changesOfScene(scene: Scene, lights: Light[]) {
+  const changes = new Map<string, ScheduleChange>();
+  for (const light of lights) {
+    const saved = scene.lights.find(({ id }) => id === lightIdOf(light));
+    if (!saved?.is_on) continue;
+    const change = changeOfSceneLight(saved);
+    if (fitsSchedule(change)) changes.set(light.address, change);
+  }
+  return changes;
+}
+
 export const hasScheduleSpace = (lights: Light[]) => lights.every(({ schedule }) => schedule.length < MAX_ENTRIES);
 
 function newScheduleId() {

@@ -12,7 +12,8 @@ import { BLACK_HEX, colourToHex, hexToColour, TextKey, type Colour } from '../..
 import type { Parameter, ParameterValue } from '../light-network/protocol';
 import { changeControl } from '../store/change-control';
 import { setTransition, type Light } from '../store/fleet-store';
-import { addColourSet, addSavedLook, useHousehold } from '../store/household-store';
+import { addSavedLook } from '../store/household-store';
+import { keepPalette, useLibrary, type PaletteEntry } from '../store/library-store';
 import { currentControls, lookNameOf } from '../store/rooms';
 import { LookControl } from './look-control';
 
@@ -55,8 +56,11 @@ function TransitionControls({ lights, light }: { lights: Light[]; light: Light }
 const toHexList = ({ default: value }: Parameter) =>
   (Array.isArray(value) ? value : [value as Colour]).map(colourToHex);
 
+const toColourSet = ({ file, name, entries, error }: PaletteEntry, index: number) =>
+  error ? [] : [{ id: file ?? `patch-${index}`, name, colours: entries.map((entry) => `#${entry.replace('#', '')}`) }];
+
 function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter: Parameter; onClose: () => void }) {
-  const sets = useHousehold((household) => household.colourSets);
+  const sets = useLibrary((library) => library.palettes).flatMap(toColourSet);
   const isPalette = parameter.type === 'palette';
   const toValue = (colours: string[]): ParameterValue =>
     isPalette ? colours.map(hexToColour) : hexToColour(colours[0] ?? BLACK_HEX);
@@ -67,7 +71,7 @@ function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter:
       minimumColours={parameter.min ?? 1}
       sets={sets}
       onChange={(colours) => changeControl(lights, parameter.key, toValue(colours))}
-      onKeepSet={addColourSet}
+      onKeepSet={(name, colours) => void keepPalette(name, colours)}
       onClose={onClose}
     />
   );

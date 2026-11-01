@@ -1,46 +1,58 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SceneCard, SceneLine, SceneShelf } from '../../composites';
 import { useRecording } from '../looks/recordings';
-import { deleteScene, useHousehold, type Scene, type SceneRoom } from '../store/household-store';
+import {
+  moveOldScenes,
+  removeScene,
+  useLibrary,
+  type SceneEntry,
+  type SceneLight,
+} from '../store/library-store';
 import { previewOfAnimation, type Room } from '../store/rooms';
-import { applyScene, roomTag, sceneSummary } from '../store/scenes';
+import { animationOf, applyScene, roomNameOf, roomTag, sceneSummary } from '../store/scenes';
 
-function RoomLine({ tag, state }: { tag: string; state: SceneRoom }) {
-  const recording = useRecording(state.isOn ? previewOfAnimation(state.animation) : null);
+function LightLine({ tag, light }: { tag: string; light: SceneLight }) {
+  const recording = useRecording(light.is_on ? previewOfAnimation(animationOf(light)) : null);
   return <SceneLine tag={tag} gradient={recording?.gradient} />;
 }
 
 type SceneRowProps = {
   rooms: Room[];
   onSave: () => void;
-  onRename: (scene: Scene) => void;
+  onRename: (scene: SceneEntry) => void;
 };
 
 export function SceneRow({ rooms, onSave, onRename }: SceneRowProps) {
-  const scenes = useHousehold((household) => household.scenes);
+  const scenes = useLibrary((library) => library.scenes).filter(({ error }) => !error);
+  const problem = useLibrary((library) => library.problem);
   const [isEditing, setEditing] = useState(false);
   const [leftOut, setLeftOut] = useState<string[]>([]);
-  const roomName = (id: string) => rooms.find((room) => room.id === id)?.name ?? id;
+  const leftOutNote = leftOut.length > 0 ? `Left out ${leftOut.join(', ')}. They can't be changed now.` : null;
+
+  useEffect(() => {
+    void moveOldScenes(rooms);
+  }, [rooms]);
+
   return (
     <SceneShelf
       hasScenes={scenes.length > 0}
       isEditing={isEditing}
-      note={leftOut.length > 0 ? `Left out ${leftOut.join(', ')}. They can't be changed now.` : null}
+      note={problem ?? leftOutNote}
       onEdit={() => setEditing(!isEditing)}
       onSave={onSave}
     >
       {scenes.map((scene) => (
         <SceneCard
-          key={scene.id}
+          key={scene.file}
           name={scene.name}
-          summary={sceneSummary(scene, roomName)}
+          summary={sceneSummary(scene, rooms)}
           isEditing={isEditing}
           onApply={() => setLeftOut(applyScene(scene, rooms))}
           onRename={() => onRename(scene)}
-          onDelete={() => deleteScene(scene.id)}
+          onDelete={() => void removeScene(scene)}
         >
-          {Object.entries(scene.rooms).map(([id, state]) => (
-            <RoomLine key={id} tag={roomTag(roomName(id))} state={state} />
+          {scene.lights.map((light) => (
+            <LightLine key={light.id} tag={roomTag(roomNameOf(light.room ?? '', rooms))} light={light} />
           ))}
         </SceneCard>
       ))}

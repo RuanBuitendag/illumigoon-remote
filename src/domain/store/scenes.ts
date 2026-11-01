@@ -1,42 +1,44 @@
+import type { AnimationState } from '../light-network/protocol';
 import { applyState, type Light } from './fleet-store';
-import type { Scene, SceneRoom } from './household-store';
-import { canPlay, highestBrightness, isAnyOn, lookNameOf, type Room } from './rooms';
+import { lightIdOf, type Scene, type SceneLight } from './library-store';
+import { canPlay, lookNameOf, type Room } from './rooms';
 
 export const WHOLE_HOUSE = 'house';
 
-function captureRoom(room: Room): SceneRoom {
-  const first = room.onlineLights[0];
-  return {
-    isOn: isAnyOn(room.onlineLights),
-    brightness: highestBrightness(room.onlineLights),
-    lookName: lookNameOf(first),
-    animation: first?.animation ?? null,
-  };
-}
+export const animationOf = ({ animation }: SceneLight): AnimationState => ({ params: {}, ...animation });
 
-export function captureRooms(rooms: Room[], scope: string) {
+const captureLight = (light: Light, room: string): SceneLight[] => {
+  const { name, isOn: is_on, brightness, animation } = light;
+  return animation ? [{ id: lightIdOf(light), name, room, is_on, brightness, animation }] : [];
+};
+
+// A light that cannot say what it shows is left out. A guess would change it when the scene runs.
+export function captureScene(name: string, rooms: Room[], scope: string): Scene {
   const covered = rooms.filter((room) => scope === WHOLE_HOUSE || room.id === scope);
-  return Object.fromEntries(covered.map((room) => [room.id, captureRoom(room)]));
+  const lights = covered.flatMap((room) => room.onlineLights.flatMap((light) => captureLight(light, room.id)));
+  return { name, lights };
 }
 
 // A light that cannot play the look keeps its own, and still follows the power and the level.
-function applyToLight(light: Light, { isOn, brightness, lookName, animation }: SceneRoom) {
-  const canShow = animation !== null && canPlay(light, animation);
+function applyToLight(light: Light, saved: SceneLight) {
+  const animation = animationOf(saved);
+  const canShow = canPlay(light, animation);
   applyState([light], {
-    isOn,
-    brightness,
-    lookName: canShow ? (lookName ?? undefined) : undefined,
+    isOn: saved.is_on,
+    brightness: saved.brightness,
+    lookName: canShow ? (lookNameOf({ ...light, animation, appliedLook: undefined }) ?? undefined) : undefined,
     animation: canShow ? animation : null,
   });
 }
 
-// Says which rooms the scene had to leave alone, because nobody can reach them or someone holds them.
+// Says which lights the scene had to leave alone, because nobody can reach them or someone holds them.
 export function applyScene(scene: Scene, rooms: Room[]) {
+  const writable = rooms.flatMap((room) => room.writableLights);
   const leftOut: string[] = [];
-  for (const [roomId, state] of Object.entries(scene.rooms)) {
-    const room = rooms.find(({ id }) => id === roomId);
-    if (!room || room.writableLights.length === 0) leftOut.push(room?.name ?? roomId);
-    for (const light of room?.writableLights ?? []) applyToLight(light, state);
+  for (const saved of scene.lights) {
+    const light = writable.find((candidate) => lightIdOf(candidate) === saved.id);
+    if (light) applyToLight(light, saved);
+    else leftOut.push(saved.name);
   }
   return leftOut;
 }
@@ -47,14 +49,17 @@ function plural(count: number, noun: string) {
 
 export const lightCount = (count: number) => plural(count, 'light');
 
-export function sceneSummary({ rooms, scope }: Pick<Scene, 'rooms' | 'scope'>, roomName: (id: string) => string) {
-  const states = Object.values(rooms);
-  const offCount = states.filter((state) => !state.isOn).length;
-  if (scope !== WHOLE_HOUSE) return `${roomName(scope)} only`;
-  if (offCount === states.length) return 'Turns everything off';
-  if (offCount === 0) return 'All rooms on';
-  return `Turns ${plural(offCount, 'room')} off`;
+export function sceneSummary({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
+  const covered = new Set(lights.map(({ room }) => room));
+  const offCount = lights.filter(({ is_on: isOn }) => !isOn).length;
+  const [only] = covered;
+  if (covered.size === 1 && rooms.length > 1) return `${roomNameOf(only ?? '', rooms)} only`;
+  if (offCount === lights.length) return 'Turns everything off';
+  if (offCount === 0) return 'All lights on';
+  return `Turns ${lightCount(offCount)} off`;
 }
+
+export const roomNameOf = (id: string, rooms: Room[]) => rooms.find((room) => room.id === id)?.name ?? id;
 
 export const roomTag = (name: string) =>
   name

@@ -15,7 +15,8 @@
       "types": "./src/phone/phone-types.d.ts",
       "default": "./src/phone/index.ts"
     },
-    "./wire": "./src/device/wire.ts"
+    "./wire": "./src/device/wire.ts",
+    "./library": "./src/library/shared.ts"
   },
   "dependencies": {
     "@illumigoon/led-tape": "*",

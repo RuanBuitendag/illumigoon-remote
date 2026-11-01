@@ -1,26 +1,23 @@
 import { useState } from 'react';
 import { ChoiceList, Overlay, OverlayBlock, OverlayText } from '../../composites';
 import { KeyRow, TextField, TextKey } from '../../design-system';
-import { addScene, renameScene, type Scene } from '../store/household-store';
+import { renameScene, saveScene, type SceneEntry } from '../store/library-store';
 import type { Room } from '../store/rooms';
-import { captureRooms, sceneSummary, WHOLE_HOUSE } from '../store/scenes';
+import { captureScene, sceneSummary, WHOLE_HOUSE } from '../store/scenes';
 
 type SaveSceneSheetProps = {
   rooms: Room[];
-  renaming: Scene | null;
+  renaming: SceneEntry | null;
   onClose: () => void;
 };
 
 export function SaveSceneSheet({ rooms, renaming, onClose }: SaveSceneSheetProps) {
   const [name, setName] = useState(renaming?.name ?? '');
   const [scope, setScope] = useState(WHOLE_HOUSE);
-  const captured = captureRooms(rooms, scope);
-  const roomName = (id: string) => rooms.find((room) => room.id === id)?.name ?? id;
+  const captured = captureScene(name.trim(), rooms, scope);
 
   const save = () => {
-    const trimmed = name.trim();
-    if (renaming) renameScene(renaming.id, trimmed);
-    else addScene({ name: trimmed, scope, rooms: captured });
+    void (renaming ? renameScene(renaming, name.trim()) : saveScene(captured));
     onClose();
   };
 
@@ -37,7 +34,7 @@ export function SaveSceneSheet({ rooms, renaming, onClose }: SaveSceneSheetProps
             />
           </OverlayBlock>
           <OverlayBlock label="What it will do">
-            <OverlayText>{sceneSummary({ rooms: captured, scope }, roomName)}</OverlayText>
+            <OverlayText>{sceneSummary(captured, rooms)}</OverlayText>
           </OverlayBlock>
         </>
       )}
@@ -45,7 +42,7 @@ export function SaveSceneSheet({ rooms, renaming, onClose }: SaveSceneSheetProps
         <TextKey isQuiet onClick={onClose}>
           CANCEL
         </TextKey>
-        <TextKey disabled={!name.trim()} onClick={save}>
+        <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={save}>
           SAVE
         </TextKey>
       </KeyRow>

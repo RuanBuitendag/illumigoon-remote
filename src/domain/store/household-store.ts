@@ -12,7 +12,8 @@ export type SceneRoom = {
   animation: AnimationState | null;
 };
 
-export type Scene = {
+// Waiting to move into the library. See `library-store`.
+export type OldScene = {
   id: string;
   name: string;
   scope: string; // `house`, or the id of the one room it covers
@@ -22,7 +23,7 @@ export type Scene = {
 export type SavedLook = { id: string; name: string; baseName: string; animation: AnimationState };
 
 type Household = {
-  scenes: Scene[];
+  scenes: OldScene[];
   savedLooks: SavedLook[];
   colourSets: typeof STARTER_COLOUR_SETS;
   roomNames: Record<string, string>;
@@ -32,7 +33,7 @@ type Household = {
 export const useHousehold = create<Household>()(
   persist(
     () => ({
-      scenes: [] as Scene[],
+      scenes: [] as OldScene[],
       savedLooks: [] as SavedLook[],
       colourSets: STARTER_COLOUR_SETS,
       roomNames: {} as Record<string, string>,
@@ -44,28 +45,8 @@ export const useHousehold = create<Household>()(
 
 const newId = () => crypto.randomUUID();
 
-export function addScene(scene: Omit<Scene, 'id'>) {
-  useHousehold.setState(({ scenes }) => ({ scenes: [...scenes, { ...scene, id: newId() }] }));
-}
-
-export function renameScene(id: string, name: string) {
-  useHousehold.setState(({ scenes }) => ({
-    scenes: scenes.map((scene) => (scene.id === id ? { ...scene, name } : scene)),
-  }));
-}
-
-export function deleteScene(id: string) {
-  useHousehold.setState(({ scenes }) => ({ scenes: scenes.filter((scene) => scene.id !== id) }));
-}
-
 export function addSavedLook(look: Omit<SavedLook, 'id'>) {
   useHousehold.setState(({ savedLooks }) => ({ savedLooks: [...savedLooks, { ...look, id: newId() }] }));
-}
-
-export function addColourSet(name: string, colours: string[]) {
-  useHousehold.setState(({ colourSets }) => ({
-    colourSets: [...colourSets, { id: newId(), name, colours }],
-  }));
 }
 
 export function renameRoom(id: string, name: string) {
