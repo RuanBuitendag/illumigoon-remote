@@ -108,7 +108,7 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
   const level = highestBrightness(shownLights);
   const isMixed = isMixedLook(shownLights);
   const hasLights = lights.length > 0;
-  const canEdit = lights.some(({ isOnline }) => isOnline);
+  const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
   return (
     <Hero
       tint={recording?.tint}

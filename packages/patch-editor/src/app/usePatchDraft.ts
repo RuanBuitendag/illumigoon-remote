@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { emptyPatch, type Patch } from '../domain/patch';
 import type { MasterColour } from '../domain/masterColour';
+import { serialise } from '../domain/patchDocument';
 
 export function usePatchDraft() {
   // Deliberately empty until the device has described itself: `starterPatch()` reads
@@ -32,6 +33,8 @@ export function usePatchDraft() {
    * has already moved past.
    */
   const patchRef = useRef(patch);
+  /** Set by the first write of this session. The light's own copy arriving does not count. */
+  const hasEditedRef = useRef(false);
   /**
    * The patch's name, always current, for the same reason `patchRef` is.
    *
@@ -60,10 +63,20 @@ export function usePatchDraft() {
   }, [putMaster, masterRef]);
 
   return {
-    patch, setPatch, patchRef, patchNameRef,
+    patch, setPatch, patchRef, patchNameRef, hasEditedRef,
     patchName, setPatchName, patchNotes, setPatchNotes,
     master, masterRef, putMaster, dropMaster,
   };
 }
 
 export type PatchDraft = ReturnType<typeof usePatchDraft>;
+
+export type EditedLook = { type: string; params: Record<string, unknown> };
+
+/** What this session leaves on the light, or null when it changed nothing. */
+export function editedLook({ hasEditedRef, patchRef, patchNameRef }: PatchDraft): EditedLook | null {
+  if (!hasEditedRef.current) return null;
+  const params = serialise(patchRef.current) as Record<string, unknown>;
+  const name = patchNameRef.current.trim();
+  return { type: 'patch', params: name ? { ...params, name } : params };
+}

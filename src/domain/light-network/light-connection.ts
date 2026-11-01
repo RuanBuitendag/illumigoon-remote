@@ -34,6 +34,7 @@ export class LightConnection {
   private hasIdentity = false;
   private lastScheduleHash: number | undefined;
   private hasManifests = false;
+  private isHeld = false;
   private manifestTimer: number | undefined;
   private writeTimer: number | undefined;
   private readonly pendingWrites = new Map<string, () => void>();
@@ -63,6 +64,12 @@ export class LightConnection {
     this.wire.reconnect();
   }
 
+  // Edit holds its own socket to this light, and its writes look like changes from elsewhere here.
+  // Each one would ask for a state report, so while held this connection leaves the light alone.
+  setHeld(isHeld: boolean) {
+    this.isHeld = isHeld;
+  }
+
   close() {
     window.clearTimeout(this.manifestTimer);
     this.wire.close();
@@ -84,7 +91,7 @@ export class LightConnection {
 
   // Asked after the light has said who it is, because an answer that comes before that is dropped.
   private readLight() {
-    this.send('light_state_req');
+    if (!this.isHeld) this.send('light_state_req');
     this.send('light_transitions_req');
     this.send('device_config_get', { key: 'ota_url' });
     this.requestManifests();
@@ -130,7 +137,8 @@ export class LightConnection {
     this.readScheduleWhenChanged(heartbeat);
     // The reply for a long look can need more memory than the light has in one piece, and a failed
     // allocation restarts it. After a write from this app the app already holds that state.
-    if (this.wire.elsewhere(heartbeat.state_hash)) this.send('light_state_req');
+    // The hash is read while held too, so the first heartbeat after does not count those edits.
+    if (this.wire.elsewhere(heartbeat.state_hash) && !this.isHeld) this.send('light_state_req');
   }
 
   private readScheduleWhenChanged({ light_sched_hash: hash }: Heartbeat) {

@@ -1,9 +1,9 @@
 import './styles.css';
-import App, { type EditorSection, type OpenLight } from './App';
+import App, { type EditedLook, type EditorSection, type OpenLight } from './App';
 import { setSourceId } from './device/source';
 import { setHostDialogs, setHostFetch, type HostDialogs, type HostFetch } from './host';
 
-export type { EditorSection, HostDialogs, HostFetch, OpenLight };
+export type { EditedLook, EditorSection, HostDialogs, HostFetch, OpenLight };
 
 type PatchEditorProps = {
   light: OpenLight;
@@ -20,8 +20,8 @@ type PatchEditorProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  /** The socket has closed. */
-  onLeave(): void;
+  /** The socket has closed. Carries the document on the light if this session changed it. */
+  onLeave(look: EditedLook | null): void;
   /** The light cannot be edited. */
   onClose(): void;
 };

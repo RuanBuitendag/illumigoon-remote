@@ -22,8 +22,12 @@ export function usePatchWrites({
   masterRef,
   putMaster,
   setPatch,
+  hasEditedRef,
   arrivalRef,
-}: Pick<PatchDraft, 'patchRef' | 'patchNameRef' | 'masterRef' | 'putMaster' | 'setPatch'> & {
+}: Pick<
+  PatchDraft,
+  'patchRef' | 'patchNameRef' | 'masterRef' | 'putMaster' | 'setPatch' | 'hasEditedRef'
+> & {
   wire: Wire | null;
   arrivalRef: RefObject<Arrival>;
 }) {
@@ -55,9 +59,10 @@ export function usePatchWrites({
       if (masterRef.current) putMaster(enforce(draft, masterRef.current));
       patchRef.current = draft;
       setPatch(draft);
+      hasEditedRef.current = true;
       return draft;
     },
-    [putMaster, patchRef, masterRef, setPatch],
+    [putMaster, patchRef, masterRef, setPatch, hasEditedRef],
   );
 
   /**

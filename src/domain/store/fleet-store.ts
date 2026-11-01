@@ -264,19 +264,27 @@ export const appliedLookOf = (name: string, animation: AnimationState): AppliedL
   shape: lookShape(animation),
 });
 
+// What a light now shows, whoever sent it.
+export function noteLook(address: string, lookName: string, animation: AnimationState) {
+  updateLight(address, {
+    isOn: true,
+    animation,
+    appliedLook: appliedLookOf(lookName, animation),
+    hold: undefined,
+    localWriteUntil: holdLocalWrite(),
+    lookWrittenAt: Date.now(),
+  });
+}
+
 export function applyLook(lights: Light[], lookName: string, animation: AnimationState) {
-  const appliedLook = appliedLookOf(lookName, animation);
   for (const { address } of lights) {
     connections.get(address)?.send('light_set_state', { is_on: true, animation: withPositions(animation) });
-    updateLight(address, {
-      isOn: true,
-      animation,
-      appliedLook,
-      hold: undefined,
-      localWriteUntil: holdLocalWrite(),
-      lookWrittenAt: Date.now(),
-    });
+    noteLook(address, lookName, animation);
   }
+}
+
+export function setHeldByEditor(address: string, isHeld: boolean) {
+  connections.get(address)?.setHeld(isHeld);
 }
 
 export type LightState = { isOn: boolean; brightness?: number; lookName?: string; animation?: AnimationState | null };

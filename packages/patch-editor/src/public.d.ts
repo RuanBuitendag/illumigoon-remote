@@ -7,6 +7,8 @@ export type HostDialogs = {
   askName(text: string, suggestion: string): Promise<string | null>;
 };
 
+export type EditedLook = { type: string; params: Record<string, unknown> };
+
 export type EditorSection = 'layers' | 'colour' | 'motion' | 'controls' | 'roll';
 
 export type OpenLight = { url: string; name: string; lookName?: string };
@@ -24,6 +26,6 @@ export function PatchEditor(props: {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  onLeave(): void;
+  onLeave(look: EditedLook | null): void;
   onClose(): void;
 }): ReactNode;

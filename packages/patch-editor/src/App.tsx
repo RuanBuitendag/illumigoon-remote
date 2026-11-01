@@ -9,9 +9,10 @@ import { ChromedApp } from './app/ChromedApp';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
 import { useEditor, type OpenLight } from './app/useEditor';
+import { editedLook, type EditedLook } from './app/usePatchDraft';
 import { useSection, type EditorSection } from './app/useSection';
 
-export type { EditorSection, OpenLight };
+export type { EditedLook, EditorSection, OpenLight };
 
 type AppProps = {
   light: OpenLight;
@@ -25,7 +26,7 @@ type AppProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  onLeave(): void;
+  onLeave(look: EditedLook | null): void;
   onClose(): void;
 };
 
@@ -46,12 +47,13 @@ function EditPage(props: Omit<AppProps, 'withChrome'>) {
   // Decided here and not by unmounting: what is still waiting goes out before the socket closes.
   const { commit } = writes;
   const left = useLatest(onLeave);
+  const leaving = useLatest(draft);
   useEffect(() => {
     if (isOpen) return;
     commit();
     disconnect();
-    left.current();
-  }, [isOpen, commit, disconnect, left]);
+    left.current(editedLook(leaving.current));
+  }, [isOpen, commit, disconnect, left, leaving]);
 
   return (
     <div

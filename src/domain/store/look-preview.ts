@@ -28,7 +28,7 @@ const ARRIVAL: LightArrival = { ms: 300 };
 const LONGEST_HOLD_MS = 15000;
 
 const isOlder = ({ softwareVersion }: Light) => isBeforeVersion(softwareVersion, FIRST_SAFE_VERSION);
-const gapOf = (light: Light) => (isOlder(light) ? OLDER_GAP_MS : GAP_MS);
+export const gapOf = (light: Light) => (isOlder(light) ? OLDER_GAP_MS : GAP_MS);
 const isLong = (look: AnimationState | null) =>
   look !== null && JSON.stringify(withPositions(look)).length >= LONG_LOOK_BYTES;
 const isSameLook = (first: AnimationState | null, second: AnimationState) =>
