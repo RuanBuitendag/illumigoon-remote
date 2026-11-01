@@ -40,6 +40,9 @@ function isOlder(version: string, latest: string) {
   return false;
 }
 
+// A version that says nothing counts as older, because that is the careful answer.
+export const isBeforeVersion = (version: string, floor: string) => !versionParts(version) || isOlder(version, floor);
+
 type SoftwareFacts = { updateServer: string; softwareChannel: string; softwareVersion: string };
 
 // A channel that the server does not list gives no alert. It says nothing about the light.

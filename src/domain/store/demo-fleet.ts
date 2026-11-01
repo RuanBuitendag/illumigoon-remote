@@ -57,6 +57,7 @@ function demoLight(address: string, name: string, roomId: string, change: Partia
     manifests: FLAT_LOOKS,
     transitions: [],
     localWriteUntil: 0,
+    lookWrittenAt: 0,
     softwareVersion: LATEST_VERSION,
     softwareChannel: 'stable',
     updateServer: DEMO_SERVER,

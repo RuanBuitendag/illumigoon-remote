@@ -2,6 +2,7 @@ import { LevelRow, LockNote, RoomCard } from '../../composites';
 import { movesToMusic } from '../looks/look-catalog';
 import { useRecording } from '../looks/recordings';
 import { setBrightness, setPower, type Light } from '../store/fleet-store';
+import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom } from '../store/navigation-store';
 import {
   highestBrightness,
@@ -36,7 +37,8 @@ function lookLabel(lights: Light[]) {
 }
 
 export function RoomSummary({ room }: { room: Room }) {
-  const { onlineLights, writableLights } = room;
+  const { writableLights } = room;
+  const onlineLights = useShownLights(room.onlineLights);
   const first = onlineLights[0];
   const source = previewOfAnimation(first?.animation ?? null);
   const recording = useRecording(source);

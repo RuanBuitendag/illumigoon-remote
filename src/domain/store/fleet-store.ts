@@ -46,6 +46,8 @@ export type Light = {
   transitionId?: string;
   transitionMs?: number;
   localWriteUntil: number;
+  lookWrittenAt: number;
+  hold?: LightHold;
   appliedLook?: AppliedLook;
   softwareVersion: string;
   softwareChannel: string;
@@ -60,6 +62,17 @@ export type SoftwareUpdate = { fromVersion: string; startedAt: number };
 
 // A light does not report the name of a look, so the name stays here while the shape still fits.
 export type AppliedLook = { name: string; shape: string };
+
+export type LightArrival = { ms: number };
+
+// The light shows something the store does not, and the store holds what it goes back to. A light
+// that restarts closes no socket, so `isRestoreSent` only ends with the next sign of life.
+type LightHold = {
+  animation: AnimationState | null;
+  arrival?: LightArrival;
+  isRestoreDue: boolean;
+  isRestoreSent: boolean;
+};
 
 type LightUpdate = Partial<Light>;
 type Fleet = {
@@ -84,8 +97,9 @@ function updateLight(address: string, update: LightUpdate | ((light: Light) => L
 
 function applyHeartbeat(address: string, heartbeat: Heartbeat) {
   updateLight(address, (light) => {
-    const held = Date.now() < light.localWriteUntil;
+    const held = Boolean(light.hold) || Date.now() < light.localWriteUntil;
     return {
+      hold: light.hold?.isRestoreSent ? undefined : light.hold,
       name: heartbeat.device_name,
       roomId: held ? light.roomId : heartbeat.room_id,
       isOnline: true,
@@ -141,6 +155,7 @@ const newLight = (address: string): Light => ({
   manifests: [],
   transitions: [],
   localWriteUntil: 0,
+  lookWrittenAt: 0,
   softwareVersion: '',
   softwareChannel: '',
   updateServer: '',
@@ -152,8 +167,11 @@ const newLight = (address: string): Light => ({
 function connectLight(address: string) {
   useFleet.setState(({ lights }) => ({ lights: { ...lights, [address]: newLight(address) } }));
   const connection = new LightConnection(address, {
+    onReady: () => {
+      if (useFleet.getState().lights[address]?.hold?.isRestoreDue) sendRestore(address);
+    },
     onHeartbeat: (heartbeat) => applyHeartbeat(address, heartbeat),
-    onState: (state) => updateLight(address, { animation: state.animation }),
+    onState: (state) => updateLight(address, ({ hold }) => (hold ? {} : { animation: state.animation })),
     onManifests: (manifests) => updateLight(address, { manifests }),
     onDeviceInfo: (info) => applyDeviceInfo(address, info),
     onTransitions: (transitions) => updateLight(address, { transitions }),
@@ -239,16 +257,23 @@ export function setParameter(lights: Light[], key: string, value: ParameterValue
   }
 }
 
-const appliedLook = (name: string, animation: AnimationState): AppliedLook => ({
+export const appliedLookOf = (name: string, animation: AnimationState): AppliedLook => ({
   name,
   shape: lookShape(animation),
 });
 
 export function applyLook(lights: Light[], lookName: string, animation: AnimationState) {
-  const applied = appliedLook(lookName, animation);
+  const appliedLook = appliedLookOf(lookName, animation);
   for (const { address } of lights) {
     connections.get(address)?.send('light_set_state', { is_on: true, animation: withPositions(animation) });
-    updateLight(address, { isOn: true, animation, localWriteUntil: holdLocalWrite(), appliedLook: applied });
+    updateLight(address, {
+      isOn: true,
+      animation,
+      appliedLook,
+      hold: undefined,
+      localWriteUntil: holdLocalWrite(),
+      lookWrittenAt: Date.now(),
+    });
   }
 }
 
@@ -263,10 +288,53 @@ export function applyState(lights: Light[], { isOn, brightness, lookName, animat
       isOn,
       brightness: brightness ?? light.brightness,
       animation: animation ?? light.animation,
-      appliedLook: animation && lookName ? appliedLook(lookName, animation) : light.appliedLook,
+      appliedLook: animation && lookName ? appliedLookOf(lookName, animation) : light.appliedLook,
+      hold: animation ? undefined : light.hold,
       localWriteUntil: holdLocalWrite(),
+      lookWrittenAt: animation ? Date.now() : light.lookWrittenAt,
     });
   }
+}
+
+export type LightHoldState = { isOn: boolean; brightness?: number; animation?: AnimationState };
+
+// A hold is never a saved change, so the store stays as it is and keeps what the light goes back to.
+export function writeHold({ address }: Light, state: LightHoldState, arrival?: LightArrival) {
+  const { isOn, brightness, animation } = state;
+  const look = animation && { animation: withPositions(animation), transition: arrival };
+  const isSent = connections.get(address)?.send('light_set_state', { is_on: isOn, brightness, ...look });
+  if (!isSent) return;
+  updateLight(address, ({ hold, lookWrittenAt }) => ({
+    hold: {
+      animation: animation ?? hold?.animation ?? null,
+      arrival: arrival ?? hold?.arrival,
+      isRestoreDue: false,
+      isRestoreSent: false,
+    },
+    lookWrittenAt: animation ? Date.now() : lookWrittenAt,
+  }));
+}
+
+function sendRestore(address: string) {
+  const light = useFleet.getState().lights[address];
+  if (!light?.hold) return;
+  const { isOn, brightness, animation, hold } = light;
+  const look = hold.animation && animation && { animation: withPositions(animation), transition: hold.arrival };
+  const isSent = connections.get(address)?.send('light_set_state', { is_on: isOn, brightness, ...look });
+  updateLight(address, { hold: { ...hold, isRestoreSent: Boolean(isSent) } });
+}
+
+// One message per light. A socket that is closed now sends it when it opens again.
+export function restoreLight(address: string) {
+  updateLight(address, ({ hold, lookWrittenAt }) => {
+    if (!hold) return {};
+    return {
+      hold: { ...hold, isRestoreDue: true },
+      localWriteUntil: holdLocalWrite(),
+      lookWrittenAt: hold.animation ? Date.now() : lookWrittenAt,
+    };
+  });
+  sendRestore(address);
 }
 
 export function setTransition(lights: Light[], id: string, milliseconds: number) {

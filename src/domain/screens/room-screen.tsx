@@ -2,6 +2,7 @@ import { Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs }
 import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
+import { useShownLights } from '../store/look-preview';
 import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
 import {
   highestBrightness,
@@ -99,12 +100,13 @@ function RoomMore({ room }: { room: Room }) {
 }
 
 function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
-  const first = lights[0];
+  const shownLights = useShownLights(lights);
+  const first = shownLights[0];
   const source = previewOfAnimation(first?.animation ?? null);
   const recording = useRecording(source);
-  const isOn = isAnyOn(lights);
-  const level = highestBrightness(lights);
-  const isMixed = isMixedLook(lights);
+  const isOn = isAnyOn(shownLights);
+  const level = highestBrightness(shownLights);
+  const isMixed = isMixedLook(shownLights);
   const hasLights = lights.length > 0;
   return (
     <Hero

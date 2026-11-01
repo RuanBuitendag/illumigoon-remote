@@ -9,11 +9,14 @@ type LookItemProps = {
   isPlaying: boolean;
   strip: ReactNode;
   onPick: () => void;
+  onHold: () => void;
+  onHoldEnd: () => void;
 };
 
-export function LookItem({ name, description, note, hasSound, isPlaying, strip, onPick }: LookItemProps) {
+export function LookItem(look: LookItemProps) {
+  const { name, description, note, hasSound, isPlaying, strip, onPick, onHold, onHoldEnd } = look;
   return (
-    <Press className="look-item" isPressed={isPlaying} onClick={onPick}>
+    <Press className="look-item" isPressed={isPlaying} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
       <span className="look-item-heading">
         <span className="look-item-name">{name}</span>
         {hasSound && <SoundMark />}

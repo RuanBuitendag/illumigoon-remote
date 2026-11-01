@@ -14,6 +14,7 @@ const WRITE_SAMPLE_MS = 80;
 const MANIFEST_RETRY_MS = 10000;
 
 export type LightEvents = {
+  onReady: () => void;
   onHeartbeat: (heartbeat: Heartbeat) => void;
   onState: (state: LightStateResponse) => void;
   onManifests: (manifests: Manifest[]) => void;
@@ -47,8 +48,9 @@ export class LightConnection {
     this.wire.connect();
   }
 
+  // Says whether the socket took it. One that did not left the light where it was.
   send(type: string, payload: object = {}, target?: string) {
-    this.wire.send(type, payload, target);
+    return this.wire.send(type, payload, target);
   }
 
   // For drags: a light takes the latest value at a steady rate, not one message per touch event.
@@ -100,7 +102,10 @@ export class LightConnection {
       const isNew = !this.hasIdentity;
       this.hasIdentity = true;
       this.events.onDeviceInfo(payload as DeviceInfo);
-      if (isNew) this.readLight();
+      if (isNew) {
+        this.events.onReady();
+        this.readLight();
+      }
     } else if (!this.hasIdentity) {
       return;
     } else if (type === 'heartbeat_ws') {
