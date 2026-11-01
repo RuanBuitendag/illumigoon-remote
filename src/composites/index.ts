@@ -15,7 +15,7 @@ export { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection } from './ho
 export { LevelRow } from './level-row';
 export { LookGroup, LookItem, LookList } from './look-list';
 export { NamingRow } from './naming-row';
-export { ChoiceList, Overlay, OverlayBlock, OverlayText } from './overlay';
+export { ChoiceList, Overlay, OverlayBlock, OverlayText, WhichLights } from './overlay';
 export {
   ArrangeRow,
   DayPicker,

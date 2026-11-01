@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Defs } from './ui/bits';
 import type { Chosen } from './ui/PatchRail';
 import { useLatest } from './ui/useLatest';
-import type { Arrival } from './domain/house';
+import { documentOf, type Arrival } from './domain/house';
 import { ChromedApp } from './app/ChromedApp';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
@@ -26,13 +26,14 @@ type AppProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
+  onSendLook(look: EditedLook, name: string): void;
   onLeave(look: EditedLook | null): void;
   onClose(): void;
 };
 
 function EditPage(props: Omit<AppProps, 'withChrome'>) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
-  const { onSection, onName, onLeave, onClose } = props;
+  const { onSection, onName, onSendLook, onLeave, onClose } = props;
   // No choice to read: the look arrives the way the light's own transition says.
   const arrivalRef = useRef<Arrival>(null);
   const editor = useEditor(light, arrivalRef);
@@ -107,6 +108,7 @@ function EditPage(props: Omit<AppProps, 'withChrome'>) {
           chosen={chosen}
           onChoose={setChosen}
           onLoad={editor.applyPreset}
+          onSend={(doc, name) => onSendLook({ type: 'patch', params: documentOf(doc) }, name)}
           say={editor.say}
           saveNudge={dialogs.saveNudge}
           onClose={onSaveClosed}

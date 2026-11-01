@@ -72,6 +72,7 @@ export function LibraryRail({
   chosen,
   onChoose,
   onLoad,
+  onSend,
   say,
   shut,
   onShut,
@@ -86,6 +87,7 @@ export function LibraryRail({
   chosen: Chosen | null;
   onChoose(chosen: Chosen | null): void;
   onLoad(preset: Preset, from: string): void;
+  onSend?(preset: Preset, name: string): void;
   say(message: string): void;
   shut: boolean;
   onShut?(): void;
@@ -98,6 +100,7 @@ export function LibraryRail({
       chosen={chosen?.key ?? null}
       onChoose={onChoose}
       onLoad={canEdit ? onLoad : undefined}
+      onSend={onSend}
       save={
         canEdit
           ? {
@@ -121,9 +124,11 @@ export function LibraryRail({
 }
 
 /** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
-export function SaveSheet({ draft, chosen, onChoose, onLoad, say, saveNudge, onClose }: Pick<
+export function SaveSheet({
+  draft, chosen, onChoose, onLoad, onSend, say, saveNudge, onClose,
+}: Pick<
   Parameters<typeof LibraryRail>[0],
-  'draft' | 'chosen' | 'onChoose' | 'onLoad' | 'say' | 'saveNudge'
+  'draft' | 'chosen' | 'onChoose' | 'onLoad' | 'onSend' | 'say' | 'saveNudge'
 > & { onClose(): void }) {
   // Not `Overlay`: that holds the frame loop, and a row's strip here has to move.
   return (
@@ -139,6 +144,7 @@ export function SaveSheet({ draft, chosen, onChoose, onLoad, say, saveNudge, onC
           chosen={chosen}
           onChoose={onChoose}
           onLoad={onLoad}
+          onSend={onSend}
           say={say}
           shut={false}
           saveNudge={saveNudge}
