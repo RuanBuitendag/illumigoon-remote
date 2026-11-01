@@ -132,6 +132,14 @@ export class Wire {
    */
   private catalogQueue: string[] = [];
 
+  /** The catalog request now out, its unanswered sends, and the wait before it goes again. */
+  private catalogAsked: string | null = null;
+  private catalogSends = 0;
+  private catalogTimer: number | null = null;
+  /** Three sends fit inside the describe grace, so firmware with no catalog still ends there. */
+  private static CATALOG_RESEND_MS = 2000;
+  private static CATALOG_MAX_SENDS = 3;
+
   private static CATALOG_REQUESTS = [
     'light_emitters_req',
     'light_warps_req',
@@ -407,6 +415,7 @@ export class Wire {
     this.closing = true;
     this.stopFlush();
     this.stopSilence();
+    this.stopCatalogResend();
     if (this.reconnectTimer !== null) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -506,9 +515,10 @@ export class Wire {
     }
     if (p.catalogHash !== undefined) this.catalogParts.catalogHash = p.catalogHash;
     // The light has written this one out, so the next can be built without the two
-    // overlapping in its transmit buffers. A response that never comes stalls the rest,
-    // which ends where six unanswered requests always did: the describe grace timeout.
-    this.askNextCatalog();
+    // overlapping in its transmit buffers. A response that never comes is asked for again,
+    // then ends where six unanswered requests always did: the describe grace timeout. A late
+    // answer to a resent request moves nothing on, so two are never out at once.
+    if (type === this.catalogAsked?.replace(/_req$/, '_res')) this.askNextCatalog();
     // `indices` rides on the colours response and `layer` inside limits, so completeness
     // is judged on the six keys the six responses actually carry.
     const need = ['emitters', 'warps', 'colours', 'modulators', 'blends', 'limits'];
@@ -598,6 +608,7 @@ export class Wire {
    */
   requestCatalog() {
     this.catalogParts = {};
+    this.catalogAsked = null;
     this.catalogQueue = [...Wire.CATALOG_REQUESTS];
     this.askNextCatalog();
   }
@@ -612,8 +623,24 @@ export class Wire {
 
   /** Send the next catalog request this connection has not sent yet, if any. */
   private askNextCatalog() {
-    const next = this.catalogQueue.shift();
-    if (next) this.send(next, {});
+    this.stopCatalogResend();
+    this.catalogAsked = this.catalogQueue.shift() ?? null;
+    this.catalogSends = 0;
+    this.sendCatalogRequest();
+  }
+
+  private sendCatalogRequest() {
+    if (!this.catalogAsked || this.catalogSends === Wire.CATALOG_MAX_SENDS) return;
+    this.catalogSends += 1;
+    this.send(this.catalogAsked, {});
+    this.catalogTimer = window.setTimeout(() => this.sendCatalogRequest(), Wire.CATALOG_RESEND_MS);
+  }
+
+  private stopCatalogResend() {
+    if (this.catalogTimer !== null) {
+      clearTimeout(this.catalogTimer);
+      this.catalogTimer = null;
+    }
   }
 
   /**
