@@ -87,7 +87,6 @@ function RoomMore({ room }: { room: Room }) {
   const waiting = room.lights.filter((light) => newVersionOf(light, servers)).length;
   return (
     <RoomSection>
-      <MoreRow label="Patch editor" note="Build and change looks" onOpen={() => openPage('editor', room.id)} />
       <MoreRow label="Schedules" note={scheduleNote(room)} onOpen={() => openPage('schedules', room.id)} />
       <MoreRow label="Lock" note={lockSummary(room)} onOpen={() => openPage('lock', room.id)} />
       <MoreRow
@@ -109,12 +108,14 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
   const level = highestBrightness(shownLights);
   const isMixed = isMixedLook(shownLights);
   const hasLights = lights.length > 0;
+  const canEdit = lights.some(({ isOnline }) => isOnline);
   return (
     <Hero
       tint={recording?.tint}
       strip={<LookStrip source={source} shape="hero" isOn={isOn} brightness={level} />}
       lookName={isMixed ? 'Mixed' : (lookNameOf(first) ?? '')}
       onChangeLook={hasLights ? () => openPage('looks', room.id) : undefined}
+      onEdit={canEdit ? () => openPage('editor', room.id) : undefined}
     >
       <LevelRow
         label={room.name}

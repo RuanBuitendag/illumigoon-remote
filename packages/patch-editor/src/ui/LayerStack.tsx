@@ -8,6 +8,7 @@ import { captureLayer, insertFragment, whyNotFit } from '../domain/fragments';
 import {
   clearLayers, duplicateLayer, removeLayer, whyNotDuplicate, type Removal,
 } from '../domain/layerops';
+import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
 import { Hr, Lab, Mono, Ico } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
@@ -105,14 +106,16 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
   };
 
   /** Wholesale and unrecoverable — the one gesture here that does ask. */
-  const clear = () => {
+  const clear = async () => {
     const n = ctl.patch.layers.length;
     if (!n) return;
-    if (!confirm(
+    const sure = await ask(
       `Remove all ${n} layer${n === 1 ? '' : 's'}?\n\n` +
       'Each one takes the modulators that only drove it. A modulator you have not pointed at ' +
       'a layer yet stays. Only the last layer you copied can be pasted back, so copy anything ' +
-      'you want to keep first.')) return;
+      'you want to keep first.',
+    );
+    if (!sure) return;
     const report: Removal[] = [];
     const reached = ctl.structural(d => { report.push(clearLayers(d)); });
     ctl.selectLayer(null);
@@ -123,7 +126,7 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
   return { onTop, copy, paste, duplicate, remove, clear };
 }
 
-export function LayerPanel({ ctl }: { ctl: Ctl }) {
+export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void }) {
   const [dragFrom, setDragFrom] = useState<number | null>(null);
   const [over, setOver] = useState<number | null>(null);
 
@@ -166,7 +169,7 @@ export function LayerPanel({ ctl }: { ctl: Ctl }) {
           {ctl.patch.layers.length > 0 && (
             <button
               title="Remove every layer, and the modulators that only drove them"
-              onClick={acts.clear}
+              onClick={() => void acts.clear()}
             >
               <Lab className="dim">Clear</Lab>
             </button>
@@ -241,6 +244,15 @@ export function LayerPanel({ ctl }: { ctl: Ctl }) {
             <Lab className="dim">Paste {ctl.clip.label}</Lab>
           </div>
         )}
+
+        <div
+          className="ghostrow well"
+          onClick={onFragments}
+          title="Save this layer as a fragment, or pull one into the patch"
+        >
+          <Ico.Copy />
+          <Lab className="dim">Fragments</Lab>
+        </div>
       </div>
 
       <div className="grow" />

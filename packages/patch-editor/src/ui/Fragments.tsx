@@ -133,7 +133,7 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
   const save = async () => {
     if (!layer || !capture) { ctl.say('select a layer to save'); return; }
     if (!name.trim()) { ctl.say('give it a name first'); return; }
-    if (!confirmReplace(clash, file)) return;
+    if (!(await confirmReplace(clash, file))) return;
     await attempt(async () => {
       await writeFragment(file, toFragment(capture.patch, name, notes));
       setLeft(capture.dropped);
@@ -239,7 +239,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   };
 
   const drop = async (e: FragmentEntry) => {
-    if (!confirmDelete(e.name, root, e.file)) return;
+    if (!(await confirmDelete(e.name, root, e.file))) return;
     await attempt(async () => {
       await deleteFragment(e.file);
       await refresh();

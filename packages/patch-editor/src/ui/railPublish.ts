@@ -1,5 +1,6 @@
 /** The steps of a publish, apart from the screen that shows how it went. */
 
+import { askName } from '../host';
 import { type Patch } from '../domain/patch';
 import { forked, type PublishKind } from '../domain/publish';
 import { positionOf } from '../domain/surface';
@@ -24,7 +25,7 @@ export async function documentToSend(
     // positions ride up beside it as a preset of the version that is already there.
     // Sending the edited document instead would mint a version nobody asked for, and the
     // preset would then belong to a patch the author never meant to make.
-    const named = window.prompt('Name this preset', 'Untitled preset');
+    const named = await askName('Name this preset', 'Untitled preset');
     if (!named || !named.trim()) return {};
     const values = positionsNow(save.patch);
     if (!Object.keys(values).length) {

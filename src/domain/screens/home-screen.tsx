@@ -77,7 +77,6 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
           ))}
         </RoomDragList>
         <HomeAdd onClick={() => openPage('add-light')}>+ Add a light</HomeAdd>
-        <HomeAdd onClick={() => openPage('editor')}>Patch editor</HomeAdd>
       </HomeLayout>
       <UpdateNotice rooms={rooms} />
     </>

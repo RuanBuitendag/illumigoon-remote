@@ -6,7 +6,11 @@
 .screen-room, .screen-page { transform: translateX(102%); z-index: 2; }
 .screen-page { z-index: 3; overflow-y: auto; padding: max(54px, env(safe-area-inset-top)) 24px 60px; }
 .screen-room[data-open='true'], .screen-page[data-open='true'] { transform: none; box-shadow: var(--push-shadow); }
-.editor-layout { position: fixed; inset: 0; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
+.edit-layout { position: fixed; inset: 0; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
+.edit-header { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 18px; }
+.edit-title { flex: none; overflow: hidden; padding: 0 18px; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+.edit-body { flex: 1; min-height: 0; }
+.edit-body > .overlay { z-index: 200; }
 
 /* Home */
 
@@ -61,7 +65,7 @@
 .hero-strip { position: sticky; top: env(safe-area-inset-top); z-index: 1; margin: 0 -24px; padding: 0 24px; background: var(--background); }
 .hero-look { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 44px; }
 .hero-look-name { min-width: 0; overflow: hidden; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
-.hero-look .text-key { flex: none; }
+.hero-look .key-row { flex: none; }
 .room-section { display: flex; flex-direction: column; margin-top: 44px; }
 .section-title { font-weight: 300; font-size: 26px; }
 .library { display: flex; flex-direction: column; gap: 36px; margin-top: 28px; }
@@ -114,7 +118,7 @@
 
 .overlay { position: absolute; inset: 0; z-index: 4; display: flex; flex-direction: column; gap: 28px; padding: 110px 24px 40px; overflow-y: auto; background: var(--background); }
 .overlay-label { color: var(--text-3); font-size: 14px; }
-.overlay-text { margin-top: 6px; }
+.overlay-text { margin-top: 6px; white-space: pre-line; }
 .choice-row { display: flex; align-items: center; gap: 12px; width: 100%; height: 44px; color: var(--text-3); }
 .choice-row[aria-pressed='true'] { color: var(--text-1); }
 .choice-mark { width: 14px; height: 1.5px; background: transparent; }

@@ -14,10 +14,9 @@
  * than none, so each of those is said where the strip is.
  */
 
-import { useEffect, useRef, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useSyncExternalStore, type ReactNode } from 'react';
 import { createLedPainter, readRgba, type LedShape } from './ledPaint';
 import { onFrame } from './live';
-import { Lab } from './bits';
 import {
   PREVIEW_PIXELS, previewStatus, renderPreview, subscribePreview,
 } from '../engine/preview';
@@ -27,7 +26,11 @@ const hex = (h: number) => (h >>> 0).toString(16).padStart(8, '0');
 
 const TAPE: LedShape = { padding: 20, spread: 5, chip: 3.4, glow: 1.25 };
 
-export function Strip({ deviceCatalogHash }: { deviceCatalogHash?: number }) {
+export function Strip({ deviceCatalogHash, meter }: {
+  deviceCatalogHash?: number;
+  /** Beside what the strip says about itself, for what must be seen while editing. */
+  meter?: ReactNode;
+}) {
   const status = useSyncExternalStore(subscribePreview, previewStatus);
   const cells = useRef<HTMLCanvasElement | null>(null);
 
@@ -49,34 +52,23 @@ export function Strip({ deviceCatalogHash }: { deviceCatalogHash?: number }) {
   const mismatch = running && deviceCatalogHash !== undefined
     && status.catalogHash !== deviceCatalogHash >>> 0;
 
+  const silent = running && status.usesAudio;
   return (
     <div className="strip">
-      <div className="striphead">
-        <Lab className="mid">Preview</Lab>
-        <span className="stripnote">
-          this document on its own clock — not a mirror of the strip, not phase-locked to it, and a
-          load here is a cut rather than its arrival
-        </span>
-        <span className="grow" />
-        {mismatch && (
-          <span
-            className="stripwarn"
-            title={`engine catalog ${hex(status.catalogHash)} · light ${hex(deviceCatalogHash!)}`}
-          >
-            this engine is not this light&rsquo;s firmware
-          </span>
-        )}
-        {running && status.usesAudio && <span className="stripwarn">audio is not simulated</span>}
-        <span
-          className="stripnote"
-          title={
-            "No message the editor receives carries the strip's length, so the preview shades " +
-            'the default.'
-          }
-        >
-          {PREVIEW_PIXELS} LEDs
-        </span>
-      </div>
+      {(mismatch || silent || meter) && (
+        <div className="striphead">
+          {meter}
+          {mismatch && (
+            <span
+              className="stripwarn"
+              title={`engine catalog ${hex(status.catalogHash)} · light ${hex(deviceCatalogHash!)}`}
+            >
+              this engine is not this light&rsquo;s firmware
+            </span>
+          )}
+          {silent && <span className="stripwarn">audio is not simulated</span>}
+        </div>
+      )}
 
       <div className="stripbox">
         {running ? (

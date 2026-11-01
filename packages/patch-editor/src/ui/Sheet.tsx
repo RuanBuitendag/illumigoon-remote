@@ -4,6 +4,7 @@
  */
 
 import type { ReactNode } from 'react';
+import { ask } from '../host';
 import { Ico, Lab, Mono } from './bits';
 
 /** Run a write, and hand what went wrong to the sheet's own error line. */
@@ -17,14 +18,14 @@ export async function attempt(work: () => Promise<void>, onError: (message: stri
 
 /** Ask before a file on disk goes. `root` is the folder as the server printed it. */
 export const confirmDelete = (name: string, root: string, file: string) =>
-  confirm(
+  ask(
     `Delete ${name}?\n\n${root}${root.includes('\\') ? '\\' : '/'}${file} is removed from the ` +
       `disk.`,
   );
 
 /** Ask before a save lands on a name that already has a file. */
-export const confirmReplace = (clash: { name: string } | undefined, file: string) =>
-  !clash || confirm(`${clash.name} already exists at ${file}.\n\nReplace it?`);
+export const confirmReplace = async (clash: { name: string } | undefined, file: string) =>
+  !clash || ask(`${clash.name} already exists at ${file}.\n\nReplace it?`);
 
 export function SheetHead({ icon, title, onClose, children }: {
   icon: ReactNode;

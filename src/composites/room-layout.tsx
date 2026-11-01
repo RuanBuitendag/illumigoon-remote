@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, ChevronMark, Eyebrow, OptionRow, Press, StatusMark, TextKey, tintStyle } from '../design-system';
+import { BackKey, ChevronMark, Eyebrow, KeyRow, OptionRow, Press, StatusMark, TextKey, tintStyle } from '../design-system';
 
 type RoomLayoutProps = {
   name: string;
@@ -39,21 +39,25 @@ type HeroProps = {
   strip: ReactNode;
   lookName: string;
   onChangeLook?: () => void;
+  onEdit?: () => void;
   children: ReactNode;
 };
 
-export function Hero({ tint, strip, lookName, onChangeLook, children }: HeroProps) {
+export function Hero({ tint, strip, lookName, onChangeLook, onEdit, children }: HeroProps) {
   return (
     <div className="hero" style={tintStyle(tint)}>
       <div className="hero-strip">{strip}</div>
       <div className="hero-look">
         <span className="hero-look-name">{lookName}</span>
-        {onChangeLook && (
-          <TextKey onClick={onChangeLook}>
-            CHANGE LOOK
-            <ChevronMark direction="right" />
-          </TextKey>
-        )}
+        <KeyRow>
+          {onEdit && <TextKey onClick={onEdit}>EDIT</TextKey>}
+          {onChangeLook && (
+            <TextKey onClick={onChangeLook}>
+              CHANGE LOOK
+              <ChevronMark direction="right" />
+            </TextKey>
+          )}
+        </KeyRow>
       </div>
       {children}
     </div>

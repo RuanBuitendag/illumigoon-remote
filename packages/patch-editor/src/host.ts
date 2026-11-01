@@ -7,10 +7,27 @@
 
 export type HostFetch = (path: string, init?: RequestInit) => Promise<Response>;
 
+/** What the editor asks a person, drawn by the app so it looks like the app. */
+export type HostDialogs = {
+  ask(text: string): Promise<boolean>;
+  askName(text: string, suggestion: string): Promise<string | null>;
+};
+
 let current: HostFetch = (path, init) => fetch(path, init);
 
 export const hostFetch: HostFetch = (path, init) => current(path, init);
 
 export function setHostFetch(api: HostFetch) {
   current = api;
+}
+
+let dialogs: HostDialogs = { ask: async () => false, askName: async () => null };
+
+export const ask: HostDialogs['ask'] = text => dialogs.ask(text);
+
+export const askName: HostDialogs['askName'] = (text, suggestion) =>
+  dialogs.askName(text, suggestion);
+
+export function setHostDialogs(next: HostDialogs) {
+  dialogs = next;
 }

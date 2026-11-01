@@ -78,7 +78,7 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
   const save = async () => {
     if (!name.trim()) { ctl.say('give it a name first'); return; }
     if (!entries.length) { ctl.say('nothing to save — this layer has no palette'); return; }
-    if (!confirmReplace(clash, file)) return;
+    if (!(await confirmReplace(clash, file))) return;
     await attempt(async () => {
       await writePalette(file, toPaletteDoc(entries, name));
       ctl.say(`palette saved to ${file}`);
@@ -178,7 +178,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
 
   const drop = async (e: PaletteEntry) => {
     if (!e.file) return;
-    if (!confirmDelete(e.name, root, e.file)) return;
+    if (!(await confirmDelete(e.name, root, e.file))) return;
     const file = e.file;
     await attempt(async () => {
       await deletePalette(file);

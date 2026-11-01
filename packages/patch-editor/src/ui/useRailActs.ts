@@ -1,6 +1,7 @@
 /** Everything a person can do from the patch rail. */
 
 import { useState } from 'react';
+import { askName } from '../host';
 import {
   capturePreset, deleteLocalPreset, deletePreset, deletePublished, downloadPreset, parsePreset,
   readPreset, readPresetFile, toPreset, writePreset,
@@ -80,7 +81,7 @@ export function useRailActs({
       return;
     }
     try {
-      const name = window.prompt('Name this preset', 'Untitled preset');
+      const name = await askName('Name this preset', 'Untitled preset');
       if (!name || !name.trim()) return;
       await capturePreset(file, name.trim(), values);
       say(`saved preset "${name.trim()}"`);

@@ -116,8 +116,7 @@
   position: relative;
   z-index: 1;
 }
-.patch-editor .striphead { display: flex; align-items: center; gap: 14px; height: 10px; }
-.patch-editor .stripnote { font: 400 11px/1 var(--sans); color: var(--text-4); white-space: nowrap; }
+.patch-editor .striphead { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; min-height: 10px; }
 .patch-editor .stripwarn { font: 400 10px/1 var(--sans); color: var(--warn); letter-spacing: 0.02em; white-space: nowrap; }
 .patch-editor .stripbox { position: relative; }
 .patch-editor .stripcells { position: relative; display: block; width: 100%; height: 72px; }
@@ -491,6 +490,8 @@
 
 .patch-editor .housebody { flex-grow: 1; min-height: 0; display: flex; }
 .patch-editor .houserail { width: 292px; flex-shrink: 0; }
+.patch-editor .savesheet { width: 460px; height: 84vh; }
+.patch-editor .savesheet .houserail { flex: 1; width: 100%; border-right: 0; }
 .patch-editor .houserail.right { width: 300px; }
 .patch-editor .houselist { flex-grow: 1; padding: 10px; gap: 6px; }
 .patch-editor .housecentre {

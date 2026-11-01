@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { BackKey, TextKey } from '../design-system';
 
 type ScreenStackProps = {
   home: ReactNode;
@@ -24,9 +25,26 @@ export function ScreenStack({ home, room, page, isRoomOpen, isPageOpen }: Screen
   );
 }
 
-// The patch editor fills the screen and brings its own layout.
-export function EditorLayout({ children }: { children: ReactNode }) {
-  return <div className="editor-layout">{children}</div>;
+type EditLayoutProps = {
+  backLabel: string;
+  title: string;
+  onBack: () => void;
+  onSave?: () => void;
+  children: ReactNode;
+};
+
+// Edit fills the screen: the way back, what is being edited, and the editor under them.
+export function EditLayout({ backLabel, title, onBack, onSave, children }: EditLayoutProps) {
+  return (
+    <div className="edit-layout">
+      <header className="edit-header">
+        <BackKey label={backLabel} onClick={onBack} />
+        {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
+      </header>
+      <h1 className="edit-title">{title}</h1>
+      <div className="edit-body">{children}</div>
+    </div>
+  );
 }
 
 type SearchLayoutProps = { strip: ReactNode; text: string; children?: ReactNode };

@@ -15,12 +15,14 @@ import type { HouseFeed } from '../ui/houseFeed';
 import type { Preset } from '../library/presets';
 import { SurfaceMenu, UserSurface } from '../ui/Surface';
 import { ControlEditor } from '../ui/controlEditor';
+import { BUDGET } from '../domain/catalog';
 import { Budget, Blurb, Hr, Ico, Lab, ModIcon, Mono, Vr } from '../ui/bits';
 import { Inspector, SideColumn } from '../ui/inspector';
 import { LayerPanel } from '../ui/LayerStack';
 import { MacroRack } from '../ui/Macros';
 import { ModDock } from '../ui/dock';
 import { MatrixSheet } from '../ui/matrixSheet';
+import { SheetHead } from '../ui/Sheet';
 import { FragmentSheet } from '../ui/Fragments';
 import { PaletteSheet } from '../ui/Palettes';
 import { Randomise } from '../ui/Randomise';
@@ -32,6 +34,9 @@ import type { Dialogs } from './useDialogs';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
 import type { Rolls } from './useRolls';
+
+/** How full a look gets before the size meter shows. */
+const NEAR_FULL = 0.8;
 
 /** Where the person is, and the lights they can go to from there. */
 export function LightTrail({ inHouse, feed, wire, info, hb, label, onHouse, onLight }: {
@@ -67,7 +72,6 @@ export function LibraryRail({
   onChoose,
   onLoad,
   say,
-  onNotice,
   shut,
   onShut,
   saveNudge,
@@ -82,9 +86,8 @@ export function LibraryRail({
   onChoose(chosen: Chosen | null): void;
   onLoad(preset: Preset, from: string): void;
   say(message: string): void;
-  onNotice(message: string | null): void;
   shut: boolean;
-  onShut(): void;
+  onShut?(): void;
   saveNudge: number;
 }) {
   const { patch, patchName, patchNotes, patchNameRef, setPatchName, setPatchNotes } = draft;
@@ -108,11 +111,39 @@ export function LibraryRail({
             }
           : undefined
       }
-      say={inHouse ? onNotice : say}
+      say={say}
       shut={shut}
       onShut={onShut}
       saveNudge={saveNudge}
     />
+  );
+}
+
+/** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
+export function SaveSheet({ draft, chosen, onChoose, onLoad, say, saveNudge, onClose }: Pick<
+  Parameters<typeof LibraryRail>[0],
+  'draft' | 'chosen' | 'onChoose' | 'onLoad' | 'say' | 'saveNudge'
+> & { onClose(): void }) {
+  // Not `Overlay`: that holds the frame loop, and a row's strip here has to move.
+  return (
+    <div className="editor-overlay" onClick={onClose}>
+      <div className="editor-sheet savesheet" onClick={e => e.stopPropagation()}>
+        <SheetHead icon={<Ico.Rail c="var(--text-3)" />} title="SAVE OR LOAD" onClose={onClose}>
+          {null}
+        </SheetHead>
+        <LibraryRail
+          inHouse={false}
+          canEdit
+          draft={draft}
+          chosen={chosen}
+          onChoose={onChoose}
+          onLoad={onLoad}
+          say={say}
+          shut={false}
+          saveNudge={saveNudge}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -250,10 +281,12 @@ export function TopTools({ inHouse, onOpen, ...light }: Parameters<typeof LightT
 }
 
 /** Connected, but the vocabulary has not arrived. */
-export function AwaitingCatalog({ ready, label, onHouse }: {
+export function AwaitingCatalog({ ready, label, notice, onBack }: {
   ready: Ready;
   label: string;
-  onHouse(): void;
+  /** Where the socket has got to, when that is the reason for waiting. */
+  notice?: string;
+  onBack(): void;
 }) {
   return (
     <div className="await-catalog">
@@ -261,9 +294,9 @@ export function AwaitingCatalog({ ready, label, onHouse }: {
         <div className="catalog-fail">
           <Lab className="head">{label || 'This device'} cannot be edited</Lab>
           <p>{ready.why}</p>
-          <button className="pill raise" onClick={onHouse}>Back to the house</button>
+          <button className="pill raise" onClick={onBack}>Back</button>
         </div>
-      ) : 'Reading what this device can build…'}
+      ) : (notice ?? 'Reading what this device can build…')}
     </div>
   );
 }
@@ -396,6 +429,12 @@ function PaletteSheets({ ctl, nav, master, onRecallMaster, onClose }: {
   return null;
 }
 
+/** How much room is left, once there is little of it. */
+function SizeMeter({ patch }: { patch: Patch }) {
+  const bytes = useMemo(() => serialisedSize(patch), [patch]);
+  return bytes > BUDGET.NVS * NEAR_FULL ? <Budget bytes={bytes} w={120} /> : null;
+}
+
 export function EditorStage({
   ctl, nav, rolled, dialogs, patch, master, audio, onRecallMaster,
   previewShut, info, hb, label, onLeave, onSave,
@@ -422,7 +461,9 @@ export function EditorStage({
           editor cannot render controls for can still be watched. Hidden means unmounted, so
           its frame loop stops with it; the `sent` tap keeps feeding the engine regardless, so
           showing it again picks up the patch as it now is. */}
-      {!previewShut && <Strip deviceCatalogHash={info?.catalog_hash} />}
+      {!previewShut && (
+        <Strip deviceCatalogHash={info?.catalog_hash} meter={<SizeMeter patch={patch} />} />
+      )}
 
       {/*
        * BELOW THE TOP BAR, and only below it. Every control down here is built from the
@@ -442,7 +483,7 @@ export function EditorStage({
         onLeave={onLeave}
       >
         <div className="body">
-          <LayerPanel ctl={ctl} />
+          <LayerPanel ctl={ctl} onFragments={() => dialogs.setShowFragments(true)} />
           <Vr />
           <CentrePanel ctl={ctl} nav={nav} />
           <Vr />
