@@ -85,7 +85,17 @@
 .look-item-heading { display: flex; align-items: center; gap: 8px; }
 .look-item-name { font-size: 17px; }
 .look-playing { margin-left: auto; color: var(--text-3); font: 500 10px/1 var(--mono); letter-spacing: 0.14em; }
-.look-description { display: block; margin-top: 2px; color: var(--text-4); font-size: 13.5px; line-height: 1.4; }
+.look-description {
+  display: -webkit-box;
+  overflow: hidden;
+  margin-top: 2px;
+  color: var(--text-4);
+  font-size: 13.5px;
+  line-height: 1.4;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+}
 .light-row { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 56px; font-size: 17px; }
 .light-status { margin-left: auto; color: var(--text-4); font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; }
 .more-row { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: 62px; color: var(--text-3); }

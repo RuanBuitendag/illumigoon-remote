@@ -7,6 +7,7 @@ type LookItemProps = {
   note?: string | null;
   hasSound: boolean;
   isPlaying: boolean;
+  disabled?: boolean;
   strip: ReactNode;
   onPick: () => void;
   onHold: () => void;
@@ -14,9 +15,16 @@ type LookItemProps = {
 };
 
 export function LookItem(look: LookItemProps) {
-  const { name, description, note, hasSound, isPlaying, strip, onPick, onHold, onHoldEnd } = look;
+  const { name, description, note, hasSound, isPlaying, disabled, strip, onPick, onHold, onHoldEnd } = look;
   return (
-    <Press className="look-item" isPressed={isPlaying} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
+    <Press
+      className="look-item"
+      isPressed={isPlaying}
+      disabled={disabled}
+      onClick={onPick}
+      onHold={onHold}
+      onHoldEnd={onHoldEnd}
+    >
       <span className="look-item-heading">
         <span className="look-item-name">{name}</span>
         {hasSound && <SoundMark />}
@@ -39,6 +47,10 @@ export function LookGroup({ title, note, children }: LookGroupProps) {
       {children}
     </section>
   );
+}
+
+export function LookProblem({ children }: { children: ReactNode }) {
+  return <p className="look-description">{children}</p>;
 }
 
 export function LookList({ children }: { children: ReactNode }) {

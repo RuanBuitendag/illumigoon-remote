@@ -14,7 +14,7 @@ type Library = { scenes: SceneEntry[]; palettes: PaletteEntry[]; problem: string
 
 export const useLibrary = create<Library>(() => ({ scenes: [], palettes: [], problem: null }));
 
-async function library() {
+export async function library() {
   const shared = await import('@illumigoon/patch-editor/library');
   if (editorApi) shared.setHostFetch(editorApi);
   return shared;
