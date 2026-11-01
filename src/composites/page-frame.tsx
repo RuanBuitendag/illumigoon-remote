@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, ChevronMark, LockMark, Press, TextField, TextKey } from '../design-system';
+import { BackKey, GripMark, LockMark, Press, TextField } from '../design-system';
 
 type PageFrameProps = {
   title: string;
@@ -75,32 +75,21 @@ export function ScanNote({ strip, children }: { strip: ReactNode; children: Reac
 }
 
 type ArrangeRowProps = {
-  number: number;
   name: string;
   maxLength: number;
-  isFirst: boolean;
-  isLast: boolean;
+  hasGrip: boolean;
   onRename: (name: string) => void;
-  onMove: (shift: number) => void;
 };
 
-export function ArrangeRow({ number, name, maxLength, isFirst, isLast, onRename, onMove }: ArrangeRowProps) {
+export function ArrangeRow({ name, maxLength, hasGrip, onRename }: ArrangeRowProps) {
   return (
     <div className="arrange-row">
-      <span className="arrange-number">{number}</span>
-      <TextField
-        size="small"
-        label={`Name of light ${number}`}
-        maxLength={maxLength}
-        defaultValue={name}
-        onLeave={onRename}
-      />
-      <TextKey disabled={isFirst} onClick={() => onMove(-1)}>
-        <ChevronMark direction="up" />
-      </TextKey>
-      <TextKey disabled={isLast} onClick={() => onMove(1)}>
-        <ChevronMark direction="down" />
-      </TextKey>
+      {hasGrip && (
+        <span className="arrange-grip">
+          <GripMark />
+        </span>
+      )}
+      <TextField size="small" label={`Name of ${name}`} maxLength={maxLength} defaultValue={name} onLeave={onRename} />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { findPatchLook, latestDocumentOf, lookShape } from '../looks/look-catalog';
 import type { PatchLook } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
-import { useFleet, type Light } from './fleet-store';
+import { lightIdOf, useFleet, type Light } from './fleet-store';
 import { useHousehold } from './household-store';
 
 // What the firmware shows by itself, or what only makes sense with a patch document.
@@ -19,10 +19,11 @@ export type Room = {
   isLocked: boolean;
 };
 
-const inOrder = (lights: Light[], names: string[] = []) => {
+// An order saved before lights were kept by id holds their names, so it still counts until the next drag.
+const inOrder = (lights: Light[], order: string[] = []) => {
   const place = (light: Light) => {
-    const index = names.indexOf(light.name);
-    return index === -1 ? names.length : index;
+    const index = order.findIndex((entry) => entry === lightIdOf(light) || entry === light.name);
+    return index === -1 ? order.length : index;
   };
   return [...lights].sort((a, b) => place(a) - place(b) || a.name.localeCompare(b.name));
 };

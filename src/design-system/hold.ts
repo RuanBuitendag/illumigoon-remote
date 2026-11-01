@@ -5,36 +5,40 @@ const HOLD_MS = 400;
 // A finger that moves further than this is scrolling, so lists still scroll from a row.
 const MOVE_LIMIT_PX = 10;
 
-type Pointer = Pick<PointerEvent, 'pointerId' | 'clientX' | 'clientY'>;
+export type Pointer = Pick<PointerEvent, 'pointerId' | 'clientX' | 'clientY'>;
 
 type PressEvents = {
   onHold: () => void;
-  onEnd: (wasTap: boolean) => void;
+  onDrag?: (pointer: Pointer) => void;
+  onEnd: (wasTap: boolean, wasLifted: boolean) => void;
 };
 
 // Follows one pointer to its end. The listeners sit on the window, because a finger can leave the
-// row it started on. The returned function ends the press early.
-function watchPress(start: Pointer, { onHold, onEnd }: PressEvents) {
+// row it started on. A press that drags keeps going after the hold, however far the finger moves.
+// The returned function ends the press early.
+export function watchPress(start: Pointer, { onHold, onDrag, onEnd }: PressEvents, holdMs = HOLD_MS) {
   let isHeld = false;
   const timer = window.setTimeout(() => {
     isHeld = true;
     onHold();
-  }, HOLD_MS);
+  }, holdMs);
 
-  const stop = (wasTap: boolean) => {
+  const stop = (wasTap: boolean, wasLifted = false) => {
     window.clearTimeout(timer);
     window.removeEventListener('pointermove', onMove);
     window.removeEventListener('pointerup', onLift);
     window.removeEventListener('pointercancel', onCancel);
-    onEnd(wasTap);
+    onEnd(wasTap, wasLifted);
   };
   const isThisPointer = ({ pointerId }: Pointer) => pointerId === start.pointerId;
   const onMove = (event: PointerEvent) => {
+    if (!isThisPointer(event)) return;
     const distance = Math.hypot(event.clientX - start.clientX, event.clientY - start.clientY);
-    if (isThisPointer(event) && distance > MOVE_LIMIT_PX) stop(false);
+    if (isHeld && onDrag) onDrag(event);
+    else if (distance > MOVE_LIMIT_PX) stop(false);
   };
   const onLift = (event: PointerEvent) => {
-    if (isThisPointer(event)) stop(!isHeld);
+    if (isThisPointer(event)) stop(!isHeld, true);
   };
   const onCancel = (event: PointerEvent) => {
     if (isThisPointer(event)) stop(false);

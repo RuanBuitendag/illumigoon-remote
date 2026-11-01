@@ -1,6 +1,6 @@
 import type { AnimationState } from '../light-network/protocol';
-import { applyState, type Light } from './fleet-store';
-import { lightIdOf, type Scene, type SceneLight } from './library-store';
+import { applyState, lightIdOf, type Light } from './fleet-store';
+import type { Scene, SceneLight } from './library-store';
 import { canPlay, lookNameOf, type Room } from './rooms';
 
 export const WHOLE_HOUSE = 'house';

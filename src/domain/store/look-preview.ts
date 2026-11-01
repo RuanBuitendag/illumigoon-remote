@@ -4,6 +4,7 @@ import { withPositions } from '../looks/looks';
 import { isBeforeVersion } from './firmware-versions';
 import {
   appliedLookOf,
+  lightIdOf,
   restoreLight,
   useFleet,
   writeHold,
@@ -11,7 +12,7 @@ import {
   type LightArrival,
   type LightHoldState,
 } from './fleet-store';
-import { lightIdOf, type Scene, type SceneLight } from './library-store';
+import type { Scene, SceneLight } from './library-store';
 import { useNavigation } from './navigation-store';
 import { canPlay, type Room } from './rooms';
 import { animationOf, sceneLookName } from './scenes';

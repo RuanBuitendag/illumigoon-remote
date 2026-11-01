@@ -30,6 +30,14 @@ export function ChevronMark({ direction }: { direction: 'left' | 'right' | 'up' 
   );
 }
 
+export function GripMark() {
+  return (
+    <svg className="mark" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
+      <path d="M2 2h2v2H2zM6 2h2v2H6zM2 7h2v2H2zM6 7h2v2H6zM2 12h2v2H2zM6 12h2v2H6z" fill="currentColor" />
+    </svg>
+  );
+}
+
 export function StatusMark({ state }: { state: 'on' | 'off' | 'silent' }) {
   return <i className="status-mark" data-state={state} />;
 }

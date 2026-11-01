@@ -53,6 +53,6 @@ export function renameRoom(id: string, name: string) {
   useHousehold.setState(({ roomNames }) => ({ roomNames: { ...roomNames, [id]: name } }));
 }
 
-export function setLightOrder(roomId: string, names: string[]) {
-  useHousehold.setState(({ lightOrders }) => ({ lightOrders: { ...lightOrders, [roomId]: names } }));
+export function setLightOrder(roomId: string, lightIds: string[]) {
+  useHousehold.setState(({ lightOrders }) => ({ lightOrders: { ...lightOrders, [roomId]: lightIds } }));
 }

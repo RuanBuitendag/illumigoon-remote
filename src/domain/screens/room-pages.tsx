@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   ArrangeRow,
   HeadingRow,
+  LightDragList,
   LockStatus,
   PageFrame,
   PageHint,
@@ -11,6 +12,7 @@ import {
 } from '../../composites';
 import { Eyebrow, OptionRow, PowerKey, TextField, TextKey } from '../../design-system';
 import {
+  lightIdOf,
   lockLights,
   moveLightToRoom,
   renameLight,
@@ -190,13 +192,6 @@ export function TakeBackPage({ room }: { room: Room }) {
   );
 }
 
-function shifted(names: string[], index: number, shift: number) {
-  const next = [...names];
-  const [name] = next.splice(index, 1);
-  if (name) next.splice(index + shift, 0, name);
-  return next;
-}
-
 function MoveLights({ room }: { room: Room }) {
   const rooms = useRooms();
   const [newRoom, setNewRoom] = useState('');
@@ -228,7 +223,7 @@ function MoveLights({ room }: { room: Room }) {
 }
 
 export function ArrangePage({ room }: { room: Room }) {
-  const names = room.lights.map(({ name }) => name);
+  const canMove = room.lights.length > 1;
   return (
     <RoomPage room={room} title="Rename and arrange">
       <PageSection>
@@ -242,21 +237,20 @@ export function ArrangePage({ room }: { room: Room }) {
       </PageSection>
       <PageSection>
         <Eyebrow>LIGHTS, IN ORDER</Eyebrow>
-        {names.length > 1 && <PageHint>Hold a light on the room screen and it breathes white.</PageHint>}
-        {room.lights.map((light, index) => (
-          <ArrangeRow
-            key={light.address}
-            number={index + 1}
-            name={light.name}
-            maxLength={MAX_LIGHT_NAME}
-            isFirst={index === 0}
-            isLast={index === names.length - 1}
-            onRename={(name) => {
-              if (name.trim() && name.trim() !== light.name) renameLight(light, name.trim());
-            }}
-            onMove={(shift) => setLightOrder(room.id, shifted(names, index, shift))}
-          />
-        ))}
+        {canMove && <PageHint>Drag a grip to move a light. To find one, hold it on the room screen.</PageHint>}
+        <LightDragList ids={room.lights.map(lightIdOf)} onOrder={(ids) => setLightOrder(room.id, ids)}>
+          {room.lights.map((light) => (
+            <ArrangeRow
+              key={light.address}
+              name={light.name}
+              maxLength={MAX_LIGHT_NAME}
+              hasGrip={canMove}
+              onRename={(name) => {
+                if (name.trim() && name.trim() !== light.name) renameLight(light, name.trim());
+              }}
+            />
+          ))}
+        </LightDragList>
       </PageSection>
       <MoveLights room={room} />
     </RoomPage>

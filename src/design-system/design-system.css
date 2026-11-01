@@ -14,6 +14,7 @@
   --tick: rgba(255, 255, 255, 0.16);
   --slot: transparent;
   --push-shadow: -20px 0 40px rgba(0, 0, 0, 0.5);
+  --lift-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
   --thumb: #f3f1ec;
   --thumb-off: #55565a;
   --led-off: #26272a;
@@ -39,6 +40,7 @@
     --tick: rgba(0, 0, 0, 0.2);
     --slot: #131315;
     --push-shadow: -20px 0 40px rgba(0, 0, 0, 0.08);
+    --lift-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
     --thumb: #161618;
     --thumb-off: #b4b4b8;
     --led-off: #2a2a2d;
@@ -70,6 +72,16 @@ button, input { font: inherit; color: inherit; }
 button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-touch-callout: none; transition: transform 140ms ease-out; }
 button:disabled { cursor: default; opacity: 0.4; }
 button[data-held='true'] { transform: translateY(-2px) scale(1.015); }
+
+[data-sorting] { user-select: none; }
+[data-sorting] > * { transition: transform 160ms ease-out; }
+[data-sorting] > [data-dragging] {
+  position: relative;
+  z-index: 2;
+  background: var(--background);
+  box-shadow: var(--lift-shadow);
+  transition: none;
+}
 input { -webkit-user-select: text; user-select: text; border: 0; border-radius: 0; outline: 0; background: none; }
 input::placeholder { color: var(--text-5); }
 

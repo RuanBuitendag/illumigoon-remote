@@ -133,9 +133,9 @@
 .day-key { width: 44px; height: 44px; color: var(--text-3); font-size: 13px; }
 .day-key[aria-pressed='true'] { color: var(--text-1); }
 .page-status { display: flex; align-items: center; gap: 10px; margin-top: 24px; color: var(--text-2); font-size: 15px; }
-.arrange-row { display: flex; align-items: center; gap: 12px; }
-.arrange-number { width: 14px; color: var(--text-4); font: 400 12px/1 var(--mono); }
-.arrange-row .text-key { justify-content: center; width: 36px; }
+.drag-list { display: contents; }
+.arrange-row { display: flex; align-items: center; gap: 4px; }
+.arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: 36px; height: 44px; margin-left: -12px; color: var(--text-5); cursor: grab; touch-action: none; }
 .scan-note { margin-top: 28px; }
 
 /* Search */

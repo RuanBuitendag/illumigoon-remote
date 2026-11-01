@@ -81,6 +81,8 @@ type Fleet = {
   hasSearched: boolean;
 };
 
+export const lightIdOf = ({ deviceId, address }: Light) => deviceId.toUpperCase() || address;
+
 export const useFleet = create<Fleet>(() => ({ lights: {}, newLights: [], hasSearched: false }));
 
 const connections = new Map<string, LightConnection>();

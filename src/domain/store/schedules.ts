@@ -1,6 +1,6 @@
 import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
-import type { Light } from './fleet-store';
-import { lightIdOf, type Scene, type SceneLight } from './library-store';
+import { lightIdOf, type Light } from './fleet-store';
+import type { Scene, SceneLight } from './library-store';
 
 // A light refuses a whole entry over a change above this size, and it tells nobody.
 const MAX_CHANGE_BYTES = 512;

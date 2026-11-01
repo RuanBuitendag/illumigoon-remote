@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { PaletteEntry, Scene, SceneEntry, SceneLight } from '@illumigoon/patch-editor/library';
 import { editorApi } from './editor-host';
-import type { Light } from './fleet-store';
+import { lightIdOf } from './fleet-store';
 import { useHousehold, type OldScene } from './household-store';
 import type { Room } from './rooms';
 
@@ -30,7 +30,6 @@ async function attempt(work: () => Promise<void>) {
   }
 }
 
-export const lightIdOf = ({ deviceId, address }: Light) => deviceId.toUpperCase() || address;
 
 const unusedFile = (file: string, taken: string[]) => {
   const stem = file.replace(/\.json$/, '');

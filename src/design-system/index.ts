@@ -18,11 +18,12 @@ export {
 export type { Colour } from './colour';
 export { ColourFill, ColourSlot, SwatchKey } from './colour-chips';
 export { STARTER_COLOUR_SETS } from './colour-sets';
+export { useDragOrder } from './drag-order';
 export { Fader } from './fader';
 export { AddKey, BackKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
-export { ChevronMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
+export { ChevronMark, GripMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
 export { Eyebrow, ValueText } from './text';
 export { TextField } from './text-field';
