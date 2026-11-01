@@ -1,13 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow } from '../../composites';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, setBrightness, setPower } from '../store/fleet-store';
-import type { SceneEntry } from '../store/library-store';
+import { moveOldScenes } from '../store/library-store';
 import { openPage } from '../store/navigation-store';
 import { highestBrightness, isAnyOn, type Room } from '../store/rooms';
 import { RoomSummary } from './room-summary';
-import { SaveSceneSheet } from './save-scene-sheet';
 import { SceneRow } from './scene-row';
 
 function HouseControls({ rooms }: { rooms: Room[] }) {
@@ -45,12 +44,14 @@ function UpdateNotice({ rooms }: { rooms: Room[] }) {
   return <BottomNotice text="The update failed." actionLabel="Retry" onAction={checkForUpdate} />;
 }
 
-type SceneSheet = { renaming: SceneEntry | null };
-
 export function HomeScreen({ rooms }: { rooms: Room[] }) {
   const [showsVersion, setShowsVersion] = useState(false);
-  const [sheet, setSheet] = useState<SceneSheet | null>(null);
   const isSilent = rooms.every((room) => room.onlineLights.length === 0);
+
+  useEffect(() => {
+    void moveOldScenes(rooms);
+  }, [rooms]);
+
   return (
     <>
       <HomeLayout
@@ -66,11 +67,7 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
         ) : (
           <HouseControls rooms={rooms} />
         )}
-        <SceneRow
-          rooms={rooms}
-          onSave={() => setSheet({ renaming: null })}
-          onRename={(scene) => setSheet({ renaming: scene })}
-        />
+        <SceneRow rooms={rooms} />
         {rooms.map((room) => (
           <RoomSummary key={room.id} room={room} />
         ))}
@@ -78,7 +75,6 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
         <HomeAdd onClick={() => openPage('editor')}>Patch editor</HomeAdd>
       </HomeLayout>
       <UpdateNotice rooms={rooms} />
-      {sheet && <SaveSceneSheet rooms={rooms} renaming={sheet.renaming} onClose={() => setSheet(null)} />}
     </>
   );
 }

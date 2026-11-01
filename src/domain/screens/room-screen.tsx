@@ -17,6 +17,7 @@ import { roomSchedules } from '../store/schedules';
 import { lightCount } from '../store/scenes';
 import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
+import { SceneRow } from './scene-row';
 
 const ALL_LIGHTS = 'all';
 
@@ -124,7 +125,7 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
   );
 }
 
-export function RoomScreen({ room }: { room: Room }) {
+export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
   const lights = lightsInScope(room, scopeAddress);
   const isScoped = lights.some(({ address }) => address === scopeAddress);
@@ -132,6 +133,7 @@ export function RoomScreen({ room }: { room: Room }) {
     <RoomLayout name={room.name} countText={lightCount(room.lights.length)} backLabel="Rooms" onBack={closeRoom}>
       <RoomScope room={room} scope={isScoped ? scopeAddress : null} />
       <RoomHero room={room} lights={lights} />
+      {rooms.length > 1 && <SceneRow rooms={rooms} room={room} />}
       <LightRows room={room} />
       <RoomMore room={room} />
     </RoomLayout>

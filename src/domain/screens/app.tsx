@@ -57,7 +57,7 @@ export function App() {
   return (
     <ScreenStack
       home={<HomeScreen rooms={rooms} />}
-      room={room && <RoomScreen room={room} />}
+      room={room && <RoomScreen room={room} rooms={rooms} />}
       page={<OpenPage key={pageVisit} rooms={rooms} />}
       isRoomOpen={isRoomOpen}
       isPageOpen={isPageOpen}

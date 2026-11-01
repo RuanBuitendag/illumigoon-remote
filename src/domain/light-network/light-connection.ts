@@ -73,17 +73,19 @@ export class LightConnection {
   }
 
   private onLink(at: string) {
-    if (at === 'open') {
-      this.send('light_state_req');
-      this.send('light_transitions_req');
-      this.send('device_config_get', { key: 'ota_url' });
-      this.requestManifests();
-    } else if (at === 'backoff') {
-      window.clearTimeout(this.manifestTimer);
-      this.hasIdentity = false;
-      this.lastScheduleHash = undefined;
-      this.events.onOffline();
-    }
+    if (at === 'open') return;
+    window.clearTimeout(this.manifestTimer);
+    this.hasIdentity = false;
+    this.lastScheduleHash = undefined;
+    if (at === 'backoff') this.events.onOffline();
+  }
+
+  // Asked after the light has said who it is, because an answer that comes before that is dropped.
+  private readLight() {
+    this.send('light_state_req');
+    this.send('light_transitions_req');
+    this.send('device_config_get', { key: 'ota_url' });
+    this.requestManifests();
   }
 
   private requestManifests() {
@@ -95,8 +97,10 @@ export class LightConnection {
 
   private handle(type: string, payload: unknown) {
     if (type === 'device_info_res') {
+      const isNew = !this.hasIdentity;
       this.hasIdentity = true;
       this.events.onDeviceInfo(payload as DeviceInfo);
+      if (isNew) this.readLight();
     } else if (!this.hasIdentity) {
       return;
     } else if (type === 'heartbeat_ws') {

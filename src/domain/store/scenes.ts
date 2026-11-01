@@ -49,10 +49,17 @@ function plural(count: number, noun: string) {
 
 export const lightCount = (count: number) => plural(count, 'light');
 
+// A scene belongs to the room that holds all of its lights now, so it follows a light that moves.
+export function roomOfScene({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
+  if (rooms.length < 2 || lights.length === 0) return undefined;
+  return rooms.find((room) => lights.every(({ id }) => room.lights.some((light) => lightIdOf(light) === id)));
+}
+
 export function sceneSummary({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
   const covered = new Set(lights.map(({ room }) => room));
   const offCount = lights.filter(({ is_on: isOn }) => !isOn).length;
   const [only] = covered;
+  if (lights.length === 0) return 'No light has a look to save yet';
   if (covered.size === 1 && rooms.length > 1) return `${roomNameOf(only ?? '', rooms)} only`;
   if (offCount === lights.length) return 'Turns everything off';
   if (offCount === 0) return 'All lights on';

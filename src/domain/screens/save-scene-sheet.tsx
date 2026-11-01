@@ -7,13 +7,14 @@ import { captureScene, sceneSummary, WHOLE_HOUSE } from '../store/scenes';
 
 type SaveSceneSheetProps = {
   rooms: Room[];
+  room?: Room;
   renaming: SceneEntry | null;
   onClose: () => void;
 };
 
-export function SaveSceneSheet({ rooms, renaming, onClose }: SaveSceneSheetProps) {
+export function SaveSceneSheet({ rooms, room, renaming, onClose }: SaveSceneSheetProps) {
   const [name, setName] = useState(renaming?.name ?? '');
-  const [scope, setScope] = useState(WHOLE_HOUSE);
+  const [scope, setScope] = useState(room?.id ?? WHOLE_HOUSE);
   const captured = captureScene(name.trim(), rooms, scope);
 
   const save = () => {
