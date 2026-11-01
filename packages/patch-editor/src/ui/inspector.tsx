@@ -102,7 +102,7 @@ export function SideColumn({ side, onSide, children }: {
 }) {
   return (
     <div className="panel" style={{ width: 348, flexShrink: 0 }}>
-      <div style={{ padding: '8px 12px 0', flexShrink: 0 }}>
+      <div className="sidetabs" style={{ padding: '8px 12px 0', flexShrink: 0 }}>
         <Tabs items={SIDES} value={side} onChange={onSide} />
       </div>
       {children}

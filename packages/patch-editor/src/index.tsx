@@ -1,9 +1,9 @@
 import './styles.css';
-import App, { type OpenLight } from './App';
+import App, { type EditorSection, type OpenLight } from './App';
 import { setSourceId } from './device/source';
 import { setHostDialogs, setHostFetch, type HostDialogs, type HostFetch } from './host';
 
-export type { HostDialogs, HostFetch, OpenLight };
+export type { EditorSection, HostDialogs, HostFetch, OpenLight };
 
 type PatchEditorProps = {
   light: OpenLight;
@@ -13,10 +13,12 @@ type PatchEditorProps = {
   identity: string;
   dialogs: HostDialogs;
   isOpen: boolean;
+  section: EditorSection;
   isSaving: boolean;
   withChrome: boolean;
   onSaveOpen(): void;
   onSaveClosed(): void;
+  onSection(section: EditorSection): void;
   onName(name: string): void;
   /** The socket has closed. */
   onLeave(): void;

@@ -122,6 +122,8 @@
 .patch-editor .stripcells { position: relative; display: block; width: 100%; height: 72px; }
 .patch-editor .stripempty { height: 40px; display: flex; align-items: center; justify-content: center; font: 400 11px/1 var(--sans); color: var(--text-4); }
 
+.patch-editor .editscroll { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
+.patch-editor .sectionpart { display: contents; }
 .patch-editor .body { flex-grow: 1; display: flex; min-height: 0; }
 
 .patch-editor .panel { display: flex; flex-direction: column; background: var(--background); border-right: 1px solid var(--track); min-height: 0; }
@@ -1076,9 +1078,9 @@
 
 /* ---------------------------------------------------------- phone
 
-   One column instead of three, in the order the work goes: layers, then the selected layer, then
-   the macros and modulators. The whole column scrolls, so no panel keeps a scroll of its own, and
-   the library takes the whole screen while it is open. */
+   One section at a time instead of three columns, chosen by the tabs under the editor. Each part
+   stays mounted while it is hidden, so a selection survives. The open section scrolls as a whole,
+   so no panel keeps a scroll of its own, and a sheet takes the whole screen while it is open. */
 
 @media (max-width: 899px) {
   .patch-editor .topbar { height: auto; flex-wrap: wrap; gap: 8px 12px; padding: 8px 12px; }
@@ -1088,16 +1090,39 @@
   .patch-editor .topbar .editor-wordmark, .patch-editor .topbar .topsep { display: none; }
   .patch-editor { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .patch-editor input, .patch-editor textarea { -webkit-user-select: text; user-select: text; }
-  .patch-editor button { min-height: 32px; }
-  .patch-editor .iconbtn { min-width: 36px; min-height: 36px; }
+
+  /* A thumb and arm's length: every press target is 44 px, and no type is under 13 px. The last
+     selector meets the font sizes the panels set inline. */
+  .patch-editor button, .patch-editor select { min-width: 44px; min-height: 44px; }
+  .patch-editor .editor-swatch { width: 44px; height: 44px; }
+  .patch-editor :is(
+    button, select, input, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
+    .kval, .kunit, .pill, .tog, .blendchip, .modchip .src, .modchip .drop, .mname, .reach, .trg,
+    .detail, .ctlglyph, .ctllabel, .ctlheadname
+  ) { font-size: 13px; }
+  .patch-editor :is([style*=' 10px/'], [style*=' 10.5px/'], [style*=' 11px/'], [style*=' 12px/']) {
+    font-size: 13px !important;
+  }
+  .patch-editor .rowmeta, .patch-editor .rowacts { height: auto; }
+  .patch-editor .swrow { height: auto; min-height: 52px; }
+  .patch-editor .flatcard, .patch-editor .ctlhead, .patch-editor .ghostrow { height: auto; min-height: 44px; }
+  .patch-editor .rackrow { min-height: 44px; }
+  .patch-editor .blurb { min-width: 0; }
+  .patch-editor .rackhead { height: auto !important; flex-wrap: wrap; gap: 4px 14px; padding-top: 6px !important; padding-bottom: 6px !important; }
+  .patch-editor .rackhead > .row { flex-wrap: wrap; row-gap: 4px; }
+  .patch-editor .slotrow { flex-wrap: wrap; overflow: visible; }
+  .patch-editor .modslot { width: calc(50% - 5px); }
 
   .patch-editor .shellbody:has(> .houserail:not([hidden])) > .shellmain { display: none; }
   .patch-editor .houserail { flex: 1; width: 100%; border-right: 0; }
 
-  .patch-editor .shellmain { overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  .patch-editor .shellmain > * { flex: none; }
+  .patch-editor [data-section]:not([data-open='true']) { display: none; }
+  .patch-editor .sidetabs { display: none; }
+  .patch-editor .shellmain, .patch-editor .editscroll { overflow-y: auto; -webkit-overflow-scrolling: touch; }
+  .patch-editor .shellmain > *, .patch-editor .editscroll > * { flex: none; }
   .patch-editor .body, .patch-editor .housebody { flex-direction: column; }
-  .patch-editor .body > *, .patch-editor .housebody > * { width: 100% !important; flex: none; }
+  .patch-editor .body .sectionpart > *, .patch-editor .housebody > * { width: 100% !important; flex: none; }
+  .patch-editor .body .vr { display: none; }
   .patch-editor .body .panel { border-right: 0; border-bottom: 1px solid var(--track); }
   .patch-editor .body .scroll, .patch-editor .centre { overflow: visible; max-height: none; }
   .patch-editor .body .grow { display: none; }

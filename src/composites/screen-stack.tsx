@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, TextKey } from '../design-system';
+import { BackKey, OptionRow, TextKey } from '../design-system';
 
 type ScreenStackProps = {
   home: ReactNode;
@@ -25,16 +25,20 @@ export function ScreenStack({ home, room, page, isRoomOpen, isPageOpen }: Screen
   );
 }
 
-type EditLayoutProps = {
+type EditLayoutProps<Section extends string> = {
   backLabel: string;
   title: string;
+  sections: { value: Section; name: string }[];
+  section: Section;
+  onSection: (section: Section) => void;
   onBack: () => void;
   onSave?: () => void;
   children: ReactNode;
 };
 
-// Edit fills the screen: the way back, what is being edited, and the editor under them.
-export function EditLayout({ backLabel, title, onBack, onSave, children }: EditLayoutProps) {
+// Edit fills the screen: the way back, what is being edited, the editor, and its sections for the thumb.
+export function EditLayout<Section extends string>(props: EditLayoutProps<Section>) {
+  const { backLabel, title, sections, section, onSection, onBack, onSave, children } = props;
   return (
     <div className="edit-layout">
       <header className="edit-header">
@@ -43,6 +47,9 @@ export function EditLayout({ backLabel, title, onBack, onSave, children }: EditL
       </header>
       <h1 className="edit-title">{title}</h1>
       <div className="edit-body">{children}</div>
+      <nav className="edit-sections">
+        <OptionRow label="Section" options={sections} value={section} onChange={onSection} />
+      </nav>
     </div>
   );
 }

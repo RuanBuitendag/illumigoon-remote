@@ -329,7 +329,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
   return (
     <div className="dock">
       <div
-        className="row"
+        className="row rackhead"
         style={{ height: 34, padding: '0 18px', justifyContent: 'space-between' }}
       >
         <div className="row" style={{ gap: 14 }}>

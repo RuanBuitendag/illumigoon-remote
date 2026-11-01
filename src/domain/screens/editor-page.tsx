@@ -1,3 +1,4 @@
+import type { EditorSection } from '@illumigoon/patch-editor';
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { EditLayout } from '../../composites';
 import { APP_IDENTITY } from '../light-network/app-identity';
@@ -9,6 +10,14 @@ import { useEditorDialogs } from './editor-dialogs';
 
 // The editor is large, so a phone that only sets looks never loads it.
 const PatchEditor = lazy(async () => ({ default: (await import('@illumigoon/patch-editor')).PatchEditor }));
+
+const SECTIONS: { value: EditorSection; name: string }[] = [
+  { value: 'layers', name: 'LAYERS' },
+  { value: 'colour', name: 'COLOUR' },
+  { value: 'motion', name: 'MOTION' },
+  { value: 'controls', name: 'CONTROLS' },
+  { value: 'roll', name: 'ROLL' },
+];
 
 function firstLight(room: Room | undefined, scopeAddress: string | null) {
   if (!room) return undefined;
@@ -27,6 +36,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   const [light] = useState(() => firstLight(room, scopeAddress));
   const [isOneLight] = useState(() => room !== undefined && lightsInScope(room, scopeAddress).length === 1);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
+  const [section, setSection] = useState<EditorSection>('layers');
   const [isSaving, setSaving] = useState(false);
   const [hasLeft, setLeft] = useState(false);
   const { dialogs, sheet } = useEditorDialogs();
@@ -41,6 +51,9 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     <EditLayout
       backLabel={room?.name ?? 'Rooms'}
       title={titleOf(lookName, light?.name, isOneLight)}
+      sections={SECTIONS}
+      section={section}
+      onSection={setSection}
       onBack={closePage}
       onSave={light && (() => setSaving(true))}
     >
@@ -52,10 +65,12 @@ export function EditorPage({ room }: { room: Room | undefined }) {
             identity={APP_IDENTITY}
             dialogs={dialogs}
             isOpen={isOpen}
+            section={section}
             isSaving={isSaving}
             withChrome={false}
             onSaveOpen={() => setSaving(true)}
             onSaveClosed={() => setSaving(false)}
+            onSection={setSection}
             onName={setLookName}
             onLeave={() => setLeft(true)}
             onClose={closePage}

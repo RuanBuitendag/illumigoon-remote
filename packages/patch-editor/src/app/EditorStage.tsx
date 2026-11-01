@@ -1,6 +1,6 @@
 /** What stands inside the frame while a light is open, and what floats over it. */
 
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { serialisedSize } from '../domain/patchDocument';
 import { drawable, type Ready } from '../domain/connection';
 import type { Patch } from '../domain/patch';
@@ -34,6 +34,7 @@ import type { Dialogs } from './useDialogs';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
 import type { Rolls } from './useRolls';
+import { sectionOfSide, type EditorSection } from './useSection';
 
 /** How full a look gets before the size meter shows. */
 const NEAR_FULL = 0.8;
@@ -435,9 +436,19 @@ function SizeMeter({ patch }: { patch: Patch }) {
   return bytes > BUDGET.NVS * NEAR_FULL ? <Budget bytes={bytes} w={120} /> : null;
 }
 
+/** One part of the editor. Stays mounted while another section shows, so nothing is lost. */
+function Part({ id, section, children }: {
+  id: EditorSection;
+  section: EditorSection | undefined;
+  children: ReactNode;
+}) {
+  const isOpen = section === undefined || section === id;
+  return <div className="sectionpart" data-section={id} data-open={isOpen}>{children}</div>;
+}
+
 export function EditorStage({
   ctl, nav, rolled, dialogs, patch, master, audio, onRecallMaster,
-  previewShut, info, hb, label, onLeave, onSave,
+  previewShut, section, info, hb, label, onLeave, onSave,
 }: {
   ctl: Ctl;
   nav: Navigation;
@@ -448,6 +459,7 @@ export function EditorStage({
   audio: AudioFeed;
   onRecallMaster(entries: string[]): Reached;
   previewShut: boolean;
+  section?: EditorSection;
   info: DeviceInfo | null;
   hb: Heartbeat | null;
   label: string;
@@ -455,6 +467,10 @@ export function EditorStage({
   onSave(): void;
 }) {
   const deviceName = hb?.device_name ?? label;
+  const scroller = useRef<HTMLDivElement | null>(null);
+  useEffect(() => {
+    scroller.current?.scrollTo(0, 0);
+  }, [section]);
   return (
     <>
       {/* Outside the boundary: it draws from the engine, not the catalog, so a light the
@@ -476,6 +492,7 @@ export function EditorStage({
        * Keyed on the light, so arriving at a different one clears a verdict about the
        * last. See LIFE-702.
        */}
+      <div className="editscroll" ref={scroller}>
       <Boundary
         key={info?.device_id ?? label}
         label={deviceName}
@@ -483,22 +500,26 @@ export function EditorStage({
         onLeave={onLeave}
       >
         <div className="body">
-          <LayerPanel ctl={ctl} onFragments={() => dialogs.setShowFragments(true)} />
-          <Vr />
-          <CentrePanel ctl={ctl} nav={nav} />
-          <Vr />
-          <SideColumn side={nav.side} onSide={nav.setSide}>
-            <SidePanel
-              ctl={ctl}
-              nav={nav}
-              patch={patch}
-              rolled={rolled}
-              dialogs={dialogs}
-              connected
-              deviceName={deviceName}
-              onSave={onSave}
-            />
-          </SideColumn>
+          <Part id="layers" section={section}>
+            <LayerPanel ctl={ctl} onFragments={() => dialogs.setShowFragments(true)} />
+            <Vr />
+            <CentrePanel ctl={ctl} nav={nav} />
+            <Vr />
+          </Part>
+          <Part id={sectionOfSide(nav.side)} section={section}>
+            <SideColumn side={nav.side} onSide={nav.setSide}>
+              <SidePanel
+                ctl={ctl}
+                nav={nav}
+                patch={patch}
+                rolled={rolled}
+                dialogs={dialogs}
+                connected
+                deviceName={deviceName}
+                onSave={onSave}
+              />
+            </SideColumn>
+          </Part>
         </div>
 
         {/*
@@ -512,15 +533,17 @@ export function EditorStage({
          * the phone by being exposed from its dial, and the User tab on the right is the
          * phone's view of the patch (LIFE-867).
          */}
-        <MacroRack ctl={ctl} />
+        <Part id="motion" section={section}>
+          <MacroRack ctl={ctl} />
 
-        <ModDock
-          ctl={ctl}
-          editing={nav.editingMod}
-          onEdit={nav.setEditingMod}
-          onOpenMatrix={() => dialogs.setShowMatrix(true)}
-          audio={audio}
-        />
+          <ModDock
+            ctl={ctl}
+            editing={nav.editingMod}
+            onEdit={nav.setEditingMod}
+            onOpenMatrix={() => dialogs.setShowMatrix(true)}
+            audio={audio}
+          />
+        </Part>
 
         {dialogs.showMatrix && (
           <MatrixSheet ctl={ctl} onClose={() => dialogs.setShowMatrix(false)} />
@@ -540,6 +563,7 @@ export function EditorStage({
           />
         )}
       </Boundary>
+      </div>
     </>
   );
 }

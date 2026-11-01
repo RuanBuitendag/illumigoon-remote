@@ -9,30 +9,36 @@ import { ChromedApp } from './app/ChromedApp';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
 import { useEditor, type OpenLight } from './app/useEditor';
+import { useSection, type EditorSection } from './app/useSection';
 
-export type { OpenLight };
+export type { EditorSection, OpenLight };
 
 type AppProps = {
   light: OpenLight;
   /** False once the page has been left: the socket closes, and `onLeave` says it is done. */
   isOpen: boolean;
+  /** Below 900 px only. */
+  section: EditorSection;
   isSaving: boolean;
   withChrome: boolean;
   onSaveOpen(): void;
   onSaveClosed(): void;
+  onSection(section: EditorSection): void;
   onName(name: string): void;
   onLeave(): void;
   onClose(): void;
 };
 
 function EditPage(props: Omit<AppProps, 'withChrome'>) {
-  const { light, isOpen, isSaving, onSaveOpen, onSaveClosed, onName, onLeave, onClose } = props;
+  const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
+  const { onSection, onName, onLeave, onClose } = props;
   // No choice to read: the look arrives the way the light's own transition says.
   const arrivalRef = useRef<Arrival>(null);
   const editor = useEditor(light, arrivalRef);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
   const [chosen, setChosen] = useState<Chosen | null>(null);
+  useSection(section, nav.side, nav.setSide, onSection);
 
   const named = useLatest(onName);
   useEffect(() => named.current(draft.patchName), [draft.patchName, named]);
@@ -65,6 +71,7 @@ function EditPage(props: Omit<AppProps, 'withChrome'>) {
           audio={audioFeed}
           onRecallMaster={editor.masterActs.recallMasterPalette}
           previewShut={false}
+          section={section}
           info={info}
           hb={hb}
           label={label}
