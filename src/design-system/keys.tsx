@@ -1,5 +1,5 @@
 import { Switch } from '@base-ui/react/switch';
-import type { ReactNode } from 'react';
+import { useRef, type ReactNode } from 'react';
 import { useHold } from './hold';
 import { ChevronMark } from './marks';
 
@@ -48,6 +48,29 @@ export function TextKey({ children, disabled, isQuiet, onClick }: TextKeyProps) 
     <button type="button" className="text-key" data-quiet={isQuiet} disabled={disabled} onClick={onClick}>
       {children}
     </button>
+  );
+}
+
+type FileKeyProps = { children: ReactNode; accept: string; onFile: (file: File) => void };
+
+// A key that asks for one file. The `input` stays hidden, because a file field cannot take a look.
+export function FileKey({ children, accept, onFile }: FileKeyProps) {
+  const input = useRef<HTMLInputElement>(null);
+  return (
+    <>
+      <TextKey onClick={() => input.current?.click()}>{children}</TextKey>
+      <input
+        ref={input}
+        type="file"
+        accept={accept}
+        hidden
+        onChange={(event) => {
+          const file = event.target.files?.[0];
+          if (file) onFile(file);
+          event.target.value = '';
+        }}
+      />
+    </>
   );
 }
 

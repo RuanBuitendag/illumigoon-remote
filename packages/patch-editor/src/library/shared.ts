@@ -4,7 +4,9 @@ export { documentOf, usesAudio, type Scene, type SceneLight } from '../domain/ho
 export { setHostFetch } from '../host';
 export { listPalettes, toPaletteDoc, writePalette, type PaletteEntry } from './palettes';
 export {
-  listExamples, listLibrary, readPreset, slugFileName, writePreset,
-  type LibraryEntry, type Preset,
+  deleteLocalPreset, deletePreset, deletePublished, downloadPreset, fetchPublished, listExamples,
+  listLibrary, listPresets, parsePreset, readPreset, readPresetFile, serverLibrary, slugFileName,
+  writePreset, type LibraryEntry, type Preset,
 } from './presets';
 export { deleteScene, listScenes, sceneFileFor, writeScene, type SceneEntry } from './scenes';
+export { shelfOf, type ServerLibrary, type Shelf } from '../domain/shelf';

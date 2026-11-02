@@ -3,31 +3,12 @@
 import { useState } from 'react';
 import { type Patch } from '../domain/patch';
 import type { PublishKind } from '../domain/publish';
-import {
-  fileNameFor,
-  serverPatch,
-  writePreset,
-  writePublished,
-  type Preset,
-} from '../library/presets';
+import { fetchPublished } from '../library/presets';
 import type { RailSave } from './PatchRail';
 import {
   documentToSend, markPresets, publishMessage, publishWarning, sendWithPresets, stampPublished,
 } from './railPublish';
 import type { RailContext } from './useRailActs';
-
-/**
- * THE NAME IS NOT IN THE DOCUMENT. `publish` sends it beside one, so the server keeps it in its
- * metadata and a fetched document comes back nameless -- it would land in the folder called
- * `auroro` rather than `Auroro`. Folded back in from the listing, which is where the server put
- * it.
- *
- * Safe to add: `name` is one of the labels the content hash strips, so the family and the
- * version are untouched and a later publish of this file is still a version of the same patch
- * rather than a new one.
- */
-const withListedName = (fetched: Preset, name: string): Preset =>
-  (typeof fetched.name === 'string' && fetched.name.trim() ? fetched : { ...fetched, name });
 
 export function useRailPublish({
   onChoose, say, save, file, setShelf, setProblem, listing, published,
@@ -39,35 +20,12 @@ export function useRailPublish({
   /** The id being fetched from the server, so its row can say it is working. */
   const [fetching, setFetching] = useState<string | null>(null);
 
-  /**
-   * Bring a published patch into this folder.
-   *
-   * What makes a preset whose patch is missing **reachable** rather than only explained (#66). A
-   * row that names a patch and offers nothing to do about it is a dead end, and a dead end in a
-   * list of things you can open reads as a bug rather than as a limit.
-   *
-   * The document lands with its identity intact, so it arrives already published -- and the
-   * snapshot goes down beside it, because this IS what it was published as, which is exactly
-   * what `published/` is for (#68). Without that the very next edit would classify against
-   * nothing and offer only a new patch.
-   */
   const fetchPatch = async (id: string, name: string) => {
     if (fetching) return;
     setFetching(id);
     setProblem(null);
     try {
-      const fetched = await serverPatch(id);
-      const doc = withListedName(fetched, name);
-      const target = fileNameFor(typeof doc.name === 'string' ? doc.name : name);
-      if (mine.some(r => r.file === target)) {
-        setProblem(`${target} is already in Mine — rename or delete it first`);
-        return;
-      }
-      await writePreset(target, doc);
-      // The same bytes beside it. This IS what it was published as, which is what makes the
-      // next edit classifiable at all -- without it #68 has no reference and can only offer a
-      // new patch (`published/`).
-      await writePublished(target, doc);
+      await fetchPublished(id, name, mine.map(r => r.file));
       say(`${name} is in Mine`);
       setShelf('mine');
       await list();

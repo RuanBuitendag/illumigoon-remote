@@ -22,3 +22,17 @@ export function TextField({ label, size, type = 'text', onChange, onLeave, ...in
     />
   );
 }
+
+type TextAreaProps = { label: string; placeholder?: string; value: string; onChange: (value: string) => void };
+
+export function TextArea({ label, onChange, ...input }: TextAreaProps) {
+  return (
+    <textarea
+      {...input}
+      className="text-area"
+      aria-label={label}
+      spellCheck={false}
+      onChange={(event) => onChange(event.target.value)}
+    />
+  );
+}

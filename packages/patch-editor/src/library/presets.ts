@@ -418,6 +418,36 @@ export const serverLibrary = (): Promise<ServerLibrary> =>
  */
 export const serverPatch = (id: string): Promise<Preset> => call(`/api/server/patch/${id}`);
 
+/**
+ * THE NAME IS NOT IN THE DOCUMENT. `publish` sends it beside one, so the server keeps it in its
+ * metadata and a fetched document comes back nameless -- it would land in the folder called
+ * `auroro` rather than `Auroro`. Folded back in from the listing, which is where the server put
+ * it.
+ *
+ * Safe to add: `name` is one of the labels the content hash strips, so the family and the
+ * version are untouched and a later publish of this file is still a version of the same patch
+ * rather than a new one.
+ */
+const withListedName = (fetched: Preset, name: string): Preset =>
+  (typeof fetched.name === 'string' && fetched.name.trim() ? fetched : { ...fetched, name });
+
+/**
+ * Bring a published patch into the folder.
+ *
+ * What makes a preset whose patch is missing **reachable** rather than only explained (#66). The
+ * document lands with its identity intact, so it arrives already published -- and the snapshot
+ * goes down beside it, because this IS what it was published as, which is exactly what
+ * `published/` is for (#68). Without that the very next edit would classify against nothing and
+ * offer only a new patch.
+ */
+export async function fetchPublished(id: string, name: string, taken: string[]): Promise<void> {
+  const doc = withListedName(await serverPatch(id), name);
+  const target = fileNameFor(typeof doc.name === 'string' ? doc.name : name);
+  if (taken.includes(target)) throw new Error(`${target} is already in Mine — rename or delete it first`);
+  await writePreset(target, doc);
+  await writePublished(target, doc);
+}
+
 // ------------------------------------------------------------------ publishing
 
 /**

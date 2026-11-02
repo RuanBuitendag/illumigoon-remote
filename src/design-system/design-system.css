@@ -167,6 +167,7 @@ input::placeholder { color: var(--text-5); }
 /* Text fields */
 
 .text-field { width: 100%; min-width: 0; border-bottom: 1px solid var(--track); }
+.text-area { width: 100%; min-height: 200px; padding: 10px 0; border-bottom: 1px solid var(--track); font: 400 13px/1.4 var(--mono); resize: vertical; }
 .text-field-title { padding-bottom: 6px; border-bottom: 1.5px solid var(--text-1); font-weight: 300; font-size: 30px; }
 .text-field-large { height: 48px; font-weight: 300; font-size: 26px; }
 .text-field-medium { height: 44px; font-size: 20px; }

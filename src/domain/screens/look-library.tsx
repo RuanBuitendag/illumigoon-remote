@@ -1,13 +1,24 @@
-import { useEffect } from 'react';
-import { LookGroup, LookItem, LookList, LookProblem } from '../../composites';
+import { useEffect, useState } from 'react';
+import { LookElsewhere, LookGroup, LookItem, LookList, LookPreset, LookProblem } from '../../composites';
+import { FileKey, KeyRow, TextKey } from '../../design-system';
 import { applyLook, type Light } from '../store/fleet-store';
+import {
+  addLookFromFile,
+  copyLook,
+  exportLook,
+  fetchLook,
+  removeLook,
+  removePreset,
+  useLookActions,
+} from '../store/look-actions';
 import { useLibrary } from '../store/library-store';
-import { loadLooks, useLookFiles } from '../store/look-files';
+import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
 import { libraryFor, partOfRoomNote, type LibraryLook } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { closePage } from '../store/navigation-store';
 import { isAnyOn, isMixedLook, lookNameOf } from '../store/rooms';
 import { LookStrip } from './look-strip';
+import { PasteLookSheet } from './paste-look-sheet';
 
 const TILE_BRIGHTNESS = 0.85;
 
@@ -18,6 +29,7 @@ function useFreshLooks() {
   useEffect(() => {
     const read = () => void loadLooks();
     read();
+    void askServer();
     const timer = setInterval(read, LIST_EVERY_MS);
     window.addEventListener('focus', read);
     return () => {
@@ -27,13 +39,76 @@ function useFreshLooks() {
   }, []);
 }
 
+// Deleting takes a second tap on the same key.
+function useArmedDelete() {
+  const [armed, setArmed] = useState<string | null>(null);
+  return (key: string, remove: () => void) => (
+    <TextKey
+      onClick={() => {
+        setArmed(armed === key ? null : key);
+        if (armed === key) remove();
+      }}
+    >
+      {armed === key ? 'DELETE?' : 'DELETE'}
+    </TextKey>
+  );
+}
+
+type DeleteKey = ReturnType<typeof useArmedDelete>;
+
+function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey }) {
+  return (
+    <>
+      {look.doc && <TextKey onClick={() => void copyLook(look)}>COPY</TextKey>}
+      {look.doc && <TextKey onClick={() => void exportLook(look)}>EXPORT</TextKey>}
+      {!look.isExample && deleteKey(look.file, () => void removeLook(look))}
+    </>
+  );
+}
+
+function PublishedElsewhere() {
+  const elsewhere = useLookFiles((files) => files.shelf.elsewhere);
+  const fetching = useLookActions((actions) => actions.fetching);
+  if (elsewhere.length === 0) return null;
+  return (
+    <LookGroup title="Published elsewhere" note="On the patch server, not in Mine">
+      {elsewhere.map(({ familyId, id, name, presets }) => (
+        <LookElsewhere
+          key={familyId}
+          name={name}
+          description={presets.map((preset) => preset.name).join(', ')}
+          action={
+            id ? (
+              <TextKey disabled={fetching !== null} onClick={() => void fetchLook(id, name)}>
+                {fetching === id ? 'GETTING' : 'GET'}
+              </TextKey>
+            ) : (
+              'WITHDRAWN'
+            )
+          }
+        />
+      ))}
+    </LookGroup>
+  );
+}
+
+function useLibraryNote() {
+  const listProblem = useLookFiles((files) => files.listProblem);
+  const problem = useLibrary((library) => library.problem);
+  const note = useLookActions((actions) => actions.note);
+  return listProblem ?? problem ?? note;
+}
+
 export function LookLibrary({ lights }: { lights: Light[] }) {
   const mine = useLookFiles((files) => files.mine);
   const examples = useLookFiles((files) => files.examples);
-  const listProblem = useLookFiles((files) => files.listProblem);
-  const problem = useLibrary((library) => library.problem);
+  const shelf = useLookFiles((files) => files.shelf);
+  const note = useLibraryNote();
   const shownLights = useShownLights(lights);
   const playingName = isMixedLook(shownLights) ? null : lookNameOf(shownLights[0]);
+  const [isEditing, setEditing] = useState(false);
+  const [isPasting, setPasting] = useState(false);
+  const deleteKey = useArmedDelete();
   useFreshLooks();
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
@@ -46,11 +121,44 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
     if (animation) previewLook(players, name, animation);
   };
 
+  const presetRows = (look: LibraryLook) =>
+    look.presets.map(({ key, name, fullName, place, file, animation }) => (
+      <LookPreset
+        key={key}
+        name={name}
+        place={place}
+        isPlaying={fullName === playingName}
+        action={isEditing && file ? deleteKey(key, () => void removePreset(file)) : undefined}
+        onPick={() => pick({ ...look, name: fullName, animation })}
+        onHold={() => hold({ ...look, name: fullName, animation })}
+        onHoldEnd={endPreview}
+      />
+    ));
+
+  if (isPasting) return <PasteLookSheet onClose={() => setPasting(false)} />;
+
   return (
     <LookList>
-      {(listProblem ?? problem) && <LookProblem>{listProblem ?? problem}</LookProblem>}
-      {libraryFor(lights, mine, examples).map(({ title, note, looks }) => (
-        <LookGroup key={title} title={title} note={note}>
+      {note && <LookProblem>{note}</LookProblem>}
+      {libraryFor(lights, mine, examples, shelf).map(({ kind, title, note: groupNote, looks }) => (
+        <LookGroup
+          key={title}
+          title={title}
+          note={groupNote}
+          action={
+            kind !== 'catalog' && (
+              <TextKey onClick={() => setEditing(!isEditing)}>{isEditing ? 'DONE' : 'EDIT'}</TextKey>
+            )
+          }
+        >
+          {isEditing && title === 'Mine' && (
+            <KeyRow>
+              <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
+                ADD FROM A FILE
+              </FileKey>
+              <TextKey onClick={() => setPasting(true)}>PASTE</TextKey>
+            </KeyRow>
+          )}
           {looks.map((look) => (
             <LookItem
               key={look.id}
@@ -59,13 +167,17 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
               note={look.animation && partOfRoomNote(look, lights)}
               hasSound={look.hasSound}
               isPlaying={look.name === playingName}
-              disabled={!look.animation}
+              disabled={isEditing || !look.animation}
               strip={<LookStrip source={look.preview} shape="tile" brightness={TILE_BRIGHTNESS} />}
+              actions={isEditing && look.file && <FileActions look={look.file} deleteKey={deleteKey} />}
               onPick={() => pick(look)}
               onHold={() => hold(look)}
               onHoldEnd={endPreview}
-            />
+            >
+              {presetRows(look)}
+            </LookItem>
           ))}
+          {title === 'Mine' && <PublishedElsewhere />}
         </LookGroup>
       ))}
     </LookList>

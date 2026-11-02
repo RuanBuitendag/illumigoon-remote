@@ -77,7 +77,14 @@
 .library-group { display: flex; flex-direction: column; gap: 22px; }
 .library-group .eyebrow { margin-bottom: -18px; }
 .library-note { margin-bottom: -8px; color: var(--text-4); font-size: 13.5px; }
+.look-row { display: flex; flex-direction: column; min-width: 0; }
 .look-item { display: block; width: 100%; }
+.look-item:disabled { cursor: default; }
+.look-actions { display: flex; flex-wrap: wrap; gap: 22px; }
+.look-preset { display: flex; align-items: center; gap: 16px; min-height: 44px; }
+.look-preset-press { display: flex; flex: 1; align-items: center; gap: 12px; min-width: 0; min-height: 44px; }
+.look-preset-name { overflow: hidden; font-size: 15px; text-overflow: ellipsis; white-space: nowrap; }
+.look-elsewhere-action { margin-left: auto; color: var(--text-4); font: 500 10px/1 var(--mono); letter-spacing: 0.14em; }
 .look-item .led-strip,
 .scene-bar { transition: filter 140ms ease-out; }
 .look-item[data-held='true'] .led-strip,

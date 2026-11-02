@@ -1,7 +1,6 @@
 import { create } from 'zustand';
-import type { LibraryEntry, Preset } from '@illumigoon/patch-editor/library';
+import type { LibraryEntry, Preset, ServerLibrary, Shelf } from '@illumigoon/patch-editor/library';
 import type { AnimationState } from '../light-network/protocol';
-import { PATCH_LOOKS } from '../looks/looks';
 import { useHousehold, type SavedLook } from './household-store';
 import { attempt, library, unusedFile, useLibrary } from './library-store';
 
@@ -18,6 +17,7 @@ export type LookFile = {
   group: string | null;
   modified: number;
   isExample: boolean;
+  familyId: string | null;
   version: number | null;
   wire: number;
   hasSound: boolean;
@@ -26,9 +26,22 @@ export type LookFile = {
   error: string | null;
 };
 
-type LookFiles = { mine: LookFile[]; examples: LookFile[]; listProblem: string | null };
+type LookFiles = {
+  mine: LookFile[];
+  examples: LookFile[];
+  // What the patch server and the preset folder hold, sorted under the looks of Mine.
+  shelf: Shelf;
+  server: ServerLibrary;
+  listProblem: string | null;
+};
 
-export const useLookFiles = create<LookFiles>(() => ({ mine: [], examples: [], listProblem: null }));
+export const useLookFiles = create<LookFiles>(() => ({
+  mine: [],
+  examples: [],
+  shelf: { under: new Map(), elsewhere: [] },
+  server: { reached: false, patches: [], presets: [] },
+  listProblem: null,
+}));
 
 type Shared = Awaited<ReturnType<typeof library>>;
 
@@ -46,6 +59,7 @@ function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, 
     group: entry.group,
     modified: entry.modified,
     isExample,
+    familyId: entry.familyId ?? null,
     version: entry.version ?? null,
     wire: entry.wire,
     hasSound: params !== null && !flatLook && shared.usesAudio(params),
@@ -76,21 +90,23 @@ function readChanged(shared: Shared, entries: LibraryEntry[], known: LookFile[],
   );
 }
 
-const catalogNames = new Set(PATCH_LOOKS.map(({ name }) => name));
-
-// The gallery folder holds the finished looks, and the app's own groups already show those.
-const isOwnExample = ({ group, name }: LibraryEntry) => group !== 'gallery' || !catalogNames.has(name);
+const folderOf = ({ file, name, familyId, version }: LookFile) => ({ file, name, familyId, version });
 
 async function readLooks() {
   try {
     const shared = await library();
-    const [{ patches }, { patches: examples }] = await Promise.all([shared.listLibrary(), shared.listExamples()]);
+    const [{ patches }, { patches: examples }, { presets }] = await Promise.all([
+      shared.listLibrary(),
+      shared.listExamples(),
+      shared.listPresets(),
+    ]);
     const known = useLookFiles.getState();
     const [mine, shownExamples] = await Promise.all([
       readChanged(shared, patches, known.mine, false),
-      readChanged(shared, examples.filter(isOwnExample), known.examples, true),
+      readChanged(shared, examples, known.examples, true),
     ]);
-    useLookFiles.setState({ mine, examples: shownExamples, listProblem: null });
+    const shelf = shared.shelfOf(mine.map(folderOf), presets, useLookFiles.getState().server);
+    useLookFiles.setState({ mine, examples: shownExamples, shelf, listProblem: null });
   } catch (error) {
     useLookFiles.setState({ listProblem: `The looks did not load: ${reasonOf(error)}` });
   }
@@ -107,19 +123,31 @@ export async function loadLooks() {
   await loading;
 }
 
+// Asked when the Looks page opens, not on its timer: the server sleeps, and a cold request takes
+// fifteen seconds to learn something that only changes when somebody publishes.
+export async function askServer() {
+  const { serverLibrary } = await library();
+  useLookFiles.setState({ server: await serverLibrary() });
+  await loadLooks();
+}
+
 function fileOfLook(name: string, notes: string, animation: AnimationState): Preset {
   if (animation.type === 'patch') return { ...animation.params, name, notes };
   return { name, notes, layers: {}, modulators: {}, matrix: [], flatLook: animation };
 }
 
-export const saveLook = (name: string, animation: AnimationState, notes = '') =>
+// A new file never replaces one of the same name.
+export const addLook = (name: string, preset: Preset) =>
   attempt(async () => {
     const { slugFileName, writePreset } = await library();
     await loadLooks();
     const taken = useLookFiles.getState().mine.map(({ file }) => file);
-    await writePreset(unusedFile(slugFileName(name, 'patch'), taken), fileOfLook(name, notes, animation));
+    await writePreset(unusedFile(slugFileName(name, 'patch'), taken), preset);
     await loadLooks();
   });
+
+export const saveLook = (name: string, animation: AnimationState, notes = '') =>
+  addLook(name, fileOfLook(name, notes, animation));
 
 const sameLook = ({ doc }: LookFile, { name, animation }: SavedLook) => {
   if (!doc) return false;
