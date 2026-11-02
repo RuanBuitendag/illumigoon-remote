@@ -8,7 +8,9 @@ type RoomCardProps = {
   strip: ReactNode;
   lookName: string;
   hasSound: boolean;
-  lightStates: { id: string; state: 'on' | 'off' | 'silent' }[];
+  isLit: boolean;
+  power: ReactNode;
+  lightStates: { id: string; name: string; state: 'on' | 'off' | 'silent' }[];
   note: string | null;
   // Shows on a laptop, where the open room stands beside its card.
   isOpen: boolean;
@@ -18,25 +20,29 @@ type RoomCardProps = {
 
 export function RoomCard(card: RoomCardProps) {
   return (
-    <article className="room-card" data-open={card.isOpen} style={tintStyle(card.tint)}>
+    <article className="room-card" data-open={card.isOpen} data-lit={card.isLit} style={tintStyle(card.tint)}>
       <Press className="room-open" onClick={card.onOpen}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>
-          <span className="room-count">{card.countText}</span>
         </span>
         {card.strip}
-        <span className="look-row">
-          <span className="look-row-name">{card.lookName}</span>
+        <span className="room-look">
+          <span className="room-look-name">{card.lookName}</span>
           {card.hasSound && <SoundMark />}
-          <span className="look-row-marks">
-            {card.lightStates.map(({ id, state }) => (
-              <StatusMark key={id} state={state} />
-            ))}
-          </span>
+          <span className="room-count">{card.countText}</span>
+        </span>
+        <span className="room-lights">
+          {card.lightStates.map(({ id, name, state }) => (
+            <span key={id} className="room-light" data-state={state}>
+              <StatusMark state={state} />
+              {name}
+            </span>
+          ))}
         </span>
       </Press>
+      {card.power && <span className="room-power">{card.power}</span>}
       {card.note && <QuietNote>{card.note}</QuietNote>}
-      {card.children}
+      <div className="room-actions">{card.children}</div>
     </article>
   );
 }

@@ -121,8 +121,7 @@ export function PowerKey({ label, isOn, disabled, onChange }: PowerKeyProps) {
       disabled={disabled}
       onCheckedChange={onChange}
     >
-      <span className="power-key-bar" />
-      <span className="power-key-label">{isOn ? 'ON' : 'OFF'}</span>
+      <Switch.Thumb className="power-key-thumb" />
     </Switch.Root>
   );
 }

@@ -1,14 +1,14 @@
 import { useEffect, useState } from 'react';
-import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow, RoomDragList } from '../../composites';
+import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, RoomDragList, ToggleRow } from '../../composites';
 import { TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { searchAgain, setBrightness, setPower } from '../store/fleet-store';
+import { searchAgain, setPower } from '../store/fleet-store';
 import { setRoomOrder } from '../store/household-store';
 import { moveOldScenes } from '../store/library-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
-import { highestBrightness, isAnyOn, type Room } from '../store/rooms';
+import { isAnyOn, type Room } from '../store/rooms';
 import { RoomSummary } from './room-summary';
 import { SceneRow } from './scene-row';
 
@@ -18,13 +18,11 @@ function HouseControls({ rooms }: { rooms: Room[] }) {
   if (rooms.length < 2) return null;
   return (
     <HouseSection title="WHOLE HOUSE" action={<TextKey onClick={() => openPage('looks')}>LOOKS</TextKey>}>
-      <LevelRow
-        label="Whole house"
+      <ToggleRow
+        label="All lights"
         isOn={isAnyOn(shownLights)}
-        level={highestBrightness(shownLights)}
         disabled={lights.length === 0}
-        onPower={(isOn) => setPower(lights, isOn)}
-        onLevel={(level) => setBrightness(lights, level)}
+        onChange={(isOn) => setPower(lights, isOn)}
       />
     </HouseSection>
   );
