@@ -1,6 +1,6 @@
 type TextFieldProps = {
   label: string;
-  size: 'title' | 'large' | 'medium' | 'small';
+  size: 'large' | 'small';
   type?: 'text' | 'password' | 'time';
   placeholder?: string;
   maxLength?: number;

@@ -7,23 +7,21 @@ import './design-system.css';
 
 export {
   BLACK_HEX,
-  HUE_GRADIENT,
   colourToHex,
-  colourToHsv,
   gradientOf,
   hexToColour,
-  hsvToColour,
   warmthToColour,
 } from './colour';
 export type { Colour } from './colour';
-export { ColourFill, ColourSlot, SwatchKey } from './colour-chips';
+export { ColourFill, ColourSlot } from './colour-chips';
+export { ColourPad } from './colour-pad';
 export { STARTER_COLOUR_SETS } from './colour-sets';
 export { useDragOrder } from './drag-order';
 export { Fader } from './fader';
-export { AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
+export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
-export { ChevronMark, GripMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
-export { Eyebrow, ValueText } from './text';
+export { ChevronMark, GripMark, LockMark, SoundMark, StatusMark } from './marks';
+export { Eyebrow, Picked, ValueText } from './text';
 export { TextArea, TextField } from './text-field';

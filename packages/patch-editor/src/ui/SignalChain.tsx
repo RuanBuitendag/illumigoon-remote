@@ -103,7 +103,7 @@ function LayerLevel({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
 
 function ChainCaption({ coloured, prefix }: { coloured: boolean; prefix: string }) {
   return (
-    <span style={{ font: '400 10.5px/1.6 var(--sans)', color: 'var(--text-5)' }}>
+    <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
       {coloured
         ?
           'Composed top to bottom. Warps above Colour bend the shape before it has a colour; ' +
@@ -126,7 +126,7 @@ function ChainStages({ ctl, warps, colourAt }: {
   const node = ctl.node;
   if (!warps.length) {
     return (
-      <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', paddingTop: 6 }}>
+      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)', paddingTop: 6 }}>
         {colourAt !== null
           ? 'No warp loaded. The layer renders in its own coordinates.'
           : 'No warp loaded. The mix reaches the strip as it is.'}
@@ -318,7 +318,7 @@ function Chain({ ctl, host, top }: {
             Stages
           </RackToggle>
           <span
-            style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+            style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
           >
             what each row does to space
           </span>
@@ -355,13 +355,13 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
         <div className="row" style={{ gap: 14, alignItems: 'baseline' }}>
           <span
             style={{
-              font: '400 20px/1 var(--sans)',
+              font: 'var(--type-heading)',
               color: 'var(--text-1)',
             }}
           >
             {name}
           </span>
-          <span style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-3)' }}>{sub}</span>
+          <span style={{ font: 'var(--type-note)', color: 'var(--text-3)' }}>{sub}</span>
         </div>
         <div className="row" style={{ gap: 10 }}>
           {crumb.map((s, i) => (
@@ -486,7 +486,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">warp{i}</Mono>
-        <span className="grow" style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
           —
         </span>
         <Ico.Plus c="var(--text-5)" />
@@ -518,7 +518,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       <Mono className={sel ? '' : 'dim'}>warp{i}</Mono>
       <span
         className="grow"
-        style={{ font: '400 13px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        style={{ font: 'var(--type-note)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
       >
         {warp.type}
       </span>
@@ -577,7 +577,7 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
       />
       <span
         className="grow"
-        style={{ font: '400 13px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        style={{ font: 'var(--type-note)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
       >
         colour
       </span>
@@ -627,7 +627,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">colour</Mono>
-        <span className="grow" style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
           —
         </span>
         <Ico.Plus c="var(--text-5)" />

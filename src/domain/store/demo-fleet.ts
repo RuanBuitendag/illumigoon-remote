@@ -56,7 +56,11 @@ function demoLight(address: string, name: string, roomId: string, change: Partia
     lockNonce: '',
     animation: null,
     manifests: FLAT_LOOKS,
-    transitions: [],
+    transitions: [
+      { id: 'fade', name: 'Fade' },
+      { id: 'wipe', name: 'Wipe' },
+    ],
+    transitionMs: 1000,
     localWriteUntil: 0,
     lookWrittenAt: 0,
     softwareVersion: LATEST_VERSION,

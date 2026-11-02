@@ -104,9 +104,13 @@ const playsPatches = (light: Light) =>
 
 export const patchLights = (lights: Light[]) => lights.filter(playsPatches);
 
+export const ALL_LIGHTS = 'all';
+
+// With nothing chosen, lights that show different looks start on the first one, so its settings are open.
 export function lightsInScope({ writableLights }: Room, scopeAddress: string | null) {
   const scoped = writableLights.filter(({ address }) => address === scopeAddress);
-  return scoped.length > 0 ? scoped : writableLights;
+  if (scoped.length > 0) return scoped;
+  return scopeAddress === null && isMixedLook(writableLights) ? writableLights.slice(0, 1) : writableLights;
 }
 
 export const lightsWithLook = (lights: Light[], animationId: string) =>
@@ -156,6 +160,16 @@ export function lookNameOf(light: Light | undefined) {
 export function isMixedLook(lights: Light[]) {
   const signatures = new Set(lights.map(({ animation }) => JSON.stringify(animation)));
   return signatures.size > 1;
+}
+
+const positionsOf = (document: Record<string, unknown>) => JSON.stringify(document.surface);
+
+// The shipped look that a light has moved the controls of, so its first positions can come back.
+export function editedLook(light: Light | undefined) {
+  const animation = light?.animation;
+  if (animation?.type !== 'patch') return undefined;
+  const look = findPatchLook(animation.params);
+  return look && positionsOf(look.document) !== positionsOf(animation.params) ? look : undefined;
 }
 
 const isColour = (value: unknown): value is Colour =>

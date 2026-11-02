@@ -1,3 +1,4 @@
+import { create } from 'zustand';
 import type { AnimationState } from '../light-network/protocol';
 import { applyState, lightIdOf, type Light } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
@@ -62,6 +63,30 @@ export function applyScene(scene: Scene, rooms: Room[]) {
   offerUndo({ text, moments: momentsOf(reached.map(({ light }) => light)) });
   for (const { light, saved } of reached) applyToLight(light, saved);
 }
+
+const LEVEL_MARGIN = 0.01;
+
+const isSameLook = (animation: AnimationState | null, saved: AnimationState) =>
+  animation?.type === saved.type && JSON.stringify(animation.params) === JSON.stringify(saved.params);
+
+function showsSaved(light: Light, saved: SceneLight) {
+  if (light.isOn !== saved.is_on) return false;
+  if (!saved.is_on) return true;
+  return Math.abs(light.brightness - saved.brightness) < LEVEL_MARGIN && isSameLook(light.animation, animationOf(saved));
+}
+
+// A light that isn't answering can't say what it shows, so it doesn't count against a scene.
+export function isSceneShowing({ lights }: Pick<Scene, 'lights'>, room: Room) {
+  const reached = lights.flatMap((saved) => {
+    const light = room.onlineLights.find((candidate) => lightIdOf(candidate) === saved.id);
+    return light ? [{ light, saved }] : [];
+  });
+  return reached.length > 0 && reached.every(({ light, saved }) => showsSaved(light, saved));
+}
+
+// The last scene a room showed, so the room can say what it has changed from.
+export const useLastScenes = create<Record<string, string>>(() => ({}));
+export const noteLastScene = (roomId: string, name: string) => useLastScenes.setState({ [roomId]: name });
 
 function plural(count: number, noun: string) {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;

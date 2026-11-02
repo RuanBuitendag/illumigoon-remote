@@ -1,22 +1,31 @@
 import { useState } from 'react';
-import { FoldKey, Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from '../../composites';
-import { useRecording } from '../looks/recordings';
-import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
+import {
+  LevelRow,
+  LightCard,
+  LookHeading,
+  MoreRow,
+  QuietNote,
+  RoomLayout,
+  RoomSection,
+  SliderRow,
+} from '../../composites';
+import { PowerKey, TextKey } from '../../design-system';
 import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
+import { playLook } from '../store/look-play';
 import { useShownLights } from '../store/look-preview';
 import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
 import {
+  ALL_LIGHTS,
+  editedLook,
   highestBrightness,
   isAnyOn,
   isMixedLook,
   lightsInScope,
-  lightState,
   lookNameOf,
   previewOfAnimation,
   type Room,
 } from '../store/rooms';
-import { offTimerNote, roomSchedules } from '../store/schedules';
-import { lightCount } from '../store/scenes';
+import { offTimerNote } from '../store/schedules';
 import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
 import { OffTimerSheet, schedulingLights } from './off-timer-sheet';
@@ -24,72 +33,130 @@ import { RecentLookRow } from './recent-looks';
 import { RoomLockNote } from './room-summary';
 import { SceneRow } from './scene-row';
 
-const ALL_LIGHTS = 'all';
+const RECENT_LOOKS = 3;
+const PERCENT = 100;
 
-function RoomScope({ room, scope }: { room: Room; scope: string | null }) {
+// The look's name stands under the lights. A light repeats it only when the lights differ.
+function lightNote(light: Light, hasOneLook: boolean) {
+  if (!light.isOnline) return "ISN'T ANSWERING";
+  if (light.isLockedByOther) return 'IN USE';
+  if (!light.isOn) return 'OFF';
+  return hasOneLook ? '' : (lookNameOf(light) ?? '');
+}
+
+function allLightsWord({ writableLights }: Room) {
+  return writableLights.length === 2 ? 'BOTH' : 'ALL';
+}
+
+function ChooseAllKey({ room, chosen }: { room: Room; chosen: Light[] }) {
   const { writableLights } = room;
-  if (writableLights.length < 2) return null;
-  const allLabel = writableLights.length === 2 ? 'Both lights' : 'All lights';
-  const tabs = writableLights.map(({ address, name }) => ({ value: address, name }));
+  const first = writableLights[0];
+  if (!first || writableLights.length < 2) return null;
+  const isAll = chosen.length === writableLights.length;
+  const word = allLightsWord(room);
   return (
-    <ScopeTabs
-      tabs={[{ value: ALL_LIGHTS, name: allLabel }, ...tabs]}
-      value={scope ?? ALL_LIGHTS}
-      onChange={(value) => setScope(value === ALL_LIGHTS ? null : value)}
-    />
+    <TextKey onClick={() => setScope(isAll ? first.address : ALL_LIGHTS)}>
+      {isAll ? `${word} CHOSEN` : `CHOOSE ${word}`}
+    </TextKey>
   );
 }
 
-function statusOf({ isOnline, isOn }: Light) {
-  if (!isOnline) return "ISN'T ANSWERING";
-  return isOn ? 'ON' : 'OFF';
-}
-
-function LightRows({ room }: { room: Room }) {
+function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
   const lights = useShownLights(room.lights);
-  if (room.lights.length < 2) return null;
+  const hasPowers = lights.length > 1;
+  const hasOneLook = !isMixedLook(lights.filter(({ isOnline }) => isOnline));
   return (
-    <RoomSection eyebrow="LIGHTS">
-      {lights.map((light) => (
-        <LightRow
-          key={light.address}
-          name={light.name}
-          status={statusOf(light)}
-          state={lightState(light)}
-          disabled={!light.isOnline || light.isLockedByOther}
-          onClick={() => setPower([light], !light.isOn)}
-          onHold={() => flashLights([light])}
-        />
-      ))}
+    <RoomSection eyebrow="LIGHTS" action={<ChooseAllKey room={room} chosen={chosen} />}>
+      {lights.map((light) => {
+        const canChange = light.isOnline && !light.isLockedByOther;
+        return (
+          <LightCard
+            key={light.address}
+            name={light.name}
+            note={lightNote(light, hasOneLook)}
+            isChosen={chosen.some(({ address }) => address === light.address)}
+            disabled={!canChange}
+            strip={
+              <LookStrip
+                source={previewOfAnimation(light.animation)}
+                shape="room"
+                isOn={light.isOnline && light.isOn}
+                brightness={light.brightness}
+              />
+            }
+            power={
+              hasPowers &&
+              light.isOnline && (
+                <PowerKey
+                  label={`${light.name} power`}
+                  isOn={light.isOn}
+                  disabled={!canChange}
+                  onChange={(next) => setPower([light], next)}
+                />
+              )
+            }
+            onChoose={() => setScope(light.address)}
+            onHold={() => flashLights([light])}
+          />
+        );
+      })}
     </RoomSection>
   );
 }
 
-function lockSummary({ lights }: Room) {
+function lookTitle(lights: Light[]) {
+  if (isMixedLook(lights)) return 'Mixed';
+  const name = lookNameOf(lights[0]) ?? '';
+  return editedLook(lights[0]) ? `${name}, changed` : name;
+}
+
+function offNote(lights: Light[]) {
+  const first = lights[0];
+  return lights.length === 1 && first ? `${first.name} is off.` : 'These lights are off.';
+}
+
+function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
+  const shownLights = useShownLights(lights);
+  const isMixed = isMixedLook(shownLights);
+  const isOn = isAnyOn(shownLights);
+  const edited = isMixed ? undefined : editedLook(lights[0]);
   const light = lights[0];
-  if (light?.isLockedByMe || light?.isLockedByOther) return 'Locked';
-  const schedule = light?.lockSchedule;
-  if (!schedule) return 'Unlocked';
-  const hours = String(Math.floor(schedule.start / 60)).padStart(2, '0');
-  return `Locks every night at ${hours}:${String(schedule.start % 60).padStart(2, '0')}`;
-}
-
-function scheduleNote({ onlineLights }: Room) {
-  const able = onlineLights.filter((light) => light.canSchedule);
-  if (able.length === 0) return 'Not on these lights';
-  const { length } = roomSchedules(able);
-  if (length === 0) return 'None yet';
-  return length === 1 ? '1 schedule' : `${length} schedules`;
-}
-
-function softwareNote({ lights }: Room, waiting: number) {
-  if (waiting > 0) return `New version for ${lightCount(waiting)}`;
-  return lights[0]?.softwareVersion ? `Version ${lights[0].softwareVersion}` : 'Version not known yet';
+  if (!light) return null;
+  const reset = () => edited && playLook(lights, edited.name, { type: 'patch', params: edited.document });
+  return (
+    <>
+      <RoomSection>
+        <LookHeading
+          name={lookTitle(shownLights)}
+          onReset={edited ? reset : undefined}
+          onEdit={!isMixed && isOn ? () => openPage('editor', room.id) : undefined}
+          onLooks={() => openPage('looks', room.id)}
+        />
+        <RecentLookRow room={room} lights={lights} limit={RECENT_LOOKS} />
+        {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
+        {!isMixed && !isOn && <QuietNote>{offNote(lights)}</QuietNote>}
+      </RoomSection>
+      {!isMixed && isOn && (
+        <RoomSection>
+          {lights.length === 1 && room.writableLights.length > 1 && (
+            <SliderRow
+              label="Level"
+              valueText={String(Math.round(light.brightness * PERCENT))}
+              value={light.brightness}
+              min={0}
+              max={1}
+              step={0.01}
+              onChange={(next) => setBrightness(lights, next)}
+            />
+          )}
+          <LookControls lights={lights} />
+        </RoomSection>
+      )}
+    </>
+  );
 }
 
 function RoomMore({ room }: { room: Room }) {
-  const servers = useLatestVersions((latest) => latest.servers);
-  const waiting = room.lights.filter((light) => newVersionOf(light, servers)).length;
   const [isTiming, setTiming] = useState(false);
   const timerLights = schedulingLights(room);
   return (
@@ -97,69 +164,43 @@ function RoomMore({ room }: { room: Room }) {
       {timerLights.length > 0 && (
         <MoreRow label="Off timer" note={offTimerNote(timerLights)} onOpen={() => setTiming(true)} />
       )}
-      <MoreRow label="Schedules" note={scheduleNote(room)} onOpen={() => openPage('schedules', room.id)} />
-      <MoreRow label="Lock" note={lockSummary(room)} onOpen={() => openPage('lock', room.id)} />
-      <MoreRow
-        label="Rename and arrange"
-        note="Room name, light names, order and rooms"
-        onOpen={() => openPage('arrange', room.id)}
-      />
-      <MoreRow label="Light software" note={softwareNote(room, waiting)} onOpen={() => openPage('software', room.id)} />
+      <MoreRow label="Room settings" onOpen={() => openPage('room-settings', room.id)} />
       {isTiming && <OffTimerSheet room={room} onClose={() => setTiming(false)} />}
     </RoomSection>
   );
 }
 
-function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
-  // A room in someone else's hands still shows what it is doing.
-  const shownLights = useShownLights(lights.length > 0 ? lights : room.onlineLights);
-  const first = shownLights[0];
-  const source = previewOfAnimation(first?.animation ?? null);
-  const recording = useRecording(source);
+export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
+  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
+  const shownLights = useShownLights(room.onlineLights);
+  const { writableLights } = room;
   const isOn = isAnyOn(shownLights);
-  const level = highestBrightness(shownLights);
-  const isMixed = isMixedLook(shownLights);
-  const hasLights = lights.length > 0;
-  const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
-  const [isAdjusting, setAdjusting] = useState(false);
+  const isReadOnly = writableLights.length === 0;
   return (
-    <Hero
-      tint={recording?.tint}
-      strip={<LookStrip source={source} shape="hero" isOn={isOn} brightness={level} />}
-      lookName={isMixed ? 'Mixed' : (lookNameOf(first) ?? '')}
-      onChangeLook={hasLights ? () => openPage('looks', room.id) : undefined}
-      onEdit={canEdit ? () => openPage('editor', room.id) : undefined}
+    <RoomLayout
+      name={room.name}
+      power={
+        <PowerKey
+          label={`${room.name} power`}
+          isOn={isOn}
+          disabled={isReadOnly}
+          onChange={(next) => setPower(writableLights, next)}
+        />
+      }
+      backLabel="Rooms"
+      onBack={closeRoom}
     >
       <LevelRow
         label={room.name}
         isOn={isOn}
-        level={level}
-        disabled={!hasLights}
-        onPower={(next) => setPower(lights, next)}
-        onLevel={(next) => setBrightness(lights, next)}
+        level={highestBrightness(shownLights)}
+        disabled={isReadOnly}
+        onLevel={(next) => setBrightness(writableLights, next)}
       />
       {room.isLocked && <RoomLockNote room={room} />}
-      {hasLights && !isMixed && (
-        <>
-          <FoldKey label="ADJUST" isOpen={isAdjusting} onToggle={() => setAdjusting(!isAdjusting)} />
-          {isAdjusting && <LookControls lights={lights} />}
-        </>
-      )}
-    </Hero>
-  );
-}
-
-export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
-  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  const lights = lightsInScope(room, scopeAddress);
-  const isScoped = lights.some(({ address }) => address === scopeAddress);
-  return (
-    <RoomLayout name={room.name} countText={lightCount(room.lights.length)} backLabel="Rooms" onBack={closeRoom}>
-      <RoomScope room={room} scope={isScoped ? scopeAddress : null} />
-      <RoomHero room={room} lights={lights} />
-      <RecentLookRow room={room} lights={lights} />
-      {rooms.length > 1 && <SceneRow rooms={rooms} room={room} />}
-      <LightRows room={room} />
+      <SceneRow rooms={rooms} room={room} />
+      <LightCards room={room} chosen={lightsInScope(room, scopeAddress)} />
+      <LookPanel room={room} lights={lightsInScope(room, scopeAddress)} />
       <RoomMore room={room} />
     </RoomLayout>
   );

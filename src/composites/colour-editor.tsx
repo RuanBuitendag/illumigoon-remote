@@ -1,36 +1,26 @@
-import { useState, type ReactNode } from 'react';
-import {
-  BLACK_HEX,
-  ChevronMark,
-  ColourFill,
-  ColourSlot,
-  Eyebrow,
-  KeyRow,
-  OptionRow,
-  Press,
-  SwatchKey,
-  TextKey,
-  ValueText,
-} from '../design-system';
-import { ColourAxes } from './colour-axes';
-import { FoldKey, HeadingRow } from './control-rows';
+import { useRef, useState } from 'react';
+import { BLACK_HEX, ChevronMark, ColourFill, ColourSlot, KeyRow, Press, TextKey } from '../design-system';
+import { ColourPicker } from './colour-picker';
+import { HeadingRow } from './control-rows';
 import { NamingRow } from './naming-row';
-import { Sheet } from './sheet';
+import { CurrentPalette, PaletteShelf, type ColourSet } from './palette-shelf';
 
 const MAX_COLOURS = 8;
 const MAX_UNDO_STEPS = 20;
 
-type NamedColours = { id: string; name: string; family: string; colours: string[] };
-
-type ColourEditorProps = {
-  strip: ReactNode;
+type ColourField = {
+  key: string;
+  label: string;
   isPalette: boolean;
   colours: string[];
   minimumColours: number;
-  sets: NamedColours[];
-  onChange: (colours: string[]) => void;
+};
+
+type ColourEditorProps = {
+  fields: ColourField[];
+  sets: ColourSet[];
+  onChange: (key: string, colours: string[]) => void;
   onKeepSet: (name: string, colours: string[]) => void;
-  onClose: () => void;
 };
 
 const replaceAt = (colours: string[], index: number, colour: string) =>
@@ -43,52 +33,9 @@ function moved(colours: string[], index: number, shift: number) {
   return next;
 }
 
-type SwatchSetsProps = {
-  sets: NamedColours[];
-  minimumColours: number;
-  roomForColours: number;
-  onPlace: (colour: string) => void;
-  onApplySet: (colours: string[]) => void;
-};
-
-// One family at a time, so the sets stay a short list.
-function SwatchSets({ sets, minimumColours, roomForColours, onPlace, onApplySet }: SwatchSetsProps) {
-  const families = [...new Set(sets.map(({ family }) => family))];
-  const [openFamily, setOpenFamily] = useState(families[0] ?? null);
-  return families.map((family) => (
-    <section key={family} className="swatch-family">
-      <FoldKey
-        label={family.toUpperCase()}
-        isOpen={family === openFamily}
-        onToggle={() => setOpenFamily(family === openFamily ? null : family)}
-      />
-      {family === openFamily &&
-        sets
-          .filter((set) => set.family === family)
-          .map(({ id, name, colours }) => (
-            <div key={id}>
-              <div className="swatch-set-heading">
-                <Eyebrow>{name.toUpperCase()}</Eyebrow>
-                <TextKey
-                  disabled={colours.length < minimumColours}
-                  onClick={() => onApplySet(colours.slice(0, roomForColours))}
-                >
-                  {colours.length > roomForColours ? `USE THE FIRST ${roomForColours}` : 'USE THESE'}
-                </TextKey>
-              </div>
-              <div className="swatches">
-                {colours.map((colour, index) => (
-                  <SwatchKey key={`${id}-${index}`} colour={colour} onClick={() => onPlace(colour)} />
-                ))}
-              </div>
-            </div>
-          ))}
-    </section>
-  ));
-}
-
 type SlotKeysProps = {
   count: number;
+  canArrange: boolean;
   canRemove: boolean;
   selected: number;
   copied: string | null;
@@ -98,7 +45,7 @@ type SlotKeysProps = {
   onRemove: () => void;
 };
 
-function SlotKeys({ count, canRemove, selected, copied, onCopy, onPaste, onMove, onRemove }: SlotKeysProps) {
+function SlotKeys({ count, canArrange, canRemove, selected, copied, onCopy, onPaste, onMove, onRemove }: SlotKeysProps) {
   return (
     <KeyRow>
       <TextKey onClick={onCopy}>COPY</TextKey>
@@ -106,40 +53,46 @@ function SlotKeys({ count, canRemove, selected, copied, onCopy, onPaste, onMove,
         PASTE
         {copied && <ColourFill className="paste-chip" paint={copied} />}
       </TextKey>
-      <TextKey disabled={selected === 0} onClick={() => onMove(-1)}>
-        <ChevronMark direction="left" />
-      </TextKey>
-      <TextKey disabled={selected === count - 1} onClick={() => onMove(1)}>
-        <ChevronMark direction="right" />
-      </TextKey>
-      <TextKey disabled={!canRemove} onClick={onRemove}>
-        REMOVE
-      </TextKey>
+      {canArrange && (
+        <>
+          <TextKey disabled={selected === 0} onClick={() => onMove(-1)}>
+            <ChevronMark direction="left" />
+          </TextKey>
+          <TextKey disabled={selected === count - 1} onClick={() => onMove(1)}>
+            <ChevronMark direction="right" />
+          </TextKey>
+          <TextKey disabled={!canRemove} onClick={onRemove}>
+            REMOVE
+          </TextKey>
+        </>
+      )}
     </KeyRow>
   );
 }
 
 type SlotsProps = {
-  colours: string[];
-  selected: number;
+  field: ColourField;
+  // Which slot is open, when it is in this field.
+  selected: number | null;
   onSelect: (index: number) => void;
   onAdd: () => void;
 };
 
-function Slots({ colours, selected, onSelect, onAdd }: SlotsProps) {
+function Slots({ field, selected, onSelect, onAdd }: SlotsProps) {
+  const { label, isPalette, colours } = field;
   return (
     <div className="slots">
       {colours.map((colour, index) => (
         <ColourSlot
-          key={`${colour}-${index}`}
+          key={index}
           colour={colour}
-          label={`Colour ${index + 1}`}
+          label={`${label} ${index + 1}`}
           isSelected={index === selected}
           onClick={() => onSelect(index)}
         />
       ))}
-      {colours.length < MAX_COLOURS && (
-        <Press className="slot-add" label="Add a colour" onClick={onAdd}>
+      {isPalette && colours.length < MAX_COLOURS && (
+        <Press className="slot-add" label={`Add to ${label}`} onClick={onAdd}>
           +
         </Press>
       )}
@@ -147,121 +100,233 @@ function Slots({ colours, selected, onSelect, onAdd }: SlotsProps) {
   );
 }
 
-export function ColourEditor(props: ColourEditorProps) {
-  const { strip, isPalette, colours, minimumColours, sets, onChange, onKeepSet, onClose } = props;
-  const [selected, setSelected] = useState(0);
-  const [tab, setTab] = useState<'swatches' | 'custom'>('swatches');
-  const [copied, setCopied] = useState<string | null>(null);
-  const [undoSteps, setUndoSteps] = useState<string[][]>([]);
-  const [isNaming, setNaming] = useState(false);
-  const current = colours[selected] ?? BLACK_HEX;
+function useColourEdits(start: ColourField, { fields, onChange }: ColourEditorProps) {
+  const [picked, setPicked] = useState({ key: start.key, index: 0 });
+  const [isOpen, setOpen] = useState(false);
+  const [undoSteps, setUndoSteps] = useState<{ key: string; colours: string[] }[]>([]);
+  const hasDragged = useRef(false);
+  const field = fields.find(({ key }) => key === picked.key) ?? start;
+  const { key, colours } = field;
+  const selected = Math.min(picked.index, colours.length - 1);
+
+  const remember = (step: { key: string; colours: string[] }) =>
+    setUndoSteps((steps) => [...steps.slice(1 - MAX_UNDO_STEPS), step]);
 
   const change = (next: string[]) => {
-    setUndoSteps([...undoSteps.slice(1 - MAX_UNDO_STEPS), colours]);
-    onChange(next);
+    remember({ key, colours });
+    onChange(key, next);
   };
 
-  // A picked swatch goes in the open slot, and the next slot opens, so a set is quick to fill in.
-  const place = (colour: string) => {
-    change(replaceAt(colours, selected, colour));
-    setSelected(Math.min(colours.length - 1, selected + 1));
+  return {
+    field,
+    selected,
+    current: colours[selected] ?? BLACK_HEX,
+    isOpen,
+    canUndo: undoSteps.length > 0,
+    // A tap on the open colour closes the picker.
+    pick: (next: { key: string; index: number }) => {
+      setOpen(!(isOpen && next.key === key && next.index === selected));
+      setPicked(next);
+    },
+    change,
+    // One press on the picker is one Undo step, however far it drags.
+    closePicker: () => setOpen(false),
+    grab: () => {
+      hasDragged.current = false;
+    },
+    drag: (colour: string) => {
+      if (!hasDragged.current) remember({ key, colours });
+      hasDragged.current = true;
+      onChange(key, replaceAt(colours, selected, colour));
+    },
+    applySet: (target: ColourField, set: string[]) => {
+      remember({ key: target.key, colours: target.colours });
+      onChange(target.key, set);
+      setPicked({ key: target.key, index: 0 });
+      setOpen(false);
+    },
+    move: (shift: number) => {
+      change(moved(colours, selected, shift));
+      setPicked({ key, index: selected + shift });
+    },
+    remove: () => {
+      change(colours.filter((_, index) => index !== selected));
+      setPicked({ key, index: Math.max(0, selected - 1) });
+    },
+    addTo: (added: ColourField) => {
+      const last = added.colours.at(-1) ?? BLACK_HEX;
+      remember({ key: added.key, colours: added.colours });
+      onChange(added.key, [...added.colours, last]);
+      setPicked({ key: added.key, index: added.colours.length });
+      setOpen(true);
+    },
+    undo: () => {
+      const previous = undoSteps.at(-1);
+      if (!previous) return;
+      setUndoSteps(undoSteps.slice(0, -1));
+      onChange(previous.key, previous.colours);
+    },
   };
+}
 
-  const applySet = (set: string[]) => {
-    change(set);
-    setSelected(0);
-  };
+type ColourDetailsProps = {
+  field: ColourField;
+  edits: ReturnType<typeof useColourEdits>;
+  isPicking: boolean;
+  copied: string | null;
+  onCopy: (colour: string) => void;
+};
 
-  const move = (shift: number) => {
-    change(moved(colours, selected, shift));
-    setSelected(selected + shift);
-  };
-
-  const remove = () => {
-    change(colours.filter((_, index) => index !== selected));
-    setSelected(Math.max(0, selected - 1));
-  };
-
-  const add = () => {
-    change([...colours, current]);
-    setSelected(colours.length);
-  };
-
-  const undo = () => {
-    const previous = undoSteps.at(-1);
-    if (!previous) return;
-    setUndoSteps(undoSteps.slice(0, -1));
-    onChange(previous);
-    setSelected(Math.min(selected, previous.length - 1));
-  };
-
-  const actions = (
-    <KeyRow>
-      <TextKey isQuiet disabled={undoSteps.length === 0} onClick={undo}>
-        UNDO
-      </TextKey>
-      <TextKey onClick={onClose}>DONE</TextKey>
-    </KeyRow>
-  );
-
-  const pinned = (
-    <>
-      {strip}
-      {isPalette && <Slots colours={colours} selected={selected} onSelect={setSelected} onAdd={add} />}
-    </>
-  );
-
+// Single colours, the last step down from a palette.
+function ColourDetails({ field, edits, isPicking, copied, onCopy }: ColourDetailsProps) {
+  const { selected, current, pick, change, grab, drag, move, remove, addTo } = edits;
+  const { key, isPalette, colours, minimumColours } = field;
+  const isHere = isPicking && edits.field.key === key;
   return (
-    <Sheet label="Edit colours" title={isPalette ? 'Palette' : 'Colour'} actions={actions} pinned={pinned}>
-      {isNaming && (
-        <NamingRow
-          label="Name of the colour set"
-          onCancel={() => setNaming(false)}
-          onKeep={(name) => {
-            onKeepSet(name, colours);
-            setNaming(false);
-          }}
-        />
-      )}
-      {isPalette && (
+    <>
+      <Slots
+        field={field}
+        selected={isHere ? selected : null}
+        onSelect={(index) => pick({ key, index })}
+        onAdd={() => addTo(field)}
+      />
+      {isHere && (
         <>
+          <ColourPicker colour={current} onGrab={grab} onChange={drag} />
           <SlotKeys
             count={colours.length}
+            canArrange={isPalette}
             canRemove={colours.length > minimumColours}
             selected={selected}
             copied={copied}
-            onCopy={() => setCopied(current)}
+            onCopy={() => onCopy(current)}
             onPaste={() => copied && change(replaceAt(colours, selected, copied))}
             onMove={move}
             onRemove={remove}
           />
-          <HeadingRow heading={<ValueText>{`${colours.length} of ${MAX_COLOURS} colours`}</ValueText>}>
-            <TextKey isQuiet onClick={() => setNaming(true)}>
-              SAVE COLOURS
-            </TextKey>
-          </HeadingRow>
         </>
       )}
-      <OptionRow
-        label="How to pick"
-        options={[
-          { value: 'swatches', name: 'Swatches' },
-          { value: 'custom', name: 'Custom' },
-        ]}
-        value={tab}
-        onChange={setTab}
-      />
-      {tab === 'swatches' ? (
-        <SwatchSets
-          sets={sets}
-          minimumColours={minimumColours}
-          roomForColours={isPalette ? MAX_COLOURS : 1}
-          onPlace={place}
-          onApplySet={applySet}
-        />
-      ) : (
-        <ColourAxes colour={current} onChange={(colour) => change(replaceAt(colours, selected, colour))} />
-      )}
-    </Sheet>
+    </>
   );
+}
+
+type PaletteChoicesProps = {
+  field: ColourField;
+  sets: ColourSet[];
+  onApply: (colours: string[]) => void;
+  onKeep: (name: string) => void;
+  onChangeColours: () => void;
+};
+
+function PaletteChoices({ field, sets, onApply, onKeep, onChangeColours }: PaletteChoicesProps) {
+  const [isNaming, setNaming] = useState(false);
+  const { colours, minimumColours } = field;
+  const keep = (name: string) => {
+    onKeep(name);
+    setNaming(false);
+  };
+  return (
+    <>
+      {isNaming ? (
+        <NamingRow label="Name of the palette" onCancel={() => setNaming(false)} onKeep={keep} />
+      ) : (
+        <HeadingRow
+          heading={
+            <TextKey onClick={onChangeColours}>
+              CHANGE COLOURS
+              <ChevronMark direction="right" />
+            </TextKey>
+          }
+        >
+          <TextKey isQuiet onClick={() => setNaming(true)}>
+            SAVE THESE
+          </TextKey>
+        </HeadingRow>
+      )}
+      <PaletteShelf
+        sets={sets}
+        current={colours}
+        maxColours={MAX_COLOURS}
+        minimumColours={minimumColours}
+        onApply={onApply}
+      />
+    </>
+  );
+}
+
+function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: ColourField }) {
+  const { fields, sets, onKeepSet } = props;
+  const edits = useColourEdits(fields.find(({ isPalette }) => isPalette) ?? first, props);
+  const { isOpen, canUndo, applySet, closePicker, undo } = edits;
+  const [copied, setCopied] = useState<string | null>(null);
+  // Closed, then the palettes to choose from, then the single colours of this one.
+  const [opened, setOpened] = useState<{ key: string; step: 'palettes' | 'colours' } | null>(null);
+  const isPicking = isOpen || !fields.some(({ isPalette }) => isPalette);
+
+  const goTo = (next: typeof opened) => {
+    setOpened(next);
+    closePicker();
+  };
+
+  const details = (field: ColourField) => (
+    <ColourDetails field={field} edits={edits} isPicking={isPicking} copied={copied} onCopy={setCopied} />
+  );
+
+  const paletteSteps = (field: ColourField) => {
+    const { key, label, colours } = field;
+    const step = opened?.key === key ? opened.step : null;
+    return (
+      <>
+        <CurrentPalette
+          label={label}
+          colours={colours}
+          sets={sets}
+          maxColours={MAX_COLOURS}
+          isOpen={step !== null}
+          onClick={() => goTo(step ? null : { key, step: 'palettes' })}
+        />
+        {step === 'palettes' && (
+          <PaletteChoices
+            field={field}
+            sets={sets}
+            onApply={(set) => applySet(field, set)}
+            onKeep={(name) => onKeepSet(name, colours)}
+            onChangeColours={() => goTo({ key, step: 'colours' })}
+          />
+        )}
+        {step === 'colours' && (
+          <>
+            <TextKey onClick={() => goTo({ key, step: 'palettes' })}>
+              <ChevronMark direction="left" />
+              OTHER PALETTES
+            </TextKey>
+            {details(field)}
+          </>
+        )}
+      </>
+    );
+  };
+
+  return (
+    <div className="colour-editor">
+      {fields.map((field) => (
+        <div key={field.key} className="colour-field">
+          <span className="control-label">
+            {field.label}
+            {field === first && (
+              <TextKey isQuiet disabled={!canUndo} onClick={undo}>
+                UNDO
+              </TextKey>
+            )}
+          </span>
+          {field.isPalette ? paletteSteps(field) : details(field)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export function ColourEditor(props: ColourEditorProps) {
+  const first = props.fields[0];
+  return first ? <OpenColourEditor first={first} {...props} /> : null;
 }

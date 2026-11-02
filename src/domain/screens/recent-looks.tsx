@@ -1,4 +1,4 @@
-import { RecentLookItem, RecentLooks, RoomSection } from '../../composites';
+import { RecentLookItem, RecentLooks } from '../../composites';
 import type { Light } from '../store/fleet-store';
 import { useHousehold } from '../store/household-store';
 import { playLook } from '../store/look-play';
@@ -6,11 +6,9 @@ import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { canPlay, isAnyOn, isMixedLook, lookNameOf, previewOfAnimation, type Room } from '../store/rooms';
 import { LookStrip } from './look-strip';
 
-type RecentLookRowProps = { room: Room; lights: Light[]; isBare?: boolean };
+type RecentLookRowProps = { room: Room; lights: Light[]; limit: number };
 
-const CARD_LOOKS = 2;
-
-export function RecentLookRow({ room, lights, isBare }: RecentLookRowProps) {
+export function RecentLookRow({ room, lights, limit }: RecentLookRowProps) {
   const recent = useHousehold((household) => household.recentLooks[room.id]);
   const shownLights = useShownLights(lights);
   const playingName = isMixedLook(shownLights) || !isAnyOn(shownLights) ? null : lookNameOf(shownLights[0]);
@@ -20,9 +18,9 @@ export function RecentLookRow({ room, lights, isBare }: RecentLookRowProps) {
   }));
   const playable = looks.filter(({ name, players }) => players.length > 0 && name !== playingName);
   if (playable.length === 0) return null;
-  const grid = (
+  return (
     <RecentLooks>
-      {playable.slice(0, isBare ? CARD_LOOKS : undefined).map(({ name, animation, players }) => (
+      {playable.slice(0, limit).map(({ name, animation, players }) => (
         <RecentLookItem
           key={name}
           name={name}
@@ -34,5 +32,4 @@ export function RecentLookRow({ room, lights, isBare }: RecentLookRowProps) {
       ))}
     </RecentLooks>
   );
-  return isBare ? grid : <RoomSection eyebrow="RECENT">{grid}</RoomSection>;
 }

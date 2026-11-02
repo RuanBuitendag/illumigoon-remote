@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   ArrangeRow,
-  HeadingRow,
   LightDragList,
   LockStatus,
   PageFrame,
@@ -9,8 +8,9 @@ import {
   PageSection,
   SelectRow,
   StepperRow,
+  ToggleRow,
 } from '../../composites';
-import { Eyebrow, KeyRow, OptionRow, PowerKey, TextField, TextKey } from '../../design-system';
+import { ActionKey, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
 import {
   forgetDeadLight,
   lightIdOf,
@@ -99,14 +99,12 @@ function NightlyLock({ room, password }: { room: Room; password: string }) {
 
   return (
     <PageSection>
-      <HeadingRow heading={<Eyebrow>EVERY NIGHT</Eyebrow>}>
-        <PowerKey
-          label="Lock every night"
-          isOn={isOn}
-          disabled={!isOn && !password}
-          onChange={(next) => save(next, start, end)}
-        />
-      </HeadingRow>
+      <ToggleRow
+        label="Lock every night"
+        isOn={isOn}
+        disabled={!isOn && !password}
+        onChange={(next) => save(next, start, end)}
+      />
       {isOn && (
         <>
           <StepperRow
@@ -156,7 +154,7 @@ export function LockPage({ room }: { room: Room }) {
     >
       <LockStatus>{lockedByMe ? 'Locked by you' : 'Unlocked'}</LockStatus>
       {lockedByMe ? (
-        <TextKey onClick={() => unlockLights(room.writableLights)}>UNLOCK</TextKey>
+        <ActionKey onClick={() => unlockLights(room.writableLights)}>Unlock</ActionKey>
       ) : (
         <PageSection>
           <Eyebrow>KEEP IT MINE</Eyebrow>
@@ -173,9 +171,9 @@ export function LockPage({ room }: { room: Room }) {
           <PasswordField value={password} onChange={setPassword} />
           {phase === 'waiting' && <PageHint>Locking.</PageHint>}
           {phase === 'failed' && <PageHint>The lights did not lock. Try again.</PageHint>}
-          <TextKey disabled={!password || phase === 'waiting'} onClick={lock}>
-            LOCK NOW
-          </TextKey>
+          <ActionKey disabled={!password || phase === 'waiting'} onClick={lock}>
+            Lock now
+          </ActionKey>
         </PageSection>
       )}
       <NightlyLock room={room} password={password} />
@@ -217,9 +215,9 @@ export function TakeBackPage({ room }: { room: Room }) {
       <PageSection>
         <PasswordField value={password} onChange={setPassword} />
         <PageHint>{hints[phase]}</PageHint>
-        <TextKey disabled={!password || phase === 'waiting'} onClick={takeBack}>
-          TAKE IT BACK
-        </TextKey>
+        <ActionKey disabled={!password || phase === 'waiting'} onClick={takeBack}>
+          Take it back
+        </ActionKey>
       </PageSection>
     </RoomPage>
   );
@@ -243,7 +241,7 @@ function MoveLights({ room }: { room: Room }) {
         />
       ))}
       <TextField
-        size="medium"
+        size="large"
         label="New room"
         placeholder="Name a new room"
         maxLength={MAX_ROOM_NAME}

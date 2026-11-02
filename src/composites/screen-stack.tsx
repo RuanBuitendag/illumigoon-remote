@@ -84,14 +84,15 @@ export function EditLayout<Section extends string>(props: EditLayoutProps<Sectio
   );
 }
 
-type SearchLayoutProps = { strip: ReactNode; text: string; children?: ReactNode };
+type SearchLayoutProps = { strip: ReactNode; text: string; note: string; children?: ReactNode };
 
-export function SearchLayout({ strip, text, children }: SearchLayoutProps) {
+export function SearchLayout({ strip, text, note, children }: SearchLayoutProps) {
   return (
     <main className="search">
       {strip}
       <p className="search-text">{text}</p>
       {children}
+      <p className="search-note">{note}</p>
     </main>
   );
 }

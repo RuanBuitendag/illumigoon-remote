@@ -25,8 +25,20 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
   };
 
   return (
-    <Overlay label={renaming ? 'Rename scene' : 'Save scene'}>
-      <TextField size="title" label="Scene name" placeholder="Name" value={name} onChange={setName} />
+    <Overlay
+      label={renaming ? 'Rename scene' : 'Save scene'}
+      actions={
+        <KeyRow>
+          <TextKey isQuiet onClick={onClose}>
+            CANCEL
+          </TextKey>
+          <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={save}>
+            SAVE
+          </TextKey>
+        </KeyRow>
+      }
+    >
+      <TextField size="large" label="Scene name" placeholder="Name" value={name} onChange={setName} />
       {!renaming && (
         <>
           {!keeping && (
@@ -43,14 +55,6 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
           </OverlayBlock>
         </>
       )}
-      <KeyRow>
-        <TextKey isQuiet onClick={onClose}>
-          CANCEL
-        </TextKey>
-        <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={save}>
-          SAVE
-        </TextKey>
-      </KeyRow>
     </Overlay>
   );
 }

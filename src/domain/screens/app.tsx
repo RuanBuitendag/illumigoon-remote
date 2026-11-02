@@ -9,10 +9,12 @@ import { AddLightPage } from './add-light-page';
 import { EditorPage } from './editor-page';
 import { HistoryPage } from './history-page';
 import { HomeScreen } from './home-screen';
+import { LightSetupPage } from './light-setup-page';
 import { LightSoftwarePage } from './light-software-page';
 import { LooksPage } from './looks-page';
 import { ArrangePage, LockPage, TakeBackPage } from './room-pages';
 import { RoomScreen } from './room-screen';
+import { RoomSettingsPage } from './room-settings-page';
 import { SchedulesPage } from './schedules-page';
 import { SearchScreen } from './search-screen';
 import { UndoBar } from './undo-bar';
@@ -20,9 +22,11 @@ import { UndoBar } from './undo-bar';
 const ROOM_PAGES = {
   schedules: SchedulesPage,
   software: LightSoftwarePage,
+  'light-setup': LightSetupPage,
   lock: LockPage,
   'take-back': TakeBackPage,
   arrange: ArrangePage,
+  'room-settings': RoomSettingsPage,
 } satisfies Record<Exclude<PageKind, 'add-light' | 'editor' | 'history' | 'looks'>, (props: { room: Room }) => ReactNode>;
 
 function OpenPage({ rooms }: { rooms: Room[] }) {
@@ -45,6 +49,7 @@ export function App() {
   const isPageOpen = useNavigation((navigation) => navigation.isPageOpen);
   const pageVisit = useNavigation((navigation) => navigation.pageVisit);
   const isEditor = useNavigation((navigation) => navigation.page === 'editor');
+  const isAddingLight = useNavigation(({ page, isPageOpen: isOpen }) => isOpen && page === 'add-light');
   const isWide = useIsWide();
   const firstRoomId = rooms[0]?.id;
   const room = rooms.find(({ id }) => id === roomId);
@@ -70,7 +75,7 @@ export function App() {
     if (isWide && !isRoomOpen && firstRoomId) openRoom(firstRoomId);
   }, [isWide, isRoomOpen, firstRoomId]);
 
-  if (rooms.length === 0) return <SearchScreen />;
+  if (rooms.length === 0 && !isAddingLight) return <SearchScreen />;
   return (
     <ScreenStack
       home={<HomeScreen rooms={rooms} />}

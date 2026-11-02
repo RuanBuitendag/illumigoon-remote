@@ -37,7 +37,7 @@ export function SheetHead({ icon, title, onClose, children }: {
     <div className="sheethead">
       <div className="row" style={{ gap: 13 }}>
         {icon}
-        <span style={{ font: '500 10.5px/1 var(--sans)', letterSpacing: '.20em' }}>{title}</span>
+        <span style={{ font: 'var(--type-label)', letterSpacing: 'var(--tracking-label)' }}>{title}</span>
       </div>
       <div className="row" style={{ gap: 18 }}>
         {children}
@@ -118,7 +118,7 @@ export function ShelfNotice({ label, colour, children }: {
   return (
     <div className="col" style={{ gap: 2 }}>
       <ShelfHeading label={label} emphasis={false} count={0} />
-      <div style={{ padding: '2px 14px 4px', font: '400 10.5px/1.5 var(--sans)', color: colour }}>
+      <div style={{ padding: '2px 14px 4px', font: 'var(--type-small-sans)', color: colour }}>
         {children}
       </div>
     </div>

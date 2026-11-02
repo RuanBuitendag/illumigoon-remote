@@ -1,21 +1,21 @@
 import type { ReactNode } from 'react';
-import { Eyebrow, Press } from '../design-system';
+import { Eyebrow, Picked, Press } from '../design-system';
+import { Sheet } from './sheet';
 
-type OverlayProps = { label: string; children: ReactNode };
+type OverlayProps = { label: string; actions: ReactNode; children: ReactNode };
 
-export function Overlay({ label, children }: OverlayProps) {
+export function Overlay({ label, actions, children }: OverlayProps) {
   return (
-    <section className="overlay" role="dialog" aria-label={label}>
-      <Eyebrow>{label.toUpperCase()}</Eyebrow>
-      {children}
-    </section>
+    <Sheet label={label} title={label} actions={actions}>
+      <div className="sheet-body">{children}</div>
+    </Sheet>
   );
 }
 
-export function OverlayBlock({ label, children }: OverlayProps) {
+export function OverlayBlock({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div>
-      <p className="overlay-label">{label}</p>
+      <Eyebrow>{label.toUpperCase()}</Eyebrow>
       {children}
     </div>
   );
@@ -30,8 +30,7 @@ type ChoiceRowProps = { name: string; isChosen: boolean; onClick: () => void };
 function ChoiceRow({ name, isChosen, onClick }: ChoiceRowProps) {
   return (
     <Press className="choice-row" isPressed={isChosen} onClick={onClick}>
-      <i className="choice-mark" />
-      {name}
+      <Picked isOn={isChosen}>{name}</Picked>
     </Press>
   );
 }

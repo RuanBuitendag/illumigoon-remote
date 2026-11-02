@@ -4,7 +4,7 @@ import { useRecording, type PreviewSource } from '../looks/recordings';
 
 type LookStripProps = {
   source: PreviewSource | null;
-  shape: 'room' | 'hero' | 'tile' | 'line';
+  shape: 'room' | 'tile' | 'line';
   isOn?: boolean;
   brightness?: number;
 };

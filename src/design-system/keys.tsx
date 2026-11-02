@@ -2,6 +2,7 @@ import { Switch } from '@base-ui/react/switch';
 import { useRef, type ReactNode } from 'react';
 import { useHold } from './hold';
 import { ChevronMark } from './marks';
+import { Picked } from './text';
 
 type PressProps = {
   className?: string;
@@ -47,6 +48,16 @@ export function TextKey({ children, disabled, isQuiet, onClick }: TextKeyProps) 
   return (
     <button type="button" className="text-key" data-quiet={isQuiet} disabled={disabled} onClick={onClick}>
       {children}
+    </button>
+  );
+}
+
+// The one main action of a form, in the same size as its fields.
+export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'isQuiet'>) {
+  return (
+    <button type="button" className="action-key" disabled={disabled} onClick={onClick}>
+      {children}
+      <ChevronMark direction="right" />
     </button>
   );
 }
@@ -144,7 +155,7 @@ export function OptionRow<Value extends string | number>({ label, options, value
           aria-pressed={option.value === value}
           onClick={() => onChange(option.value)}
         >
-          {option.name}
+          <Picked isOn={option.value === value}>{option.name}</Picked>
         </button>
       ))}
     </div>

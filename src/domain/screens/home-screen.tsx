@@ -3,7 +3,7 @@ import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, RoomDragLis
 import { TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { searchAgain } from '../store/fleet-store';
+import { searchAgain, useFleet } from '../store/fleet-store';
 import { setHousePower } from '../store/house-power';
 import { setRoomOrder, skipSoftware, useHousehold } from '../store/household-store';
 import { moveOldScenes } from '../store/library-store';
@@ -12,6 +12,7 @@ import { openPage } from '../store/navigation-store';
 import { isAnyOn, type Room } from '../store/rooms';
 import { RoomSummary } from './room-summary';
 import { SceneRow } from './scene-row';
+import { SEARCH_REFUSED_TEXT } from './search-screen';
 
 function HouseControls({ rooms }: { rooms: Room[] }) {
   const lights = rooms.flatMap((room) => room.writableLights);
@@ -60,12 +61,13 @@ function SoftwareNotice({ rooms }: { rooms: Room[] }) {
 function UpdateNotice({ rooms }: { rooms: Room[] }) {
   const updateError = useUpdateError((update) => update.message);
   if (!updateError) return <SoftwareNotice rooms={rooms} />;
-  return <BottomNotice text="The update failed." actionLabel="Retry" onAction={checkForUpdate} />;
+  return <BottomNotice text={`The update failed: ${updateError}`} actionLabel="Retry" onAction={checkForUpdate} />;
 }
 
 export function HomeScreen({ rooms }: { rooms: Room[] }) {
   const [showsVersion, setShowsVersion] = useState(false);
   const isSilent = rooms.every((room) => room.onlineLights.length === 0);
+  const isRefused = useFleet((fleet) => fleet.isSearchRefused);
 
   useEffect(() => {
     void moveOldScenes(rooms);
@@ -79,7 +81,11 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
       >
         {isSilent ? (
           <HouseNote
-            text="No lights are answering. Check that you are on the home Wi-Fi."
+            text={
+              isRefused
+                ? SEARCH_REFUSED_TEXT
+                : 'No lights are answering. Check the home Wi-Fi, and that Local Network is on for Illumigoon in Settings.'
+            }
             actionLabel="SEARCH AGAIN"
             onAction={searchAgain}
           />

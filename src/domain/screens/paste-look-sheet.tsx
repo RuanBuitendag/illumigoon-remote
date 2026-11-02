@@ -14,17 +14,21 @@ export function PasteLookSheet({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <Overlay label="Paste a look">
+    <Overlay
+      label="Paste a look"
+      actions={
+        <KeyRow>
+          <TextKey isQuiet onClick={onClose}>
+            CANCEL
+          </TextKey>
+          <TextKey disabled={text.trim() === ''} onClick={() => void add()}>
+            ADD TO MINE
+          </TextKey>
+        </KeyRow>
+      }
+    >
       <TextArea label="The look as text" placeholder="The text of a look file" value={text} onChange={setText} />
       {problem && <OverlayText>{problem}</OverlayText>}
-      <KeyRow>
-        <TextKey isQuiet onClick={onClose}>
-          CANCEL
-        </TextKey>
-        <TextKey disabled={text.trim() === ''} onClick={() => void add()}>
-          ADD TO MINE
-        </TextKey>
-      </KeyRow>
     </Overlay>
   );
 }

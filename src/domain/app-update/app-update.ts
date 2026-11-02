@@ -14,28 +14,27 @@ const bundleUrl = (version: string) =>
 
 async function readLatestRelease() {
   const response = await fetch(LATEST_RELEASE_URL);
-  if (!response.ok) return null;
+  if (!response.ok) throw new Error(`GitHub replied ${response.status}`);
   // The Web update workflow writes the SHA-256 of update.zip as the release notes.
   const { tag_name: version, body: checksum } = (await response.json()) as { tag_name: string; body: string };
   return { version, checksum: checksum.trim() };
 }
 
-// The plugin installs the bundle next time the app goes to the background.
-async function queueLatestBundle() {
-  const release = await readLatestRelease();
-  if (!release || release.version === APP_VERSION) return;
-  const { version, checksum } = release;
+// `set` reloads the page into the new bundle at once, so an update never waits for the app to go to the background.
+async function installLatestBundle() {
+  const { version, checksum } = await readLatestRelease();
+  if (version === APP_VERSION) return;
   const { bundles } = await CapacitorUpdater.list();
   const known = bundles.find((bundle) => bundle.version === version);
   // The plugin rolled this one back, so wait for a newer release.
   if (known?.status === 'error') return;
   const bundle = known ?? (await CapacitorUpdater.download({ url: bundleUrl(version), version, checksum }));
-  await CapacitorUpdater.next({ id: bundle.id });
+  await CapacitorUpdater.set({ id: bundle.id });
 }
 
 export function checkForUpdate() {
   useUpdateError.setState({ message: null });
-  queueLatestBundle().catch((error: unknown) => {
+  installLatestBundle().catch((error: unknown) => {
     useUpdateError.setState({ message: error instanceof Error ? error.message : String(error) });
   });
 }

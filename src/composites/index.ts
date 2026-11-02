@@ -2,10 +2,7 @@ import './composites.css';
 
 export { ColourEditor } from './colour-editor';
 export {
-  ColourRow,
-  FoldKey,
   HeadingRow,
-  PaletteRow,
   SelectRow,
   SliderRow,
   StepperRow,
@@ -38,8 +35,8 @@ export {
   PageSection,
   ScanNote,
 } from './page-frame';
-export { LockNote, RoomCard } from './room-card';
-export { Hero, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from './room-layout';
+export { LockNote, QuietNote, RoomCard } from './room-card';
+export { LightCard, LookHeading, MoreRow, RoomLayout, RoomSection } from './room-layout';
 export { SceneCard, SceneLine, SceneShelf, StateCard, StateList } from './scene-shelf';
 export { EditLayout, ScreenStack, SearchLayout, UndoNotice, useIsWide } from './screen-stack';
 export { ControlGroup, ControlList, SheetFooter } from './sheet';

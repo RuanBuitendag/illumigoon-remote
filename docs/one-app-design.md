@@ -22,7 +22,7 @@ the screens: a person sees "look" and "Edit". The **package** is `packages/patch
 | Power one light from its row | `room-screen.tsx` |
 | Look controls: slider, stepper, select, toggle, colour, palette | `look-control.tsx`, `look-controls.tsx` |
 | Colours: edit, keep as a set | `look-controls.tsx` |
-| Transition style and length, stored on the light | `look-controls.tsx` |
+| Transition style and length, stored on the light | `transition-sheet.tsx`, from Room settings |
 | Save the tuned look as a new look | `look-controls.tsx` |
 | Looks: saved, grouped, simple; live strips; playing mark; "plays on X only" | `looks-page.tsx`, `look-library.tsx`, `look-strip.tsx` |
 | Schedules: on, off, on between, off timer, days, scene; pause; remove | `schedules-page.tsx` |
@@ -230,7 +230,7 @@ Parts stay mounted, so a section change loses no selection, and an open modulato
 | House view and send bar | `ui/House.tsx`, `ui/houseFeed.ts`, `device/house.ts`, the planning half of `domain/house.ts` | Home, Room, Looks |
 | Scene rail | `ui/ScenesRail.tsx` | `scene-row.tsx` |
 | Library rail browsing | `ui/PatchRail.tsx`, `ui/useRailListing.ts`, `ui/RailRows.tsx` | Looks page |
-| Arrival | `ui/arrival.tsx` | `TransitionControls` in `look-controls.tsx` |
+| Arrival | `ui/arrival.tsx` | `TransitionSheet` in `transition-sheet.tsx` |
 | Own tokens | Lines 12 to 72 of `styles.css` | `design-system.css` |
 | Phone house feed | `/api/devices` answer in `phone/phone-host.ts`, `houseNow` in `editor-host.ts` | Nothing. Only the House view read it. |
 

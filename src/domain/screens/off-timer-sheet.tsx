@@ -45,19 +45,23 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
   };
 
   return (
-    <Overlay label="Off timer">
+    <Overlay
+      label="Off timer"
+      actions={
+        <KeyRow>
+          <TextKey isQuiet onClick={onClose}>
+            CLOSE
+          </TextKey>
+          {isWaiting && <TextKey onClick={cancel}>CANCEL TIMER</TextKey>}
+        </KeyRow>
+      }
+    >
       {isWaiting && <OverlayText>{offTimerNote(lights)}.</OverlayText>}
       {hasSpace ? (
         <ChoiceList choices={LENGTHS} value="" onChange={start} />
       ) : (
         <OverlayText>These lights hold all the schedules they can. Remove one in Schedules first.</OverlayText>
       )}
-      <KeyRow>
-        <TextKey isQuiet onClick={onClose}>
-          CLOSE
-        </TextKey>
-        {isWaiting && <TextKey onClick={cancel}>CANCEL TIMER</TextKey>}
-      </KeyRow>
     </Overlay>
   );
 }

@@ -12,7 +12,6 @@ export type PreviewSource =
   | { kind: 'scan'; key: string };
 
 export type Recording = StripRecording & {
-  tint: string;
   gradient: string;
 };
 
@@ -34,14 +33,6 @@ function closeLoop(take: Uint8Array) {
     }
   }
   return frames;
-}
-
-// A colour that is bright enough to draw a control with, whatever the look.
-function tintOf(frames: Uint8Array) {
-  const sum = [0, 0, 0] as [number, number, number];
-  for (let byte = 0; byte < frames.length; byte++) sum[(byte % 3) as 0 | 1 | 2] += frames[byte]!;
-  const largest = Math.max(...sum) || 1;
-  return sum.map((channel) => Math.round((channel / largest) * 199 + 56)).join(',');
 }
 
 const GRADIENT_STOPS = 6;
@@ -120,7 +111,7 @@ function record(source: PreviewSource) {
   const take = lastTake.then(nextTask).then(() => framesFor(source));
   lastTake = take.catch(() => null);
   return take.then((frames) => {
-    const recording = { frames, frameCount: LOOP_FRAMES, tint: tintOf(frames), gradient: gradientOfFrames(frames) };
+    const recording = { frames, frameCount: LOOP_FRAMES, gradient: gradientOfFrames(frames) };
     recordings.set(source.key, recording);
     return recording;
   });

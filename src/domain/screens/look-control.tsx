@@ -1,12 +1,10 @@
 import type { ReactNode } from 'react';
-import { ColourRow, PaletteRow, SelectRow, SliderRow, StepperRow, ToggleRow } from '../../composites';
-import { colourToHex, type Colour } from '../../design-system';
+import { SelectRow, SliderRow, StepperRow, ToggleRow } from '../../composites';
 import type { Parameter, ParameterValue } from '../light-network/protocol';
 
 type ControlProps = {
   parameter: Parameter;
   onChange: (value: ParameterValue) => void;
-  onEditColours: () => void;
 };
 
 const shownValue = (value: number) => String(Number(value.toFixed(2)));
@@ -44,23 +42,11 @@ function ToggleControl({ parameter, onChange }: ControlProps) {
   return <ToggleRow label={parameter.label} isOn={Boolean(parameter.default)} onChange={onChange} />;
 }
 
-function ColourControl({ parameter, onEditColours }: ControlProps) {
-  const colour = colourToHex(parameter.default as Colour);
-  return <ColourRow label={parameter.label} colour={colour} onOpen={onEditColours} />;
-}
-
-function PaletteControl({ parameter, onEditColours }: ControlProps) {
-  const colours = (parameter.default as Colour[]).map(colourToHex);
-  return <PaletteRow label={parameter.label} colours={colours} onOpen={onEditColours} />;
-}
-
 const CONTROLS: Record<string, (props: ControlProps) => ReactNode> = {
   slider: SliderControl,
   stepper: StepperControl,
   select: SelectControl,
   toggle: ToggleControl,
-  color_picker: ColourControl,
-  palette: PaletteControl,
 };
 
 export function LookControl(props: ControlProps) {

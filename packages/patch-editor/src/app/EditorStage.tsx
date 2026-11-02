@@ -103,7 +103,7 @@ function CentrePanel({ ctl, nav }: { ctl: Ctl; nav: Navigation }) {
   if (layer) return <EmitterPanel ctl={ctl} layer={layer} tab={tab} onTab={setTab} />;
   return (
     <div className="centre" style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ font: '400 13px/1.7 var(--sans)', color: 'var(--text-5)' }}>
+      <span style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
         No layer selected. Add one on the left.
       </span>
     </div>
@@ -365,7 +365,7 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
     <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }}>
       <div className="modslot raise-hi" data-dragging="true" style={{ width: 170 }}>
         <div className="row" style={{ gap: 9 }}>
-          <span style={{ font: '400 10.5px/1 var(--mono)', color: 'var(--modulation-soft)' }}>
+          <span style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}>
             {draggingMod.slot + 1}
           </span>
           <ModIcon type={draggingMod.type} />

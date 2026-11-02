@@ -1,8 +1,3 @@
-import type { CSSProperties } from 'react';
-
-export const tintStyle = (tint: string | undefined) =>
-  (tint ? { '--tint': tint } : undefined) as CSSProperties | undefined;
-
 export function SoundMark() {
   return (
     <span className="sound-mark" role="img" aria-label="Moves to music">

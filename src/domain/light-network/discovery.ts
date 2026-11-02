@@ -1,12 +1,15 @@
 import { Capacitor } from '@capacitor/core';
-import { ZeroConf } from '@mhaberler/capacitor-zeroconf-nsd';
+import { ZeroConf, type ZeroConfWatchResult } from '@mhaberler/capacitor-zeroconf-nsd';
 
 // The firmware advertises under both names for one release.
 const SERVICE_TYPES = ['_modulight._tcp.', '_illumigoon._tcp.'];
 
+const DOMAIN = 'local.';
+
 type DiscoveryEvents = {
   onFound: (name: string, address: string) => void;
   onLost: (name: string) => void;
+  onRefused: () => void;
 };
 
 type FoundDevice = { name: string; addresses: string[] };
@@ -35,16 +38,34 @@ function discoverFromHelper({ onFound, onLost }: DiscoveryEvents) {
   window.setInterval(() => void poll(), HELPER_POLL_MS);
 }
 
+let phoneEvents: DiscoveryEvents | null = null;
+
+// The native search outlives a reload of the page, and it can stop when the network changes.
+// `unwatch` never settles for a running search, so it is not awaited. The plugin runs the two calls in order.
+export function restartDiscovery() {
+  const events = phoneEvents;
+  if (!events) return;
+  for (const type of SERVICE_TYPES) {
+    ZeroConf.unwatch({ type, domain: DOMAIN }).catch(() => undefined);
+    // Capacitor passes a null result and an error when the search fails.
+    const onEvent = (result: ZeroConfWatchResult | null) => {
+      if (!result) {
+        events.onRefused();
+        return;
+      }
+      const { action, service } = result;
+      const address = service.ipv4Addresses[0];
+      if (action === 'removed') events.onLost(service.name);
+      if (action === 'resolved' && address) events.onFound(service.name, address);
+    };
+    void ZeroConf.watch({ type, domain: DOMAIN }, onEvent);
+  }
+}
+
 export function startDiscovery(events: DiscoveryEvents) {
   if (!Capacitor.isNativePlatform()) {
     discoverFromHelper(events);
     return;
   }
-  for (const type of SERVICE_TYPES) {
-    void ZeroConf.watch({ type, domain: 'local.' }, ({ action, service }) => {
-      const address = service.ipv4Addresses[0];
-      if (action === 'removed') events.onLost(service.name);
-      if (action === 'resolved' && address) events.onFound(service.name, address);
-    });
-  }
+  phoneEvents = events;
 }

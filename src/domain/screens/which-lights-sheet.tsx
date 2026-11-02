@@ -25,20 +25,24 @@ export function WhichLightsSheet({ rooms, picked, onDone, onClose }: WhichLights
     setChosen(chosen.includes(id) ? chosen.filter((address) => address !== id) : [...chosen, id]);
 
   return (
-    <Overlay label="Which lights">
+    <Overlay
+      label="Which lights"
+      actions={
+        <KeyRow>
+          <TextKey isQuiet onClick={onClose}>
+            CANCEL
+          </TextKey>
+          <TextKey onClick={() => setChosen(shownRooms.flatMap(({ lights }) => lights.map(({ id }) => id)))}>
+            EVERY LIGHT
+          </TextKey>
+          <TextKey disabled={chosen.length === 0} onClick={() => onDone(chosen)}>
+            DONE
+          </TextKey>
+        </KeyRow>
+      }
+    >
       {shownRooms.length === 0 && <OverlayText>No light can take a look right now.</OverlayText>}
       <WhichLights rooms={shownRooms} picked={chosen} onToggle={toggle} />
-      <KeyRow>
-        <TextKey isQuiet onClick={onClose}>
-          CANCEL
-        </TextKey>
-        <TextKey onClick={() => setChosen(shownRooms.flatMap(({ lights }) => lights.map(({ id }) => id)))}>
-          EVERY LIGHT
-        </TextKey>
-        <TextKey disabled={chosen.length === 0} onClick={() => onDone(chosen)}>
-          DONE
-        </TextKey>
-      </KeyRow>
     </Overlay>
   );
 }

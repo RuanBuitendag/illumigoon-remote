@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { APP_IDENTITY } from '../light-network/app-identity';
-import { startDiscovery } from '../light-network/discovery';
+import { restartDiscovery, startDiscovery } from '../light-network/discovery';
 import { LightConnection } from '../light-network/light-connection';
 import { lockKey, lockProof } from '../light-network/lock-keys';
 import { lookShape } from '../looks/look-catalog';
@@ -81,11 +81,17 @@ type Fleet = {
   lights: Record<string, Light>;
   newLights: NewLight[];
   hasSearched: boolean;
+  isSearchRefused: boolean;
 };
 
 export const lightIdOf = ({ deviceId, address }: Light) => deviceId.toUpperCase() || address;
 
-export const useFleet = create<Fleet>(() => ({ lights: {}, newLights: [], hasSearched: false }));
+export const useFleet = create<Fleet>(() => ({
+  lights: {},
+  newLights: [],
+  hasSearched: false,
+  isSearchRefused: false,
+}));
 
 const connections = new Map<string, LightConnection>();
 const addressesByServiceName = new Map<string, string>();
@@ -234,21 +240,55 @@ export function addLightByAddress(typed: string) {
   return address;
 }
 
+// A light with no Wi-Fi raises its own network, and always answers at this address on it.
+const OWN_WIFI_ADDRESS = '192.168.4.1';
+const SEND_FLUSH_MS = 1000;
+
+export const useLightOnItsOwnWifi = () => useFleet((fleet) => fleet.lights[OWN_WIFI_ADDRESS]);
+
+export function findLightOnItsOwnWifi() {
+  onLightFound(OWN_WIFI_ADDRESS, OWN_WIFI_ADDRESS);
+}
+
+export const useHasJoinedWifi = (id: string) =>
+  useFleet((fleet) =>
+    Object.values(fleet.lights).some(
+      ({ address, deviceId, isOnline }) => deviceId === id && isOnline && address !== OWN_WIFI_ADDRESS,
+    ),
+  );
+
+type LightWifi = { name: string; room: string; wifiName: string; wifiPassword: string };
+
+export function sendWifiToLight({ name, room, wifiName, wifiPassword }: LightWifi) {
+  const provision = { device_name: name, room_id: room, wifi_ssid: wifiName, wifi_pass: wifiPassword };
+  connections.get(OWN_WIFI_ADDRESS)?.send('provision_self', provision);
+  // Every light answers at this address, so the next one must get a socket of its own.
+  window.setTimeout(() => forgetLight(OWN_WIFI_ADDRESS), SEND_FLUSH_MS);
+}
+
 const SEARCH_MS = 6000;
 
+export const lookForLights = () => restartDiscovery();
+
 export function searchAgain() {
-  useFleet.setState({ hasSearched: false });
+  useFleet.setState({ hasSearched: false, isSearchRefused: false });
   window.setTimeout(() => useFleet.setState({ hasSearched: true }), SEARCH_MS);
+  restartDiscovery();
   for (const connection of connections.values()) connection.reconnect();
 }
 
 export function startFleet() {
-  startDiscovery({ onFound: onLightFound, onLost: onLightLost });
+  startDiscovery({
+    onFound: onLightFound,
+    onLost: onLightLost,
+    onRefused: () => useFleet.setState({ isSearchRefused: true }),
+  });
   for (const address of useHousehold.getState().lightAddresses) onLightFound(address, address);
   searchAgain();
   // iOS drops sockets while the app is in the background.
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState !== 'visible') return;
+    restartDiscovery();
     for (const connection of connections.values()) connection.reconnect();
   });
 }
@@ -453,6 +493,25 @@ export function flashLights(lights: Light[]) {
 // Sent to the light that reported the new one, which passes it on.
 export function flashNewLight({ mac, relayAddress }: NewLight, isOn: boolean) {
   connections.get(relayAddress)?.send('light_identify', flashOf(isOn, FLASH_MS), mac);
+}
+
+export function flashLightOnItsOwnWifi(isOn: boolean) {
+  connections.get(OWN_WIFI_ADDRESS)?.send('light_identify', flashOf(isOn, FLASH_MS));
+}
+
+export function restartLight({ address }: Light) {
+  connections.get(address)?.send('device_reboot');
+}
+
+// With no password the light keeps the one it has.
+export function changeLightWifi({ address }: Light, wifiName: string, wifiPassword: string) {
+  connections.get(address)?.send('wifi_update', { ssid: wifiName, ...(wifiPassword && { pass: wifiPassword }) });
+}
+
+// The light comes back with no name, room or Wi-Fi, so this one will never answer again.
+export function resetLight(light: Light) {
+  connections.get(light.address)?.send('device_reset');
+  window.setTimeout(() => forgetDeadLight(light), SEND_FLUSH_MS);
 }
 
 export function addNewLightToRoom({ mac, relayAddress }: NewLight, roomId: string, name: string) {

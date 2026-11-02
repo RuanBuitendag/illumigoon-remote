@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ChevronMark, ColourFill, Eyebrow, Fader, OptionRow, PowerKey, Press, TextKey, ValueText } from '../design-system';
+import { Fader, OptionRow, PowerKey, TextKey, ValueText } from '../design-system';
 
 function ControlLine({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -81,60 +81,11 @@ export function ToggleRow({ label, isOn, disabled, onChange }: ToggleRowProps) {
   );
 }
 
-type FoldKeyProps = { label: string; isOpen: boolean; onToggle: () => void };
-
-export function FoldKey({ label, isOpen, onToggle }: FoldKeyProps) {
-  return (
-    <Press className="fold-key" onClick={onToggle}>
-      <Eyebrow>{label}</Eyebrow>
-      <ChevronMark direction={isOpen ? 'up' : 'down'} />
-    </Press>
-  );
-}
-
-export function HeadingRow({ heading, children }: { heading: ReactNode; children: ReactNode }) {
+export function HeadingRow({ heading, children }: { heading: ReactNode; children?: ReactNode }) {
   return (
     <div className="heading-row">
       {heading}
       {children}
-    </div>
-  );
-}
-
-export function ColourValue({ colour }: { colour: string }) {
-  return (
-    <span className="colour-value">
-      <ColourFill className="swatch" paint={colour} />
-      {colour}
-    </span>
-  );
-}
-
-type ColourRowProps = { label: string; colour: string; onOpen: () => void };
-
-export function ColourRow({ label, colour, onOpen }: ColourRowProps) {
-  return (
-    <Press className="control-line" onClick={onOpen}>
-      <span className="control-label">{label}</span>
-      <ColourValue colour={colour} />
-    </Press>
-  );
-}
-
-type PaletteRowProps = { label: string; colours: string[]; onOpen: () => void };
-
-export function PaletteRow({ label, colours, onOpen }: PaletteRowProps) {
-  return (
-    <div className="control-stack">
-      <span className="control-label">
-        {label}
-        <TextKey onClick={onOpen}>EDIT COLOURS</TextKey>
-      </span>
-      <Press className="palette-boxes" label={`Edit ${label}`} onClick={onOpen}>
-        {colours.map((colour, index) => (
-          <ColourFill key={`${colour}-${index}`} className="palette-box" paint={colour} />
-        ))}
-      </Press>
     </div>
   );
 }

@@ -16,7 +16,7 @@
   margin: 0;
   color: var(--text-1);
   font-family: var(--sans);
-  font-size: 13px;
+  font-size: var(--size-note);
   -webkit-font-smoothing: antialiased;
   overflow: hidden;
   user-select: none;
@@ -36,19 +36,19 @@
 
 /* --------------------------------------------------------------- type */
 
-.patch-editor .lab { font: 500 10.5px/1.2 var(--mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-4); }
+.patch-editor .lab { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-4); }
 .patch-editor .lab.dim { color: var(--text-5); }
 .patch-editor .lab.mid { color: var(--text-3); }
-.patch-editor .lab.head { font-size: 10.5px; color: var(--text-3); }
+.patch-editor .lab.head { font-size: var(--size-small); color: var(--text-3); }
 
-.patch-editor .blurb { font: 400 10.5px/1.5 var(--sans); color: var(--text-4); }
+.patch-editor .blurb { font: var(--type-small-sans); color: var(--text-4); }
 .patch-editor .blurb.rt { text-align: right; }
 
-.patch-editor .mono { font: 400 10.5px/1 var(--mono); color: var(--text-3); }
+.patch-editor .mono { font: var(--type-small); color: var(--text-3); }
 .patch-editor .mono.dim { color: var(--text-4); }
 .patch-editor .mono.text { color: var(--text-1); }
 .patch-editor .mono.accent { color: var(--modulation-soft); }
-.patch-editor .mono.sm { font-size: 10.5px; }
+.patch-editor .mono.sm { font-size: var(--size-small); }
 
 .patch-editor .hr { height: 1px; background: var(--track); flex-shrink: 0; }
 .patch-editor .vr { width: 1px; background: var(--track); align-self: stretch; flex-shrink: 0; }
@@ -66,14 +66,14 @@
  * that had overflowed onto them. Two lines of selector is the right trade.
  */
 .patch-editor .seg { display: flex; flex-wrap: wrap; gap: 2px 16px; width: fit-content; background: none; }
-.patch-editor .seg > button { position: relative; padding: 6px 0 8px; font: 400 13px/1 var(--sans); color: var(--text-4); }
+.patch-editor .seg > button { position: relative; padding: 6px 0 8px; font: var(--type-note); color: var(--text-4); }
 .patch-editor .seg > button:hover { color: var(--text-2); }
 .patch-editor .seg > button[data-on='true'] { color: var(--text-1); }
 .patch-editor .seg > button[data-on='true']::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 1.5px; background: var(--text-1); }
 .patch-editor .seg.tight { gap: 2px 12px; }
-.patch-editor .seg.tight > button { font-size: 10.5px; }
+.patch-editor .seg.tight > button { font-size: var(--size-small); }
 
-.patch-editor .pill { padding: 8px 0 !important; font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; color: var(--text-2); }
+.patch-editor .pill { padding: 8px 0 !important; font: var(--type-label); letter-spacing: var(--tracking-label); color: var(--text-2); }
 .patch-editor .pill:hover { color: var(--text-1); }
 .patch-editor .pill[data-primary='true'] { color: var(--text-1); }
 .patch-editor .pill:disabled { color: var(--text-5); cursor: default; }
@@ -95,7 +95,7 @@
 .patch-editor .app { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 
 .patch-editor .livedot { width: 12px; height: 2.5px; background: var(--thumb-off); flex-shrink: 0; }
-.patch-editor .livedot[data-on='true'] { background: rgb(var(--tint)); box-shadow: 0 0 6px rgba(var(--tint), 0.7); }
+.patch-editor .livedot[data-on='true'] { background: var(--fill); }
 .patch-editor .livedot[data-warn='true'] { background: var(--warn); }
 
 /* ---------------------------------------------------------------- strip
@@ -113,10 +113,10 @@
   z-index: 1;
 }
 .patch-editor .striphead { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 14px; min-height: 10px; }
-.patch-editor .stripwarn { font: 400 10.5px/1 var(--sans); color: var(--warn); letter-spacing: 0.02em; white-space: nowrap; }
+.patch-editor .stripwarn { font: var(--type-small-sans); color: var(--warn); white-space: nowrap; }
 .patch-editor .stripbox { position: relative; }
 .patch-editor .stripcells { position: relative; display: block; width: 100%; height: 72px; }
-.patch-editor .stripempty { height: 40px; display: flex; align-items: center; justify-content: center; font: 400 10.5px/1 var(--sans); color: var(--text-4); }
+.patch-editor .stripempty { height: 40px; display: flex; align-items: center; justify-content: center; font: var(--type-small-sans); color: var(--text-4); }
 
 .patch-editor .editscroll { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
 .patch-editor .sectionpart { display: contents; }
@@ -149,8 +149,7 @@
   flex-shrink: 0;
 }
 .patch-editor .layerrow .name {
-  font: 400 13px/1 var(--sans);
-  letter-spacing: 0.01em;
+  font: var(--type-note);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -192,7 +191,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 500 10.5px/1 var(--sans);
+  font: var(--type-label);
   color: var(--text-5);
 }
 .patch-editor .tog[data-on='true'] { color: var(--text-1); background: var(--wash-strong); }
@@ -209,16 +208,16 @@
   position: relative;
 }
 .patch-editor .knob svg.dial { display: block; overflow: visible; }
-.patch-editor .knob .kval { font: 400 13px/1 var(--mono); color: var(--text-1); }
+.patch-editor .knob .kval { font: var(--type-value); color: var(--text-1); }
 .patch-editor .knob[data-dim='true'] .kval { color: var(--text-5); }
 /* Quieter than the value: it qualifies the number without competing with it for the eye. */
-.patch-editor .knob .kunit { font: 400 10.5px/1 var(--mono); color: var(--text-5); }
+.patch-editor .knob .kunit { font: var(--type-small); color: var(--text-5); }
 .patch-editor .knob[data-dim='true'] .kunit { opacity: .6; }
 /* One chip per row driving this parameter: source, polarity, and a way out. */
 .patch-editor .modchip { display: inline-flex; align-items: stretch; border: 1px solid var(--track); border-radius: 2px; overflow: hidden; background: var(--modulation-ghost); }
 .patch-editor .modchip[data-inert] { opacity: 0.45; }
 .patch-editor .modchip .src {
-  font: 400 10.5px/1 var(--mono);
+  font: var(--type-small);
   color: var(--modulation-soft);
   padding: 3px 4px 2px;
   display: flex;
@@ -227,7 +226,7 @@
 }
 .patch-editor .modchip .src > i { font-style: normal; opacity: 0.75; }
 .patch-editor .modchip .src:hover { background: var(--wash-strong); }
-.patch-editor .modchip .drop { font: 400 10.5px/1 var(--mono); color: var(--text-4); padding: 3px 4px 2px; border-left: 1px solid var(--track); }
+.patch-editor .modchip .drop { font: var(--type-small); color: var(--text-4); padding: 3px 4px 2px; border-left: 1px solid var(--track); }
 .patch-editor .modchip .drop:hover { color: var(--bad); background: var(--wash-strong); }
 
 /* A modulator's destination list: what this source drives, and how hard. */
@@ -242,7 +241,7 @@
 }
 .patch-editor .destrow:hover { background: var(--wash-strong); }
 .patch-editor .destrow .dst {
-  font: 400 10.5px/1 var(--mono);
+  font: var(--type-small);
   color: var(--text-3);
   flex-grow: 1;
   overflow: hidden;
@@ -253,7 +252,7 @@
   width: 18px;
   height: 16px;
   border-radius: 2px;
-  font: 400 13px/1 var(--mono);
+  font: var(--type-value);
   color: var(--modulation-soft);
   background: var(--modulation-ghost);
 }
@@ -321,7 +320,7 @@
   outline: 1px dashed var(--modulation-dim);
   outline-offset: -1px;
 }
-.patch-editor .modslot .mname { font: 400 13px/1 var(--sans); letter-spacing: 0.01em; flex-grow: 1; }
+.patch-editor .modslot .mname { font: var(--type-note); flex-grow: 1; }
 .patch-editor .modslot .meter { height: 4px; }
 /*
  * No transition on the width. `LiveMeter` writes it every frame, so a 60ms ease can never
@@ -335,10 +334,9 @@
   height: 2px;
   margin: 1px 0;
   background: var(--modulation);
-  box-shadow: 0 0 7px var(--modulation-glow);
 }
 .patch-editor .modslot[data-dead='true'] .meter > i { background: var(--text-5); box-shadow: none; }
-.patch-editor .modslot .detail { font: 400 10.5px/1 var(--mono); color: var(--text-5); }
+.patch-editor .modslot .detail { font: var(--type-small); color: var(--text-5); }
 
 /* `.macroplate` was here — the dial-and-plate tile the macro rack used to draw. Both racks
    are `.modslot` now, which is the point: a macro and an lfo are the same slot in the same
@@ -397,12 +395,11 @@
  * `.trg` and is sized to match it, so a tile carrying both reads as one row of badges.
  */
 .patch-editor .reach {
-  font: 400 10.5px/1 var(--mono);
+  font: var(--type-small);
   color: var(--modulation-soft);
   background: var(--modulation-ghost);
   border-radius: 2px;
   padding: 3px 4px 2px;
-  letter-spacing: 0.02em;
 }
 /* Lit with the tile, so the number and the things it counts light together. */
 .patch-editor .modslot[data-traced='true'] .reach { background: var(--modulation); color: var(--background); }
@@ -413,8 +410,8 @@
 .patch-editor .destrow[data-wire='true'] .dst { color: var(--text-5); }
 
 .patch-editor .trg {
-  font: 500 10.5px/1 var(--sans);
-  letter-spacing: 0.11em;
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
   color: var(--modulation-soft);
   background: var(--modulation-ghost);
   border-radius: 2px;
@@ -433,7 +430,7 @@
 .patch-editor .sw { width: 22px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: none; }
 .patch-editor .sw > i { width: 16px; height: 3px; background: var(--thumb-off); transition: background-color 300ms, box-shadow 300ms; }
 .patch-editor .sw-on { background: none; }
-.patch-editor .sw-on > i { background: var(--fill); box-shadow: var(--fill-glow); }
+.patch-editor .sw-on > i { background: var(--fill); }
 
 /* A bypassed node is still there and still says what it is — just out of circuit. */
 .patch-editor .bypassed { opacity: 0.4; }
@@ -451,7 +448,7 @@
   border-radius: 2px;
 }
 .patch-editor .editor-swatch { width: 22px; height: 22px; border-radius: 2px; flex-shrink: 0; padding: 0; cursor: pointer; box-shadow: inset 0 0 0 1px var(--track); }
-.patch-editor .hexin { font: 400 10.5px/1 var(--mono); color: var(--text-3); width: 70px; }
+.patch-editor .hexin { font: var(--type-small); color: var(--text-3); width: 70px; }
 .patch-editor .hexin:focus { color: var(--text-1); }
 .patch-editor .gradstrip { height: 40px; border-radius: 2px; }
 
@@ -465,12 +462,12 @@
 .patch-editor .mrow:hover { background: var(--wash-strong); }
 .patch-editor .mrow[data-dropped='true'] { opacity: 0.4; }
 .patch-editor .mrow[data-dropped='true'] .dst, .patch-editor .mrow[data-dropped='true'] .src { text-decoration: line-through; }
-.patch-editor .mrow .dst { font: 400 13px/1 var(--mono); }
-.patch-editor .warnline { font: 400 10.5px/1 var(--sans); color: var(--warn); letter-spacing: 0.03em; }
+.patch-editor .mrow .dst { font: var(--type-value); }
+.patch-editor .warnline { font: var(--type-small-sans); color: var(--warn); }
 .patch-editor .warn     { color: var(--warn); }
-.patch-editor .srcdot { width: 5px; height: 5px; background: var(--modulation); box-shadow: 0 0 6px var(--modulation-glow); }
+.patch-editor .srcdot { width: 5px; height: 5px; background: var(--modulation); }
 
-.patch-editor .numdrag { font: 400 13px/1 var(--mono); color: var(--modulation-soft); cursor: ns-resize; }
+.patch-editor .numdrag { font: var(--type-value); color: var(--modulation-soft); cursor: ns-resize; }
 
 /* -------------------------------------------------------------- budget */
 
@@ -487,16 +484,15 @@
 .patch-editor .savesheet { width: 460px; padding: 16px 24px 24px; }
 .patch-editor .savesheet .panel { border: 0; }
 .patch-editor .savehead { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.patch-editor .savehead h2 { margin: 0; font: 300 28px/1.2 var(--sans); }
+.patch-editor .savehead h2 { margin: 0; font: var(--type-title); }
 
 /* A native select, like the blend chip, so the menu is the platform's. */
 
 .patch-editor .rooms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 18px; }
 .patch-editor .room { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 .patch-editor .tilenote {
-  font: 400 10.5px/1 var(--sans);
+  font: var(--type-small-sans);
   color: var(--text-5);
-  letter-spacing: 0.02em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -516,13 +512,13 @@
 /* The Save sheet. */
 .patch-editor .railsave { display: flex; flex-direction: column; gap: 14px; padding: 12px 0; flex-shrink: 0; }
 .patch-editor .railsave input {
-  font: 400 15px/1 var(--sans);
+  font: var(--type-body);
   color: var(--text-1);
   padding: 9px 0;
   min-width: 0;
   flex-grow: 1;
 }
-.patch-editor .railsave input.railnotes { font: 400 15px/1 var(--sans); color: var(--text-3); }
+.patch-editor .railsave input.railnotes { font: var(--type-body); color: var(--text-3); }
 .patch-editor .railsave input::placeholder { color: var(--text-5); }
 
 /* A room's master, as a mark beside the name rather than a word that took the name's room. */
@@ -539,19 +535,18 @@
   display: flex;
   align-items: center;
   gap: 5px;
-  font: 400 10.5px/1 var(--sans);
-  letter-spacing: 0.04em;
+  font: var(--type-small-sans);
   color: var(--text-5);
   pointer-events: none;
 }
-.patch-editor .scopecap b { font-weight: 450; color: var(--text-3); }
+.patch-editor .scopecap b { font-weight: var(--weight-medium); color: var(--text-3); }
 .patch-editor .scopecap .dash { display: inline-block; width: 12px; height: 0; border-top: 1px dashed currentColor; }
 .patch-editor .scopecap .dash.warn { color: var(--warn); }
 .patch-editor .scopecap .dash.accent { color: var(--modulation-soft); }
 
 /* -------------------------------------------------------------- toasts */
 
-.patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: 300; padding: 11px 18px; border-radius: 2px; font: 400 13px/1 var(--sans); background: var(--text-1); color: var(--background); box-shadow: var(--float-shadow); }
+.patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: 300; padding: 11px 18px; border-radius: 2px; font: var(--type-note); background: var(--text-1); color: var(--background); box-shadow: var(--float-shadow); }
 
 /* -------------------------------------------------------------- scroll */
 
@@ -583,7 +578,7 @@
 /* Two lines, not one: the row is 58px and the note is the thing worth reading. The rest
    is on the title attribute rather than lost. */
 .patch-editor .librow .libnote {
-  font: 400 10.5px/1.4 var(--sans);
+  font: var(--type-small-sans);
   color: var(--text-4);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -606,7 +601,7 @@
 .patch-editor .libempty {
   padding: 46px 20px;
   text-align: center;
-  font: 400 10.5px/1.9 var(--sans);
+  font: var(--type-small-sans);
   color: var(--text-5);
 }
 
@@ -623,7 +618,7 @@
 
 /* The strip carries the row; the hover tint the library rows use fights it. */
 .patch-editor .palrow:hover { background: var(--wash); }
-.patch-editor .palrow .libnote { -webkit-line-clamp: 1; font: 400 10.5px/1.4 var(--mono); color: var(--text-5); }
+.patch-editor .palrow .libnote { -webkit-line-clamp: 1; font: var(--type-small); color: var(--text-5); }
 
 /*
  * Connected, waiting on the six catalog responses. Same weight as the "no layer selected"
@@ -635,7 +630,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font: 400 13px/1.7 var(--sans);
+  font: var(--type-note);
   color: var(--text-5);
 }
 
@@ -654,7 +649,7 @@
 
 .patch-editor .catalog-fail p {
   margin: 0;
-  font: 400 13px/1.75 var(--sans);
+  font: var(--type-note);
   color: var(--text-3);
 }
 
@@ -666,7 +661,7 @@
    parameter. Tabs sit on the rule they interrupt, which is what says "the panel below is
    mine". */
 .patch-editor .tabs { display: flex; align-items: flex-end; }
-.patch-editor .tabs > button { position: relative; padding: 9px 0 10px; margin-right: 18px; font: 500 10.5px/1 var(--mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-4); }
+.patch-editor .tabs > button { position: relative; padding: 9px 0 10px; margin-right: 18px; font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-4); }
 .patch-editor .tabs > button:hover { color: var(--text-3); }
 .patch-editor .tabs > button[data-on='true'] { color: var(--text-1); box-shadow: inset 0 -1.5px 0 var(--text-1); }
 .patch-editor .tabs > .tabrule { flex-grow: 1; height: 1px; background: var(--track); }
@@ -683,8 +678,8 @@
   field-sizing: content;
   padding: 4px 7px 3px;
   border-radius: 2px;
-  font: 500 10.5px/1 var(--sans);
-  letter-spacing: 0.1em;
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
   text-transform: uppercase;
   color: var(--text-4);
   background: var(--wash-strong);
@@ -714,7 +709,7 @@
   position: absolute; left: 0; top: 6px; height: 2px; max-width: 100%;
   background: var(--text-5);
 }
-.patch-editor .layerrow.raise-hi .editor-fader .fill { background: var(--fill); box-shadow: var(--fill-glow); }
+.patch-editor .layerrow.raise-hi .editor-fader .fill { background: var(--fill); }
 .patch-editor .layerrow[data-muted='true'] .editor-fader .fill { background: var(--text-5); box-shadow: none; }
 .patch-editor .editor-fader .reach {
   position: absolute; top: 3px; height: 8px;
@@ -726,7 +721,6 @@
 .patch-editor .editor-fader .dot {
   position: absolute; top: 2px; width: 2px; height: 10px; margin-left: -1px;
   background: var(--text-1);
-  box-shadow: 0 0 6px var(--modulation-glow);
 }
 .patch-editor .editor-fader[data-armed='true'] .track { outline: 1px dashed var(--modulation-dim); outline-offset: 3px; }
 .patch-editor .editor-fader[data-hot='true'] .track { outline: 1px dashed var(--modulation-soft); outline-offset: 3px; }
@@ -771,13 +765,13 @@
 .patch-editor .stagerow.editor-mark:hover { background: none; }
 .patch-editor .stagename {
   flex-grow: 1;
-  font: 400 13px/1 var(--sans);
+  font: var(--type-note);
   color: var(--text-1);
   overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 .patch-editor .stagename.dim { color: var(--text-4); }
-.patch-editor .stageslot { font: 400 10.5px/1 var(--mono); color: var(--text-5); }
-.patch-editor .stagecap { font: 400 10.5px/1.4 var(--sans); color: var(--text-5); }
+.patch-editor .stageslot { font: var(--type-small); color: var(--text-5); }
+.patch-editor .stagecap { font: var(--type-small-sans); color: var(--text-5); }
 
 /* ------------------------------------------------ the user surface (LIFE-867) */
 
@@ -793,7 +787,6 @@
   height: 5px;
   border-radius: 0;
   background: var(--modulation);
-  box-shadow: 0 0 6px var(--modulation-glow);
   pointer-events: none;
   z-index: 2;
 }
@@ -809,12 +802,12 @@
   text-align: left;
   padding: 9px 10px;
   border-radius: 2px;
-  font: 400 13px/1 var(--sans);
+  font: var(--type-note);
   color: var(--text-3);
 }
 .patch-editor .surfacemenu > button:hover:not(:disabled) { background: var(--modulation-ghost); color: var(--text-1); }
 .patch-editor .surfacemenu > button:disabled { color: var(--text-5); cursor: default; }
-.patch-editor .surfacemenu .menunote { padding: 9px 10px; font: 400 10.5px/1.4 var(--sans); color: var(--text-5); }
+.patch-editor .surfacemenu .menunote { padding: 9px 10px; font: var(--type-small-sans); color: var(--text-5); }
 .patch-editor .surfacepop {
   padding: 14px 16px 16px;
   display: flex;
@@ -830,7 +823,7 @@
   border-radius: 2px;
   padding: 8px 10px;
   min-width: 0;
-  font: 400 13px/1.2 var(--sans);
+  font: var(--type-note);
   color: var(--text-1);
   user-select: text;
 }
@@ -849,12 +842,12 @@
 .patch-editor .ctlhead[data-dragover='true'], .patch-editor .ctlrow[data-dragover='true'], .patch-editor .ctlend[data-dragover='true'] {
   box-shadow: inset 0 2px 0 var(--modulation-soft);
 }
-.patch-editor .ctlheadname { font: 500 10.5px/1 var(--sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-3); }
+.patch-editor .ctlheadname { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-3); }
 .patch-editor .ctlrow { gap: 10px; padding: 8px 10px; min-height: 42px; cursor: pointer; }
 .patch-editor .ctlrow[data-dead='true'] { opacity: 0.45; }
 .patch-editor .ctlrow[data-dead='true'] .ctllabel { text-decoration: line-through; }
-.patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: 500 10.5px/1 var(--mono); color: var(--modulation-soft); }
-.patch-editor .ctllabel { font: 400 13px/1 var(--sans); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
+.patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctltarget { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctlend { height: 6px; border-radius: 2px; }
 
@@ -878,9 +871,9 @@
     button, select, input, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
     .kval, .kunit, .pill, .tog, .blendchip, .modchip .src, .modchip .drop, .mname, .reach, .trg,
     .detail, .ctlglyph, .ctllabel, .ctlheadname
-  ) { font-size: 13px; }
-  .patch-editor :is([style*=' 10px/'], [style*=' 10.5px/'], [style*=' 11px/'], [style*=' 12px/']) {
-    font-size: 13px !important;
+  ) { font-size: var(--size-note); }
+  .patch-editor :is([style*='--type-small'], [style*='--type-label']) {
+    font-size: var(--size-note) !important;
   }
   .patch-editor .rowacts { height: auto; }
   .patch-editor .swrow { height: auto; min-height: 52px; }

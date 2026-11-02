@@ -294,8 +294,8 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
         <span
           className="name grow"
           style={{
-            font: '500 10.5px/1 var(--sans)',
-            letterSpacing: '.18em',
+            font: 'var(--type-label)',
+            letterSpacing: 'var(--tracking-label)',
             textTransform: 'uppercase',
           }}
         >
@@ -374,7 +374,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
           style={{
             width: 16,
             textAlign: 'right',
-            font: '400 15px/1 var(--mono)',
+            font: 'var(--type-value)',
             color: selected ? 'var(--text-1)' : 'var(--text-3)',
           }}
         >

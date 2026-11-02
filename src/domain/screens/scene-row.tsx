@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { SceneCard, SceneLine, SceneShelf } from '../../composites';
 import {
   removeScene,
@@ -10,14 +10,17 @@ import {
 } from '../store/library-store';
 import { endPreview, previewScene } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
-import { previewOfAnimation, type Room } from '../store/rooms';
+import { isAnyOn, previewOfAnimation, type Room } from '../store/rooms';
 import {
   animationOf,
   applyScene,
+  isSceneShowing,
   lightCount,
+  noteLastScene,
   refreshScene,
   roomOfScene,
   sceneSummary,
+  useLastScenes,
   WHOLE_HOUSE,
 } from '../store/scenes';
 import { offerUndo } from '../store/undo';
@@ -58,12 +61,35 @@ type SceneRowProps = {
 
 type SceneSheet = { renaming: SceneEntry | null };
 
-// Home holds the scenes that cross rooms, and a room holds its own.
+function currentText(showing: SceneEntry | undefined, last: SceneEntry | undefined, isOn: boolean) {
+  if (showing) return showing.name;
+  return isOn && last ? `${last.name}, changed` : '';
+}
+
+// A room says which scene it shows, or which one it has moved away from.
+function useCurrentScene(scenes: SceneEntry[], room: Room | undefined) {
+  const roomId = room?.id;
+  const showing = room && scenes.find((scene) => isSceneShowing(scene, room));
+  const lastName = useLastScenes((last) => (roomId ? last[roomId] : undefined));
+  const showingName = showing?.name;
+  useEffect(() => {
+    if (roomId && showingName) noteLastScene(roomId, showingName);
+  }, [roomId, showingName]);
+  if (!room) return { showing, current: undefined, changedFrom: undefined };
+  const isOn = isAnyOn(room.onlineLights);
+  const last = scenes.find(({ name }) => name === lastName);
+  const changedFrom = !showing && isOn ? last : undefined;
+  const current = { text: currentText(showing, last, isOn), isChanged: Boolean(changedFrom) };
+  return { showing, current, changedFrom };
+}
+
+// Home holds the scenes that cross rooms, and a room holds its own. One room has every scene.
 export function SceneRow({ rooms, room }: SceneRowProps) {
   const scenes = useLibrary((library) => library.scenes).filter(
-    (scene) => !scene.error && roomOfScene(scene, rooms)?.id === room?.id,
+    (scene) => !scene.error && (rooms.length < 2 || roomOfScene(scene, rooms)?.id === room?.id),
   );
   const problem = useLibrary((library) => library.problem);
+  const { showing, current, changedFrom } = useCurrentScene(scenes, room);
   const [isEditing, setEditing] = useState(false);
   const [sheet, setSheet] = useState<SceneSheet | null>(null);
   const update = (scene: SceneEntry) => {
@@ -80,11 +106,14 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
   return (
     <>
       <SceneShelf
+        title={room ? 'SCENE' : 'SCENES'}
+        current={current}
         hasScenes={scenes.length > 0}
         isEditing={isEditing}
         note={problem}
         onEdit={() => setEditing(!isEditing)}
         onSave={() => setSheet({ renaming: null })}
+        onUpdate={changedFrom ? () => update(changedFrom) : undefined}
         onRecent={room ? undefined : () => openPage('history')}
       >
         {scenes.map((scene) => (
@@ -92,6 +121,7 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             key={scene.file}
             name={scene.name}
             summary={sceneSummary(scene, room ? [room] : rooms)}
+            isCurrent={room ? scene === showing : undefined}
             isEditing={isEditing}
             onApply={() => applyScene(scene, rooms)}
             onHold={() => previewScene(scene, rooms)}

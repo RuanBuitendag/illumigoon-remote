@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, GripMark, LockMark, Press, TextField } from '../design-system';
+import { BackKey, GripMark, LockMark, Picked, Press, TextField } from '../design-system';
 
 type PageFrameProps = {
   title: string;
@@ -25,7 +25,7 @@ export function PageSection({ children }: { children: ReactNode }) {
 }
 
 export function PageHint({ children }: { children: ReactNode }) {
-  return <p className="page-hint">{children}</p>;
+  return <p className="note">{children}</p>;
 }
 
 type InfoRowProps = { label: string; note: string; onOpen?: () => void; children?: ReactNode };
@@ -34,7 +34,7 @@ export function InfoRow({ label, note, onOpen, children }: InfoRowProps) {
   const text = (
     <span className="more-text">
       <span className="more-label">{label}</span>
-      <span className="more-note">{note}</span>
+      <span className="note">{note}</span>
     </span>
   );
   return (
@@ -58,7 +58,7 @@ export function DayPicker({ days, onToggle }: DayPickerProps) {
     <div className="day-picker">
       {days.map(({ name, isOn }, index) => (
         <Press key={name} className="day-key" isPressed={isOn} onClick={() => onToggle(index)}>
-          {name}
+          <Picked isOn={isOn}>{name}</Picked>
         </Press>
       ))}
     </div>

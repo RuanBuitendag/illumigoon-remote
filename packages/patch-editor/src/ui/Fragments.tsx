@@ -148,10 +148,10 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
                ready={!!layer && !!name.trim()}>
         <SaveField value={name} wide={false} disabled={!layer} onChange={setName} onEnter={save}
                    placeholder={layer ? `${layer.emitter.type} bed` : 'select a layer first'}
-                   font="450 11.5px/1 var(--sans)" colour="var(--text-1)" />
+                   font="var(--type-note)" colour="var(--text-1)" />
         <SaveField value={notes} wide disabled={!layer} onChange={setNotes} onEnter={save}
                    placeholder="notes — what it is for, and what it needs under it"
-                   font="400 11px/1 var(--sans)" colour="var(--text-3)" />
+                   font="var(--type-note)" colour="var(--text-3)" />
         {capture && (
           <Mono className="dim sm" title="What this fragment will cost the patch it lands in">
             {capture.patch.modulators.length} mod · {capture.patch.matrix.length} row
@@ -162,7 +162,7 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
       <div className="col" style={{ gap: 7, padding: '0 20px 14px', flexShrink: 0 }}>
         <div className="row" style={{ gap: 10 }}>
           <Mono className="dim sm">{file}</Mono>
-          <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)' }}>
+          <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
             a slash makes a group — <span style={{ fontFamily: 'var(--mono)' }}>fire/Ember</span>
           </span>
         </div>
@@ -358,7 +358,7 @@ function FragmentRow({ ctl, e, odd, onPull, onDrop }: {
           className="libname"
           title={e.name}
           style={{
-            font: '400 13px/1 var(--sans)',
+            font: 'var(--type-note)',
             color: e.error ? 'var(--text-4)' : 'var(--text-1)',
           }}
         >

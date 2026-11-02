@@ -245,10 +245,10 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
         <div className="tick" style={{ left: (BUDGET.NVS / max) * w }} />
         <div className="tick" style={{ left: (BUDGET.MESH / max) * w }} />
       </div>
-      <span style={{ font: '400 10.5px/1 var(--mono)', color: col }}>
+      <span style={{ font: 'var(--type-small)', color: col }}>
         {(bytes / 1024).toFixed(1)} KB
       </span>
-      <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.05em' }}>
+      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
         4K · 8K
       </span>
     </div>

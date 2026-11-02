@@ -1,10 +1,14 @@
 {
+  "ignoreBinaries": ["netsh"],
   "$schema": "https://unpkg.com/knip@6/schema.json",
   "ignoreExportsUsedInFile": true,
   "workspaces": {
     ".": {
       "entry": [
         "scripts/lint/*.mjs",
+        "scripts/friction/measure.mjs",
+        "scripts/regression/run.mjs",
+        "scripts/setup-light/setup-light.mjs",
         "electron-builder.config.mjs"
       ],
       "project": [

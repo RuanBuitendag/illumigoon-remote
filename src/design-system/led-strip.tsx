@@ -10,7 +10,6 @@ import {
 
 const SHAPES = {
   room: { padding: 14, spread: 3.2, glow: 1 },
-  hero: { padding: 20, spread: 5, chip: 3.4, glow: 1.25 },
   tile: { padding: 8, spread: 2.6, glow: 0.75, isSlow: true },
   line: { padding: 4, spread: 1.6, glow: 0.6 },
 } satisfies Record<string, StripShape>;

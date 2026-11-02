@@ -108,7 +108,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
         </div>
         <div className="grow" />
         <span
-          style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+          style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
         >
           {sources.length === 0
             ? 'nothing in this patch has an edge — periodic, threshold or an LFO'

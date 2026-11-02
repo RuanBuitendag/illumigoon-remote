@@ -1,13 +1,11 @@
 import type { ReactNode } from 'react';
-import { ChevronMark, LinkKey, LockMark, Press, SoundMark, StatusMark, tintStyle } from '../design-system';
+import { ChevronMark, LinkKey, LockMark, Press, SoundMark, StatusMark } from '../design-system';
 
 type RoomCardProps = {
   name: string;
-  tint?: string;
   strip: ReactNode;
   lookName: string;
   hasSound: boolean;
-  isLit: boolean;
   power: ReactNode;
   lightStates: { id: string; name: string; state: 'on' | 'off' | 'silent' }[];
   note: string | null;
@@ -21,7 +19,7 @@ type RoomCardProps = {
 
 export function RoomCard(card: RoomCardProps) {
   return (
-    <article className="room-card" data-open={card.isOpen} data-lit={card.isLit} style={tintStyle(card.tint)}>
+    <article className="room-card" data-open={card.isOpen}>
       <Press className="room-open" onClick={card.onOpen}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>
@@ -41,7 +39,7 @@ export function RoomCard(card: RoomCardProps) {
         <span className="room-look-name">{card.lookName}</span>
         {card.hasSound && <SoundMark />}
         {card.onLooks && (
-          <span className="room-look-key">
+          <span className="key-text room-look-key">
             LOOKS
             <ChevronMark direction="right" />
           </span>
@@ -55,14 +53,14 @@ export function RoomCard(card: RoomCardProps) {
 }
 
 export function QuietNote({ children }: { children: ReactNode }) {
-  return <p className="quiet-note">{children}</p>;
+  return <p className="note quiet-note">{children}</p>;
 }
 
 type LockNoteProps = { text: string; actionLabel: string; onAction: () => void };
 
 export function LockNote({ text, actionLabel, onAction }: LockNoteProps) {
   return (
-    <p className="lock-note">
+    <p className="note lock-note">
       <LockMark />
       <span>
         {text} · <LinkKey onClick={onAction}>{actionLabel}</LinkKey>

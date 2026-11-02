@@ -6,7 +6,7 @@ type SheetProps = {
   title: ReactNode;
   actions: ReactNode;
   // Stays in view while the rest of the sheet scrolls.
-  pinned: ReactNode;
+  pinned?: ReactNode;
   children: ReactNode;
 };
 

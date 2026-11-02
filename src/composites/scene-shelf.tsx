@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Eyebrow, Press, TextKey } from '../design-system';
+import { Eyebrow, Picked, Press, TextKey } from '../design-system';
 import { HeadingRow } from './control-rows';
 import { QuietNote } from './room-card';
 
@@ -15,6 +15,7 @@ export function SceneLine({ name, strip }: { name: string; strip?: ReactNode }) 
 type SceneCardProps = {
   name: string;
   summary: string;
+  isCurrent?: boolean;
   isEditing: boolean;
   onApply: () => void;
   onHold: () => void;
@@ -26,19 +27,21 @@ type SceneCardProps = {
 };
 
 export function SceneCard(props: SceneCardProps) {
-  const { name, summary, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
+  const { name, summary, isCurrent, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
   return (
     <div className="scene-card">
       <Press className="scene-apply" disabled={isEditing} onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
-        <span className="scene-name">{name}</span>
+        <span className="scene-name">
+          <Picked isOn={isCurrent}>{name}</Picked>
+        </span>
         {children}
         <span className="scene-summary">{summary}</span>
       </Press>
       {isEditing && (
         <span className="scene-edit">
-          <Press onClick={onUpdate}>Update</Press>
-          <Press onClick={onRename}>Rename</Press>
-          <Press onClick={onDelete}>Delete</Press>
+          <TextKey onClick={onUpdate}>UPDATE</TextKey>
+          <TextKey onClick={onRename}>RENAME</TextKey>
+          <TextKey onClick={onDelete}>DELETE</TextKey>
         </span>
       )}
     </div>
@@ -73,26 +76,35 @@ export function StateList({ children }: { children: ReactNode }) {
 }
 
 type SceneShelfProps = {
+  title: string;
+  current?: { text: string; isChanged: boolean };
   hasScenes: boolean;
   isEditing: boolean;
   note: string | null;
   onEdit: () => void;
   onSave: () => void;
+  onUpdate?: () => void;
   onRecent?: () => void;
   children: ReactNode;
 };
 
 export function SceneShelf(props: SceneShelfProps) {
-  const { hasScenes, isEditing, note, onEdit, onSave, onRecent, children } = props;
+  const { title, current, hasScenes, isEditing, note, onEdit, onSave, onUpdate, onRecent, children } = props;
   return (
     <section className="scene-shelf">
-      <HeadingRow heading={<Eyebrow>SCENES</Eyebrow>}>
+      <HeadingRow heading={<Eyebrow>{title}</Eyebrow>}>
         <span className="scene-keys">
           {onRecent && <TextKey onClick={onRecent}>RECENT</TextKey>}
+          {onUpdate && <TextKey onClick={onUpdate}>UPDATE</TextKey>}
           {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>}
           <TextKey onClick={onSave}>+ SAVE</TextKey>
         </span>
       </HeadingRow>
+      {current?.text && (
+        <p className="scene-current" data-changed={current.isChanged}>
+          {current.text}
+        </p>
+      )}
       {hasScenes && <div className="scene-list">{children}</div>}
       {note && <QuietNote>{note}</QuietNote>}
     </section>

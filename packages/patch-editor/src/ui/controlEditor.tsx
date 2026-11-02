@@ -231,7 +231,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
         )}
 
         {problem && (
-          <span className="warnline" style={{ lineHeight: 1.5 }}>
+          <span className="warnline">
             {problem}
           </span>
         )}

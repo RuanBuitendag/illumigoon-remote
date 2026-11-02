@@ -5,14 +5,14 @@ type LevelRowProps = {
   isOn: boolean;
   level: number;
   disabled?: boolean;
-  onPower: (isOn: boolean) => void;
+  onPower?: (isOn: boolean) => void;
   onLevel: (level: number) => void;
 };
 
 export function LevelRow({ label, isOn, level, disabled, onPower, onLevel }: LevelRowProps) {
   return (
     <div className="level-row">
-      <PowerKey label={`${label} power`} isOn={isOn} disabled={disabled} onChange={onPower} />
+      {onPower && <PowerKey label={`${label} power`} isOn={isOn} disabled={disabled} onChange={onPower} />}
       <Fader
         label={`${label} brightness`}
         value={level}

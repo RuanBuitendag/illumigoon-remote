@@ -6,6 +6,8 @@
 //   - Only the design system holds raw colours, in TypeScript and in CSS.
 //   - The two CSS files stay with their layer.
 //   - The editor's style sheet takes every colour from the tokens.
+//   - Type comes only from the tokens, in composites, the design system and the editor.
+//   - Spacing, row heights and corners come only from the tokens in composites.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -14,6 +16,7 @@ const SOURCE = 'src';
 const LAYERS = ['design-system', 'composites', 'domain'];
 const GENERATED = /^src\/domain\/looks\/engine\//;
 const EDITOR_STYLES = 'packages/patch-editor/src/styles.css';
+const EDITOR_SOURCE = 'packages/patch-editor/src';
 
 const walk = (folder) =>
   fs.readdirSync(folder, { withFileTypes: true }).flatMap((entry) => {
@@ -49,6 +52,14 @@ const CSS_RAW_COLOUR = [
   'use a token from design-system.css',
 ];
 
+const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem)?(?![\d.]))\d*\.?\d+(?:px|em|rem)\b/;
+const BARE_WEIGHT = /(?<![\w.-])[1-9]00\b/;
+const TYPE_PROPERTY = /(?:^|[;{\s])(font|font-size|font-weight|line-height|letter-spacing)\s*:\s*([^;}]+)/g;
+const SPACE_PROPERTY =
+  /(?:^|[;{\s])(gap|row-gap|column-gap|margin(?:-\w+)?|padding(?:-\w+)?|min-height|border-radius)\s*:\s*([^;}]+)/g;
+const INLINE_TYPE = /\b(font|fontSize|fontWeight|letterSpacing|lineHeight)\s*:\s*['"]?\.?\d[^,}\n]*/g;
+const TOKENS_END = /^\* \{/m;
+
 const problems = [];
 
 const report = (file, line, rule, text) => problems.push({ file, line, rule, text });
@@ -61,9 +72,31 @@ function runChecks(file, checks) {
   }
 }
 
+// Reports a declaration that writes its own size. `from` skips the tokens at the top of the design system.
+function checkTokens(file, pattern, rule, from = 0) {
+  const text = fs.readFileSync(file, 'utf8');
+  for (const match of text.slice(from).matchAll(pattern)) {
+    const [, property, value] = match;
+    if (LITERAL.test(value) || BARE_WEIGHT.test(value)) {
+      report(file, lineOf(text, from + match.index), rule, `${property}: ${value.trim()}: use a token from design-system.css`);
+    }
+  }
+}
+
+function checkInlineType(file) {
+  runChecks(file, [['raw-type', INLINE_TYPE, 'use a type token from design-system.css']]);
+}
+
 function checkCss(file, layer) {
   if (layer === 'domain') report(file, 1, 'look-in-domain', 'the domain holds no CSS: move it to a composite');
-  if (layer === 'composites') runChecks(file, [CSS_RAW_COLOUR]);
+  if (layer === 'composites') {
+    runChecks(file, [CSS_RAW_COLOUR]);
+    checkTokens(file, TYPE_PROPERTY, 'raw-type');
+    checkTokens(file, SPACE_PROPERTY, 'raw-spacing');
+  }
+  if (layer === 'design-system') {
+    checkTokens(file, TYPE_PROPERTY, 'raw-type', fs.readFileSync(file, 'utf8').search(TOKENS_END));
+  }
 }
 
 for (const file of walk(SOURCE)) {
@@ -76,6 +109,10 @@ for (const file of walk(SOURCE)) {
 }
 
 runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);
+checkTokens(EDITOR_STYLES, TYPE_PROPERTY, 'raw-type');
+for (const file of walk(EDITOR_SOURCE)) {
+  if (file.endsWith('.tsx')) checkInlineType(file);
+}
 
 for (const layer of ['design-system', 'composites']) {
   const door = `${SOURCE}/${layer}/index.ts`;

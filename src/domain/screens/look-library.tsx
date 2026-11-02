@@ -65,17 +65,6 @@ function useArmedDelete() {
 
 type DeleteKey = ReturnType<typeof useArmedDelete>;
 
-// A search shows every group, and a group keeps what a person chose until the page closes.
-function useFolds(isSearching: boolean) {
-  const [chosen, setChosen] = useState<Record<string, boolean>>({});
-  const isOpen = (title: string, byDefault: boolean) => isSearching || (chosen[title] ?? byDefault);
-  const toggle = (title: string, byDefault: boolean) =>
-    setChosen({ ...chosen, [title]: !isOpen(title, byDefault) });
-  return { isOpen, toggle };
-}
-
-type Folds = ReturnType<typeof useFolds>;
-
 function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey }) {
   return (
     <>
@@ -88,18 +77,13 @@ function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey
 
 const includesText = (text: string, wanted: string) => text.toLowerCase().includes(wanted);
 
-function PublishedElsewhere({ wanted, folds }: { wanted: string; folds: Folds }) {
+function PublishedElsewhere({ wanted }: { wanted: string }) {
   const elsewhere = useLookFiles((files) => files.shelf.elsewhere);
   const fetching = useLookActions((actions) => actions.fetching);
   const ready = elsewhere.filter(({ id, name }) => id && includesText(name, wanted));
   if (ready.length === 0) return null;
   return (
-    <LookGroup
-      title={ELSEWHERE}
-      note="Published looks you do not have yet"
-      isOpen={folds.isOpen(ELSEWHERE, false)}
-      onToggle={() => folds.toggle(ELSEWHERE, false)}
-    >
+    <LookGroup title={ELSEWHERE} note="Published looks you do not have yet">
       {ready.map(({ familyId, id, name, presets }) => (
         <LookElsewhere
           key={familyId}
@@ -138,9 +122,6 @@ function foundGroups(groups: LibraryGroup[], wanted: string) {
   return named.length > 0 ? named : keptLooks(groups, ({ description }) => includesText(description, wanted));
 }
 
-const holdsLook = ({ looks }: LibraryGroup, name: string | null | undefined) =>
-  looks.some((look) => look.name === name || look.presets.some(({ fullName }) => fullName === name));
-
 export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () => void }) {
   const mine = useLookFiles((files) => files.mine);
   const examples = useLookFiles((files) => files.examples);
@@ -151,7 +132,6 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
   const [isEditing, setEditing] = useState(false);
   const [query, setQuery] = useState('');
   const wanted = query.trim().toLowerCase();
-  const folds = useFolds(wanted !== '');
   const deleteKey = useArmedDelete();
   useFreshLooks();
   const groups = foundGroups(libraryFor(lights, mine, examples, shelf), wanted);
@@ -181,15 +161,12 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
     ));
 
   const groupRows = (group: LibraryGroup) => {
-    const byDefault = group.kind !== 'example' || holdsLook(group, playingName);
     const { title, note: groupNote, looks } = group;
     return (
       <LookGroup
         key={title}
         title={title}
         note={groupNote}
-        isOpen={folds.isOpen(title, byDefault)}
-        onToggle={() => folds.toggle(title, byDefault)}
         action={
           title === 'Mine' && <TextKey onClick={() => setEditing(!isEditing)}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>
         }
@@ -231,7 +208,7 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
         {note && <LookProblem>{note}</LookProblem>}
         {groups.length === 0 && <LookProblem>{`No look called ${query.trim()}.`}</LookProblem>}
         {groups.map(groupRows)}
-        <PublishedElsewhere wanted={wanted} folds={folds} />
+        <PublishedElsewhere wanted={wanted} />
       </LookList>
     </>
   );

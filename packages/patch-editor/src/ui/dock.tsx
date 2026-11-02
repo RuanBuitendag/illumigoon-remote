@@ -141,7 +141,7 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
     <div className="row" style={{ gap: 9 }}>
       <span
         style={{
-          font: '400 10.5px/1 var(--mono)',
+          font: 'var(--type-small)',
           color: dead ? 'var(--text-5)' : 'var(--modulation-soft)',
         }}
       >
@@ -356,7 +356,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
         </div>
         <div className="row" style={{ gap: 20 }}>
           <span
-            style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+            style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
           >
             drag one onto a dial, or hold the dial
           </span>

@@ -14,20 +14,24 @@ function QuestionSheet({ text, suggestion, onAnswer }: Question) {
   const [name, setName] = useState(suggestion ?? '');
   const isNaming = suggestion !== undefined;
   return (
-    <Overlay label={isNaming ? text : 'Check'}>
+    <Overlay
+      label={isNaming ? text : 'Check'}
+      actions={
+        <KeyRow>
+          <TextKey isQuiet onClick={() => onAnswer(null)}>
+            CANCEL
+          </TextKey>
+          <TextKey disabled={isNaming && !name.trim()} onClick={() => onAnswer(name.trim())}>
+            {isNaming ? 'SAVE' : 'YES'}
+          </TextKey>
+        </KeyRow>
+      }
+    >
       {isNaming ? (
-        <TextField size="title" label={text} placeholder="Name" value={name} onChange={setName} />
+        <TextField size="large" label={text} placeholder="Name" value={name} onChange={setName} />
       ) : (
         <OverlayText>{text}</OverlayText>
       )}
-      <KeyRow>
-        <TextKey isQuiet onClick={() => onAnswer(null)}>
-          CANCEL
-        </TextKey>
-        <TextKey disabled={isNaming && !name.trim()} onClick={() => onAnswer(name.trim())}>
-          {isNaming ? 'SAVE' : 'YES'}
-        </TextKey>
-      </KeyRow>
     </Overlay>
   );
 }

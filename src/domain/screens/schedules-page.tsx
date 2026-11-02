@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from '../../composites';
-import { AddKey, Eyebrow, KeyRow, PowerKey, TextField, TextKey } from '../../design-system';
+import { ActionKey, AddKey, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
 import { removeSchedule, setScheduleEnabled, writeSchedule, type Light } from '../store/fleet-store';
 import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
 import { useLibrary } from '../store/library-store';
@@ -48,7 +48,7 @@ const SAME_AS_NOW = 'now';
 function TimeField({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) {
   return (
     <TextField
-      size="medium"
+      size="large"
       type="time"
       label={label}
       value={clockText(value)}
@@ -149,14 +149,12 @@ function ScheduleForm({ room, changing, onDone }: ScheduleFormProps) {
           />
         </>
       )}
-      <KeyRow>
-        <TextKey isQuiet onClick={onDone}>
-          CANCEL
-        </TextKey>
-        <TextKey disabled={lights.length === 0 || (kind !== 'timer' && days === 0)} onClick={save}>
-          SAVE
-        </TextKey>
-      </KeyRow>
+      <ActionKey disabled={lights.length === 0 || (kind !== 'timer' && days === 0)} onClick={save}>
+        Save
+      </ActionKey>
+      <TextKey isQuiet onClick={onDone}>
+        CANCEL
+      </TextKey>
     </PageSection>
   );
 }

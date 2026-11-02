@@ -1,24 +1,15 @@
 import { useState } from 'react';
-import {
-  ColourEditor,
-  ControlGroup,
-  ControlList,
-  NamingRow,
-  SelectRow,
-  SheetFooter,
-  SliderRow,
-} from '../../composites';
+import { ColourEditor, ControlGroup, ControlList, NamingRow, SheetFooter } from '../../composites';
 import { BLACK_HEX, colourToHex, hexToColour, TextKey, type Colour } from '../../design-system';
 import type { Parameter, ParameterValue } from '../light-network/protocol';
 import { changeControl } from '../store/change-control';
-import { setTransition, type Light } from '../store/fleet-store';
+import type { Light } from '../store/fleet-store';
 import { saveLook } from '../store/look-files';
 import { keepPalette, useLibrary, type PaletteEntry } from '../store/library-store';
-import { currentControls, lookNameOf, OWN_LOOK, previewOfAnimation } from '../store/rooms';
+import { currentControls, lookNameOf, OWN_LOOK } from '../store/rooms';
 import { LookControl } from './look-control';
-import { LookStrip } from './look-strip';
 
-const MAX_TRANSITION_SECONDS = 10;
+const COLOUR_TYPES = ['palette', 'color_picker'];
 
 function groupControls(controls: Parameter[]) {
   const groups = new Map<string, Parameter[]>();
@@ -29,73 +20,50 @@ function groupControls(controls: Parameter[]) {
   return [...groups];
 }
 
-function TransitionControls({ lights, light }: { lights: Light[]; light: Light }) {
-  if (light.transitions.length === 0) return null;
-  const id = light.transitionId ?? light.transitions[0]?.id ?? '';
-  const seconds = (light.transitionMs ?? 0) / 1000;
-  return (
-    <ControlGroup title="Changing to the next look">
-      <SelectRow
-        label="Style"
-        options={light.transitions.map(({ id: value, name }) => ({ value, name }))}
-        value={id}
-        onChange={(next) => setTransition(lights, next, seconds * 1000)}
-      />
-      <SliderRow
-        label="How long it takes"
-        valueText={`${seconds.toFixed(1)} s`}
-        value={seconds}
-        min={0}
-        max={MAX_TRANSITION_SECONDS}
-        step={0.1}
-        onChange={(next) => setTransition(lights, id, next * 1000)}
-      />
-    </ControlGroup>
-  );
-}
-
 const toHexList = ({ default: value }: Parameter) =>
   (Array.isArray(value) ? value : [value as Colour]).map(colourToHex);
 
-const familyOf = ({ file, group, shipped }: PaletteEntry) => {
-  if (shipped) return group ?? 'Palettes';
-  return file ? 'Yours' : 'From looks';
-};
+const familyOf = ({ group, shipped }: PaletteEntry) => (shipped ? (group ?? 'Palettes') : 'Yours');
 
 const toColourSet = (palette: PaletteEntry, index: number) => {
-  const { file, name, entries, error } = palette;
-  if (error) return [];
+  const { file, name, entries, error, shipped } = palette;
+  // A palette with no file comes out of a look. Those are dark ramps, which the lights show badly.
+  if (error || (!file && !shipped)) return [];
   const colours = entries.map((entry) => `#${entry.replace('#', '')}`);
   return [{ id: file ?? `listed-${index}`, name, family: familyOf(palette), colours }];
 };
 
-function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter: Parameter; onClose: () => void }) {
+const toField = (parameter: Parameter) => ({
+  key: parameter.key,
+  label: parameter.label,
+  isPalette: parameter.type === 'palette',
+  colours: toHexList(parameter),
+  minimumColours: parameter.min ?? 1,
+});
+
+function ColoursOf({ lights, parameters }: { lights: Light[]; parameters: Parameter[] }) {
   const sets = useLibrary((library) => library.palettes).flatMap(toColourSet);
-  const isPalette = parameter.type === 'palette';
-  const toValue = (colours: string[]): ParameterValue =>
-    isPalette ? colours.map(hexToColour) : hexToColour(colours[0] ?? BLACK_HEX);
+  const change = (key: string, colours: string[]) => {
+    const isPalette = parameters.some((parameter) => parameter.key === key && parameter.type === 'palette');
+    const value: ParameterValue = isPalette ? colours.map(hexToColour) : hexToColour(colours[0] ?? BLACK_HEX);
+    changeControl(lights, key, value);
+  };
   return (
     <ColourEditor
-      strip={<LookStrip source={previewOfAnimation(lights[0]?.animation ?? null)} shape="line" />}
-      isPalette={isPalette}
-      colours={toHexList(parameter)}
-      minimumColours={parameter.min ?? 1}
+      fields={parameters.map(toField)}
       sets={sets}
-      onChange={(colours) => changeControl(lights, parameter.key, toValue(colours))}
+      onChange={change}
       onKeepSet={(name, colours) => void keepPalette(name, colours)}
-      onClose={onClose}
     />
   );
 }
 
 export function LookControls({ lights }: { lights: Light[] }) {
   const [isNaming, setNaming] = useState(false);
-  const [editingKey, setEditingKey] = useState<string | null>(null);
   const light = lights[0];
   if (!light) return null;
   const controls = currentControls(light);
-  const editing = controls.find(({ key }) => key === editingKey);
-  if (editing) return <ColoursOf lights={lights} parameter={editing} onClose={() => setEditingKey(null)} />;
+  const isColour = ({ type }: Parameter) => COLOUR_TYPES.includes(type);
 
   const keepLook = (name: string) => {
     const baseName = lookNameOf(light);
@@ -106,25 +74,24 @@ export function LookControls({ lights }: { lights: Light[] }) {
 
   return (
     <ControlList>
-      {groupControls(controls).map(([group, parameters]) => (
+      <ColoursOf key={`${light.address}-${lookNameOf(light)}`} lights={lights} parameters={controls.filter(isColour)} />
+      {groupControls(controls.filter((control) => !isColour(control))).map(([group, parameters]) => (
         <ControlGroup key={group} title={group}>
           {parameters.map((parameter) => (
             <LookControl
               key={parameter.key}
               parameter={parameter}
               onChange={(value) => changeControl(lights, parameter.key, value)}
-              onEditColours={() => setEditingKey(parameter.key)}
             />
           ))}
         </ControlGroup>
       ))}
-      <TransitionControls lights={lights} light={light} />
       {isNaming ? (
-        <NamingRow label="Name of the look" onCancel={() => setNaming(false)} onKeep={keepLook} />
+        <NamingRow label="Name" onCancel={() => setNaming(false)} onKeep={keepLook} />
       ) : (
         <SheetFooter>
           <TextKey isQuiet onClick={() => setNaming(true)}>
-            SAVE AS A NEW LOOK
+            SAVE AS NEW
           </TextKey>
         </SheetFooter>
       )}

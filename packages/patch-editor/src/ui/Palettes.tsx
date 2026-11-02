@@ -105,7 +105,7 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
           placeholder="Ember"
           onChange={setName}
           onEnter={save}
-          font="450 11.5px/1 var(--sans)"
+          font="var(--type-note)"
           colour="var(--text-1)"
         />
         <Mono className="dim sm">{entries.length} stops</Mono>
@@ -113,7 +113,7 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
 
       <div className="row" style={{ gap: 10, padding: '0 20px 14px', flexShrink: 0 }}>
         <Mono className="dim sm">{file}</Mono>
-        <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
           the colours only — hue, saturation and value stay with the layer
         </span>
       </div>
@@ -310,7 +310,7 @@ function PaletteName({
       <span
         className="libname"
         title={e.name}
-        style={{ font: '400 13px/1 var(--sans)', color: e.error ? 'var(--text-4)' : 'var(--text-1)' }}
+        style={{ font: 'var(--type-note)', color: e.error ? 'var(--text-4)' : 'var(--text-1)' }}
       >
         {e.name}
       </span>
@@ -339,7 +339,7 @@ function PaletteCount({ e }: { e: PaletteEntry }) {
           so the count is the warning. The number is the DEVICE's, never a
           local copy -- it moves when the firmware's cap does. */}
       <span style={{
-        font: '400 10.5px/1 var(--mono)',
+        font: 'var(--type-small)',
         color: over ? 'var(--warn)' : 'var(--text-5)',
       }} title={over ? `the engine keeps the first ${LIMITS().PALETTE}` : undefined}>
         {e.error ? '—' : e.entries.length}

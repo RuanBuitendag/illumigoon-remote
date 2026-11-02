@@ -1,6 +1,6 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { ChevronMark, Press, SoundMark, TextField } from '../design-system';
-import { FoldKey, HeadingRow } from './control-rows';
+import { ChevronMark, Eyebrow, Press, SoundMark, TextField } from '../design-system';
+import { HeadingRow } from './control-rows';
 
 type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void };
 
@@ -32,10 +32,10 @@ export function LookItem({ actions, children, ...look }: LookItemProps) {
         <span className="look-item-heading">
           <span className="look-item-name">{name}</span>
           {hasSound && <SoundMark />}
-          {isPlaying && <span className="look-playing">PLAYING</span>}
+          {isPlaying && <span className="key-text look-playing">PLAYING</span>}
         </span>
-        {description && <span className="look-description">{description}</span>}
-        {note && <span className="look-description">{note}</span>}
+        {description && <span className="note look-description">{description}</span>}
+        {note && <span className="note look-description">{note}</span>}
         {strip}
       </Press>
       {children}
@@ -56,7 +56,12 @@ export function RecentLookItem({ name, strip, onPick, onHold, onHoldEnd }: Recen
 }
 
 export function RecentLooks({ children }: { children: ReactNode }) {
-  return <div className="recent-looks">{children}</div>;
+  return (
+    <div className="recent-block">
+      <Eyebrow>RECENT</Eyebrow>
+      <div className="recent-looks">{children}</div>
+    </div>
+  );
 }
 
 type LookPresetProps = HoldProps & { name: string; place: string; isPlaying: boolean; action?: ReactNode };
@@ -72,7 +77,7 @@ export function LookPreset({ name, place, isPlaying, action, onPick, onHold, onH
         onHoldEnd={onHoldEnd}
       >
         <span className="look-preset-name">{name}</span>
-        <span className="look-playing">{isPlaying ? 'PLAYING' : place}</span>
+        <span className="key-text look-playing">{isPlaying ? 'PLAYING' : place}</span>
       </Press>
       {action}
     </div>
@@ -87,9 +92,9 @@ export function LookElsewhere({ name, description, action }: LookElsewhereProps)
     <div className="look-row">
       <span className="look-item-heading">
         <span className="look-item-name">{name}</span>
-        <span className="look-elsewhere-action">{action}</span>
+        <span className="key-text look-elsewhere-action">{action}</span>
       </span>
-      {description && <span className="look-description">{description}</span>}
+      {description && <span className="note look-description">{description}</span>}
     </div>
   );
 }
@@ -98,18 +103,15 @@ type LookGroupProps = {
   title: string;
   note?: string;
   action?: ReactNode;
-  isOpen: boolean;
-  onToggle: () => void;
   children: ReactNode;
 };
 
-export function LookGroup({ title, note, action, isOpen, onToggle, children }: LookGroupProps) {
-  const fold = <FoldKey label={title.toUpperCase()} isOpen={isOpen} onToggle={onToggle} />;
+export function LookGroup({ title, note, action, children }: LookGroupProps) {
   return (
     <section className="library-group">
-      <HeadingRow heading={fold}>{action}</HeadingRow>
-      {isOpen && note && <p className="library-note">{note}</p>}
-      {isOpen && children}
+      <HeadingRow heading={<Eyebrow>{title.toUpperCase()}</Eyebrow>}>{action}</HeadingRow>
+      {note && <p className="note">{note}</p>}
+      {children}
     </section>
   );
 }
@@ -132,14 +134,14 @@ export function WhichLine({ text, onClick }: { text: string; onClick: () => void
 }
 
 export function LookProblem({ children }: { children: ReactNode }) {
-  return <p className="look-description">{children}</p>;
+  return <p className="note">{children}</p>;
 }
 
-// Opens at the look that plays, which can be far down a long list. A search goes back to the top.
+// Opens with the look that plays in view, and moves no further than that. A search goes back to the top.
 export function LookList({ search, children }: { search: string; children: ReactNode }) {
   const list = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    list.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'center' });
+    list.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'nearest' });
   }, []);
   useEffect(() => {
     if (search) list.current?.scrollIntoView({ block: 'start' });

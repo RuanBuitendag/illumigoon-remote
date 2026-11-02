@@ -1,35 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { HeadingRow, PageFrame, PageHint, PageSection, ScanNote } from '../../composites';
-import { Eyebrow, OptionRow, TextField, TextKey } from '../../design-system';
+import { ActionKey, Eyebrow, OptionRow, TextField, TextKey } from '../../design-system';
 import type { NewLight } from '../light-network/protocol';
 import { SCAN_PREVIEW } from '../looks/recordings';
 import {
   addLightByAddress,
   addNewLightToRoom,
   flashNewLight,
-  FLASH_MS,
   searchAgain,
   useFleet,
 } from '../store/fleet-store';
 import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { LookStrip } from './look-strip';
+import { MAX_LIGHT_NAME, OwnWifiForm } from './own-wifi-form';
+import { useFlash } from './use-flash';
 
-const MAX_LIGHT_NAME = 15;
 const SCAN_MS = 12000;
 const ADDRESS_WAIT_MS = 6000;
-
-function useFlash(light: NewLight, isFlashing: boolean) {
-  useEffect(() => {
-    if (!isFlashing) return;
-    flashNewLight(light, true);
-    const renewal = window.setInterval(() => flashNewLight(light, true), FLASH_MS / 2);
-    return () => {
-      window.clearInterval(renewal);
-      flashNewLight(light, false);
-    };
-  }, [light, isFlashing]);
-}
 
 type NewLightFormProps = {
   light: NewLight;
@@ -42,7 +30,8 @@ function NewLightForm({ light, number, rooms, onAdded }: NewLightFormProps) {
   const [isFlashing, setFlashing] = useState(false);
   const [name, setName] = useState('');
   const [roomId, setRoomId] = useState(rooms[0]?.id ?? '');
-  useFlash(light, isFlashing);
+  const flash = useCallback((isOn: boolean) => flashNewLight(light, isOn), [light]);
+  useFlash(flash, isFlashing);
 
   const add = () => {
     setFlashing(false);
@@ -56,7 +45,7 @@ function NewLightForm({ light, number, rooms, onAdded }: NewLightFormProps) {
         <TextKey onClick={() => setFlashing(!isFlashing)}>{isFlashing ? 'STOP' : 'FLASH IT'}</TextKey>
       </HeadingRow>
       <TextField
-        size="medium"
+        size="large"
         label="Name of the new light"
         placeholder="Name"
         maxLength={MAX_LIGHT_NAME}
@@ -69,9 +58,9 @@ function NewLightForm({ light, number, rooms, onAdded }: NewLightFormProps) {
         value={roomId}
         onChange={setRoomId}
       />
-      <TextKey disabled={!name.trim() || !roomId} onClick={add}>
-        ADD LIGHT
-      </TextKey>
+      <ActionKey disabled={!name.trim() || !roomId} onClick={add}>
+        Add light
+      </ActionKey>
     </PageSection>
   );
 }
@@ -105,15 +94,15 @@ function AddressForm() {
       <Eyebrow>BY ADDRESS</Eyebrow>
       <PageHint>Your router lists the address of each device on the network.</PageHint>
       <TextField
-        size="medium"
+        size="large"
         label="Address of the light"
         placeholder="Like 192.168.0.40"
         value={address}
         onChange={setAddress}
       />
-      <TextKey disabled={!address.trim()} onClick={add}>
-        ADD ADDRESS
-      </TextKey>
+      <ActionKey disabled={!address.trim()} onClick={add}>
+        Add address
+      </ActionKey>
       {sought && <PageHint>{soughtText()}</PageHint>}
     </PageSection>
   );
@@ -140,7 +129,7 @@ function ScanStatus() {
   return (
     <PageSection>
       <PageHint>Nothing found. Check that the new light has power and stays near a working light.</PageHint>
-      <TextKey onClick={again}>SEARCH AGAIN</TextKey>
+      <ActionKey onClick={again}>Search again</ActionKey>
     </PageSection>
   );
 }
@@ -170,11 +159,12 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
           onAdded={(message) => setAdded([...added, message])}
         />
       ))}
+      {newLights.length === 0 && <OwnWifiForm />}
       {newLights.length === 0 && <AddressForm />}
       {isDone && (
         <PageSection>
           <PageHint>{doneText}</PageHint>
-          <TextKey onClick={closePage}>DONE</TextKey>
+          <ActionKey onClick={closePage}>Done</ActionKey>
         </PageSection>
       )}
     </PageFrame>

@@ -1,7 +1,6 @@
 import { LockNote, RoomCard } from '../../composites';
 import { PowerKey } from '../../design-system';
 import { movesToMusic } from '../looks/look-catalog';
-import { useRecording } from '../looks/recordings';
 import { setPower, type Light } from '../store/fleet-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom, useNavigation } from '../store/navigation-store';
@@ -19,6 +18,8 @@ import { offTimerNote, offTimersOf } from '../store/schedules';
 import { LookStrip } from './look-strip';
 import { schedulingLights } from './off-timer-sheet';
 import { RecentLookRow } from './recent-looks';
+
+const CARD_LOOKS = 2;
 
 function lockedText({ onlineLights }: Room) {
   const until = onlineLights[0]?.lockedUntil ?? 0;
@@ -60,14 +61,12 @@ export function RoomSummary({ room }: { room: Room }) {
   const onlineLights = useShownLights(room.onlineLights);
   const first = onlineLights[0];
   const source = previewOfAnimation(first?.animation ?? null);
-  const recording = useRecording(source);
   const isOn = isAnyOn(onlineLights);
   const level = highestBrightness(onlineLights);
   const lookId = lookIdOf(first?.animation ?? null);
   return (
     <RoomCard
       name={room.name}
-      isLit={isOn}
       power={
         !room.isLocked && (
           <PowerKey
@@ -78,7 +77,6 @@ export function RoomSummary({ room }: { room: Room }) {
           />
         )
       }
-      tint={recording?.tint}
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
       lookName={lookLabel(onlineLights)}
       hasSound={Boolean(lookId && movesToMusic(lookId))}
@@ -91,7 +89,7 @@ export function RoomSummary({ room }: { room: Room }) {
       {room.isLocked ? (
         <RoomLockNote room={room} />
       ) : (
-        <RecentLookRow room={room} lights={writableLights} isBare />
+        <RecentLookRow room={room} lights={writableLights} limit={CARD_LOOKS} />
       )}
     </RoomCard>
   );
