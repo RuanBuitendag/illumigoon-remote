@@ -1,9 +1,9 @@
-import { InfoRow, PageFrame, PageHint, PageSection, ToggleRow } from '../../composites';
+import { InfoRow, PageHint, PageSection, ToggleRow } from '../../composites';
 import { TextKey } from '../../design-system';
 import { setAutoUpdate, updateSoftware, type Light } from '../store/fleet-store';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
+import { AppPage } from './app-page';
 
 // A light restarts, restarts again and downloads in between, and it reports none of this.
 const UPDATE_WAIT_MS = 5 * 60000;
@@ -39,11 +39,9 @@ export function LightSoftwarePage({ room }: { room: Room }) {
   const servers = useLatestVersions((latest) => latest.servers);
   const patchLights = room.lights.filter((light) => newVersionOf(light, servers) && canPlayPatches(light));
   return (
-    <PageFrame
+    <AppPage
       title="Light software"
       intro="An update takes a few minutes. The light goes off while it restarts."
-      backLabel={room.name}
-      onBack={closePage}
     >
       {patchLights.length > 0 && (
         <PageHint>
@@ -68,6 +66,6 @@ export function LightSoftwarePage({ room }: { room: Room }) {
           onChange={(isOn) => setAutoUpdate(room.writableLights, isOn)}
         />
       </PageSection>
-    </PageFrame>
+    </AppPage>
   );
 }

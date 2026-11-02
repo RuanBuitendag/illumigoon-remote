@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { PageFrame, WhichLine } from '../../composites';
+import { WhichLine } from '../../composites';
 import type { Light } from '../store/fleet-store';
-import { closePage, useNavigation } from '../store/navigation-store';
+import { useNavigation } from '../store/navigation-store';
 import { lightsInScope, type Room } from '../store/rooms';
+import { AppPage } from './app-page';
 import { LookLibrary } from './look-library';
 import { PasteLookSheet } from './paste-look-sheet';
 import { WhichLightsSheet } from './which-lights-sheet';
@@ -39,14 +40,12 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
     return <WhichLightsSheet rooms={rooms} picked={chosen} onDone={pick} onClose={() => setSheet(null)} />;
   }
   return (
-    <PageFrame
+    <AppPage
       title="Looks"
       intro="Tap to play. Hold to try."
-      backLabel={room?.name ?? 'Rooms'}
-      onBack={closePage}
     >
       <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet('which')} />
       <LookLibrary lights={lights} onPaste={() => setSheet('paste')} />
-    </PageFrame>
+    </AppPage>
   );
 }

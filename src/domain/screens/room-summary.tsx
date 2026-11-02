@@ -1,10 +1,10 @@
-import { LockNote, RoomCard } from '../../composites';
-import { PowerKey, TextKey } from '../../design-system';
+import { LevelLine, LockNote, RoomBlock } from '../../composites';
+import { TextKey } from '../../design-system';
 import { movesToMusic } from '../looks/look-catalog';
 import { useRecording } from '../looks/recordings';
-import { setPower, type Light } from '../store/fleet-store';
+import { setBrightness, type Light } from '../store/fleet-store';
 import { useShownLights } from '../store/look-preview';
-import { openPage, openRoom, useNavigation } from '../store/navigation-store';
+import { openPage, openRoom } from '../store/navigation-store';
 import {
   highestBrightness,
   isAnyOn,
@@ -15,8 +15,7 @@ import {
   previewOfAnimation,
   type Room,
 } from '../store/rooms';
-import { LookStrip } from './look-strip';
-import { RecentLookRow } from './recent-looks';
+import { LightList, RoomSwitch } from './light-list';
 
 function lockedText({ onlineLights }: Room) {
   const until = onlineLights[0]?.lockedUntil ?? 0;
@@ -37,43 +36,28 @@ function lookLabel(lights: Light[]) {
   return lookNameOf(lights[0]) ?? '';
 }
 
-function onCountText({ lights }: Room) {
+// The look when every light is on, how many are on when only some are, and Off when none are.
+export function roomStateText(lights: Light[], shownOnline: Light[]) {
   const onCount = lights.filter((light) => lightState(light) === 'on').length;
-  if (onCount === 0) return lights.length === 1 ? 'Off' : 'All off';
-  if (onCount === lights.length) return lights.length === 1 ? 'On' : 'All on';
-  return `${onCount} of ${lights.length} on`;
+  if (onCount === 0) return 'Off';
+  if (onCount < lights.length) return `${onCount} of ${lights.length} lights on`;
+  return lookLabel(shownOnline) || 'On';
 }
 
-export function RoomSummary({ room }: { room: Room }) {
+export function RoomSummary({ room, isOpen }: { room: Room; isOpen: boolean }) {
   const { writableLights } = room;
-  const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
   const onlineLights = useShownLights(room.onlineLights);
   const first = onlineLights[0];
-  const source = previewOfAnimation(first?.animation ?? null);
-  const recording = useRecording(source);
+  const recording = useRecording(previewOfAnimation(first?.animation ?? null));
   const isOn = isAnyOn(onlineLights);
-  const level = highestBrightness(onlineLights);
   const lookId = lookIdOf(first?.animation ?? null);
   return (
-    <RoomCard
+    <RoomBlock
       name={room.name}
-      countText={onCountText(room)}
-      isLit={isOn}
-      power={
-        !room.isLocked && (
-          <PowerKey
-            label={`${room.name} power`}
-            isOn={isOn}
-            disabled={writableLights.length === 0}
-            onChange={(next) => setPower(writableLights, next)}
-          />
-        )
-      }
-      tint={recording?.tint}
-      strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
-      lookName={lookLabel(onlineLights)}
+      stateText={roomStateText(room.lights, onlineLights)}
       hasSound={Boolean(lookId && movesToMusic(lookId))}
-      lightStates={room.lights.map((light) => ({ id: light.address, name: light.name, state: lightState(light) }))}
+      tint={recording?.tint}
+      power={!room.isLocked && <RoomSwitch room={room} />}
       note={silentText(room)}
       isOpen={isOpen}
       onOpen={() => openRoom(room.id)}
@@ -85,11 +69,17 @@ export function RoomSummary({ room }: { room: Room }) {
           onAction={() => openPage('take-back', room.id)}
         />
       ) : (
-        <>
-          <RecentLookRow room={room} lights={writableLights} isBare />
+        <LevelLine
+          label="Room brightness"
+          level={highestBrightness(onlineLights)}
+          isLit={isOn}
+          disabled={writableLights.length === 0}
+          onLevel={(next) => setBrightness(writableLights, next)}
+        >
           <TextKey onClick={() => openPage('looks', room.id)}>LOOKS</TextKey>
-        </>
+        </LevelLine>
       )}
-    </RoomCard>
+      <LightList room={room} />
+    </RoomBlock>
   );
 }

@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
-import { HeadingRow, PageFrame, PageHint, PageSection, ScanNote } from '../../composites';
+import { HeadingRow, PageHint, PageSection, ScanNote } from '../../composites';
 import { Eyebrow, OptionRow, TextField, TextKey } from '../../design-system';
 import type { NewLight } from '../light-network/protocol';
 import { SCAN_PREVIEW } from '../looks/recordings';
 import { addLightByAddress, addNewLightToRoom, flashNewLight, FLASH_MS, useFleet } from '../store/fleet-store';
 import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
+import { AppPage } from './app-page';
 import { LookStrip } from './look-strip';
 
 const MAX_LIGHT_NAME = 15;
@@ -96,10 +97,8 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
   const isDone = added.length > 0 && newLights.length === 0;
   const doneText = added.length === 1 ? '1 new light added.' : `${added.length} new lights added.`;
   return (
-    <PageFrame
+    <AppPage
       title="Add a light"
-      backLabel="Rooms"
-      onBack={closePage}
       intro="Plug in the new lights and stay close to them. You can set up several in one go."
     >
       {newLights.length === 0 && !isDone && (
@@ -124,6 +123,6 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
           <TextKey onClick={closePage}>DONE</TextKey>
         </PageSection>
       )}
-    </PageFrame>
+    </AppPage>
   );
 }

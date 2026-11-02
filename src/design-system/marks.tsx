@@ -37,7 +37,3 @@ export function GripMark() {
     </svg>
   );
 }
-
-export function StatusMark({ state }: { state: 'on' | 'off' | 'silent' }) {
-  return <i className="status-mark" data-state={state} />;
-}

@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from '../../composites';
+import { DayPicker, InfoRow, PageHint, PageSection, SelectRow } from '../../composites';
 import { AddKey, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
 import { removeSchedule, setScheduleEnabled, writeSchedule } from '../store/fleet-store';
 import type { ScheduleChange } from '../light-network/protocol';
 import { useLibrary } from '../store/library-store';
-import { closePage } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import {
   changesOfScene,
@@ -20,6 +19,7 @@ import {
   windowEntry,
   type RoomSchedule,
 } from '../store/schedules';
+import { AppPage } from './app-page';
 
 type Kind = 'on' | 'off' | 'between' | 'timer';
 
@@ -145,11 +145,9 @@ export function SchedulesPage({ room }: { room: Room }) {
   const unable = room.onlineLights.filter((light) => !light.canSchedule).map(({ name }) => name);
   const schedules = roomSchedules(able);
   return (
-    <PageFrame
+    <AppPage
       title="Schedules"
       intro="The lights keep these themselves, so they run with this app closed."
-      backLabel={room.name}
-      onBack={closePage}
     >
       {schedules.length > 0 && (
         <PageSection>
@@ -163,6 +161,6 @@ export function SchedulesPage({ room }: { room: Room }) {
       {!isAdding && able.length > 0 && hasScheduleSpace(able) && (
         <AddKey onClick={() => setAdding(true)}>+ Add a schedule</AddKey>
       )}
-    </PageFrame>
+    </AppPage>
   );
 }

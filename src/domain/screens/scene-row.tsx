@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { SceneCard, SceneLine, SceneShelf } from '../../composites';
+import { MoodSegment, SceneCard, SceneShelf } from '../../composites';
 import { useRecording } from '../looks/recordings';
 import { removeScene, updateScene, useLibrary, type SceneEntry, type SceneLight } from '../store/library-store';
 import { endPreview, previewScene } from '../store/look-preview';
@@ -7,18 +7,17 @@ import { previewOfAnimation, type Room } from '../store/rooms';
 import {
   animationOf,
   applyScene,
+  isSceneShowing,
   refreshScene,
-  roomNameOf,
   roomOfScene,
-  roomTag,
   sceneSummary,
   WHOLE_HOUSE,
 } from '../store/scenes';
 import { SaveSceneSheet } from './save-scene-sheet';
 
-function LightLine({ tag, light }: { tag: string; light: SceneLight }) {
+function LightSegment({ light }: { light: SceneLight }) {
   const recording = useRecording(light.is_on ? previewOfAnimation(animationOf(light)) : null);
-  return <SceneLine tag={tag} gradient={recording?.gradient} />;
+  return <MoodSegment gradient={recording?.gradient} />;
 }
 
 type SceneRowProps = {
@@ -28,7 +27,7 @@ type SceneRowProps = {
 
 type SceneSheet = { renaming: SceneEntry | null };
 
-// Home holds the scenes that cross rooms, and a room holds its own.
+// All rooms holds the scenes that cross rooms, and a room holds its own, called moods.
 export function SceneRow({ rooms, room }: SceneRowProps) {
   const scenes = useLibrary((library) => library.scenes).filter(
     (scene) => !scene.error && roomOfScene(scene, rooms)?.id === room?.id,
@@ -47,6 +46,9 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
   return (
     <>
       <SceneShelf
+        title={room ? 'MOODS' : 'SCENES'}
+        saveLabel={room ? '+ Save mood' : '+ Save scene'}
+        isMood={Boolean(room)}
         hasScenes={scenes.length > 0}
         isEditing={isEditing}
         note={problem ?? leftOutNote}
@@ -58,6 +60,7 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             key={scene.file}
             name={scene.name}
             summary={sceneSummary(scene, room ? [room] : rooms)}
+            isActive={isSceneShowing(scene, rooms)}
             isEditing={isEditing}
             onApply={() => setLeftOut(applyScene(scene, rooms))}
             onHold={() => previewScene(scene, rooms)}
@@ -66,9 +69,7 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             onRename={() => setSheet({ renaming: scene })}
             onDelete={() => void removeScene(scene)}
           >
-            {scene.lights.map((light) => (
-              <LightLine key={light.id} tag={roomTag(roomNameOf(light.room ?? '', rooms))} light={light} />
-            ))}
+            {room && scene.lights.map((light) => <LightSegment key={light.id} light={light} />)}
           </SceneCard>
         ))}
       </SceneShelf>

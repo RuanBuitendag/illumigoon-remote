@@ -91,37 +91,47 @@ the screens: a person sees "look" and "Edit". The **package** is `packages/patch
 
 ### The screens
 
-There are eleven screens. There is no separate editor, no second home and no Done button.
+Three tabs stand at the bottom: All rooms, the current room, and Settings. The light card and every page open over a
+tab, and the design in `Fresh Directions.dc.html` section 6a sets the look. There is no separate editor and no second
+home.
 
 | Screen | What it holds | Reached from |
 | -- | -- | -- |
 | Search | Only when no light is known | App start |
-| Home | Whole house row, house scenes, rooms, Add a light | App start |
-| Room | Which lights, hero, room scenes, lights, more rows | Tap a room |
-| Looks | Saved, Mine, grouped looks, simple looks, Examples | CHANGE LOOK on a room, or the whole house row |
+| All rooms | House summary and square, house scenes, room blocks with fader and lights, Add a light | First tab |
+| Room | Room chips, title and fader, moods, look with recent looks, lights, add a light | Second tab, OPEN on a room block |
+| Settings | Per room: Off timer, Schedules, Lock, Rename and arrange, Light software. App: Add a light, App version | Third tab |
+| Light card | Power, strip, brightness, colours, CHANGE LOOK, ALL CONTROLS, DONE | Tap a light row |
+| All controls | Which lights, hero, level, look controls, recent looks | ALL CONTROLS on Room or the light card |
+| Looks | Saved, Mine, grouped looks, simple looks, Examples | CHANGE LOOK, LOOKS on a room block, or the house LOOKS |
 | Edit | The live strip and five sections | EDIT on a room, for the lights in scope |
-| Schedules | As today, with the off timer row beside it on Room | Room |
-| Lock, Take back | As today | Room, room card on Home |
-| Rename and arrange | Names, move a light to a room | Room |
-| Light software | As today, plus which light is master | Room, Home notice |
-| Add a light | As today, plus an address box when nothing is found | Home |
+| Schedules | As today | Settings |
+| Lock, Take back | As today | Settings, a room block |
+| Rename and arrange | Names, move a light to a room | Settings |
+| Light software | As today, plus which light is master | Settings, the notice on All rooms |
+| Add a light | As today, plus an address box when nothing is found | All rooms, Room, Settings |
 
 Sheets over a screen: Save scene, Save look, Which lights, Colours, Modulation matrix, Fragments, Palettes, Off timer.
 
 ### Moving on a phone
 
 ```
-Home
- |- tap a room ------------> Room
- |                            |- CHANGE LOOK ------> Looks
- |                            |- EDIT -------------> Edit
- |                            |- Schedules, Lock, Rename and arrange, Light software
- |- whole house LOOKS -----> Looks, for every light
- |- + Add a light ---------> Add a light
+All rooms ---------- Room ---------- Settings        the tabs
+ |- OPEN ----------> Room             |- Off timer, Schedules, Lock, Rename and arrange,
+ |- light row -----> Light card       |  Light software
+ |- LOOKS ---------> Looks            |- Add a light
+ |- + Add a light -> Add a light
+                     Room
+                      |- light row ---> Light card
+                      |- CHANGE LOOK -> Looks
+                      |- EDIT --------> Edit
+                      |- ALL CONTROLS > All controls
 ```
 
-`BackKey` at the top left leaves every page, and it is always named after where it goes: "Rooms", or the room name.
-`ScreenStack` keeps its three levels, because Looks and Edit are both pages over Room. Nothing nests deeper.
+`BackKey` at the top left leaves every page, and it is always named after where it goes: "All rooms", the room name, or
+"Settings". `useBackLabel` works this out from the tab under the page. A page for a room also makes that room the
+current one, so the second tab and the laptop pane follow it. `ScreenStack` keeps tab, card and page as its three
+levels. Nothing nests deeper.
 
 Tap acts and hold shows. This is the one rule for gestures, and a person learns it once:
 
@@ -129,21 +139,23 @@ Tap acts and hold shows. This is the one rule for gestures, and a person learns 
 | -- | -- | -- |
 | Look | Play it | Try it on the lights, until release |
 | Scene | Apply it | Try it on the lights, until release |
-| Light row | Power | Flash that light |
+| Light square | Power | |
+| Light row | Open the light card | Flash that light |
 | Light row, in Rename and arrange | | Drag to order |
+| Room block | | Drag to order |
 
 The Looks page says this in its one intro line: "Tap to play. Hold to try."
 
 ### Room, top to bottom
 
-1. Which lights (`ScopeTabs`), only with two lights or more.
-2. Hero: strip, look name, CHANGE LOOK, EDIT, power and level, look controls.
-3. Recent looks: the last four in this room, as small strips.
-4. Scenes of this room, then + Save scene.
-5. Lights: name, status, mark.
-6. Off timer, Schedules, Lock, Rename and arrange, Light software.
+1. Room chips, only with two rooms or more.
+2. Room square, name, state, and the room fader.
+3. Moods: the scenes of this room, then + Save mood. EDIT shows each one's summary, Update, Rename and Delete.
+4. Look: name, strip, EDIT, CHANGE LOOK, ALL CONTROLS, then recent looks, the last four in this room.
+5. Lights: square, name, status.
+6. Add a light to this room.
 
-The "Patch editor" rows on Home and Room are gone. Editing is reached from the look itself.
+The "Patch editor" rows are gone. Editing is reached from the look itself.
 
 ### Edit on a phone
 
@@ -172,9 +184,9 @@ was not saved, Room shows the notice "Changes are on the light" with SAVE and UN
 
 The same screens and the same order, from 900 px up. No screen exists on one size only.
 
-- Two panes. Home is a fixed 380 px column on the left. Room and its pages fill the right pane. The first room opens
-  at start, so the pane is never empty. A room's `BackKey` hides, and a page's stays. This replaces the two column
-  grid from `ef08825`.
+- Two panes. All rooms is a fixed 380 px column on the left, so its tab hides. Room, Settings and their pages fill the
+  right pane. The first room opens at start, so the pane is never empty. A page's `BackKey` stays. This replaces the
+  two column grid from `ef08825`.
 - Edit takes the whole window, because it needs the width. The bottom tabs hide. The layers, the chain and the
   inspector stand as three columns, with macros and modulators under them, as today.
 - The column's own tabs (FX, Colour, Randomise, User) show only here. The bottom tabs do that job on a phone.

@@ -10,6 +10,7 @@ import { loadLibrary } from '../store/library-store';
 import { closePage, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
 import { momentsOf, offerUndo } from '../store/undo';
+import { useBackLabel } from './app-page';
 import { useEditorDialogs } from './editor-dialogs';
 
 // The editor is large, so a phone that only sets looks never loads it.
@@ -37,6 +38,7 @@ function titleOf(lookName: string, lightName: string | undefined, isOneLight: bo
 }
 
 export function EditorPage({ room }: { room: Room | undefined }) {
+  const backLabel = useBackLabel();
   const isOpen = useNavigation((navigation) => navigation.isPageOpen);
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
   // Chosen once: the editor stays on this light whatever the fleet does while it is open.
@@ -76,7 +78,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   if (hasLeft || (!light && !isOpen)) return null;
   return (
     <EditLayout
-      backLabel={room?.name ?? 'Rooms'}
+      backLabel={backLabel}
       title={titleOf(lookName, light?.name, isOneLight)}
       sections={SECTIONS}
       section={section}
