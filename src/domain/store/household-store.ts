@@ -35,6 +35,8 @@ type Household = {
   recentLooks: Record<string, RecentLook[]>;
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
+  // Light software versions the notice on Home was told to leave for later.
+  skippedSoftware: string[];
 };
 
 export const useHousehold = create<Household>()(
@@ -48,6 +50,7 @@ export const useHousehold = create<Household>()(
       roomOrder: [] as string[],
       recentLooks: {} as Record<string, RecentLook[]>,
       lightAddresses: [] as string[],
+      skippedSoftware: [] as string[],
     }),
     { name: 'household' },
   ),
@@ -57,6 +60,12 @@ export const useHousehold = create<Household>()(
 export function rememberLightAddress(address: string) {
   useHousehold.setState(({ lightAddresses }) => ({
     lightAddresses: lightAddresses.includes(address) ? lightAddresses : [...lightAddresses, address],
+  }));
+}
+
+export function forgetLightAddress(address: string) {
+  useHousehold.setState(({ lightAddresses }) => ({
+    lightAddresses: lightAddresses.filter((kept) => kept !== address),
   }));
 }
 
@@ -71,6 +80,12 @@ export function rememberRecentLook(roomId: string, look: RecentLook) {
     const others = (recentLooks[roomId] ?? []).filter(({ name }) => name !== look.name);
     return { recentLooks: { ...recentLooks, [roomId]: [look, ...others].slice(0, RECENT_LOOKS) } };
   });
+}
+
+export function skipSoftware(versions: string[]) {
+  useHousehold.setState(({ skippedSoftware }) => ({
+    skippedSoftware: [...new Set([...skippedSoftware, ...versions])],
+  }));
 }
 
 export function setRoomOrder(roomOrder: string[]) {

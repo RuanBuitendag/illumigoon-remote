@@ -271,6 +271,8 @@ export interface Ctl {
   beginDrag(src: DragSrc, x: number, y: number): void
   dragMove(x: number, y: number): void
   dragEnd(): void
+  /** The same connection without a drag, for a phone, where the two ends are on different sections. */
+  bind(src: DragSrc, target: string): void
   /** Path the pointer is over while dragging, so the knob can light up. */
   hot: string | null
 

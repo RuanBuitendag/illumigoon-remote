@@ -10,7 +10,7 @@ import {
 } from '../domain/layerops';
 import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Ico, RowGrip } from './bits';
+import { Hr, Lab, Mono, Ico, RowGrip, layerName } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
@@ -28,7 +28,7 @@ function tale(head: string, r: Removal, reached: Reached, note = ''): string {
   if (r.mods.length) took.push(`mod ${r.mods.join(', ')}`);
   // The one thing a removal takes that someone else will notice: it is gone from their phone.
   if (r.controls.length)
-    took.push(`the user control${r.controls.length === 1 ? '' : 's'} ${r.controls.join(', ')}`);
+    took.push(`the room control${r.controls.length === 1 ? '' : 's'} ${r.controls.join(', ')}`);
   return `${head}${took.length ? ` with ${took.join(', ')}` : ''}${note}${unlessReached(reached)}`;
 }
 
@@ -56,12 +56,12 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
 
   const copy = (slot: number) => {
     const left = lift(slot);
-    if (left < 0) { ctl.say(`could not copy L${slot}`); return; }
+    if (left < 0) { ctl.say(`could not copy ${layerName(slot)}`); return; }
     // The same sentence the fragment sheet says on save, for the same reason: a row driving
     // ANOTHER layer off a shared modulator is not part of this layer and does not travel.
     ctl.say(left
-      ? `L${slot} copied — ${left} row(s) left behind, they drive other layers`
-      : `L${slot} copied`);
+      ? `${layerName(slot)} copied — ${left} row(s) left behind, they drive other layers`
+      : `${layerName(slot)} copied`);
   };
 
   const paste = () => {
@@ -72,16 +72,16 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
     let landed = -1;
     const reached = ctl.structural(d => { landed = insertFragment(d, clip.patch); });
     ctl.selectLayer(landed);
-    ctl.say(`${clip.label} pasted into L${landed}${reached ? '' : ' — not connected'}`);
+    ctl.say(`${clip.label} pasted into ${layerName(landed)}${reached ? '' : ' — not connected'}`);
   };
 
   const duplicate = (slot: number) => {
     const problem = whyNotDuplicate(ctl.patch, slot);
-    if (problem) { ctl.say(`cannot duplicate L${slot} — ${problem}`); return; }
+    if (problem) { ctl.say(`cannot duplicate ${layerName(slot)} — ${problem}`); return; }
     let landed = -1;
     const reached = ctl.structural(d => { landed = duplicateLayer(d, slot); });
     ctl.selectLayer(landed);
-    ctl.say(`L${slot} duplicated into L${landed}${reached ? '' : ' — not connected'}`);
+    ctl.say(`${layerName(slot)} copied to ${layerName(landed)}${reached ? '' : ' — not connected'}`);
   };
 
   /** The layer the selection falls back to once this one is gone. */
@@ -102,7 +102,7 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
     const reached = ctl.structural(d => { report.push(removeLayer(d, slot)); });
     if (ctl.sel === slot) ctl.selectLayer(next);
     const [removal] = report;
-    if (removal) ctl.say(tale(`L${slot} removed`, removal, reached, ' — paste to put it back'));
+    if (removal) ctl.say(tale(`${layerName(slot)} removed`, removal, reached, ' — paste to put it back'));
   };
 
   /** Wholesale and unrecoverable — the one gesture here that does ask. */
@@ -238,7 +238,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
           <div
             className="ghostrow well"
             onClick={acts.paste}
-            title={`A copy of L${ctl.clip.from}, with the modulators that drove it`}
+            title={`A copy of ${layerName(ctl.clip.from)}, with the modulators that drove it`}
           >
             <Ico.Copy />
             <Lab className="dim">Paste {ctl.clip.label}</Lab>
@@ -294,7 +294,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
         <span
           className="name grow"
           style={{
-            font: '500 11px/1 var(--sans)',
+            font: '500 10.5px/1 var(--sans)',
             letterSpacing: '.18em',
             textTransform: 'uppercase',
           }}
@@ -374,19 +374,17 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
           style={{
             width: 16,
             textAlign: 'right',
-            font: '400 14px/1 var(--mono)',
+            font: '400 15px/1 var(--mono)',
             color: selected ? 'var(--text-1)' : 'var(--text-3)',
           }}
         >
-          {L.slot}
+          {L.slot + 1}
         </span>
         <span className="name grow">{L.emitter.type}</span>
-        {/* Same place, two occupants: `ord` at rest, the actions on hover or when this
-            row is the selected one, so nothing beside them moves. */}
-        <Mono className="dim sm rowmeta">ord {L.order}</Mono>
+        {/* The actions show on hover or when this row is the selected one. */}
         <div className="row rowacts" style={{ gap: 7 }}>
           <button
-            title={`Copy L${L.slot} — paste it into any patch in this window`}
+            title={`Copy ${layerName(L.slot)} — paste it into any patch in this window`}
             onClick={e => {
               e.stopPropagation();
               acts.copy(L.slot);
@@ -395,7 +393,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             <Ico.Copy />
           </button>
           <button
-            title={`Duplicate L${L.slot} — the copy is driven by the same modulators`}
+            title={`Duplicate ${layerName(L.slot)} — the copy is driven by the same modulators`}
             onClick={e => {
               e.stopPropagation();
               acts.duplicate(L.slot);
@@ -404,7 +402,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             <Ico.Dup />
           </button>
           <button
-            title={`Remove L${L.slot}, its rows and any modulator left driving nothing — paste ` +
+            title={`Remove ${layerName(L.slot)}, its rows and any modulator left driving nothing — paste ` +
               `puts it back`}
             onClick={e => {
               e.stopPropagation();

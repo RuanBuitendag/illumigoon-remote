@@ -72,7 +72,7 @@ export function MacroRack({ ctl }: { ctl: Ctl }) {
           </Mono>
         </div>
         <span
-          style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+          style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
         >
           {macros.length
             ? 'drag a macro onto any parameter to bind it'
@@ -184,7 +184,7 @@ function MacroNaming({ ctl, m }: { ctl: Ctl; m: Modulator }) {
           spellCheck={false}
           placeholder={uniqueSlotName(ctl.patch)}
           maxLength={SLOT_LABEL_MAX}
-          style={{ font: '400 12px/1 var(--sans)', color: 'var(--text-1)', flexGrow: 1 }}
+          style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-1)', flexGrow: 1 }}
           onChange={e => setText(e.target.value.slice(0, SLOT_LABEL_MAX))}
           onBlur={commit}
           onKeyDown={e => {

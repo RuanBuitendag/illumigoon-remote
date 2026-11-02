@@ -43,7 +43,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   },
 
   'wave.freq': {
-    unit: 'cyc',
+    unit: 'cycles',
     curve: 2.5,
     desc:
       'How many full waves fit across the strip. This is a wave in SPACE, not in time — it ' +
@@ -57,7 +57,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   },
 
   'perlin.scale': {
-    unit: 'cyc',
+    unit: 'cycles',
     curve: 4,
     desc: 'How many noise features fit across the strip. Low is broad clouds; high is fine grain.',
   },

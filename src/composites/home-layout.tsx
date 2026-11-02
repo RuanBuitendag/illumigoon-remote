@@ -51,11 +51,14 @@ export function HomeAdd({ children, onClick }: { children: ReactNode; onClick: (
   );
 }
 
-export function BottomNotice({ text, actionLabel, onAction }: HouseNoteProps) {
+type BottomNoticeProps = HouseNoteProps & { laterLabel?: string; onLater?: () => void };
+
+export function BottomNotice({ text, actionLabel, onAction, laterLabel, onLater }: BottomNoticeProps) {
   return (
     <footer className="bottom-notice">
       <span>{text}</span>
       <LinkKey onClick={onAction}>{actionLabel}</LinkKey>
+      {onLater && <LinkKey onClick={onLater}>{laterLabel}</LinkKey>}
     </footer>
   );
 }

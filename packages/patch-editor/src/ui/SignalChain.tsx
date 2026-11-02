@@ -4,7 +4,7 @@ import { useState, type DragEvent, type HTMLAttributes, type ReactNode } from 'r
 import { LIMITS, nodeById, requireParam, globalParam, GLOBAL_NODE } from '../domain/catalog';
 import { makeWarp, pathOf, type Layer, type Warp } from '../domain/patch';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Tabs, Ico, Switch, Blurb, RackToggle, RowGrip } from './bits';
+import { Hr, Lab, Mono, Tabs, Ico, Switch, Blurb, RackToggle, RowGrip, layerName } from './bits';
 import { Stages } from './Stages';
 import { useCollapsed } from './collapsed';
 import { unlessReached, type Ctl, type Tab } from './ctl';
@@ -28,15 +28,15 @@ import { reshuffle } from './ColourBodies';
  *
  * See include/lighting/layer.h -- `shade()` is eight lines and is the authority.
  */
-const CRUMB = ['WARP', 'EMITTER', 'OPACITY', 'COLOUR', 'BLEND'] as const;
+const CRUMB = ['BEND', 'SHAPE', 'OPACITY', 'COLOUR', 'BLEND'] as const;
 
 /**
  * Which crumbs the visible tab is standing on. Source holds the emitter and the opacity that scales
  * it; the FX rack holds the warps and the Colour row between them.
  */
 const CRUMB_FOR: Record<Tab, readonly (typeof CRUMB)[number][]> = {
-  source: ['EMITTER', 'OPACITY'],
-  fx: ['WARP', 'COLOUR'],
+  source: ['SHAPE', 'OPACITY'],
+  fx: ['BEND', 'COLOUR'],
 };
 
 export function EmitterPanel({ ctl, layer, tab, onTab }: {
@@ -52,7 +52,7 @@ export function EmitterPanel({ ctl, layer, tab, onTab }: {
 }) {
   return (
     <div className="centre">
-      <CentreHead name={`L${layer.slot}`} sub={layer.emitter.type}
+      <CentreHead name={layerName(layer.slot)} sub={layer.emitter.type}
                   crumb={CRUMB} lit={CRUMB_FOR[tab]} tab={tab} onTab={onTab} />
 
       {/* The emitter is not a rack row, so its controls live on this tab. */}
@@ -103,7 +103,7 @@ function LayerLevel({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
 
 function ChainCaption({ coloured, prefix }: { coloured: boolean; prefix: string }) {
   return (
-    <span style={{ font: '400 10px/1.6 var(--sans)', color: 'var(--text-5)' }}>
+    <span style={{ font: '400 10.5px/1.6 var(--sans)', color: 'var(--text-5)' }}>
       {coloured
         ?
           'Composed top to bottom. Warps above Colour bend the shape before it has a colour; ' +
@@ -126,7 +126,7 @@ function ChainStages({ ctl, warps, colourAt }: {
   const node = ctl.node;
   if (!warps.length) {
     return (
-      <span style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', paddingTop: 6 }}>
+      <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', paddingTop: 6 }}>
         {colourAt !== null
           ? 'No warp loaded. The layer renders in its own coordinates.'
           : 'No warp loaded. The mix reaches the strip as it is.'}
@@ -318,7 +318,7 @@ function Chain({ ctl, host, top }: {
             Stages
           </RackToggle>
           <span
-            style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+            style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
           >
             what each row does to space
           </span>
@@ -355,14 +355,13 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
         <div className="row" style={{ gap: 14, alignItems: 'baseline' }}>
           <span
             style={{
-              font: '400 20px/1 var(--mono)',
+              font: '400 20px/1 var(--sans)',
               color: 'var(--text-1)',
-              letterSpacing: '-.01em',
             }}
           >
             {name}
           </span>
-          <span style={{ font: '400 14px/1 var(--sans)', color: 'var(--text-3)' }}>{sub}</span>
+          <span style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-3)' }}>{sub}</span>
         </div>
         <div className="row" style={{ gap: 10 }}>
           {crumb.map((s, i) => (
@@ -487,7 +486,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">warp{i}</Mono>
-        <span className="grow" style={{ font: '400 12px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-5)' }}>
           —
         </span>
         <Ico.Plus c="var(--text-5)" />
@@ -519,7 +518,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       <Mono className={sel ? '' : 'dim'}>warp{i}</Mono>
       <span
         className="grow"
-        style={{ font: '400 12px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        style={{ font: '400 13px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
       >
         {warp.type}
       </span>
@@ -578,7 +577,7 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
       />
       <span
         className="grow"
-        style={{ font: '400 12px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        style={{ font: '400 13px/1 var(--sans)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
       >
         colour
       </span>
@@ -628,7 +627,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">colour</Mono>
-        <span className="grow" style={{ font: '400 12px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: '400 13px/1 var(--sans)', color: 'var(--text-5)' }}>
           —
         </span>
         <Ico.Plus c="var(--text-5)" />

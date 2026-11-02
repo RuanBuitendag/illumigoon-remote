@@ -72,7 +72,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
               style={{
                 padding: '48px 20px',
                 textAlign: 'center',
-                font: '400 11px/1.7 var(--sans)',
+                font: '400 10.5px/1.7 var(--sans)',
                 color: 'var(--text-5)',
               }}
             >
@@ -96,7 +96,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         <Hr />
         <div style={{ padding: '17px 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
           <Lab className="dim">Depth is in the parameter’s own units</Lab>
-          <span style={{ font: '400 10px/1.65 var(--sans)', color: 'var(--text-5)' }}>
+          <span style={{ font: '400 10.5px/1.65 var(--sans)', color: 'var(--text-5)' }}>
             The device resolves <M>target = base + v × depth</M> every frame, clamped, wrapped or
             folded by whatever the parameter is. <M>bi</M> takes the source at ±1; <M>uni</M> remaps
             it to 0–1 first; <M>mul</M> scales the base instead of offsetting it.
@@ -140,7 +140,7 @@ function MatrixRoute({
       <div className="row" style={{ width: 52, gap: 9 }}>
         <span
           className="src"
-          style={{ font: '400 11px/1 var(--mono)', color: 'var(--modulation-soft)' }}
+          style={{ font: '400 10.5px/1 var(--mono)', color: 'var(--modulation-soft)' }}
         >
           {r.src}
         </span>
@@ -149,7 +149,7 @@ function MatrixRoute({
       {/* The NAME when it has one: a patch with three macros on it otherwise reads
           as three rows of `macro`, told apart only by the number in SRC. */}
       <div style={{ width: 118 }}>
-        <span style={{ font: '400 12px/1 var(--sans)', color: colour }}>{label}</span>
+        <span style={{ font: '400 13px/1 var(--sans)', color: colour }}>{label}</span>
       </div>
       <div className="row" style={{ width: 26 }}>
         <Ico.Arrow />

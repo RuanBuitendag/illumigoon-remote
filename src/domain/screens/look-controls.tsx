@@ -14,8 +14,9 @@ import { changeControl } from '../store/change-control';
 import { setTransition, type Light } from '../store/fleet-store';
 import { saveLook } from '../store/look-files';
 import { keepPalette, useLibrary, type PaletteEntry } from '../store/library-store';
-import { currentControls, lookNameOf, OWN_LOOK } from '../store/rooms';
+import { currentControls, lookNameOf, OWN_LOOK, previewOfAnimation } from '../store/rooms';
 import { LookControl } from './look-control';
+import { LookStrip } from './look-strip';
 
 const MAX_TRANSITION_SECONDS = 10;
 
@@ -75,6 +76,7 @@ function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter:
     isPalette ? colours.map(hexToColour) : hexToColour(colours[0] ?? BLACK_HEX);
   return (
     <ColourEditor
+      strip={<LookStrip source={previewOfAnimation(lights[0]?.animation ?? null)} shape="line" />}
       isPalette={isPalette}
       colours={toHexList(parameter)}
       minimumColours={parameter.min ?? 1}

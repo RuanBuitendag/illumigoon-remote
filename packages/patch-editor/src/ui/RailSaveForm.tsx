@@ -1,8 +1,9 @@
 /** The saving form: the open patch's name, where it would go, and what it may become. */
 
 import type { Ref } from 'react';
+import { BUDGET } from '../domain/catalog';
 import { whyNoVersion, type PublishKind } from '../domain/publish';
-import { Mono, budgetColour, budgetNote, kb } from './bits';
+import { Blurb, Mono, budgetNote } from './bits';
 import type { RailSave } from './railPublish';
 import type { useRailVerdict } from './useRailVerdict';
 
@@ -109,13 +110,26 @@ export function RailSaveForm({
           ref={nameInput}
           className="well"
           value={save.name}
-          placeholder="Name this patch"
+          placeholder="Name this look"
           spellCheck={false}
           onChange={e => save.onName(e.target.value)}
           onKeyDown={e => {
             if (e.key === 'Enter') onSave();
           }}
         />
+      </div>
+      <input
+        className="well railnotes"
+        value={save.notes}
+        placeholder="Notes: warm, slow, good at night"
+        spellCheck={false}
+        onChange={e => save.onNotes(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') onSave();
+        }}
+      />
+      {size > BUDGET.NVS && <Blurb>{budgetNote(size)}</Blurb>}
+      <div className="row" style={{ gap: 18 }}>
         <button
           className="pill"
           data-primary="true"
@@ -166,7 +180,7 @@ export function RailSaveForm({
           + PRESET
         </button>
         <Mono className="dim sm">
-          {presetCount ? `${presetCount} preset(s)` : 'no presets yet'}
+          {presetCount === 1 ? '1 preset' : `${presetCount || 'No'} presets`}
         </Mono>
         <span className="grow" />
         <button
@@ -177,29 +191,6 @@ export function RailSaveForm({
         >
           COPY
         </button>
-      </div>
-      <input
-        className="well railnotes"
-        value={save.notes}
-        placeholder="notes — warm, slow, good at night"
-        spellCheck={false}
-        onChange={e => save.onNotes(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter') onSave();
-        }}
-      />
-      <div className="row" style={{ gap: 8 }}>
-        {/* The slash is the only group syntax there is, so it has to be said somewhere. */}
-        <Mono className="dim sm" title="A slash makes a group: kitchen/Morning">
-          {save.name.trim() ? file : 'a slash makes a group'}
-        </Mono>
-        <span className="grow" />
-        <span
-          style={{ font: '400 11px/1 var(--mono)', color: budgetColour(size) }}
-          title={budgetNote(size)}
-        >
-          {kb(size)}
-        </span>
       </div>
     </div>
   );

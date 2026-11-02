@@ -3,8 +3,9 @@ import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, RoomDragLis
 import { TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { searchAgain, setPower } from '../store/fleet-store';
-import { setRoomOrder } from '../store/household-store';
+import { searchAgain } from '../store/fleet-store';
+import { setHousePower } from '../store/house-power';
+import { setRoomOrder, skipSoftware, useHousehold } from '../store/household-store';
 import { moveOldScenes } from '../store/library-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
@@ -22,7 +23,7 @@ function HouseControls({ rooms }: { rooms: Room[] }) {
         label="All lights"
         isOn={isAnyOn(shownLights)}
         disabled={lights.length === 0}
-        onChange={(isOn) => setPower(lights, isOn)}
+        onChange={(isOn) => setHousePower(rooms, isOn)}
       />
     </HouseSection>
   );
@@ -30,14 +31,30 @@ function HouseControls({ rooms }: { rooms: Room[] }) {
 
 function SoftwareNotice({ rooms }: { rooms: Room[] }) {
   const servers = useLatestVersions((latest) => latest.servers);
+  const skipped = useHousehold((household) => household.skippedSoftware);
   const [isSeen, setSeen] = useState(false);
-  const room = rooms.find(({ lights }) => lights.some((light) => newVersionOf(light, servers)));
-  if (isSeen || !room) return null;
+  const waiting = rooms.flatMap(({ id, lights }) =>
+    lights.flatMap((light) => {
+      const version = newVersionOf(light, servers);
+      return version && !skipped.includes(version) ? [{ roomId: id, version }] : [];
+    }),
+  );
+  const [first] = waiting;
+  if (isSeen || !first) return null;
   const see = () => {
     setSeen(true);
-    openPage('software', room.id);
+    openPage('software', first.roomId);
   };
-  return <BottomNotice text="New light software is ready." actionLabel="See" onAction={see} />;
+  const later = () => skipSoftware(waiting.map(({ version }) => version));
+  return (
+    <BottomNotice
+      text="New light software is ready."
+      actionLabel="See"
+      onAction={see}
+      laterLabel="Later"
+      onLater={later}
+    />
+  );
 }
 
 function UpdateNotice({ rooms }: { rooms: Room[] }) {

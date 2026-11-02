@@ -1,6 +1,21 @@
 import { create } from 'zustand';
 
-export type PageKind = 'looks' | 'schedules' | 'software' | 'lock' | 'take-back' | 'arrange' | 'add-light' | 'editor';
+// A page opened from Home goes back to Home, not to a room that was never open.
+export function useBackLabel(room: { id: string; name: string } | undefined) {
+  const isBeneath = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room?.id);
+  return room && isBeneath ? room.name : 'Rooms';
+}
+
+export type PageKind =
+  | 'looks'
+  | 'schedules'
+  | 'software'
+  | 'lock'
+  | 'take-back'
+  | 'arrange'
+  | 'add-light'
+  | 'editor'
+  | 'history';
 
 // A screen stays in the state after it closes, so it is still there while it slides away.
 type Navigation = {

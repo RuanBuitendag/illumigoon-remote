@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { PageFrame, WhichLine } from '../../composites';
 import type { Light } from '../store/fleet-store';
-import { closePage, useNavigation } from '../store/navigation-store';
+import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, type Room } from '../store/rooms';
 import { LookLibrary } from './look-library';
 import { PasteLookSheet } from './paste-look-sheet';
@@ -22,6 +22,7 @@ function whichLine(lights: Light[], rooms: Room[]) {
 // With no room this page is for the whole house. Which lights lasts as long as the page is open.
 export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room[] }) {
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
+  const backLabel = useBackLabel(room);
   const [sheet, setSheet] = useState<'which' | 'paste' | null>(null);
   const [picked, setPicked] = useState<string[] | null>(null);
   const writable = rooms.flatMap(({ writableLights }) => writableLights);
@@ -42,7 +43,7 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
     <PageFrame
       title="Looks"
       intro="Tap to play. Hold to try."
-      backLabel={room?.name ?? 'Rooms'}
+      backLabel={backLabel}
       onBack={closePage}
     >
       <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet('which')} />

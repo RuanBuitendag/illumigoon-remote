@@ -16,7 +16,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { Blurb, Hr, Lab, Mono, Tabs } from './bits';
+import { Blurb, Hr, Lab, Mono, Tabs, layerName } from './bits';
 import { ColourBody, MasterColourBody } from './ColourBodies';
 import { EmitterBody, WarpBody } from './NodeBodies';
 import { MASTER_NAME } from './LayerStack';
@@ -95,6 +95,9 @@ const INSPECTORS: { [K in NodeRef['kind']]: Kind<Extract<NodeRef, { kind: K }>> 
  * The same `Tabs` the centre column uses for Source / FX rack, so a tab reads as a tab wherever
  * it is (LIFE-844).
  */
+// The words of the sections on the phone.
+const SIDE_NAMES = { randomise: 'roll', user: 'controls' };
+
 export function SideColumn({ side, onSide, children }: {
   side: Side;
   onSide(side: Side): void;
@@ -103,7 +106,7 @@ export function SideColumn({ side, onSide, children }: {
   return (
     <div className="panel" style={{ width: 348, flexShrink: 0 }}>
       <div className="sidetabs" style={{ padding: '8px 12px 0', flexShrink: 0 }}>
-        <Tabs items={SIDES} value={side} onChange={onSide} />
+        <Tabs items={SIDES} value={side} onChange={onSide} labels={SIDE_NAMES} />
       </div>
       {children}
     </div>
@@ -127,7 +130,7 @@ export function Inspector({ ctl, layer, host, onBrowsePalettes }: {
     return (
       <>
         <div className="panelhead">
-          <Lab className="head">{colour ? 'Colour' : 'FX'}</Lab>
+          <Lab className="head">{colour ? 'Colour' : 'Effects'}</Lab>
         </div>
         <Hr />
         <div style={{ padding: '18px 16px' }}>
@@ -135,7 +138,7 @@ export function Inspector({ ctl, layer, host, onBrowsePalettes }: {
             {colour
               ? `The mix has no colour of its own. Add Colour at the top of ${MASTER_NAME}’s FX ` +
                 `rack to give every layer one palette.`
-              : `No FX on ${layer ? `L${layer.slot}` : MASTER_NAME} yet. Add a row in the FX ` +
+              : `No effects on ${layer ? layerName(layer.slot) : MASTER_NAME} yet. Add a row in the effects ` +
                 `rack and its controls land here.`}
           </Blurb>
         </div>

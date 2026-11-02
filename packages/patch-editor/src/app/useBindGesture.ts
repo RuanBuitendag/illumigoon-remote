@@ -10,6 +10,7 @@ import {
   type Modulator,
   type Patch,
 } from '../domain/patch';
+import { layerName, pathName } from '../ui/bits';
 import { unlessReached, type DragSrc } from '../ui/ctl';
 import type { PatchDraft } from './usePatchDraft';
 import type { PatchWrites } from './usePatchWrites';
@@ -41,7 +42,7 @@ function wireTrigger(
     const L = d.layers.find(x => x.slot === slot);
     if (L) L.emitter.trigger = { src: src.slot, out: 0 };
   });
-  return `${mod!.type} → L${slot} trigger${unlessReached(reached)}`;
+  return `${mod!.type} → ${layerName(slot)} trigger${unlessReached(reached)}`;
 }
 
 /** Why this row cannot be added, or null when it can. */
@@ -91,15 +92,7 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
     setHot(prev => (prev === path ? prev : path));
   }, [dragRef]);
 
-  const dragEnd = useCallback(() => {
-    // Read the target off the ref, not state: the last pointermove and the pointerup can
-    // land in the same frame, and state would still be showing the previous target.
-    const gesture = dragRef.current;
-    dragRef.current = null;
-    setDrag(null); setGhost(null); setHot(null);
-    if (!gesture?.hot) return;
-
-    const { src, hot: target } = gesture;
+  const bind = useCallback((src: DragSrc, target: string) => {
     const patchNow = patchRef.current;
     const mod = patchNow.modulators.find(m => m.slot === src.slot);
 
@@ -124,10 +117,19 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
         bypass: false,
       });
     });
-    say(`${mod?.type ?? 'source'} → ${target}${unlessReached(reached)}`);
-  }, [structural, say, dragRef, patchRef]);
+    say(`${mod?.type ?? 'source'} → ${pathName(target)}${unlessReached(reached)}`);
+  }, [structural, say, patchRef]);
 
-  return { drag, hot, trace, setTrace, ghost, beginDrag, dragMove, dragEnd };
+  const dragEnd = useCallback(() => {
+    // Read the target off the ref, not state: the last pointermove and the pointerup can
+    // land in the same frame, and state would still be showing the previous target.
+    const gesture = dragRef.current;
+    dragRef.current = null;
+    setDrag(null); setGhost(null); setHot(null);
+    if (gesture?.hot) bind(gesture.src, gesture.hot);
+  }, [bind, dragRef]);
+
+  return { drag, hot, trace, setTrace, ghost, beginDrag, dragMove, dragEnd, bind };
 }
 
 export type BindGesture = ReturnType<typeof useBindGesture>;

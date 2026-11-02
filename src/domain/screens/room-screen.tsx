@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from '../../composites';
+import { FoldKey, Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from '../../composites';
 import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
@@ -21,14 +21,16 @@ import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
 import { OffTimerSheet, schedulingLights } from './off-timer-sheet';
 import { RecentLookRow } from './recent-looks';
+import { RoomLockNote } from './room-summary';
 import { SceneRow } from './scene-row';
 
 const ALL_LIGHTS = 'all';
 
 function RoomScope({ room, scope }: { room: Room; scope: string | null }) {
-  if (room.lights.length < 2) return null;
-  const allLabel = room.lights.length === 2 ? 'Both lights' : 'All lights';
-  const tabs = room.writableLights.map(({ address, name }) => ({ value: address, name }));
+  const { writableLights } = room;
+  if (writableLights.length < 2) return null;
+  const allLabel = writableLights.length === 2 ? 'Both lights' : 'All lights';
+  const tabs = writableLights.map(({ address, name }) => ({ value: address, name }));
   return (
     <ScopeTabs
       tabs={[{ value: ALL_LIGHTS, name: allLabel }, ...tabs]}
@@ -109,7 +111,8 @@ function RoomMore({ room }: { room: Room }) {
 }
 
 function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
-  const shownLights = useShownLights(lights);
+  // A room in someone else's hands still shows what it is doing.
+  const shownLights = useShownLights(lights.length > 0 ? lights : room.onlineLights);
   const first = shownLights[0];
   const source = previewOfAnimation(first?.animation ?? null);
   const recording = useRecording(source);
@@ -118,6 +121,7 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
   const isMixed = isMixedLook(shownLights);
   const hasLights = lights.length > 0;
   const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
+  const [isAdjusting, setAdjusting] = useState(false);
   return (
     <Hero
       tint={recording?.tint}
@@ -134,7 +138,13 @@ function RoomHero({ room, lights }: { room: Room; lights: Light[] }) {
         onPower={(next) => setPower(lights, next)}
         onLevel={(next) => setBrightness(lights, next)}
       />
-      {hasLights && !isMixed && <LookControls lights={lights} />}
+      {room.isLocked && <RoomLockNote room={room} />}
+      {hasLights && !isMixed && (
+        <>
+          <FoldKey label="ADJUST" isOpen={isAdjusting} onToggle={() => setAdjusting(!isAdjusting)} />
+          {isAdjusting && <LookControls lights={lights} />}
+        </>
+      )}
     </Hero>
   );
 }

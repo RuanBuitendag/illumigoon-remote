@@ -3,6 +3,7 @@ import './composites.css';
 export { ColourEditor } from './colour-editor';
 export {
   ColourRow,
+  FoldKey,
   HeadingRow,
   PaletteRow,
   SelectRow,
@@ -20,6 +21,7 @@ export {
   LookList,
   LookPreset,
   LookProblem,
+  LookSearch,
   RecentLookItem,
   RecentLooks,
   WhichLine,
@@ -38,6 +40,6 @@ export {
 } from './page-frame';
 export { LockNote, RoomCard } from './room-card';
 export { Hero, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from './room-layout';
-export { SceneCard, SceneLine, SceneShelf } from './scene-shelf';
+export { SceneCard, SceneLine, SceneShelf, StateCard, StateList } from './scene-shelf';
 export { EditLayout, ScreenStack, SearchLayout, UndoNotice, useIsWide } from './screen-stack';
 export { ControlGroup, ControlList, SheetFooter } from './sheet';

@@ -18,6 +18,8 @@ import {
 } from '../domain/patch'
 import {
   Hr, Lab, Mono, Blurb, Seg, Ico, Switch, StructField, depthAfterDrag, fineOf, type DragRange,
+  layerName,
+  pathName,
 } from './bits';
 import { dropControls, modulatorOfTarget } from '../domain/surface';
 import { exposeProps } from './Surface';
@@ -54,7 +56,7 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
         <div className="col" style={{ gap: 12, width: 300, flexShrink: 0 }}>
           <div className="row" style={{ gap: 11, justifyContent: 'space-between' }}>
             <div className="row" style={{ gap: 11 }}>
-              <Mono className="accent">{m.slot}</Mono>
+              <Mono className="accent">{m.slot + 1}</Mono>
               {/* The rack it is sitting in, said out loud — the same editor opens under both. */}
               <Lab className="head">{m.type === 'macro' ? 'Macro' : 'Modulator'}</Lab>
             </div>
@@ -231,7 +233,7 @@ function SourceWire({ ctl, m, others, wire, label }: {
       <Lab className="dim">{label}</Lab>
       <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
         {others.length === 0 ? (
-          <span style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)' }}>
+          <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)' }}>
             no other modulator loaded
           </span>
         ) : (
@@ -332,7 +334,7 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
       <div className="col" style={{ gap: 9, minWidth: 210 }}>
         <Lab className="dim">Drives</Lab>
         <Blurb>
-          Nothing yet — drag this slot onto any knob.
+          Nothing yet. Drag this onto a dial, or hold the dial.
         </Blurb>
       </div>
     );
@@ -348,7 +350,7 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
           const resolved = specForPath(ctl.patch, r.dst);
           return (
             <div key={r.id} className="destrow">
-              <span className="dst" title={r.dst}>{r.dst}</span>
+              <span className="dst">{pathName(r.dst)}</span>
               <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
               <button className="poltog" disabled={!slotSwings}
                       title={slotSwings
@@ -365,8 +367,8 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
         {/* A wire, so it carries no depth and no polarity — the row is the whole fact. */}
         {reach.triggers.map(L => (
           <div key={`t${L}`} className="destrow" data-wire="true"
-               title={`Fires L${L}'s emitter — unwire it on that layer's Trigger row`}>
-            <span className="dst">L{L}.emitter.trigger</span>
+               title={`Fires ${layerName(L)}'s emitter — unwire it on that layer's Trigger row`}>
+            <span className="dst">{layerName(L)} trigger</span>
             <Lab className="dim">trig</Lab>
           </div>
         ))}

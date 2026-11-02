@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from '../../composites';
-import { AddKey, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
-import { removeSchedule, setScheduleEnabled, writeSchedule } from '../store/fleet-store';
-import type { ScheduleChange } from '../light-network/protocol';
+import { AddKey, Eyebrow, KeyRow, PowerKey, TextField, TextKey } from '../../design-system';
+import { removeSchedule, setScheduleEnabled, writeSchedule, type Light } from '../store/fleet-store';
+import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
 import { useLibrary } from '../store/library-store';
-import { closePage } from '../store/navigation-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import {
   changesOfScene,
@@ -20,6 +20,7 @@ import {
   windowEntry,
   type RoomSchedule,
 } from '../store/schedules';
+import { offerUndo } from '../store/undo';
 
 type Kind = 'on' | 'off' | 'between' | 'timer';
 
@@ -40,7 +41,9 @@ const TIMERS = [
 const DEFAULT_AT = 19 * 60;
 const DEFAULT_UNTIL = 23 * 60;
 const EVERY_DAY = 127;
-const AS_IT_WAS = '';
+const LAST_LOOK = '';
+// While a schedule is changed: what it starts now, whatever that is on each light.
+const SAME_AS_NOW = 'now';
 
 function TimeField({ label, value, onChange }: { label: string; value: number; onChange: (value: number) => void }) {
   return (
@@ -62,19 +65,45 @@ function useSceneChoices(room: Room) {
     if (ofLights.size > 0) changes.set(scene.file, ofLights);
   }
   const options = scenes.filter(({ file }) => changes.has(file)).map(({ file, name }) => ({ value: file, name }));
-  return { options: [{ value: AS_IT_WAS, name: 'As it was' }, ...options], changes };
+  return { options: [{ value: LAST_LOOK, name: 'The last look' }, ...options], changes };
 }
 
-function ScheduleForm({ room, onDone }: { room: Room; onDone: () => void }) {
-  const [kind, setKind] = useState<Kind>('on');
-  const [at, setAt] = useState(DEFAULT_AT);
-  const [until, setUntil] = useState(DEFAULT_UNTIL);
-  const [days, setDays] = useState(EVERY_DAY);
+function kindOf({ at_utc: atUtc, until, state }: ScheduleEntry): Kind {
+  if (atUtc !== undefined) return 'timer';
+  if (until !== undefined) return 'between';
+  return state.is_on === false ? 'off' : 'on';
+}
+
+// Only a time of day can be changed. A timer that runs once is set again instead.
+const canChange = ({ at_utc: atUtc }: ScheduleEntry) => atUtc === undefined;
+
+type ScheduleFormProps = { room: Room; changing: RoomSchedule | null; onDone: () => void };
+
+function formStart(entry: ScheduleEntry | undefined) {
+  return {
+    kind: entry ? kindOf(entry) : ('on' as Kind),
+    at: entry?.at ?? DEFAULT_AT,
+    until: entry?.until ?? DEFAULT_UNTIL,
+    days: entry?.days ?? EVERY_DAY,
+    startsLook: Boolean(entry?.state.animation),
+  };
+}
+
+function ScheduleForm({ room, changing, onDone }: ScheduleFormProps) {
+  const entryNow = changing?.entry;
+  const start = formStart(entryNow);
+  const [kind, setKind] = useState(start.kind);
+  const [at, setAt] = useState(start.at);
+  const [until, setUntil] = useState(start.until);
+  const [days, setDays] = useState(start.days);
   const [timer, setTimer] = useState(30);
-  const [sceneId, setSceneId] = useState(AS_IT_WAS);
+  const [sceneId, setSceneId] = useState(start.startsLook ? SAME_AS_NOW : LAST_LOOK);
   const { options, changes } = useSceneChoices(room);
+  const sameAsNow = { value: SAME_AS_NOW, name: changing?.title ?? '' };
+  const sceneOptions = start.startsLook ? [sameAsNow, ...options] : options;
   const lights = room.writableLights.filter((light) => light.canSchedule);
-  const sceneChanges = kind === 'on' || kind === 'between' ? changes.get(sceneId) : undefined;
+  const startsLight = kind === 'on' || kind === 'between';
+  const sceneChanges = startsLight ? changes.get(sceneId) : undefined;
 
   const entries = {
     on: () => dailyEntry(at, days, TURN_ON),
@@ -83,11 +112,19 @@ function ScheduleForm({ room, onDone }: { room: Room; onDone: () => void }) {
     timer: () => timerEntry(timer),
   };
 
+  const stateOf = (light: Light, entry: ScheduleEntry) => {
+    if (sceneChanges) return sceneChanges.get(light.address);
+    if (startsLight && sceneId === SAME_AS_NOW) {
+      return light.schedule.find(({ id }) => id === entry.id)?.state ?? entry.state;
+    }
+    return entry.state;
+  };
+
   // One entry id across the room, with the state each light takes in the scene.
   const save = () => {
-    const entry = entries[kind]();
+    const entry = { ...entries[kind](), ...(entryNow && { id: entryNow.id, enabled: entryNow.enabled }) };
     for (const light of lights) {
-      const state = sceneChanges ? sceneChanges.get(light.address) : entry.state;
+      const state = stateOf(light, entry);
       if (state) writeSchedule([light], { ...entry, state });
     }
     onDone();
@@ -95,14 +132,14 @@ function ScheduleForm({ room, onDone }: { room: Room; onDone: () => void }) {
 
   return (
     <PageSection>
-      <Eyebrow>NEW SCHEDULE</Eyebrow>
+      <Eyebrow>{changing ? 'CHANGE SCHEDULE' : 'NEW SCHEDULE'}</Eyebrow>
       <SelectRow label="What" options={KINDS} value={kind} onChange={setKind} />
       {kind === 'timer' ? (
         <SelectRow label="Turn off after" options={TIMERS} value={timer} onChange={setTimer} />
       ) : (
         <>
           {kind !== 'off' && options.length > 1 && (
-            <SelectRow label="Scene" options={options} value={sceneId} onChange={setSceneId} />
+            <SelectRow label="Shows" options={sceneOptions} value={sceneId} onChange={setSceneId} />
           )}
           <TimeField label={kind === 'between' ? 'From' : 'At'} value={at} onChange={setAt} />
           {kind === 'between' && <TimeField label="Until" value={until} onChange={setUntil} />}
@@ -112,24 +149,47 @@ function ScheduleForm({ room, onDone }: { room: Room; onDone: () => void }) {
           />
         </>
       )}
-      <TextKey disabled={lights.length === 0 || (kind !== 'timer' && days === 0)} onClick={save}>
-        SAVE
-      </TextKey>
+      <KeyRow>
+        <TextKey isQuiet onClick={onDone}>
+          CANCEL
+        </TextKey>
+        <TextKey disabled={lights.length === 0 || (kind !== 'timer' && days === 0)} onClick={save}>
+          SAVE
+        </TextKey>
+      </KeyRow>
     </PageSection>
   );
 }
 
-function ScheduleItem({ room, schedule }: { room: Room; schedule: RoomSchedule }) {
+// Each light keeps its own copy, and a light adds `owner` by itself when it takes one back.
+function removeWithUndo(room: Room, { entry, title }: RoomSchedule) {
+  const copies = room.writableLights.flatMap((light) => {
+    const copy = light.schedule.find(({ id }) => id === entry.id);
+    return copy ? [{ light, copy }] : [];
+  });
+  removeSchedule(room.writableLights, entry.id);
+  const restore = () => {
+    for (const { light, copy } of copies) {
+      const { owner: _owner, ...kept } = copy;
+      writeSchedule([light], kept);
+    }
+  };
+  offerUndo({ text: `${title} removed`, moments: [], restore });
+}
+
+type ScheduleItemProps = { room: Room; schedule: RoomSchedule; onChange: () => void };
+
+function ScheduleItem({ room, schedule, onChange }: ScheduleItemProps) {
   const { entry, title, when, missingFrom } = schedule;
   const note = missingFrom.length > 0 ? `${when}. Not on ${missingFrom.join(', ')}` : when;
   return (
-    <InfoRow label={title} note={note}>
+    <InfoRow label={title} note={note} onOpen={canChange(entry) ? onChange : undefined}>
       <PowerKey
         label={title}
         isOn={entry.enabled !== false}
         onChange={(isOn) => setScheduleEnabled(room.writableLights, entry.id, isOn)}
       />
-      <TextKey isQuiet onClick={() => removeSchedule(room.writableLights, entry.id)}>
+      <TextKey isQuiet onClick={() => removeWithUndo(room, schedule)}>
         REMOVE
       </TextKey>
     </InfoRow>
@@ -140,7 +200,8 @@ const unableText = (names: string[]) =>
   `${names.join(', ')} can't keep a schedule. ${names.length === 1 ? 'It needs' : 'They need'} newer light software.`;
 
 export function SchedulesPage({ room }: { room: Room }) {
-  const [isAdding, setAdding] = useState(false);
+  const [form, setForm] = useState<{ changing: RoomSchedule | null } | null>(null);
+  const backLabel = useBackLabel(room);
   const able = room.onlineLights.filter((light) => light.canSchedule);
   const unable = room.onlineLights.filter((light) => !light.canSchedule).map(({ name }) => name);
   const schedules = roomSchedules(able);
@@ -148,20 +209,25 @@ export function SchedulesPage({ room }: { room: Room }) {
     <PageFrame
       title="Schedules"
       intro="The lights keep these themselves, so they run with this app closed."
-      backLabel={room.name}
+      backLabel={backLabel}
       onBack={closePage}
     >
-      {schedules.length > 0 && (
+      {!form && schedules.length > 0 && (
         <PageSection>
           {schedules.map((schedule) => (
-            <ScheduleItem key={schedule.entry.id} room={room} schedule={schedule} />
+            <ScheduleItem
+              key={schedule.entry.id}
+              room={room}
+              schedule={schedule}
+              onChange={() => setForm({ changing: schedule })}
+            />
           ))}
         </PageSection>
       )}
       {unable.length > 0 && <PageHint>{unableText(unable)}</PageHint>}
-      {isAdding && <ScheduleForm room={room} onDone={() => setAdding(false)} />}
-      {!isAdding && able.length > 0 && hasScheduleSpace(able) && (
-        <AddKey onClick={() => setAdding(true)}>+ Add a schedule</AddKey>
+      {form && <ScheduleForm room={room} changing={form.changing} onDone={() => setForm(null)} />}
+      {!form && able.length > 0 && hasScheduleSpace(able) && (
+        <AddKey onClick={() => setForm({ changing: null })}>+ Add a schedule</AddKey>
       )}
     </PageFrame>
   );

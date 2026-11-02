@@ -105,6 +105,7 @@ There are eleven screens. There is no separate editor, no second home and no Don
 | Rename and arrange | Names, move a light to a room | Room |
 | Light software | As today, plus which light is master | Room, Home notice |
 | Add a light | As today, plus an address box when nothing is found | Home |
+| Recent | The last 10 states of the house, kept in memory until the app closes. Tap goes back, hold tries, KEEP saves a scene | RECENT beside the scenes on Home |
 
 Sheets over a screen: Save scene, Save look, Which lights, Colours, Modulation matrix, Fragments, Palettes, Off timer.
 
@@ -156,6 +157,10 @@ The "Patch editor" rows on Home and Room are gone. Editing is reached from the l
 |                                      |
 | LAYERS  COLOUR  MOTION  CONTROLS ROLL|   OptionRow fixed at the bottom, for the thumb
 ```
+
+A modulator and a dial sit in different sections on a phone, so a drag cannot join them. Hold the dial and choose
+"Move with" a modulator. The laptop side tabs use the same words as these sections, ROLL and CONTROLS. Layers and
+modulators count from 1 on screen, and the patch keeps its slot numbers from 0.
 
 | Section | Shows | Editor side tab |
 | -- | -- | -- |

@@ -5,15 +5,20 @@ type SheetProps = {
   label: string;
   title: ReactNode;
   actions: ReactNode;
+  // Stays in view while the rest of the sheet scrolls.
+  pinned: ReactNode;
   children: ReactNode;
 };
 
-export function Sheet({ label, title, actions, children }: SheetProps) {
+export function Sheet({ label, title, actions, pinned, children }: SheetProps) {
   return (
     <section className="sheet" role="dialog" aria-label={label}>
-      <div className="sheet-heading">
-        <h2 className="sheet-title">{title}</h2>
-        {actions}
+      <div className="sheet-pinned">
+        <div className="sheet-heading">
+          <h2 className="sheet-title">{title}</h2>
+          {actions}
+        </div>
+        {pinned}
       </div>
       {children}
     </section>

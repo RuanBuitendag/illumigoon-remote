@@ -7,7 +7,7 @@ import { finishEdit } from '../store/edit-follow';
 import { editorApi } from '../store/editor-host';
 import { setHeldByEditor } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
-import { closePage, useNavigation } from '../store/navigation-store';
+import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
 import { momentsOf, offerUndo } from '../store/undo';
 import { useEditorDialogs } from './editor-dialogs';
@@ -47,6 +47,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     momentsOf(room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : []),
   );
   const [isOneLight] = useState(() => room !== undefined && lightsInScope(room, scopeAddress).length === 1);
+  const backLabel = useBackLabel(room);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
   const [section, setSection] = useState<EditorSection>('layers');
   const [isSaving, setSaving] = useState(false);
@@ -76,7 +77,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   if (hasLeft || (!light && !isOpen)) return null;
   return (
     <EditLayout
-      backLabel={room?.name ?? 'Rooms'}
+      backLabel={backLabel}
       title={titleOf(lookName, light?.name, isOneLight)}
       sections={SECTIONS}
       section={section}

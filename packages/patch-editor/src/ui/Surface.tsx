@@ -21,7 +21,7 @@
 
 import { useState, type CSSProperties, type DragEvent } from 'react';
 import { LIMITS } from '../domain/catalog';
-import { type Patch } from '../domain/patch';
+import { specForPath, type Patch } from '../domain/patch';
 import {
   controlOn,
   groupsOf,
@@ -32,7 +32,7 @@ import {
   whyDropped,
 } from '../domain/surface';
 import { type Control } from '../domain/control';
-import { Blurb, Hr, Ico, Lab, Mono, RowGrip } from './bits';
+import { Blurb, Hr, Ico, Lab, Mono, RowGrip, pathName } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 
 // ---------------------------------------------------------------- exposing
@@ -65,6 +65,12 @@ export const Catch = ({ onClose }: { onClose(): void }) => (
        onContextMenu={e => { e.preventDefault(); onClose(); }} />
 );
 
+/** Each modulator not yet driving this target. A phone has no way to drag one here. */
+function freeSources({ modulators, matrix }: Patch, target: string) {
+  const taken = (slot: number) => matrix.some(row => row.src === slot && row.dst === target);
+  return modulators.filter(m => !taken(m.slot));
+}
+
 export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
   ctl: Ctl;
   at: ExposeAt;
@@ -74,12 +80,13 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
   const existing = controlOn(ctl.patch, at.target);
   const r = existing ? null : resolveTarget(ctl.patch, at.target);
   const full = !existing && keptControls(ctl.patch).length >= LIMITS().SURFACE;
+  const sources = specForPath(ctl.patch, at.target) ? freeSources(ctl.patch, at.target) : [];
 
   const remove = () => {
     const reached = ctl.structural(d => {
       d.surface = d.surface.filter(c => c.target !== at.target);
     });
-    ctl.say(`${existing!.label} is off the user surface${unlessReached(reached)}`);
+    ctl.say(`${existing!.label} is off the room${unlessReached(reached)}`);
     onClose();
   };
 
@@ -88,16 +95,15 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
       <Catch onClose={onClose} />
       <div
         className="surfacemenu"
-        style={placed(at, 240, 120)}
+        style={placed(at, 240, 120 + sources.length * 44)}
         onContextMenu={e => e.preventDefault()}
       >
-        <Mono className="dim sm menuhead">{at.target}</Mono>
         {existing ? (
           <>
             <button onClick={() => onEdit(existing, false)}>
-              Edit user control “{existing.label}”…
+              Edit room control “{existing.label}”…
             </button>
-            <button onClick={remove}>Remove from user surface</button>
+            <button onClick={remove}>Take off the room</button>
           </>
         ) : r ? (
           <button
@@ -110,11 +116,22 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
               if (seed) onEdit(seed, true);
             }}
           >
-            {full ? `User surface is full (${LIMITS().SURFACE})` : 'Expose to user…'}
+            {full ? `The room has all ${LIMITS().SURFACE} controls` : 'Show on the room…'}
           </button>
         ) : (
           <span className="menunote">Nothing here a person can be handed</span>
         )}
+        {sources.map(m => (
+          <button
+            key={m.slot}
+            onClick={() => {
+              ctl.bind({ kind: 'mod', slot: m.slot }, at.target);
+              onClose();
+            }}
+          >
+            Move with {m.slot + 1} {m.type}
+          </button>
+        ))}
       </div>
     </>
   );
@@ -309,7 +326,7 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
       <span className="ctlglyph">{GLYPH[c.type] ?? '?'}</span>
       <div className="col grow" style={{ gap: 5, minWidth: 0 }}>
         <span className="ctllabel">{c.label}</span>
-        <Mono className="dim sm ctltarget">{c.target}</Mono>
+        <Mono className="dim sm ctltarget">{pathName(c.target)}</Mono>
       </div>
       <Mono className="dim sm">{c.key}</Mono>
     </div>
@@ -456,7 +473,7 @@ export function UserSurface({ ctl, onEdit }: {
   return (
     <>
       <div className="panelhead">
-        <Lab className="head">User surface</Lab>
+        <Lab className="head">Room controls</Lab>
         <div className="row" style={{ gap: 10 }}>
           <Mono className={kept.length >= cap ? 'sm warn' : 'dim sm'}>
             {kept.length} / {cap}
@@ -476,8 +493,8 @@ export function UserSurface({ ctl, onEdit }: {
         {!list.length && (
           <div style={{ padding: '6px 4px 4px' }}>
             <Blurb>
-              Nothing is exposed yet. Right-click any knob, switch, blend or palette and choose
-              Expose to user — it lands here, in the order the room will draw it.
+              Nothing shows on the room yet. Hold any knob, switch, blend or palette and choose
+              Show on the room. On a laptop, right-click it.
             </Blurb>
           </div>
         )}

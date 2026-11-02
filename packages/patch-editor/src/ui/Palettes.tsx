@@ -113,7 +113,7 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
 
       <div className="row" style={{ gap: 10, padding: '0 20px 14px', flexShrink: 0 }}>
         <Mono className="dim sm">{file}</Mono>
-        <span style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)' }}>
+        <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)' }}>
           the colours only — hue, saturation and value stay with the layer
         </span>
       </div>
@@ -339,7 +339,7 @@ function PaletteCount({ e }: { e: PaletteEntry }) {
           so the count is the warning. The number is the DEVICE's, never a
           local copy -- it moves when the firmware's cap does. */}
       <span style={{
-        font: '400 11px/1 var(--mono)',
+        font: '400 10.5px/1 var(--mono)',
         color: over ? 'var(--warn)' : 'var(--text-5)',
       }} title={over ? `the engine keeps the first ${LIMITS().PALETTE}` : undefined}>
         {e.error ? '—' : e.entries.length}

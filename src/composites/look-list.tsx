@@ -1,6 +1,6 @@
-import type { ReactNode } from 'react';
-import { ChevronMark, Eyebrow, Press, SoundMark } from '../design-system';
-import { HeadingRow } from './control-rows';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { ChevronMark, Press, SoundMark, TextField } from '../design-system';
+import { FoldKey, HeadingRow } from './control-rows';
 
 type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void };
 
@@ -44,11 +44,11 @@ export function LookItem({ actions, children, ...look }: LookItemProps) {
   );
 }
 
-type RecentLookItemProps = HoldProps & { name: string; isPlaying: boolean; strip: ReactNode };
+type RecentLookItemProps = HoldProps & { name: string; strip: ReactNode };
 
-export function RecentLookItem({ name, isPlaying, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
+export function RecentLookItem({ name, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
   return (
-    <Press className="recent-look" isPressed={isPlaying} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
+    <Press className="recent-look" onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
       <span className="recent-look-name">{name}</span>
       {strip}
     </Press>
@@ -94,15 +94,31 @@ export function LookElsewhere({ name, description, action }: LookElsewhereProps)
   );
 }
 
-type LookGroupProps = { title: string; note?: string; action?: ReactNode; children: ReactNode };
+type LookGroupProps = {
+  title: string;
+  note?: string;
+  action?: ReactNode;
+  isOpen: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+};
 
-export function LookGroup({ title, note, action, children }: LookGroupProps) {
+export function LookGroup({ title, note, action, isOpen, onToggle, children }: LookGroupProps) {
+  const fold = <FoldKey label={title.toUpperCase()} isOpen={isOpen} onToggle={onToggle} />;
   return (
     <section className="library-group">
-      <HeadingRow heading={<Eyebrow>{title.toUpperCase()}</Eyebrow>}>{action}</HeadingRow>
-      {note && <p className="library-note">{note}</p>}
-      {children}
+      <HeadingRow heading={fold}>{action}</HeadingRow>
+      {isOpen && note && <p className="library-note">{note}</p>}
+      {isOpen && children}
     </section>
+  );
+}
+
+export function LookSearch({ value, onChange }: { value: string; onChange: (value: string) => void }) {
+  return (
+    <div className="look-search">
+      <TextField size="small" label="Search looks" placeholder="Search looks" value={value} onChange={onChange} />
+    </div>
   );
 }
 
@@ -119,6 +135,18 @@ export function LookProblem({ children }: { children: ReactNode }) {
   return <p className="look-description">{children}</p>;
 }
 
-export function LookList({ children }: { children: ReactNode }) {
-  return <div className="library">{children}</div>;
+// Opens at the look that plays, which can be far down a long list. A search goes back to the top.
+export function LookList({ search, children }: { search: string; children: ReactNode }) {
+  const list = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    list.current?.querySelector('[aria-pressed="true"]')?.scrollIntoView({ block: 'center' });
+  }, []);
+  useEffect(() => {
+    if (search) list.current?.scrollIntoView({ block: 'start' });
+  }, [search]);
+  return (
+    <div ref={list} className="library">
+      {children}
+    </div>
+  );
 }

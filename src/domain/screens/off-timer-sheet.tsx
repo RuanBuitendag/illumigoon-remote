@@ -2,7 +2,8 @@ import { ChoiceList, Overlay, OverlayText } from '../../composites';
 import { KeyRow, TextKey } from '../../design-system';
 import { removeSchedule, writeSchedule, type Light } from '../store/fleet-store';
 import type { Room } from '../store/rooms';
-import { hasScheduleSpace, offTimerNote, offTimersOf, timerEntry } from '../store/schedules';
+import { hasScheduleSpace, offTimerNote, offTimersOf, timeOfDay, timerEntry } from '../store/schedules';
+import { offerUndo, showNotice } from '../store/undo';
 
 const LENGTHS = [
   { id: '15', name: '15 minutes' },
@@ -27,12 +28,19 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
 
   const start = (minutes: string) => {
     cancelTimers(lights);
-    writeSchedule(lights, timerEntry(Number(minutes)));
+    const entry = timerEntry(Number(minutes));
+    writeSchedule(lights, entry);
+    offerUndo({
+      text: `${room.name} goes off at ${timeOfDay(entry.at_utc ?? 0)}`,
+      moments: [],
+      restore: () => removeSchedule(lights, entry.id),
+    });
     onClose();
   };
 
   const cancel = () => {
     cancelTimers(lights);
+    showNotice(`${room.name} stays on`);
     onClose();
   };
 

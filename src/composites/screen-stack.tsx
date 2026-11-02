@@ -43,14 +43,14 @@ export function ScreenStack(props: ScreenStackProps) {
   );
 }
 
-type UndoNoticeProps = { text: string; onUndo: () => void; onSave?: () => void };
+type UndoNoticeProps = { text: string; onUndo?: () => void; onSave?: () => void };
 
 export function UndoNotice({ text, onUndo, onSave }: UndoNoticeProps) {
   return (
     <aside className="undo-notice">
       <p className="undo-text">{text}</p>
       {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
-      <TextKey onClick={onUndo}>UNDO</TextKey>
+      {onUndo && <TextKey onClick={onUndo}>UNDO</TextKey>}
     </aside>
   );
 }

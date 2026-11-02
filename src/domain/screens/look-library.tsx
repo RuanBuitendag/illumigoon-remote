@@ -1,5 +1,13 @@
 import { useEffect, useState } from 'react';
-import { LookElsewhere, LookGroup, LookItem, LookList, LookPreset, LookProblem } from '../../composites';
+import {
+  LookElsewhere,
+  LookGroup,
+  LookItem,
+  LookList,
+  LookPreset,
+  LookProblem,
+  LookSearch,
+} from '../../composites';
 import { FileKey, KeyRow, TextKey } from '../../design-system';
 import type { Light } from '../store/fleet-store';
 import {
@@ -14,13 +22,14 @@ import {
 import { useLibrary } from '../store/library-store';
 import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
 import { playLook } from '../store/look-play';
-import { libraryFor, partOfRoomNote, type LibraryLook } from '../store/look-library';
+import { libraryFor, partOfRoomNote, type LibraryGroup, type LibraryLook } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { closePage } from '../store/navigation-store';
 import { isAnyOn, isMixedLook, lookNameOf } from '../store/rooms';
 import { LookStrip } from './look-strip';
 
 const TILE_BRIGHTNESS = 0.85;
+const ELSEWHERE = 'On the patch server';
 
 // Read again while open, so a file written to the folder from a terminal shows up.
 const LIST_EVERY_MS = 3000;
@@ -56,6 +65,17 @@ function useArmedDelete() {
 
 type DeleteKey = ReturnType<typeof useArmedDelete>;
 
+// A search shows every group, and a group keeps what a person chose until the page closes.
+function useFolds(isSearching: boolean) {
+  const [chosen, setChosen] = useState<Record<string, boolean>>({});
+  const isOpen = (title: string, byDefault: boolean) => isSearching || (chosen[title] ?? byDefault);
+  const toggle = (title: string, byDefault: boolean) =>
+    setChosen({ ...chosen, [title]: !isOpen(title, byDefault) });
+  return { isOpen, toggle };
+}
+
+type Folds = ReturnType<typeof useFolds>;
+
 function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey }) {
   return (
     <>
@@ -66,25 +86,29 @@ function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey
   );
 }
 
-function PublishedElsewhere() {
+const includesText = (text: string, wanted: string) => text.toLowerCase().includes(wanted);
+
+function PublishedElsewhere({ wanted, folds }: { wanted: string; folds: Folds }) {
   const elsewhere = useLookFiles((files) => files.shelf.elsewhere);
   const fetching = useLookActions((actions) => actions.fetching);
-  if (elsewhere.length === 0) return null;
+  const ready = elsewhere.filter(({ id, name }) => id && includesText(name, wanted));
+  if (ready.length === 0) return null;
   return (
-    <LookGroup title="Published elsewhere" note="On the patch server, not in Mine">
-      {elsewhere.map(({ familyId, id, name, presets }) => (
+    <LookGroup
+      title={ELSEWHERE}
+      note="Published looks you do not have yet"
+      isOpen={folds.isOpen(ELSEWHERE, false)}
+      onToggle={() => folds.toggle(ELSEWHERE, false)}
+    >
+      {ready.map(({ familyId, id, name, presets }) => (
         <LookElsewhere
           key={familyId}
           name={name}
           description={presets.map((preset) => preset.name).join(', ')}
           action={
-            id ? (
-              <TextKey disabled={fetching !== null} onClick={() => void fetchLook(id, name)}>
-                {fetching === id ? 'GETTING' : 'GET'}
-              </TextKey>
-            ) : (
-              'WITHDRAWN'
-            )
+            <TextKey disabled={fetching !== null} onClick={() => id && void fetchLook(id, name)}>
+              {fetching === id ? 'GETTING' : 'GET'}
+            </TextKey>
           }
         />
       ))}
@@ -99,6 +123,24 @@ function useLibraryNote() {
   return listProblem ?? problem ?? note;
 }
 
+const hasName = ({ name, presets }: LibraryLook, wanted: string) =>
+  [name, ...presets.map((preset) => preset.name)].some((text) => includesText(text, wanted));
+
+function keptLooks(groups: LibraryGroup[], isKept: (look: LibraryLook) => boolean) {
+  const kept = groups.map((group) => ({ ...group, looks: group.looks.filter(isKept) }));
+  return kept.filter(({ looks }) => looks.length > 0);
+}
+
+// Names first. Descriptions only answer when no name does, so a short word finds what it says.
+function foundGroups(groups: LibraryGroup[], wanted: string) {
+  if (!wanted) return groups;
+  const named = keptLooks(groups, (look) => hasName(look, wanted));
+  return named.length > 0 ? named : keptLooks(groups, ({ description }) => includesText(description, wanted));
+}
+
+const holdsLook = ({ looks }: LibraryGroup, name: string | null | undefined) =>
+  looks.some((look) => look.name === name || look.presets.some(({ fullName }) => fullName === name));
+
 export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () => void }) {
   const mine = useLookFiles((files) => files.mine);
   const examples = useLookFiles((files) => files.examples);
@@ -107,8 +149,12 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
   const shownLights = useShownLights(lights);
   const playingName = isMixedLook(shownLights) ? null : lookNameOf(shownLights[0]);
   const [isEditing, setEditing] = useState(false);
+  const [query, setQuery] = useState('');
+  const wanted = query.trim().toLowerCase();
+  const folds = useFolds(wanted !== '');
   const deleteKey = useArmedDelete();
   useFreshLooks();
+  const groups = foundGroups(libraryFor(lights, mine, examples, shelf), wanted);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
     if (!animation) return;
@@ -134,49 +180,59 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
       />
     ));
 
+  const groupRows = (group: LibraryGroup) => {
+    const byDefault = group.kind !== 'example' || holdsLook(group, playingName);
+    const { title, note: groupNote, looks } = group;
+    return (
+      <LookGroup
+        key={title}
+        title={title}
+        note={groupNote}
+        isOpen={folds.isOpen(title, byDefault)}
+        onToggle={() => folds.toggle(title, byDefault)}
+        action={
+          title === 'Mine' && <TextKey onClick={() => setEditing(!isEditing)}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>
+        }
+      >
+        {isEditing && title === 'Mine' && (
+          <KeyRow>
+            <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
+              ADD FROM A FILE
+            </FileKey>
+            <TextKey onClick={onPaste}>PASTE</TextKey>
+          </KeyRow>
+        )}
+        {looks.map((look) => (
+          <LookItem
+            key={look.id}
+            name={look.name}
+            description={look.description}
+            note={look.animation && partOfRoomNote(look, lights)}
+            hasSound={look.hasSound}
+            isPlaying={look.name === playingName}
+            disabled={isEditing || !look.animation}
+            strip={<LookStrip source={look.preview} shape="tile" brightness={TILE_BRIGHTNESS} />}
+            actions={isEditing && look.file && <FileActions look={look.file} deleteKey={deleteKey} />}
+            onPick={() => pick(look)}
+            onHold={() => hold(look)}
+            onHoldEnd={endPreview}
+          >
+            {presetRows(look)}
+          </LookItem>
+        ))}
+      </LookGroup>
+    );
+  };
+
   return (
-    <LookList>
-      {note && <LookProblem>{note}</LookProblem>}
-      {libraryFor(lights, mine, examples, shelf).map(({ kind, title, note: groupNote, looks }) => (
-        <LookGroup
-          key={title}
-          title={title}
-          note={groupNote}
-          action={
-            kind !== 'catalog' && (
-              <TextKey onClick={() => setEditing(!isEditing)}>{isEditing ? 'DONE' : 'EDIT'}</TextKey>
-            )
-          }
-        >
-          {isEditing && title === 'Mine' && (
-            <KeyRow>
-              <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
-                ADD FROM A FILE
-              </FileKey>
-              <TextKey onClick={onPaste}>PASTE</TextKey>
-            </KeyRow>
-          )}
-          {looks.map((look) => (
-            <LookItem
-              key={look.id}
-              name={look.name}
-              description={look.description}
-              note={look.animation && partOfRoomNote(look, lights)}
-              hasSound={look.hasSound}
-              isPlaying={look.name === playingName}
-              disabled={isEditing || !look.animation}
-              strip={<LookStrip source={look.preview} shape="tile" brightness={TILE_BRIGHTNESS} />}
-              actions={isEditing && look.file && <FileActions look={look.file} deleteKey={deleteKey} />}
-              onPick={() => pick(look)}
-              onHold={() => hold(look)}
-              onHoldEnd={endPreview}
-            >
-              {presetRows(look)}
-            </LookItem>
-          ))}
-          {title === 'Mine' && <PublishedElsewhere />}
-        </LookGroup>
-      ))}
-    </LookList>
+    <>
+      <LookSearch value={query} onChange={setQuery} />
+      <LookList search={wanted}>
+        {note && <LookProblem>{note}</LookProblem>}
+        {groups.length === 0 && <LookProblem>{`No look called ${query.trim()}.`}</LookProblem>}
+        {groups.map(groupRows)}
+        <PublishedElsewhere wanted={wanted} folds={folds} />
+      </LookList>
+    </>
   );
 }

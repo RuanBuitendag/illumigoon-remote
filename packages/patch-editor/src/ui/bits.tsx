@@ -203,6 +203,13 @@ export const StructField = ({ node, field, value, onChange }: {
 
 // -------------------------------------------------------------------- budget
 
+/** A layer as a person reads it. `slot` counts from 0, and the name counts from 1. */
+export const layerName = (slot: number) => `Layer ${slot + 1}`;
+
+/** A parameter's address in words: `L0.emitter.speed` reads `Layer 1 emitter speed`. */
+export const pathName = (path: string) =>
+  path.replace(/^L(\d+)\./, (_, slot) => `${layerName(Number(slot))} `).replaceAll('.', ' ');
+
 /**
  * The two thresholds, in one place.
  *
@@ -213,8 +220,6 @@ export const StructField = ({ node, field, value, onChange }: {
  */
 export const budgetColour = (bytes: number) =>
   bytes <= BUDGET.NVS ? 'var(--text-1)' : bytes <= BUDGET.MESH ? 'var(--warn)' : 'var(--bad)';
-
-export const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
 
 export const budgetNote = (bytes: number) =>
   bytes <= BUDGET.NVS
@@ -240,10 +245,10 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
         <div className="tick" style={{ left: (BUDGET.NVS / max) * w }} />
         <div className="tick" style={{ left: (BUDGET.MESH / max) * w }} />
       </div>
-      <span style={{ font: '400 11px/1 var(--mono)', color: col }}>
+      <span style={{ font: '400 10.5px/1 var(--mono)', color: col }}>
         {(bytes / 1024).toFixed(1)} KB
       </span>
-      <span style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.05em' }}>
+      <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.05em' }}>
         4K · 8K
       </span>
     </div>

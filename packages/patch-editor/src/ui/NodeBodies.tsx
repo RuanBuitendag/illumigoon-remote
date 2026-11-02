@@ -7,7 +7,7 @@ import {
   triggerWarning, type Layer,
 } from '../domain/patch';
 import { dropControls } from '../domain/surface';
-import { Lab, Seg, StructField, Blurb } from './bits';
+import { Lab, Seg, StructField, Blurb, layerName } from './bits';
 import { StageStrip } from './Stages';
 import { unlessReached, type Ctl } from './ctl';
 import { Param } from './Param';
@@ -54,7 +54,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
       d.modulators.push(makeModulator(free, 'periodic'));
       d.layers.find(x => x.slot === layer.slot)!.emitter.trigger = { src: free, out: 0 };
     });
-    ctl.say(`periodic in slot ${free} → L${layer.slot}${unlessReached(reached)}`);
+    ctl.say(`periodic in slot ${free + 1} → ${layerName(layer.slot)}${unlessReached(reached)}`);
   };
 
   return (
@@ -108,7 +108,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
         </div>
         <div className="grow" />
         <span
-          style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+          style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
         >
           {sources.length === 0
             ? 'nothing in this patch has an edge — periodic, threshold or an LFO'

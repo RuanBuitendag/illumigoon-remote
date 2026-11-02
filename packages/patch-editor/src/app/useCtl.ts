@@ -24,7 +24,7 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
   const { setParam, commit, setStructural, setLocal, pushDoc, structural, sampleStructural } =
     writes;
   const { sel, setSel, scope, setScope, side, node, selectNode, followFx } = nav;
-  const { drag, hot, trace, setTrace, beginDrag, dragMove, dragEnd } = gesture;
+  const { drag, hot, trace, setTrace, beginDrag, dragMove, dragEnd, bind } = gesture;
   const {
     addMasterPalette, setMasterPalette, removeMasterPalette, setMasterMode, setMasterCount,
     reshuffleMaster,
@@ -101,6 +101,7 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
       beginDrag,
       dragMove,
       dragEnd,
+      bind,
       hot,
       // NOTHING IS TRACED WHILE A DRAG IS IN FLIGHT. `armed` already dashes every droppable
       // knob on the screen, and a second accent over the top of that reads as one signal
@@ -141,6 +142,7 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
       beginDrag,
       dragMove,
       dragEnd,
+      bind,
       hot,
       trace,
       setTrace,

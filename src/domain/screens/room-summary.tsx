@@ -1,5 +1,5 @@
 import { LockNote, RoomCard } from '../../composites';
-import { PowerKey, TextKey } from '../../design-system';
+import { PowerKey } from '../../design-system';
 import { movesToMusic } from '../looks/look-catalog';
 import { useRecording } from '../looks/recordings';
 import { setPower, type Light } from '../store/fleet-store';
@@ -15,7 +15,9 @@ import {
   previewOfAnimation,
   type Room,
 } from '../store/rooms';
+import { offTimerNote, offTimersOf } from '../store/schedules';
 import { LookStrip } from './look-strip';
+import { schedulingLights } from './off-timer-sheet';
 import { RecentLookRow } from './recent-looks';
 
 function lockedText({ onlineLights }: Room) {
@@ -23,6 +25,16 @@ function lockedText({ onlineLights }: Room) {
   if (until <= Date.now()) return 'In use on another device';
   const time = new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   return `In use on another device until ${time}`;
+}
+
+export function RoomLockNote({ room }: { room: Room }) {
+  return (
+    <LockNote
+      text={lockedText(room)}
+      actionLabel="Take it back"
+      onAction={() => openPage('take-back', room.id)}
+    />
+  );
 }
 
 function silentText({ lights, onlineLights }: Room) {
@@ -37,11 +49,9 @@ function lookLabel(lights: Light[]) {
   return lookNameOf(lights[0]) ?? '';
 }
 
-function onCountText({ lights }: Room) {
-  const onCount = lights.filter((light) => lightState(light) === 'on').length;
-  if (onCount === 0) return lights.length === 1 ? 'Off' : 'All off';
-  if (onCount === lights.length) return lights.length === 1 ? 'On' : 'All on';
-  return `${onCount} of ${lights.length} on`;
+function timerText(room: Room) {
+  const lights = schedulingLights(room);
+  return offTimersOf(lights).length > 0 ? offTimerNote(lights) : null;
 }
 
 export function RoomSummary({ room }: { room: Room }) {
@@ -57,7 +67,6 @@ export function RoomSummary({ room }: { room: Room }) {
   return (
     <RoomCard
       name={room.name}
-      countText={onCountText(room)}
       isLit={isOn}
       power={
         !room.isLocked && (
@@ -74,21 +83,15 @@ export function RoomSummary({ room }: { room: Room }) {
       lookName={lookLabel(onlineLights)}
       hasSound={Boolean(lookId && movesToMusic(lookId))}
       lightStates={room.lights.map((light) => ({ id: light.address, name: light.name, state: lightState(light) }))}
-      note={silentText(room)}
+      note={silentText(room) ?? timerText(room)}
       isOpen={isOpen}
       onOpen={() => openRoom(room.id)}
+      onLooks={writableLights.length > 0 ? () => openPage('looks', room.id) : undefined}
     >
       {room.isLocked ? (
-        <LockNote
-          text={lockedText(room)}
-          actionLabel="Take it back"
-          onAction={() => openPage('take-back', room.id)}
-        />
+        <RoomLockNote room={room} />
       ) : (
-        <>
-          <RecentLookRow room={room} lights={writableLights} isBare />
-          <TextKey onClick={() => openPage('looks', room.id)}>LOOKS</TextKey>
-        </>
+        <RecentLookRow room={room} lights={writableLights} isBare />
       )}
     </RoomCard>
   );

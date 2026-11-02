@@ -323,7 +323,7 @@ function ModChip({ m, onPolarity, onUnbind }: {
         // and inert -- a control that moves and changes nothing is the worse lie.
         disabled={!m.srcBipolar}
         title={
-          `Modulator ${m.src} · depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}` +
+          `Modulator ${m.src + 1} · depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}` +
           (m.srcBipolar
             ? ` · ${m.bipolar ? 'bipolar (±1)' : 'unipolar (0–1)'}\nclick to switch polarity`
             : ' · source is one-way (0–1)\npolarity is fixed: there is no negative half to fold')

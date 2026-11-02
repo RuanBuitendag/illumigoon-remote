@@ -78,7 +78,7 @@ export const timerEntry = (minutes: number): ScheduleEntry => ({
   state: TURN_OFF,
 });
 
-const timeOfDay = (atUtc: number) =>
+export const timeOfDay = (atUtc: number) =>
   new Date(atUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
 // Timers still to come on these lights, soonest first.

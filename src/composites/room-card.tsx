@@ -1,9 +1,8 @@
 import type { ReactNode } from 'react';
-import { LinkKey, LockMark, Press, SoundMark, StatusMark, tintStyle } from '../design-system';
+import { ChevronMark, LinkKey, LockMark, Press, SoundMark, StatusMark, tintStyle } from '../design-system';
 
 type RoomCardProps = {
   name: string;
-  countText: string;
   tint?: string;
   strip: ReactNode;
   lookName: string;
@@ -15,6 +14,8 @@ type RoomCardProps = {
   // Shows on a laptop, where the open room stands beside its card.
   isOpen: boolean;
   onOpen: () => void;
+  // A room someone else holds has no looks to change.
+  onLooks?: () => void;
   children: ReactNode;
 };
 
@@ -24,12 +25,7 @@ export function RoomCard(card: RoomCardProps) {
       <Press className="room-open" onClick={card.onOpen}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>
-        </span>
-        {card.strip}
-        <span className="room-look">
-          <span className="room-look-name">{card.lookName}</span>
-          {card.hasSound && <SoundMark />}
-          <span className="room-count">{card.countText}</span>
+          <ChevronMark direction="right" />
         </span>
         <span className="room-lights">
           {card.lightStates.map(({ id, name, state }) => (
@@ -39,6 +35,17 @@ export function RoomCard(card: RoomCardProps) {
             </span>
           ))}
         </span>
+        {card.strip}
+      </Press>
+      <Press className="room-look" onClick={card.onLooks ?? card.onOpen}>
+        <span className="room-look-name">{card.lookName}</span>
+        {card.hasSound && <SoundMark />}
+        {card.onLooks && (
+          <span className="room-look-key">
+            LOOKS
+            <ChevronMark direction="right" />
+          </span>
+        )}
       </Press>
       {card.power && <span className="room-power">{card.power}</span>}
       {card.note && <QuietNote>{card.note}</QuietNote>}

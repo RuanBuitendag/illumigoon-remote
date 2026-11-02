@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ChoiceList, Overlay, OverlayBlock, OverlayText } from '../../composites';
 import { KeyRow, TextField, TextKey } from '../../design-system';
-import { renameScene, saveScene, type SceneEntry } from '../store/library-store';
+import { renameScene, saveScene, type SceneEntry, type SceneLight } from '../store/library-store';
 import type { Room } from '../store/rooms';
 import { captureScene, sceneSummary, WHOLE_HOUSE } from '../store/scenes';
 
@@ -9,13 +9,15 @@ type SaveSceneSheetProps = {
   rooms: Room[];
   room?: Room;
   renaming: SceneEntry | null;
+  // Saved lights to keep as a scene, in place of what the lights show now.
+  keeping?: SceneLight[];
   onClose: () => void;
 };
 
-export function SaveSceneSheet({ rooms, room, renaming, onClose }: SaveSceneSheetProps) {
+export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: SaveSceneSheetProps) {
   const [name, setName] = useState(renaming?.name ?? '');
   const [scope, setScope] = useState(room?.id ?? WHOLE_HOUSE);
-  const captured = captureScene(name.trim(), rooms, scope);
+  const captured = keeping ? { name: name.trim(), lights: keeping } : captureScene(name.trim(), rooms, scope);
 
   const save = () => {
     void (renaming ? renameScene(renaming, name.trim()) : saveScene(captured));
@@ -27,13 +29,15 @@ export function SaveSceneSheet({ rooms, room, renaming, onClose }: SaveSceneShee
       <TextField size="title" label="Scene name" placeholder="Name" value={name} onChange={setName} />
       {!renaming && (
         <>
-          <OverlayBlock label="Saves">
-            <ChoiceList
-              choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]}
-              value={scope}
-              onChange={setScope}
-            />
-          </OverlayBlock>
+          {!keeping && (
+            <OverlayBlock label="Saves">
+              <ChoiceList
+                choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]}
+                value={scope}
+                onChange={setScope}
+              />
+            </OverlayBlock>
+          )}
           <OverlayBlock label="What it will do">
             <OverlayText>{sceneSummary(captured, rooms)}</OverlayText>
           </OverlayBlock>

@@ -143,7 +143,7 @@ export function lookIdOf(animation: AnimationState | null) {
   return findPatchLook(animation.params)?.id ?? null;
 }
 
-export const OWN_LOOK = 'Your own look';
+export const OWN_LOOK = 'Custom look';
 
 export function lookNameOf(light: Light | undefined) {
   const animation = light?.animation;

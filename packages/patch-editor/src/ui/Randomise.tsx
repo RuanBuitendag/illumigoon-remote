@@ -252,7 +252,7 @@ function Amount({ spec, value, lo, hi, off, onChange }: {
     >
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="mid">{spec.label}</Lab>
-        <span style={{ font: '400 11px/1 var(--mono)', color: 'var(--text-1)' }}>
+        <span style={{ font: '400 10.5px/1 var(--mono)', color: 'var(--text-1)' }}>
           {value.toFixed(2)}
         </span>
       </div>
@@ -344,7 +344,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
       <span
         style={{
           flexGrow: 1,
-          font: '400 12px/1 var(--sans)',
+          font: '400 13px/1 var(--sans)',
           letterSpacing: '.01em',
           color: on ? 'var(--text-3)' : 'var(--text-1)',
         }}

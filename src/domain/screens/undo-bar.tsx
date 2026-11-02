@@ -11,7 +11,7 @@ export function UndoBar() {
   const { dialogs, sheet } = useEditorDialogs();
   if (sheet) return sheet;
   if (!offer || isEditing) return null;
-  const { text, unsaved } = offer;
+  const { text, unsaved, isNoteOnly } = offer;
 
   const keep = async () => {
     if (!unsaved) return;
@@ -25,5 +25,11 @@ export function UndoBar() {
     markUndoSaved();
   };
 
-  return <UndoNotice text={text} onUndo={undoChange} onSave={unsaved && (() => void keep())} />;
+  return (
+    <UndoNotice
+      text={text}
+      onUndo={isNoteOnly ? undefined : undoChange}
+      onSave={unsaved && (() => void keep())}
+    />
+  );
 }

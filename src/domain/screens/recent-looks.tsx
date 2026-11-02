@@ -8,6 +8,8 @@ import { LookStrip } from './look-strip';
 
 type RecentLookRowProps = { room: Room; lights: Light[]; isBare?: boolean };
 
+const CARD_LOOKS = 2;
+
 export function RecentLookRow({ room, lights, isBare }: RecentLookRowProps) {
   const recent = useHousehold((household) => household.recentLooks[room.id]);
   const shownLights = useShownLights(lights);
@@ -16,19 +18,16 @@ export function RecentLookRow({ room, lights, isBare }: RecentLookRowProps) {
     ...look,
     players: lights.filter((light) => canPlay(light, look.animation)),
   }));
-  const playable = looks.filter(({ players }) => players.length > 0);
+  const playable = looks.filter(({ name, players }) => players.length > 0 && name !== playingName);
   if (playable.length === 0) return null;
   const grid = (
     <RecentLooks>
-      {playable.map(({ name, animation, players }) => (
+      {playable.slice(0, isBare ? CARD_LOOKS : undefined).map(({ name, animation, players }) => (
         <RecentLookItem
           key={name}
           name={name}
-          isPlaying={name === playingName}
           strip={<LookStrip source={previewOfAnimation(animation)} shape="tile" />}
-          onPick={() => {
-            if (name !== playingName) playLook(players, name, animation);
-          }}
+          onPick={() => playLook(players, name, animation)}
           onHold={() => previewLook(players, name, animation)}
           onHoldEnd={endPreview}
         />

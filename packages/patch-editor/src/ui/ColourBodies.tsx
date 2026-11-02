@@ -163,7 +163,7 @@ function PaletteStops({
               disabled={locked}
               onChange={e => setEntry(i, e.target.value.slice(1).toLowerCase())}
             />
-            <Mono className="dim sm">{i}</Mono>
+            <Mono className="dim sm">{i + 1}</Mono>
             <input
               className="hexin grow"
               value={c}

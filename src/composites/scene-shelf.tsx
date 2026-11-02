@@ -1,13 +1,13 @@
 import type { ReactNode } from 'react';
-import { AddKey, ColourFill, Eyebrow, Press, TextKey } from '../design-system';
+import { Eyebrow, Press, TextKey } from '../design-system';
 import { HeadingRow } from './control-rows';
 import { QuietNote } from './room-card';
 
-export function SceneLine({ tag, gradient }: { tag: string; gradient?: string }) {
+export function SceneLine({ name, strip }: { name: string; strip?: ReactNode }) {
   return (
     <span className="scene-line">
-      <span className="scene-tag">{tag}</span>
-      <ColourFill className="scene-bar" paint={gradient} />
+      <span className="scene-tag">{name}</span>
+      {strip}
     </span>
   );
 }
@@ -45,27 +45,55 @@ export function SceneCard(props: SceneCardProps) {
   );
 }
 
+type StateCardProps = {
+  name: string;
+  summary: string;
+  onApply: () => void;
+  onHold: () => void;
+  onHoldEnd: () => void;
+  onKeep: () => void;
+  children: ReactNode;
+};
+
+export function StateCard({ name, summary, onApply, onHold, onHoldEnd, onKeep, children }: StateCardProps) {
+  return (
+    <div className="state-card">
+      <Press className="scene-apply" onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
+        <span className="scene-name">{name}</span>
+        {children}
+        <span className="scene-summary">{summary}</span>
+      </Press>
+      <TextKey onClick={onKeep}>KEEP</TextKey>
+    </div>
+  );
+}
+
+export function StateList({ children }: { children: ReactNode }) {
+  return <div className="state-list">{children}</div>;
+}
+
 type SceneShelfProps = {
   hasScenes: boolean;
   isEditing: boolean;
   note: string | null;
   onEdit: () => void;
   onSave: () => void;
+  onRecent?: () => void;
   children: ReactNode;
 };
 
-export function SceneShelf({ hasScenes, isEditing, note, onEdit, onSave, children }: SceneShelfProps) {
+export function SceneShelf(props: SceneShelfProps) {
+  const { hasScenes, isEditing, note, onEdit, onSave, onRecent, children } = props;
   return (
     <section className="scene-shelf">
       <HeadingRow heading={<Eyebrow>SCENES</Eyebrow>}>
-        {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'EDIT'}</TextKey>}
-      </HeadingRow>
-      <div className="scene-list">
-        {children}
-        <span className="scene-add">
-          <AddKey onClick={onSave}>+ Save scene</AddKey>
+        <span className="scene-keys">
+          {onRecent && <TextKey onClick={onRecent}>RECENT</TextKey>}
+          {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>}
+          <TextKey onClick={onSave}>+ SAVE</TextKey>
         </span>
-      </div>
+      </HeadingRow>
+      {hasScenes && <div className="scene-list">{children}</div>}
       {note && <QuietNote>{note}</QuietNote>}
     </section>
   );

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { AnimationState } from '../light-network/protocol';
-import { applyState, setPower, useFleet, type Light } from './fleet-store';
+import { applyState, noteState, setPower, useFleet, type Light } from './fleet-store';
 import { cancelWaiting, gapOf, laterOn } from './light-timing';
 import { lookNameOf } from './rooms';
 
@@ -20,6 +20,10 @@ type Offer = {
   moments: LightMoment[];
   // A look from Edit that has no file yet, so the notice can still keep it.
   unsaved?: { name: string; animation: AnimationState };
+  // A change to a saved thing, not to a light.
+  restore?: () => void;
+  // Tells what happened, with nothing to put back.
+  isNoteOnly?: boolean;
 };
 
 export const useUndo = create<{ offer: Offer | null }>(() => ({ offer: null }));
@@ -40,8 +44,13 @@ export const momentsOf = (lights: Light[]): LightMoment[] =>
   });
 
 export function offerUndo(offer: Offer) {
-  if (offer.moments.length === 0) return;
+  if (offer.moments.length === 0 && !offer.restore) return;
   useUndo.setState({ offer });
+  resumeUndo();
+}
+
+export function showNotice(text: string) {
+  useUndo.setState({ offer: { text, moments: [], isNoteOnly: true } });
   resumeUndo();
 }
 
@@ -63,7 +72,7 @@ function putLookBack(address: string, { isOn, brightness, lookName, animation }:
 }
 
 function putBack(moment: LightMoment) {
-  const { address, isOn, brightness, animation } = moment;
+  const { address, isOn, brightness, lookName, animation } = moment;
   const light = useFleet.getState().lights[address];
   if (!light?.isOnline || light.isLockedByOther) return;
   cancelWaiting(address);
@@ -74,8 +83,13 @@ function putBack(moment: LightMoment) {
   const wait = Math.max(0, light.lookWrittenAt + gapOf(light) - Date.now());
   if (!light.isOn) setPower([light], true);
   const delay = light.isOn ? wait : Math.max(wait, gapOf(light));
-  if (delay === 0) putLookBack(address, moment);
-  else laterOn(address, delay, () => putLookBack(address, moment));
+  if (delay === 0) {
+    putLookBack(address, moment);
+    return;
+  }
+  // The screen goes back now, and the light when it can take another look.
+  noteState(light, { isOn, brightness, lookName, animation });
+  laterOn(address, delay, () => putLookBack(address, moment));
 }
 
 export function undoChange() {
@@ -83,4 +97,5 @@ export function undoChange() {
   pauseUndo();
   useUndo.setState({ offer: null });
   offer?.moments.forEach(putBack);
+  offer?.restore?.();
 }

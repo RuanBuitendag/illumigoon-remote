@@ -141,11 +141,11 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
     <div className="row" style={{ gap: 9 }}>
       <span
         style={{
-          font: '400 11px/1 var(--mono)',
+          font: '400 10.5px/1 var(--mono)',
           color: dead ? 'var(--text-5)' : 'var(--modulation-soft)',
         }}
       >
-        {m.slot}
+        {m.slot + 1}
       </span>
       <ModIcon type={m.type} dead={dead} />
       {/* A NAMED SLOT SAYS ITS NAME. Three macros in a row all reading `macro` is three
@@ -301,8 +301,8 @@ export function AddSlot({ slot, what, onAdd, played }: {
   if (slot === undefined) return null;
   return (
     <div className="emptyslot well" data-played={played || undefined}
-         title={`Add a ${what} in slot ${slot}`} onClick={() => onAdd(slot)}>
-      <Ico.Plus c="var(--text-5)" /><Mono className="dim sm">{slot}</Mono>
+         title={`Add a ${what}`} onClick={() => onAdd(slot)}>
+      <Ico.Plus c="var(--text-5)" />
     </div>
   );
 }
@@ -356,9 +356,9 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
         </div>
         <div className="row" style={{ gap: 20 }}>
           <span
-            style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
+            style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)', letterSpacing: '.04em' }}
           >
-            drag a slot onto any parameter to bind it
+            drag one onto a dial, or hold the dial
           </span>
           <button
             className="row raise"

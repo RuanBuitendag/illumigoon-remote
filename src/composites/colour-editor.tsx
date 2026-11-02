@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   BLACK_HEX,
   ChevronMark,
@@ -13,8 +13,9 @@ import {
   ValueText,
 } from '../design-system';
 import { ColourAxes } from './colour-axes';
+import { FoldKey, HeadingRow } from './control-rows';
 import { NamingRow } from './naming-row';
-import { Sheet, SheetFooter } from './sheet';
+import { Sheet } from './sheet';
 
 const MAX_COLOURS = 8;
 const MAX_UNDO_STEPS = 20;
@@ -22,6 +23,7 @@ const MAX_UNDO_STEPS = 20;
 type NamedColours = { id: string; name: string; family: string; colours: string[] };
 
 type ColourEditorProps = {
+  strip: ReactNode;
   isPalette: boolean;
   colours: string[];
   minimumColours: number;
@@ -49,30 +51,38 @@ type SwatchSetsProps = {
   onApplySet: (colours: string[]) => void;
 };
 
+// One family at a time, so the sets stay a short list.
 function SwatchSets({ sets, minimumColours, roomForColours, onPlace, onApplySet }: SwatchSetsProps) {
-  return [...new Set(sets.map(({ family }) => family))].map((family) => (
+  const families = [...new Set(sets.map(({ family }) => family))];
+  const [openFamily, setOpenFamily] = useState(families[0] ?? null);
+  return families.map((family) => (
     <section key={family} className="swatch-family">
-      <h3 className="swatch-family-name">{family}</h3>
-      {sets
-        .filter((set) => set.family === family)
-        .map(({ id, name, colours }) => (
-          <div key={id}>
-            <div className="swatch-set-heading">
-              <Eyebrow>{name.toUpperCase()}</Eyebrow>
-              <TextKey
-                disabled={colours.length < minimumColours}
-                onClick={() => onApplySet(colours.slice(0, roomForColours))}
-              >
-                {colours.length > roomForColours ? `APPLY FIRST ${roomForColours}` : `APPLY ALL ${colours.length}`}
-              </TextKey>
+      <FoldKey
+        label={family.toUpperCase()}
+        isOpen={family === openFamily}
+        onToggle={() => setOpenFamily(family === openFamily ? null : family)}
+      />
+      {family === openFamily &&
+        sets
+          .filter((set) => set.family === family)
+          .map(({ id, name, colours }) => (
+            <div key={id}>
+              <div className="swatch-set-heading">
+                <Eyebrow>{name.toUpperCase()}</Eyebrow>
+                <TextKey
+                  disabled={colours.length < minimumColours}
+                  onClick={() => onApplySet(colours.slice(0, roomForColours))}
+                >
+                  {colours.length > roomForColours ? `USE THE FIRST ${roomForColours}` : 'USE THESE'}
+                </TextKey>
+              </div>
+              <div className="swatches">
+                {colours.map((colour, index) => (
+                  <SwatchKey key={`${id}-${index}`} colour={colour} onClick={() => onPlace(colour)} />
+                ))}
+              </div>
             </div>
-            <div className="swatches">
-              {colours.map((colour, index) => (
-                <SwatchKey key={`${id}-${index}`} colour={colour} onClick={() => onPlace(colour)} />
-              ))}
-            </div>
-          </div>
-        ))}
+          ))}
     </section>
   ));
 }
@@ -138,7 +148,7 @@ function Slots({ colours, selected, onSelect, onAdd }: SlotsProps) {
 }
 
 export function ColourEditor(props: ColourEditorProps) {
-  const { isPalette, colours, minimumColours, sets, onChange, onKeepSet, onClose } = props;
+  const { strip, isPalette, colours, minimumColours, sets, onChange, onKeepSet, onClose } = props;
   const [selected, setSelected] = useState(0);
   const [tab, setTab] = useState<'swatches' | 'custom'>('swatches');
   const [copied, setCopied] = useState<string | null>(null);
@@ -185,17 +195,24 @@ export function ColourEditor(props: ColourEditorProps) {
     setSelected(Math.min(selected, previous.length - 1));
   };
 
-  const actions = isPalette && (
-    <>
-      <ValueText>{`${colours.length} / ${MAX_COLOURS}`}</ValueText>
-      <TextKey isQuiet onClick={() => setNaming(true)}>
-        KEEP AS SET
+  const actions = (
+    <KeyRow>
+      <TextKey isQuiet disabled={undoSteps.length === 0} onClick={undo}>
+        UNDO
       </TextKey>
+      <TextKey onClick={onClose}>DONE</TextKey>
+    </KeyRow>
+  );
+
+  const pinned = (
+    <>
+      {strip}
+      {isPalette && <Slots colours={colours} selected={selected} onSelect={setSelected} onAdd={add} />}
     </>
   );
 
   return (
-    <Sheet label="Edit colours" title={isPalette ? 'Palette' : 'Colour'} actions={actions}>
+    <Sheet label="Edit colours" title={isPalette ? 'Palette' : 'Colour'} actions={actions} pinned={pinned}>
       {isNaming && (
         <NamingRow
           label="Name of the colour set"
@@ -208,7 +225,6 @@ export function ColourEditor(props: ColourEditorProps) {
       )}
       {isPalette && (
         <>
-          <Slots colours={colours} selected={selected} onSelect={setSelected} onAdd={add} />
           <SlotKeys
             count={colours.length}
             canRemove={colours.length > minimumColours}
@@ -219,6 +235,11 @@ export function ColourEditor(props: ColourEditorProps) {
             onMove={move}
             onRemove={remove}
           />
+          <HeadingRow heading={<ValueText>{`${colours.length} of ${MAX_COLOURS} colours`}</ValueText>}>
+            <TextKey isQuiet onClick={() => setNaming(true)}>
+              SAVE COLOURS
+            </TextKey>
+          </HeadingRow>
         </>
       )}
       <OptionRow
@@ -241,12 +262,6 @@ export function ColourEditor(props: ColourEditorProps) {
       ) : (
         <ColourAxes colour={current} onChange={(colour) => change(replaceAt(colours, selected, colour))} />
       )}
-      <SheetFooter>
-        <TextKey isQuiet disabled={undoSteps.length === 0} onClick={undo}>
-          {`UNDO · ${undoSteps.length}`}
-        </TextKey>
-        <TextKey onClick={onClose}>DONE</TextKey>
-      </SheetFooter>
     </Sheet>
   );
 }

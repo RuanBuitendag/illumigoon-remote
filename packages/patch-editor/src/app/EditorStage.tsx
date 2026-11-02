@@ -11,13 +11,12 @@ import { Boundary } from '../ui/Boundary';
 import { SurfaceMenu, UserSurface } from '../ui/Surface';
 import { ControlEditor } from '../ui/controlEditor';
 import { BUDGET } from '../domain/catalog';
-import { Budget, Blurb, Hr, Ico, Lab, ModIcon, Vr } from '../ui/bits';
+import { Budget, Blurb, Hr, Lab, ModIcon, Vr, layerName } from '../ui/bits';
 import { Inspector, SideColumn } from '../ui/inspector';
 import { LayerPanel } from '../ui/LayerStack';
 import { MacroRack } from '../ui/Macros';
 import { ModDock } from '../ui/dock';
 import { MatrixSheet } from '../ui/matrixSheet';
-import { SheetHead } from '../ui/Sheet';
 import { FragmentSheet } from '../ui/Fragments';
 import { PaletteSheet } from '../ui/Palettes';
 import { Randomise } from '../ui/Randomise';
@@ -51,9 +50,10 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
   return (
     <div className="editor-overlay" onClick={onClose}>
       <div className="editor-sheet savesheet" onClick={e => e.stopPropagation()}>
-        <SheetHead icon={<Ico.Rail c="var(--text-3)" />} title="SAVE" onClose={onClose}>
-          {null}
-        </SheetHead>
+        <div className="savehead">
+          <h2>Save</h2>
+          <button className="pill" onClick={onClose}>DONE</button>
+        </div>
         <SavePanel
           save={{
             patch,
@@ -103,7 +103,7 @@ function CentrePanel({ ctl, nav }: { ctl: Ctl; nav: Navigation }) {
   if (layer) return <EmitterPanel ctl={ctl} layer={layer} tab={tab} onTab={setTab} />;
   return (
     <div className="centre" style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ font: '400 12px/1.7 var(--sans)', color: 'var(--text-5)' }}>
+      <span style={{ font: '400 13px/1.7 var(--sans)', color: 'var(--text-5)' }}>
         No layer selected. Add one on the left.
       </span>
     </div>
@@ -153,10 +153,10 @@ function SidePanel({ ctl, nav, patch, rolled, dialogs, connected, deviceName, on
   }
   return (
     <>
-      <div className="panelhead"><Lab className="head">{side === 'fx' ? 'FX' : 'Colour'}</Lab></div>
+      <div className="panelhead"><Lab className="head">{side === 'fx' ? 'Effects' : 'Colour'}</Lab></div>
       <Hr />
       <div style={{ padding: '18px 16px' }}>
-        <Blurb>No layer selected. Add one on the left, or roll a patch on the Randomise tab.</Blurb>
+        <Blurb>No layer selected. Add one on the left, or roll one on the Roll tab.</Blurb>
       </div>
     </>
   );
@@ -214,7 +214,9 @@ function PaletteSheets({ ctl, nav, master, onRecallMaster, onClose }: {
             if (L) L.colour.palette.entries = entries.slice();
           });
           ctl.say(
-            reached ? `${name} recalled onto L${layer.slot}` : `${name} recalled — not connected`,
+            reached
+              ? `${name} recalled onto ${layerName(layer.slot)}`
+              : `${name} recalled — not connected`,
           );
           onClose();
         }}
@@ -363,8 +365,8 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
     <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }}>
       <div className="modslot raise-hi" data-dragging="true" style={{ width: 170 }}>
         <div className="row" style={{ gap: 9 }}>
-          <span style={{ font: '400 11px/1 var(--mono)', color: 'var(--modulation-soft)' }}>
-            {draggingMod.slot}
+          <span style={{ font: '400 10.5px/1 var(--mono)', color: 'var(--modulation-soft)' }}>
+            {draggingMod.slot + 1}
           </span>
           <ModIcon type={draggingMod.type} />
           <span className="mname">{draggingMod.type}</span>

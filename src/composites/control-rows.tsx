@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ColourFill, Fader, OptionRow, PowerKey, Press, TextKey, ValueText } from '../design-system';
+import { ChevronMark, ColourFill, Eyebrow, Fader, OptionRow, PowerKey, Press, TextKey, ValueText } from '../design-system';
 
 function ControlLine({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -78,6 +78,17 @@ export function ToggleRow({ label, isOn, disabled, onChange }: ToggleRowProps) {
     <ControlLine label={label}>
       <PowerKey label={label} isOn={isOn} disabled={disabled} onChange={onChange} />
     </ControlLine>
+  );
+}
+
+type FoldKeyProps = { label: string; isOpen: boolean; onToggle: () => void };
+
+export function FoldKey({ label, isOpen, onToggle }: FoldKeyProps) {
+  return (
+    <Press className="fold-key" onClick={onToggle}>
+      <Eyebrow>{label}</Eyebrow>
+      <ChevronMark direction={isOpen ? 'up' : 'down'} />
+    </Press>
   );
 }
 

@@ -30,7 +30,7 @@ import {
 import {
   deleteFragment, fragmentFileNameFor, listFragments, listStarters, readFragment, writeFragment,
 } from '../library/fragment-store';
-import { Hr, Lab, Mono, Ico, Overlay } from './bits';
+import { Hr, Lab, Mono, Ico, Overlay, layerName } from './bits';
 import type { Layer } from '../domain/patch';
 import type { Ctl } from './ctl';
 
@@ -137,14 +137,14 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
     await attempt(async () => {
       await writeFragment(file, toFragment(capture.patch, name, notes));
       setLeft(capture.dropped);
-      ctl.say(`L${layer.slot} saved to ${file}`);
+      ctl.say(`${layerName(layer.slot)} saved to ${file}`);
       await onSaved();
     }, onError);
   };
 
   return (
     <>
-      <SaveBar label={layer ? `Save L${layer.slot} as` : 'Save as'} clash={!!clash} onSave={save}
+      <SaveBar label={layer ? `Save ${layerName(layer.slot)} as` : 'Save as'} clash={!!clash} onSave={save}
                ready={!!layer && !!name.trim()}>
         <SaveField value={name} wide={false} disabled={!layer} onChange={setName} onEnter={save}
                    placeholder={layer ? `${layer.emitter.type} bed` : 'select a layer first'}
@@ -162,7 +162,7 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
       <div className="col" style={{ gap: 7, padding: '0 20px 14px', flexShrink: 0 }}>
         <div className="row" style={{ gap: 10 }}>
           <Mono className="dim sm">{file}</Mono>
-          <span style={{ font: '400 10px/1 var(--sans)', color: 'var(--text-5)' }}>
+          <span style={{ font: '400 10.5px/1 var(--sans)', color: 'var(--text-5)' }}>
             a slash makes a group — <span style={{ fontFamily: 'var(--mono)' }}>fire/Ember</span>
           </span>
         </div>
@@ -230,8 +230,8 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
       const reached = ctl.structural(d => { slot = insertFragment(d, frag); });
       ctl.selectLayer(slot);
       ctl.say(reached
-        ? `${e.name} pulled into L${slot}`
-        : `${e.name} pulled into L${slot} — not connected`);
+        ? `${e.name} pulled into ${layerName(slot)}`
+        : `${e.name} pulled into ${layerName(slot)} — not connected`);
       // Left open on purpose: building by composition means pulling two or three in a row.
     } catch (err: any) {
       setError(err.message ?? String(err));

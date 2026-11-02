@@ -81,7 +81,7 @@ body {
   overflow: hidden;
   background: var(--background);
   color: var(--text-1);
-  font: 400 16px/1.35 var(--sans);
+  font: 400 15px/1.35 var(--sans);
   -webkit-user-select: none;
   user-select: none;
 }
@@ -124,7 +124,7 @@ input::placeholder { color: var(--text-5); }
 /* Text */
 
 .eyebrow { color: var(--text-4); font: 500 10.5px/1.3 var(--mono); letter-spacing: 0.18em; }
-.value-text { color: var(--text-3); font: 400 12px/1 var(--mono); }
+.value-text { color: var(--text-3); font: 400 13px/1 var(--mono); }
 
 /* Keys */
 
@@ -134,7 +134,7 @@ input::placeholder { color: var(--text-5); }
 .link-key { position: relative; text-decoration: underline; text-underline-offset: 3px; }
 .link-key::after { content: ''; position: absolute; inset: -14px -4px; }
 .add-key { min-height: 44px; color: var(--text-3); white-space: nowrap; }
-.back-key { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text-3); font-size: 14px; }
+.back-key { display: flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text-3); font-size: 15px; }
 
 .power-key { position: relative; display: block; flex: none; width: 50px; height: 30px; padding: 0; border: 0; border-radius: 15px; background: var(--wash-strong); box-shadow: inset 0 0 0 1px var(--track); cursor: pointer; transition: background-color 300ms, box-shadow 300ms; }
 .power-key::after { content: ''; position: absolute; inset: -7px 0; }
@@ -168,10 +168,10 @@ input::placeholder { color: var(--text-5); }
 
 .text-field { width: 100%; min-width: 0; border-bottom: 1px solid var(--track); }
 .text-area { width: 100%; min-height: 200px; padding: 10px 0; border-bottom: 1px solid var(--track); font: 400 13px/1.4 var(--mono); resize: vertical; }
-.text-field-title { padding-bottom: 6px; border-bottom: 1.5px solid var(--text-1); font-weight: 300; font-size: 30px; }
-.text-field-large { height: 48px; font-weight: 300; font-size: 26px; }
+.text-field-title { padding-bottom: 6px; border-bottom: 1.5px solid var(--text-1); font-weight: 300; font-size: 28px; }
+.text-field-large { height: 48px; font-weight: 300; font-size: 28px; }
 .text-field-medium { height: 44px; font-size: 20px; }
-.text-field-small { flex: 1; height: 44px; font-size: 17px; }
+.text-field-small { flex: 1; height: 44px; font-size: 15px; }
 
 /* Colour chips */
 
@@ -184,7 +184,8 @@ input::placeholder { color: var(--text-5); }
 
 /* Lit strips */
 
-.led-strip { display: block; width: 100%; }
+.led-strip { display: block; width: 100%; background: var(--slot); }
 .led-strip-room { width: calc(100% + 28px); height: 72px; margin: 8px -14px 6px; }
 .led-strip-hero { width: calc(100% + 48px); height: 150px; margin: 0 -24px; }
 .led-strip-tile { height: 28px; margin-top: 6px; }
+.led-strip-line { height: 12px; }

@@ -146,7 +146,7 @@ function parseSettings(raw: any[]): StructuralField[] {
 function taperOf(p: any): Partial<Presentation> {
   const t: Partial<Presentation> = {};
   if (typeof p.curve === 'number') t.curve = p.curve;
-  if (typeof p.unit === 'string') t.unit = p.unit;
+  if (typeof p.unit === 'string') t.unit = p.unit === 'cyc' ? 'cycles' : p.unit;
   if (typeof p.step === 'number') t.step = p.step;
   if (Array.isArray(p.soft) && p.soft.length === 2) t.soft = [p.soft[0], p.soft[1]];
   return t;

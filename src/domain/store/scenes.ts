@@ -3,7 +3,7 @@ import { applyState, lightIdOf, type Light } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
 import { cancelWaiting } from './light-timing';
 import { canPlay, lookNameOf, type Room } from './rooms';
-import { momentsOf, offerUndo } from './undo';
+import { momentsOf, offerUndo, showNotice } from './undo';
 
 export const WHOLE_HOUSE = 'house';
 
@@ -45,18 +45,22 @@ function applyToLight(light: Light, saved: SceneLight) {
   });
 }
 
-// Says which lights the scene had to leave alone, because nobody can reach them or someone holds them.
+// The notice says which lights the scene had to leave alone: nobody can reach them or someone holds them.
 export function applyScene(scene: Scene, rooms: Room[]) {
   const writable = rooms.flatMap((room) => room.writableLights);
-  const leftOut: string[] = [];
-  const touched = writable.filter((light) => scene.lights.some(({ id }) => id === lightIdOf(light)));
-  offerUndo({ text: `${scene.name} applied`, moments: momentsOf(touched) });
-  for (const saved of scene.lights) {
+  const reached = scene.lights.flatMap((saved) => {
     const light = writable.find((candidate) => lightIdOf(candidate) === saved.id);
-    if (light) applyToLight(light, saved);
-    else leftOut.push(saved.name);
+    return light ? [{ light, saved }] : [];
+  });
+  const leftOut = scene.lights.filter((saved) => !reached.some((pair) => pair.saved === saved));
+  const leftOutText = `${leftOut.map(({ name }) => name).join(', ')} left out, locked or not answering.`;
+  if (reached.length === 0) {
+    showNotice(leftOutText);
+    return;
   }
-  return leftOut;
+  const text = leftOut.length > 0 ? `${scene.name} applied. ${leftOutText}` : `${scene.name} applied`;
+  offerUndo({ text, moments: momentsOf(reached.map(({ light }) => light)) });
+  for (const { light, saved } of reached) applyToLight(light, saved);
 }
 
 function plural(count: number, noun: string) {
@@ -82,12 +86,4 @@ export function sceneSummary({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
   return `Turns ${lightCount(offCount)} off`;
 }
 
-export const roomNameOf = (id: string, rooms: Room[]) => rooms.find((room) => room.id === id)?.name ?? id;
-
-export const roomTag = (name: string) =>
-  name
-    .split(/\s+/)
-    .map((word) => word.charAt(0))
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
+const roomNameOf = (id: string, rooms: Room[]) => rooms.find((room) => room.id === id)?.name ?? id;

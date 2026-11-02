@@ -2,7 +2,7 @@ import { InfoRow, PageFrame, PageHint, PageSection, ToggleRow } from '../../comp
 import { TextKey } from '../../design-system';
 import { setAutoUpdate, updateSoftware, type Light } from '../store/fleet-store';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
-import { closePage } from '../store/navigation-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 
 // A light restarts, restarts again and downloads in between, and it reports none of this.
@@ -37,12 +37,13 @@ function isUpdatable(light: Light, newVersion: string | null) {
 
 export function LightSoftwarePage({ room }: { room: Room }) {
   const servers = useLatestVersions((latest) => latest.servers);
+  const backLabel = useBackLabel(room);
   const patchLights = room.lights.filter((light) => newVersionOf(light, servers) && canPlayPatches(light));
   return (
     <PageFrame
       title="Light software"
       intro="An update takes a few minutes. The light goes off while it restarts."
-      backLabel={room.name}
+      backLabel={backLabel}
       onBack={closePage}
     >
       {patchLights.length > 0 && (

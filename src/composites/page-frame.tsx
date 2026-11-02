@@ -28,15 +28,24 @@ export function PageHint({ children }: { children: ReactNode }) {
   return <p className="page-hint">{children}</p>;
 }
 
-type InfoRowProps = { label: string; note: string; children?: ReactNode };
+type InfoRowProps = { label: string; note: string; onOpen?: () => void; children?: ReactNode };
 
-export function InfoRow({ label, note, children }: InfoRowProps) {
+export function InfoRow({ label, note, onOpen, children }: InfoRowProps) {
+  const text = (
+    <span className="more-text">
+      <span className="more-label">{label}</span>
+      <span className="more-note">{note}</span>
+    </span>
+  );
   return (
     <div className="info-row">
-      <span className="more-text">
-        <span className="more-label">{label}</span>
-        <span className="more-note">{note}</span>
-      </span>
+      {onOpen ? (
+        <Press className="info-open" onClick={onOpen}>
+          {text}
+        </Press>
+      ) : (
+        text
+      )}
       {children}
     </div>
   );
@@ -79,9 +88,10 @@ type ArrangeRowProps = {
   maxLength: number;
   hasGrip: boolean;
   onRename: (name: string) => void;
+  action?: ReactNode;
 };
 
-export function ArrangeRow({ name, maxLength, hasGrip, onRename }: ArrangeRowProps) {
+export function ArrangeRow({ name, maxLength, hasGrip, onRename, action }: ArrangeRowProps) {
   return (
     <div className="arrange-row">
       {hasGrip && (
@@ -90,6 +100,7 @@ export function ArrangeRow({ name, maxLength, hasGrip, onRename }: ArrangeRowPro
         </span>
       )}
       <TextField size="small" label={`Name of ${name}`} maxLength={maxLength} defaultValue={name} onLeave={onRename} />
+      {action}
     </div>
   );
 }

@@ -10,8 +10,9 @@ import {
   SelectRow,
   StepperRow,
 } from '../../composites';
-import { Eyebrow, OptionRow, PowerKey, TextField, TextKey } from '../../design-system';
+import { Eyebrow, KeyRow, OptionRow, PowerKey, TextField, TextKey } from '../../design-system';
 import {
+  forgetDeadLight,
   lightIdOf,
   lockLights,
   moveLightToRoom,
@@ -19,11 +20,13 @@ import {
   setNightlyLock,
   takeBackLights,
   unlockLights,
+  type Light,
 } from '../store/fleet-store';
 import { renameRoom, setLightOrder } from '../store/household-store';
-import { closePage } from '../store/navigation-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
 import { useRooms, type Room } from '../store/rooms';
 import { clockText } from '../store/schedules';
+import { offerUndo, showNotice } from '../store/undo';
 
 const HOUR_MS = 3600000;
 const WEEK_MS = 7 * 24 * HOUR_MS;
@@ -34,10 +37,21 @@ const DEFAULT_LOCK_START = 22 * 60;
 const DEFAULT_LOCK_END = 7 * 60;
 const MAX_LIGHT_NAME = 15;
 const MAX_ROOM_NAME = 40;
-const TAKE_BACK_WAIT_MS = 3000;
+const ANSWER_WAIT_MS = 3000;
 
 function RoomPage({ room, ...page }: { room: Room; title: string; intro?: string; children?: React.ReactNode }) {
-  return <PageFrame {...page} backLabel={room.name} onBack={closePage} />;
+  return <PageFrame {...page} backLabel={useBackLabel(room)} onBack={closePage} />;
+}
+
+// A light gives no refusal, so a change that has not shown up after a short wait has failed.
+function useAnswerWait() {
+  const [phase, setPhase] = useState<'idle' | 'waiting' | 'failed'>('idle');
+  useEffect(() => {
+    if (phase !== 'waiting') return;
+    const timer = window.setTimeout(() => setPhase('failed'), ANSWER_WAIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [phase]);
+  return [phase, setPhase] as const;
 }
 
 function nextMorning() {
@@ -115,10 +129,23 @@ export function LockPage({ room }: { room: Room }) {
   const [length, setLength] = useState<keyof typeof LOCK_ENDS>('morning');
   const [password, setPassword] = useState('');
   const lockedByMe = room.lights.some((light) => light.isLockedByMe);
+  const [phase, setPhase] = useAnswerWait();
+  const isLocked = phase === 'waiting' && lockedByMe;
+
+  useEffect(() => {
+    if (!isLocked) return;
+    setPhase('idle');
+    offerUndo({
+      text: `${room.name} locked`,
+      moments: [],
+      restore: () => unlockLights(room.lights.filter((light) => light.isLockedByMe)),
+    });
+    closePage();
+  }, [isLocked, room, setPhase]);
 
   const lock = () => {
+    setPhase('waiting');
     void lockLights(room.writableLights, LOCK_ENDS[length](), password);
-    closePage();
   };
 
   return (
@@ -144,7 +171,9 @@ export function LockPage({ room }: { room: Room }) {
             onChange={setLength}
           />
           <PasswordField value={password} onChange={setPassword} />
-          <TextKey disabled={!password} onClick={lock}>
+          {phase === 'waiting' && <PageHint>Locking.</PageHint>}
+          {phase === 'failed' && <PageHint>The lights did not lock. Try again.</PageHint>}
+          <TextKey disabled={!password || phase === 'waiting'} onClick={lock}>
             LOCK NOW
           </TextKey>
         </PageSection>
@@ -156,21 +185,27 @@ export function LockPage({ room }: { room: Room }) {
 
 export function TakeBackPage({ room }: { room: Room }) {
   const [password, setPassword] = useState('');
-  const [hasTried, setTried] = useState(false);
-  const [hasFailed, setFailed] = useState(false);
+  const [phase, setPhase] = useAnswerWait();
   const lockedLights = room.onlineLights.filter((light) => light.isLockedByOther);
-  const isTaken = hasTried && lockedLights.length === 0;
+  const isTaken = phase === 'waiting' && lockedLights.length === 0;
+  const { name } = room;
 
   useEffect(() => {
-    if (isTaken) closePage();
-  }, [isTaken]);
+    if (!isTaken) return;
+    setPhase('idle');
+    showNotice(`${name} is yours for an hour`);
+    closePage();
+  }, [isTaken, name, setPhase]);
 
-  // A light gives no refusal, so a lock that still holds after a short wait means a wrong password.
   const takeBack = () => {
-    setTried(true);
-    setFailed(false);
+    setPhase('waiting');
     void takeBackLights(lockedLights, Date.now() + HOUR_MS, password);
-    window.setTimeout(() => setFailed(true), TAKE_BACK_WAIT_MS);
+  };
+
+  const hints = {
+    idle: "Don't know it? Ask whoever set up the lights.",
+    waiting: 'Checking the password.',
+    failed: "That isn't the house password. Try again.",
   };
 
   return (
@@ -181,10 +216,8 @@ export function TakeBackPage({ room }: { room: Room }) {
     >
       <PageSection>
         <PasswordField value={password} onChange={setPassword} />
-        <PageHint>
-          {hasFailed ? "That isn't the house password. Try again." : "Don't know it? Ask whoever set up the lights."}
-        </PageHint>
-        <TextKey disabled={!password} onClick={takeBack}>
+        <PageHint>{hints[phase]}</PageHint>
+        <TextKey disabled={!password || phase === 'waiting'} onClick={takeBack}>
           TAKE IT BACK
         </TextKey>
       </PageSection>
@@ -197,7 +230,6 @@ function MoveLights({ room }: { room: Room }) {
   const [newRoom, setNewRoom] = useState('');
   const newName = newRoom.trim();
   const options = rooms.map(({ id, name }) => ({ value: id, name }));
-  if (newName) options.push({ value: newName, name: newName });
   return (
     <PageSection>
       <Eyebrow>ROOM OF EACH LIGHT</Eyebrow>
@@ -218,7 +250,26 @@ function MoveLights({ room }: { room: Room }) {
         value={newRoom}
         onChange={setNewRoom}
       />
+      {newName && (
+        <KeyRow>
+          {room.writableLights.map((light) => (
+            <TextKey key={light.address} onClick={() => moveLightToRoom(light, newName)}>
+              {`MOVE ${light.name.toUpperCase()} HERE`}
+            </TextKey>
+          ))}
+        </KeyRow>
+      )}
     </PageSection>
+  );
+}
+
+// A light that has gone for good stays on the card until someone says so.
+function ForgetKey({ light }: { light: Light }) {
+  const [isArmed, setArmed] = useState(false);
+  return (
+    <TextKey isQuiet onClick={() => (isArmed ? forgetDeadLight(light) : setArmed(true))}>
+      {isArmed ? 'FORGET?' : 'FORGET'}
+    </TextKey>
   );
 }
 
@@ -245,6 +296,7 @@ export function ArrangePage({ room }: { room: Room }) {
               name={light.name}
               maxLength={MAX_LIGHT_NAME}
               hasGrip={canMove}
+              action={!light.isOnline && <ForgetKey light={light} />}
               onRename={(name) => {
                 if (name.trim() && name.trim() !== light.name) renameLight(light, name.trim());
               }}

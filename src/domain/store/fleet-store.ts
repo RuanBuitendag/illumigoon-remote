@@ -6,7 +6,7 @@ import { lockKey, lockProof } from '../light-network/lock-keys';
 import { lookShape } from '../looks/look-catalog';
 import { withPositions } from '../looks/looks';
 import { loadLatestVersions } from './firmware-versions';
-import { rememberLightAddress, useHousehold } from './household-store';
+import { forgetLightAddress, rememberLightAddress, useHousehold } from './household-store';
 import type {
   AnimationState,
   ConfigValue,
@@ -220,6 +220,13 @@ function onLightLost(serviceName: string) {
   if (address) updateLight(address, { isOnline: false });
 }
 
+// For a light that is gone for good. A light that answers again comes back by itself.
+export function forgetDeadLight({ address }: Light) {
+  typedAddresses.delete(address);
+  forgetLightAddress(address);
+  forgetLight(address);
+}
+
 export function addLightByAddress(typed: string) {
   const address = typed.trim().replace(/^ws:\/\//, '').replace(/\/ws$/, '');
   typedAddresses.add(address);
@@ -309,20 +316,26 @@ export function setHeldByEditor(address: string, isHeld: boolean) {
 
 export type LightState = { isOn: boolean; brightness?: number; lookName?: string; animation?: AnimationState | null };
 
+// What the screen shows of a light, before the write that makes it true has gone out.
+export function noteState(light: Light, { isOn, brightness, lookName, animation }: LightState) {
+  updateLight(light.address, {
+    isOn,
+    brightness: brightness ?? light.brightness,
+    animation: animation ?? light.animation,
+    appliedLook: animation && lookName ? appliedLookOf(lookName, animation) : light.appliedLook,
+    hold: animation ? undefined : light.hold,
+    localWriteUntil: holdLocalWrite(),
+  });
+}
+
 // One message, so a light never shows half of a scene.
-export function applyState(lights: Light[], { isOn, brightness, lookName, animation }: LightState) {
+export function applyState(lights: Light[], lightState: LightState) {
+  const { isOn, brightness, animation } = lightState;
   const state = { is_on: isOn, brightness, ...(animation && { animation: withPositions(animation) }) };
   for (const light of lights) {
     connections.get(light.address)?.send('light_set_state', state);
-    updateLight(light.address, {
-      isOn,
-      brightness: brightness ?? light.brightness,
-      animation: animation ?? light.animation,
-      appliedLook: animation && lookName ? appliedLookOf(lookName, animation) : light.appliedLook,
-      hold: animation ? undefined : light.hold,
-      localWriteUntil: holdLocalWrite(),
-      lookWrittenAt: animation ? Date.now() : light.lookWrittenAt,
-    });
+    noteState(light, lightState);
+    if (animation) updateLight(light.address, { lookWrittenAt: Date.now() });
   }
 }
 

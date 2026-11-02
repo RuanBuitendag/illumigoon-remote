@@ -159,7 +159,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
       dr.surface = arrange(list, groupsOf({ ...dr, surface: list }));
     });
     ctl.say(
-      `${next.label} ${isNew ? 'is on the user surface' : 'updated'}${unlessReached(reached)}`,
+      `${next.label} ${isNew ? 'shows on the room' : 'updated'}${unlessReached(reached)}`,
     );
     onClose();
   };
@@ -168,7 +168,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
     const reached = ctl.structural(dr => {
       dr.surface = (dr.surface ?? []).filter(c => c.key !== control.key);
     });
-    ctl.say(`${control.label} is off the user surface${unlessReached(reached)}`);
+    ctl.say(`${control.label} is off the room${unlessReached(reached)}`);
     onClose();
   };
 
@@ -185,8 +185,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
         }}
       >
         <div className="row" style={{ justifyContent: 'space-between' }}>
-          <Lab className="head">{isNew ? 'Expose to user' : 'User control'}</Lab>
-          <Mono className="dim sm">{control.target}</Mono>
+          <Lab className="head">{isNew ? 'Show on the room' : 'Control on the room'}</Lab>
         </div>
 
         <label className="popfield">
