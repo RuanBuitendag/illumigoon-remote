@@ -82,6 +82,10 @@
 .library-group .eyebrow { margin-bottom: -18px; }
 .library-note { margin-bottom: -8px; color: var(--text-4); font-size: 13.5px; }
 .look-row { display: flex; flex-direction: column; min-width: 0; }
+.recent-looks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 20px; }
+.recent-look { display: flex; flex-direction: column; min-width: 0; min-height: 56px; text-align: left; }
+.recent-look-name { overflow: hidden; color: var(--text-3); font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.recent-look[aria-pressed='true'] .recent-look-name { color: var(--text-1); }
 .look-item { display: block; width: 100%; }
 .look-item:disabled { cursor: default; }
 .look-actions { display: flex; flex-wrap: wrap; gap: 22px; }

@@ -44,6 +44,21 @@ export function LookItem({ actions, children, ...look }: LookItemProps) {
   );
 }
 
+type RecentLookItemProps = HoldProps & { name: string; isPlaying: boolean; strip: ReactNode };
+
+export function RecentLookItem({ name, isPlaying, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
+  return (
+    <Press className="recent-look" isPressed={isPlaying} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
+      <span className="recent-look-name">{name}</span>
+      {strip}
+    </Press>
+  );
+}
+
+export function RecentLooks({ children }: { children: ReactNode }) {
+  return <div className="recent-looks">{children}</div>;
+}
+
 type LookPresetProps = HoldProps & { name: string; place: string; isPlaying: boolean; action?: ReactNode };
 
 export function LookPreset({ name, place, isPlaying, action, onPick, onHold, onHoldEnd }: LookPresetProps) {

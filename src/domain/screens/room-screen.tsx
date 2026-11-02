@@ -18,6 +18,7 @@ import { roomSchedules } from '../store/schedules';
 import { lightCount } from '../store/scenes';
 import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
+import { RecentLookRow } from './recent-looks';
 import { SceneRow } from './scene-row';
 
 const ALL_LIGHTS = 'all';
@@ -138,6 +139,7 @@ export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
     <RoomLayout name={room.name} countText={lightCount(room.lights.length)} backLabel="Rooms" onBack={closeRoom}>
       <RoomScope room={room} scope={isScoped ? scopeAddress : null} />
       <RoomHero room={room} lights={lights} />
+      <RecentLookRow room={room} lights={lights} />
       {rooms.length > 1 && <SceneRow rooms={rooms} room={room} />}
       <LightRows room={room} />
       <RoomMore room={room} />

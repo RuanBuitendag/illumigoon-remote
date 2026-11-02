@@ -23,6 +23,8 @@ export type OldScene = {
 // Waiting to move into the library. See `look-files`.
 export type SavedLook = { id: string; name: string; baseName: string; animation: AnimationState };
 
+export type RecentLook = { name: string; animation: AnimationState };
+
 type Household = {
   scenes: OldScene[];
   savedLooks: SavedLook[];
@@ -30,6 +32,7 @@ type Household = {
   roomNames: Record<string, string>;
   lightOrders: Record<string, string[]>;
   roomOrder: string[];
+  recentLooks: Record<string, RecentLook[]>;
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
 };
@@ -43,6 +46,7 @@ export const useHousehold = create<Household>()(
       roomNames: {} as Record<string, string>,
       lightOrders: {} as Record<string, string[]>,
       roomOrder: [] as string[],
+      recentLooks: {} as Record<string, RecentLook[]>,
       lightAddresses: [] as string[],
     }),
     { name: 'household' },
@@ -58,6 +62,15 @@ export function rememberLightAddress(address: string) {
 
 export function renameRoom(id: string, name: string) {
   useHousehold.setState(({ roomNames }) => ({ roomNames: { ...roomNames, [id]: name } }));
+}
+
+const RECENT_LOOKS = 4;
+
+export function rememberRecentLook(roomId: string, look: RecentLook) {
+  useHousehold.setState(({ recentLooks }) => {
+    const others = (recentLooks[roomId] ?? []).filter(({ name }) => name !== look.name);
+    return { recentLooks: { ...recentLooks, [roomId]: [look, ...others].slice(0, RECENT_LOOKS) } };
+  });
 }
 
 export function setRoomOrder(roomOrder: string[]) {
