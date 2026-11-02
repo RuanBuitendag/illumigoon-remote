@@ -8,8 +8,6 @@ import type { MasterColour } from '../domain/masterColour';
 import type { AudioFeed } from '../domain/scope';
 import type { DeviceInfo, Heartbeat } from '../device/wire';
 import { Boundary } from '../ui/Boundary';
-import { PatchRail, type Chosen } from '../ui/PatchRail';
-import type { Preset } from '../library/presets';
 import { SurfaceMenu, UserSurface } from '../ui/Surface';
 import { ControlEditor } from '../ui/controlEditor';
 import { BUDGET } from '../domain/catalog';
@@ -23,6 +21,7 @@ import { SheetHead } from '../ui/Sheet';
 import { FragmentSheet } from '../ui/Fragments';
 import { PaletteSheet } from '../ui/Palettes';
 import { Randomise } from '../ui/Randomise';
+import { SavePanel } from '../ui/SavePanel';
 import { EmitterPanel, MasterPanel } from '../ui/SignalChain';
 import { Strip } from '../ui/Strip';
 import type { Ctl, Reached } from '../ui/ctl';
@@ -36,33 +35,24 @@ import { sectionOfSide, type EditorSection } from './useSection';
 /** How full a look gets before the size meter shows. */
 const NEAR_FULL = 0.8;
 
-/** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
-export function SaveSheet({
-  draft, chosen, onChoose, onLoad, say, saveNudge, onClose,
-}: {
+/** The name, the notes and publishing. Choosing a look is the Looks page. */
+export function SaveSheet({ draft, say, saveNudge, onClose }: {
   draft: Pick<
     PatchDraft,
     'patch' | 'patchName' | 'patchNotes' | 'patchNameRef' | 'setPatchName' | 'setPatchNotes'
   >;
-  chosen: Chosen | null;
-  onChoose(chosen: Chosen | null): void;
-  onLoad(preset: Preset, from: string): void;
   say(message: string): void;
   saveNudge: number;
   onClose(): void;
 }) {
   const { patch, patchName, patchNotes, patchNameRef, setPatchName, setPatchNotes } = draft;
-  // Not `Overlay`: that holds the frame loop, and a row's strip here has to move.
   return (
     <div className="editor-overlay" onClick={onClose}>
       <div className="editor-sheet savesheet" onClick={e => e.stopPropagation()}>
-        <SheetHead icon={<Ico.Rail c="var(--text-3)" />} title="SAVE OR LOAD" onClose={onClose}>
+        <SheetHead icon={<Ico.Rail c="var(--text-3)" />} title="SAVE" onClose={onClose}>
           {null}
         </SheetHead>
-        <PatchRail
-          chosen={chosen?.key ?? null}
-          onChoose={onChoose}
-          onLoad={onLoad}
+        <SavePanel
           save={{
             patch,
             name: patchName,

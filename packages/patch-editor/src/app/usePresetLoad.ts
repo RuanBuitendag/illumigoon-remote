@@ -1,4 +1,4 @@
-/** A preset arriving: from the rail, or as a file dropped on the window. */
+/** A preset arriving as a file dropped on the window. */
 
 import { useCallback, useEffect } from 'react';
 import type { Link } from '../domain/connection';
@@ -93,6 +93,4 @@ export function usePresetLoad({
       window.removeEventListener('drop', drop);
     };
   }, [link, applyPreset, say]);
-
-  return applyPreset;
 }

@@ -214,6 +214,8 @@ export const StructField = ({ node, field, value, onChange }: {
 export const budgetColour = (bytes: number) =>
   bytes <= BUDGET.NVS ? 'var(--text-1)' : bytes <= BUDGET.MESH ? 'var(--warn)' : 'var(--bad)';
 
+export const kb = (b: number) => `${(b / 1024).toFixed(1)} KB`;
+
 export const budgetNote = (bytes: number) =>
   bytes <= BUDGET.NVS
     ? 'Survives a power cut, and fits over the mesh.'

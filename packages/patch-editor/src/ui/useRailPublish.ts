@@ -1,40 +1,18 @@
-/** The two acts of the patch rail that talk to the patch server. */
+/** Publishing, the one act of the Save sheet that talks to the patch server. */
 
 import { useState } from 'react';
 import { type Patch } from '../domain/patch';
 import type { PublishKind } from '../domain/publish';
-import { fetchPublished } from '../library/presets';
-import type { RailSave } from './PatchRail';
 import {
   documentToSend, markPresets, publishMessage, publishWarning, sendWithPresets, stampPublished,
+  type RailSave, type SaveContext,
 } from './railPublish';
-import type { RailContext } from './useRailActs';
 
-export function useRailPublish({
-  onChoose, say, save, file, setShelf, setProblem, listing, published,
-}: RailContext) {
-  const { list, mine, askServer } = listing;
+export function useRailPublish({ say, save, file, setProblem, listing, published }: SaveContext) {
+  const { list, askServer } = listing;
   const { publishedDocument, setReference } = published;
   /** True while a publish is in flight. The server sleeps, so this can be fifteen seconds. */
   const [publishing, setPublishing] = useState(false);
-  /** The id being fetched from the server, so its row can say it is working. */
-  const [fetching, setFetching] = useState<string | null>(null);
-
-  const fetchPatch = async (id: string, name: string) => {
-    if (fetching) return;
-    setFetching(id);
-    setProblem(null);
-    try {
-      await fetchPublished(id, name, mine.map(r => r.file));
-      say(`${name} is in Mine`);
-      setShelf('mine');
-      await list();
-    } catch (e) {
-      setProblem((e as Error).message);
-    } finally {
-      setFetching(null);
-    }
-  };
 
   /** Every step after the document is settled, in the order the comments below depend on. */
   const send = async (kind: PublishKind, open: RailSave, document: Patch) => {
@@ -46,7 +24,6 @@ export function useRailPublish({
     // edited one would leave it claiming a version whose contents it no longer has.
     if (kind !== 'preset') {
       const stamped = await stampPublished(document, open, file, result);
-      onChoose({ key: `mine:${file}`, name: stamped.name, doc: stamped });
       setReference({ file, doc: stamped });
     }
 
@@ -59,7 +36,6 @@ export function useRailPublish({
     // worse way round.
     await markPresets(mineForThis, result);
 
-    setShelf('mine');
     await list();
     // The server now holds something it did not a moment ago, and this is the one act that
     // changes that -- which is why the listing is asked for here rather than polled.
@@ -99,5 +75,5 @@ export function useRailPublish({
     }
   };
 
-  return { publishing, fetching, fetchPatch, doPublish };
+  return { publishing, doPublish };
 }

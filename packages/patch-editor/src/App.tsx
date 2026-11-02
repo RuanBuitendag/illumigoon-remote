@@ -1,8 +1,7 @@
 /** The Edit page: the live strip and the sections, for one light. */
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { Defs } from './ui/bits';
-import type { Chosen } from './ui/PatchRail';
 import { useLatest } from './ui/useLatest';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
@@ -33,7 +32,6 @@ export default function App(props: AppProps) {
   const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
-  const [chosen, setChosen] = useState<Chosen | null>(null);
   useSection(section, nav.side, nav.setSide, onSection);
 
   const named = useLatest(onName);
@@ -98,9 +96,6 @@ export default function App(props: AppProps) {
       {canEdit && isSaving && (
         <SaveSheet
           draft={draft}
-          chosen={chosen}
-          onChoose={setChosen}
-          onLoad={editor.applyPreset}
           say={editor.say}
           saveNudge={dialogs.saveNudge}
           onClose={onSaveClosed}

@@ -8,7 +8,29 @@ import {
   capturePreset, fromPreset, listPresets, markPublished, presetFolderFor, publish, toPreset,
   writePreset, writePublished, type Preset,
 } from '../library/presets';
-import type { RailSave } from './PatchRail';
+import type { useRailVerdict } from './useRailVerdict';
+
+/** What the Save sheet needs to save the open light's patch. */
+export interface RailSave {
+  patch: Patch;
+  name: string;
+  notes: string;
+  onName(v: string): void;
+  onNotes(v: string): void;
+}
+
+export interface SaveContext {
+  say(message: string): void;
+  save: RailSave;
+  file: string;
+  setProblem(message: string | null): void;
+  listing: {
+    mine: { file: string; notes: string }[];
+    list(): Promise<void>;
+    askServer(): void;
+  };
+  published: ReturnType<typeof useRailVerdict>;
+}
 
 /** Where the controls are now, as a preset's `values`. */
 export const positionsNow = (patch: Patch) => Object.fromEntries(

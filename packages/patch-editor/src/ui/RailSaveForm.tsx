@@ -1,10 +1,9 @@
-/** The rail's saving row: the open patch's name, where it would go, and what it may become. */
+/** The saving form: the open patch's name, where it would go, and what it may become. */
 
 import type { Ref } from 'react';
 import { whyNoVersion, type PublishKind } from '../domain/publish';
-import { Mono, budgetColour, budgetNote } from './bits';
-import type { RailSave } from './PatchRail';
-import { kb } from './RailRows';
+import { Mono, budgetColour, budgetNote, kb } from './bits';
+import type { RailSave } from './railPublish';
 import type { useRailVerdict } from './useRailVerdict';
 
 type Verdict = ReturnType<typeof useRailVerdict>['verdict'];
@@ -88,6 +87,7 @@ export function RailSaveForm({
   onSave,
   onPublish,
   onCapture,
+  onCopy,
 }: {
   save: RailSave;
   file: string;
@@ -100,6 +100,7 @@ export function RailSaveForm({
   onSave(): void;
   onPublish(kind: PublishKind): void;
   onCapture(): void;
+  onCopy(): void;
 }) {
   return (
     <div className="railsave">
@@ -167,6 +168,15 @@ export function RailSaveForm({
         <Mono className="dim sm">
           {presetCount ? `${presetCount} preset(s)` : 'no presets yet'}
         </Mono>
+        <span className="grow" />
+        <button
+          className="pill sm"
+          style={{ padding: '5px 10px' }}
+          onClick={() => onCopy()}
+          title="Copy the patch on the light as JSON"
+        >
+          COPY
+        </button>
       </div>
       <input
         className="well railnotes"

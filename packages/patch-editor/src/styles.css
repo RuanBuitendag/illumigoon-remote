@@ -488,35 +488,12 @@
    The house view: the house in the middle, Scenes on the right, the patch rail on the left
    (LIFE-863). Built from the same elevation ladder as the editor: the send bar is the one raised
    thing in the middle, a chosen light is `raise-hi`, everything else sits flat. */
-.patch-editor .library { flex: 1; width: 100%; border-right: 0; }
-.patch-editor .savesheet { width: 460px; height: 84vh; }
-.patch-editor .librarylist { flex-grow: 1; padding: 10px; gap: 6px; }
+.patch-editor .savesheet { width: 460px; }
 
-.patch-editor .patchrow {
-  display: flex;
-  flex-direction: column;
-  gap: 11px;
-  padding: 13px 14px 13px 16px;
-  position: relative;
-  text-align: left;
-  flex-shrink: 0;
-}
-.patch-editor .patchrow:disabled { cursor: default; }
-.patch-editor .patchname {
-  font: 400 13px/1 var(--sans);
-  letter-spacing: 0.01em;
-  color: var(--text-3);
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-.patch-editor .patchrow.raise-hi .patchname { color: var(--text-1); }
 /* A native select, like the blend chip, so the menu is the platform's. */
 
 .patch-editor .rooms { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px 18px; }
 .patch-editor .room { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.patch-editor .roomrule { flex-grow: 1; height: 1px; background: var(--track); }
 .patch-editor .tilenote {
   font: 400 10px/1 var(--sans);
   color: var(--text-5);
@@ -537,22 +514,7 @@
 .patch-editor .check[data-state='some']::after { content: ''; width: 7px; height: 1.5px; background: var(--text-3); }
 .patch-editor .check[data-state='dead'] { box-shadow: inset 0 0 0 1px var(--track); }
 
-/* A strip in a list (LedStrip.tsx). The canvas is 8px wider on each side than the box, the padding
-   of its tape, so the chips line up with the text above them. */
-.patch-editor .led { position: relative; min-width: 0; }
-.patch-editor .led canvas {
-  position: absolute;
-  top: 0;
-  left: -8px;
-  width: calc(100% + 16px);
-  height: 100%;
-  pointer-events: none;
-}
-.patch-editor .led.dim canvas { opacity: 0.45; }
-.patch-editor .led.silent { outline: 1px dashed var(--text-5); outline-offset: -1px; }
-
-/* The library in the Save sheet: shelves, a save box, groups, and the chosen row's actions. */
-.patch-editor .railhead { height: 40px; gap: 8px; padding: 0 8px 0 12px; }
+/* The Save sheet. */
 .patch-editor .railsave { display: flex; flex-direction: column; gap: 8px; padding: 12px 10px; flex-shrink: 0; }
 .patch-editor .railsave input {
   font: 400 12px/1 var(--sans);
@@ -564,20 +526,6 @@
 }
 .patch-editor .railsave input.railnotes { font: 400 11px/1 var(--sans); color: var(--text-3); }
 .patch-editor .railsave input::placeholder { color: var(--text-5); }
-.patch-editor .railgroup { display: flex; align-items: center; gap: 10px; padding: 10px 4px 2px; }
-.patch-editor .patchrow { cursor: pointer; }
-.patch-editor .patchrow[data-dead='true'] { cursor: default; }
-.patch-editor .railnote {
-  font: 400 11px/1.45 var(--sans);
-  color: var(--text-4);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-}
-.patch-editor .railfoot { display: flex; flex-direction: column; gap: 8px; padding: 8px 10px 10px; flex-shrink: 0; box-shadow: inset 0 1px 0 var(--track); }
-.patch-editor .railfoot textarea { height: 84px; padding: 9px 10px; font: 400 11px/1.5 var(--mono); color: var(--text-1); resize: none; }
 
 /* A room's master, as a mark beside the name rather than a word that took the name's room. */
 

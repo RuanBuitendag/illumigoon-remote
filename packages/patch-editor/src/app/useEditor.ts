@@ -34,7 +34,7 @@ export function useEditor(light: OpenLight | undefined) {
   const writes = usePatchWrites({ ...draft, wire });
   const nav = useNavigation(draft.patch);
   const masterActs = useMasterPalette({ ...draft, ...writes, wire, sel: nav.sel });
-  const applyPreset = usePresetLoad({ ...draft, ...writes, ...nav, link, say });
+  usePresetLoad({ ...draft, ...writes, ...nav, link, say });
   const rolled = useRolls({ ...draft, ...writes, ...nav, say });
   const gesture = useBindGesture({ ...draft, ...writes, dragRef, say });
   const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say });
@@ -61,7 +61,7 @@ export function useEditor(light: OpenLight | undefined) {
   });
 
   return {
-    toast, say, draft, connection, writes, nav, masterActs, applyPreset, rolled, gesture, ctl,
+    toast, say, draft, connection, writes, nav, masterActs, rolled, gesture, ctl,
     dialogs, longPress, canEdit, hb,
   };
 }
