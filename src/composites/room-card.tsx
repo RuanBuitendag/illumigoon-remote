@@ -10,13 +10,15 @@ type RoomCardProps = {
   hasSound: boolean;
   lightStates: { id: string; state: 'on' | 'off' | 'silent' }[];
   note: string | null;
+  // Shows on a laptop, where the open room stands beside its card.
+  isOpen: boolean;
   onOpen: () => void;
   children: ReactNode;
 };
 
 export function RoomCard(card: RoomCardProps) {
   return (
-    <article className="room-card" style={tintStyle(card.tint)}>
+    <article className="room-card" data-open={card.isOpen} style={tintStyle(card.tint)}>
       <Press className="room-open" onClick={card.onOpen}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>

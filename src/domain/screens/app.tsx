@@ -1,8 +1,8 @@
 import { useEffect, type ReactNode } from 'react';
 import { startLibrary } from '../store/library-store';
 import { startLooks } from '../store/look-files';
-import { ScreenStack } from '../../composites';
-import { closePage, closeRoom, useNavigation, type PageKind } from '../store/navigation-store';
+import { ScreenStack, useIsWide } from '../../composites';
+import { closePage, closeRoom, openRoom, useNavigation, type PageKind } from '../store/navigation-store';
 import { useRooms, type Room } from '../store/rooms';
 import { AddLightPage } from './add-light-page';
 import { EditorPage } from './editor-page';
@@ -41,6 +41,9 @@ export function App() {
   const isRoomOpen = useNavigation((navigation) => navigation.isRoomOpen);
   const isPageOpen = useNavigation((navigation) => navigation.isPageOpen);
   const pageVisit = useNavigation((navigation) => navigation.pageVisit);
+  const isEditor = useNavigation((navigation) => navigation.page === 'editor');
+  const isWide = useIsWide();
+  const firstRoomId = rooms[0]?.id;
   const room = rooms.find(({ id }) => id === roomId);
 
   useEffect(() => {
@@ -55,6 +58,11 @@ export function App() {
     }
   }, [roomId, room]);
 
+  // On a laptop the pane beside Home is never empty.
+  useEffect(() => {
+    if (isWide && !isRoomOpen && firstRoomId) openRoom(firstRoomId);
+  }, [isWide, isRoomOpen, firstRoomId]);
+
   if (rooms.length === 0) return <SearchScreen />;
   return (
     <ScreenStack
@@ -64,6 +72,7 @@ export function App() {
       notice={<UndoBar />}
       isRoomOpen={isRoomOpen}
       isPageOpen={isPageOpen}
+      isPageWide={isEditor}
     />
   );
 }

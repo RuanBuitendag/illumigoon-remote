@@ -24,7 +24,7 @@ export const useNavigation = create<Navigation>(() => ({
 }));
 
 export function openRoom(roomId: string) {
-  useNavigation.setState({ roomId, isRoomOpen: true, scopeAddress: null });
+  useNavigation.setState({ roomId, isRoomOpen: true, scopeAddress: null, isPageOpen: false });
 }
 
 export const closeRoom = () => useNavigation.setState({ isRoomOpen: false });

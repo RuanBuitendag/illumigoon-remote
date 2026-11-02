@@ -3,7 +3,7 @@ import { movesToMusic } from '../looks/look-catalog';
 import { useRecording } from '../looks/recordings';
 import { setBrightness, setPower, type Light } from '../store/fleet-store';
 import { useShownLights } from '../store/look-preview';
-import { openPage, openRoom } from '../store/navigation-store';
+import { openPage, openRoom, useNavigation } from '../store/navigation-store';
 import {
   highestBrightness,
   isAnyOn,
@@ -38,6 +38,7 @@ function lookLabel(lights: Light[]) {
 
 export function RoomSummary({ room }: { room: Room }) {
   const { writableLights } = room;
+  const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
   const onlineLights = useShownLights(room.onlineLights);
   const first = onlineLights[0];
   const source = previewOfAnimation(first?.animation ?? null);
@@ -55,6 +56,7 @@ export function RoomSummary({ room }: { room: Room }) {
       hasSound={Boolean(lookId && movesToMusic(lookId))}
       lightStates={room.lights.map((light) => ({ id: light.address, state: lightState(light) }))}
       note={silentText(room)}
+      isOpen={isOpen}
       onOpen={() => openRoom(room.id)}
     >
       {room.isLocked ? (

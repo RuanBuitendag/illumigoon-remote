@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useSyncExternalStore, type ReactNode } from 'react';
 import { BackKey, OptionRow, TextKey } from '../design-system';
 
 type ScreenStackProps = {
@@ -8,18 +8,34 @@ type ScreenStackProps = {
   notice?: ReactNode;
   isRoomOpen: boolean;
   isPageOpen: boolean;
+  // A page that takes the whole window on a laptop.
+  isPageWide: boolean;
 };
 
-export function ScreenStack({ home, room, page, notice, isRoomOpen, isPageOpen }: ScreenStackProps) {
+const WIDE = '(min-width: 900px)';
+
+function listenToWidth(onChange: () => void) {
+  const query = window.matchMedia(WIDE);
+  query.addEventListener('change', onChange);
+  return () => query.removeEventListener('change', onChange);
+}
+
+// From this width Home stands beside the room instead of under it.
+export const useIsWide = () => useSyncExternalStore(listenToWidth, () => window.matchMedia(WIDE).matches);
+
+export function ScreenStack(props: ScreenStackProps) {
+  const { home, room, page, notice, isRoomOpen, isPageOpen, isPageWide } = props;
+  const isWide = useIsWide();
+  const isHomeCovered = isWide ? isPageOpen && isPageWide : isRoomOpen || isPageOpen;
   return (
     <div className="screen-stack">
-      <main className="screen screen-home" data-pushed={isRoomOpen} inert={isRoomOpen}>
+      <main className="screen screen-home" data-pushed={isRoomOpen} inert={isHomeCovered}>
         {home}
       </main>
-      <main className="screen screen-room" data-open={isRoomOpen} inert={!isRoomOpen}>
+      <main className="screen screen-room" data-open={isRoomOpen} inert={!isRoomOpen || isPageOpen}>
         {room}
       </main>
-      <main className="screen screen-page" data-open={isPageOpen} inert={!isPageOpen}>
+      <main className="screen screen-page" data-open={isPageOpen} data-wide={isPageWide} inert={!isPageOpen}>
         {page}
       </main>
       {notice}

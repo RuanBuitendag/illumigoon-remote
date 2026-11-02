@@ -180,12 +180,20 @@
 /* Laptop */
 
 @media (min-width: 900px) {
-  .home-header { height: 76px; padding: 32px max(24px, calc(50% - 536px)) 0; }
-  .home-column { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 48px; max-width: 1120px; margin: 0 auto; padding: 4px 0 60px; }
-  .home-column > :not(.room-card) { grid-column: 1 / -1; }
+  .home-header { height: 76px; padding: 32px 24px 0; }
   .scene-list { flex-wrap: wrap; margin: 0; padding: 0; overflow: visible; }
   .room-scroll, .screen-page { padding-inline: max(24px, calc(50% - 360px)); }
   .room-scroll::before { margin-inline: 0; }
-  .screen-home[data-pushed='true'] { transform: none; opacity: 0; }
+  .room-scroll > .back-key { display: none; }
+  .screen-home { right: auto; width: 380px; box-shadow: 1px 0 0 var(--track); }
+  .screen-home[data-pushed='true'] { transform: none; opacity: 1; }
+  .screen-room { left: 380px; transform: none; transition: none; }
+  .screen-room[data-open='true'] { box-shadow: none; }
+  .screen-page { left: 380px; }
+  .screen-page[data-wide='true'] { left: 0; padding-inline: 0; }
+  .room-card[data-open='true'] .room-name { color: var(--text-1); }
+  .room-card[data-open='true'] { background: var(--wash); }
+  .screen-stack > .overlay { left: 380px; }
+  .undo-notice { left: 392px; }
   .edit-sections { display: none; }
 }
