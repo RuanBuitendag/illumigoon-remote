@@ -1,65 +1,35 @@
 import type { ReactNode } from 'react';
-import { ChevronMark, LinkKey, Press, SoundMark, TextKey, tintStyle } from '../design-system';
+import { AddKey, Eyebrow, LinkKey, Press, TextKey } from '../design-system';
+import { HeadingRow } from './control-rows';
 
-export function TabPage({ children }: { children: ReactNode }) {
-  return <div className="tab-page">{children}</div>;
-}
-
-type AllRoomsHeaderProps = { summary: string; playing: string; power: ReactNode; children?: ReactNode };
-
-export function AllRoomsHeader({ summary, playing, power, children }: AllRoomsHeaderProps) {
-  return (
-    <header className="all-rooms-header">
-      <div>
-        <h1 className="tab-title">{summary}</h1>
-        <p className="tab-subtitle">{playing}</p>
-        {children}
-      </div>
-      {power}
-    </header>
-  );
-}
-
-type RoomBlockProps = {
-  name: string;
-  stateText: string;
-  hasSound: boolean;
-  tint?: string;
-  power: ReactNode;
-  note: string | null;
-  // Shows on a laptop, where the open room stands beside its block.
-  isOpen: boolean;
-  onOpen: () => void;
+type HomeLayoutProps = {
+  wordmark: string;
+  onWordmark: () => void;
   children: ReactNode;
 };
 
-export function RoomBlock({ name, stateText, hasSound, tint, power, note, isOpen, onOpen, children }: RoomBlockProps) {
+export function HomeLayout({ wordmark, onWordmark, children }: HomeLayoutProps) {
   return (
-    <section className="room-block" data-open={isOpen} style={tintStyle(tint)}>
-      <div className="room-head">
-        {power}
-        <Press className="room-open" onClick={onOpen}>
-          <span className="room-heading">
-            <span className="room-name">{name}</span>
-            <span className="room-state">
-              {stateText}
-              {hasSound && <SoundMark />}
-            </span>
-          </span>
-          <span className="room-go">
-            OPEN
-            <ChevronMark direction="right" />
-          </span>
+    <div className="home-scroll">
+      <header className="home-header">
+        <Press className="wordmark" onClick={onWordmark}>
+          {wordmark}
         </Press>
-      </div>
-      {note && <QuietNote>{note}</QuietNote>}
-      {children}
-    </section>
+      </header>
+      <div className="home-column">{children}</div>
+    </div>
   );
 }
 
-export function QuietNote({ children }: { children: ReactNode }) {
-  return <p className="quiet-note">{children}</p>;
+type HouseSectionProps = { title: string; action: ReactNode; children: ReactNode };
+
+export function HouseSection({ title, action, children }: HouseSectionProps) {
+  return (
+    <section className="house-section">
+      <HeadingRow heading={<Eyebrow>{title}</Eyebrow>}>{action}</HeadingRow>
+      {children}
+    </section>
+  );
 }
 
 type HouseNoteProps = { text: string; actionLabel: string; onAction: () => void };
@@ -70,6 +40,14 @@ export function HouseNote({ text, actionLabel, onAction }: HouseNoteProps) {
       <p>{text}</p>
       <TextKey onClick={onAction}>{actionLabel}</TextKey>
     </section>
+  );
+}
+
+export function HomeAdd({ children, onClick }: { children: ReactNode; onClick: () => void }) {
+  return (
+    <span className="home-add">
+      <AddKey onClick={onClick}>{children}</AddKey>
+    </span>
   );
 }
 

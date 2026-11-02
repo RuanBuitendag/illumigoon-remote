@@ -1,16 +1,20 @@
 import type { ReactNode } from 'react';
-import { ColourFill, Eyebrow, Press, TextKey } from '../design-system';
+import { AddKey, ColourFill, Eyebrow, Press, TextKey } from '../design-system';
 import { HeadingRow } from './control-rows';
-import { QuietNote } from './home-layout';
+import { QuietNote } from './room-card';
 
-export function MoodSegment({ gradient }: { gradient?: string }) {
-  return <ColourFill className="mood-segment" paint={gradient} />;
+export function SceneLine({ tag, gradient }: { tag: string; gradient?: string }) {
+  return (
+    <span className="scene-line">
+      <span className="scene-tag">{tag}</span>
+      <ColourFill className="scene-bar" paint={gradient} />
+    </span>
+  );
 }
 
 type SceneCardProps = {
   name: string;
   summary: string;
-  isActive: boolean;
   isEditing: boolean;
   onApply: () => void;
   onHold: () => void;
@@ -18,19 +22,17 @@ type SceneCardProps = {
   onUpdate: () => void;
   onRename: () => void;
   onDelete: () => void;
-  // A mood shows one segment per light. A scene shows only its name.
-  children?: ReactNode;
+  children: ReactNode;
 };
 
 export function SceneCard(props: SceneCardProps) {
-  const { name, summary, isActive, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } =
-    props;
+  const { name, summary, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
   return (
-    <div className="scene-card" data-active={isActive}>
+    <div className="scene-card">
       <Press className="scene-apply" disabled={isEditing} onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
         <span className="scene-name">{name}</span>
-        {children && <span className="mood-segments">{children}</span>}
-        {isEditing && <span className="scene-summary">{summary}</span>}
+        {children}
+        <span className="scene-summary">{summary}</span>
       </Press>
       {isEditing && (
         <span className="scene-edit">
@@ -44,9 +46,6 @@ export function SceneCard(props: SceneCardProps) {
 }
 
 type SceneShelfProps = {
-  title: string;
-  saveLabel: string;
-  isMood: boolean;
   hasScenes: boolean;
   isEditing: boolean;
   note: string | null;
@@ -55,23 +54,18 @@ type SceneShelfProps = {
   children: ReactNode;
 };
 
-export function SceneShelf(shelf: SceneShelfProps) {
-  const { title, saveLabel, isMood, hasScenes, isEditing, note, onEdit, onSave, children } = shelf;
+export function SceneShelf({ hasScenes, isEditing, note, onEdit, onSave, children }: SceneShelfProps) {
   return (
-    <section className="scene-shelf" data-mood={isMood}>
-      <HeadingRow heading={<Eyebrow>{title}</Eyebrow>}>
-        <span className="scene-keys">
-          {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'EDIT'}</TextKey>}
-          <Press className="scene-save" onClick={onSave}>
-            {saveLabel}
-          </Press>
-        </span>
+    <section className="scene-shelf">
+      <HeadingRow heading={<Eyebrow>SCENES</Eyebrow>}>
+        {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'EDIT'}</TextKey>}
       </HeadingRow>
-      {hasScenes && (
-        <div className="scene-grid" data-editing={isEditing}>
-          {children}
-        </div>
-      )}
+      <div className="scene-list">
+        {children}
+        <span className="scene-add">
+          <AddKey onClick={onSave}>+ Save scene</AddKey>
+        </span>
+      </div>
       {note && <QuietNote>{note}</QuietNote>}
     </section>
   );

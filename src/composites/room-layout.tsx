@@ -1,87 +1,22 @@
 import type { ReactNode } from 'react';
-import { ChevronMark, Eyebrow, KeyRow, OptionRow, Press, SoundMark, TextKey, tintStyle } from '../design-system';
+import { BackKey, ChevronMark, Eyebrow, KeyRow, OptionRow, Press, StatusMark, TextKey, tintStyle } from '../design-system';
 
 type RoomLayoutProps = {
-  tint?: string;
-  chips: { value: string; name: string }[];
-  chip: string;
-  onChip: (value: string) => void;
   name: string;
-  stateText: string;
-  power: ReactNode;
+  countText: string;
+  backLabel: string;
+  onBack: () => void;
   children: ReactNode;
 };
 
-export function RoomLayout({ tint, chips, chip, onChip, name, stateText, power, children }: RoomLayoutProps) {
+export function RoomLayout({ name, countText, backLabel, onBack, children }: RoomLayoutProps) {
   return (
-    <div className="tab-page room-page" style={tintStyle(tint)}>
-      <nav className="room-chips" aria-label="Rooms">
-        {chips.map(({ value, name: chipName }) => (
-          <Press key={value} className="room-chip" isPressed={value === chip} onClick={() => onChip(value)}>
-            {chipName}
-          </Press>
-        ))}
-      </nav>
-      <div className="room-title-row">
-        {power}
-        <div>
-          <h1 className="tab-title">{name}</h1>
-          <p className="tab-subtitle">{stateText}</p>
-        </div>
-      </div>
+    <div className="room-scroll">
+      <BackKey label={backLabel} onClick={onBack} />
+      <h1 className="room-title">{name}</h1>
+      <p className="room-count">{countText}</p>
       {children}
     </div>
-  );
-}
-
-type LookSummaryProps = {
-  name: string;
-  hasSound: boolean;
-  strip: ReactNode;
-  onEdit?: () => void;
-  onChangeLook?: () => void;
-  onControls?: () => void;
-  children?: ReactNode;
-};
-
-export function LookSummary({ name, hasSound, strip, onEdit, onChangeLook, onControls, children }: LookSummaryProps) {
-  return (
-    <section className="look-summary">
-      <div className="room-heading-row">
-        <Eyebrow>LOOK</Eyebrow>
-      </div>
-      <span className="look-summary-name">
-        {name}
-        {hasSound && <SoundMark />}
-      </span>
-      {strip}
-      <KeyRow>
-        {onEdit && <TextKey onClick={onEdit}>EDIT</TextKey>}
-        {onChangeLook && (
-          <TextKey onClick={onChangeLook}>
-            CHANGE LOOK
-            <ChevronMark direction="right" />
-          </TextKey>
-        )}
-        {onControls && (
-          <TextKey isQuiet onClick={onControls}>
-            ALL CONTROLS
-          </TextKey>
-        )}
-      </KeyRow>
-      {children}
-    </section>
-  );
-}
-
-export function RoomLights({ children }: { children: ReactNode }) {
-  return (
-    <section className="room-lights">
-      <div className="room-heading-row">
-        <Eyebrow>LIGHTS</Eyebrow>
-      </div>
-      {children}
-    </section>
   );
 }
 
@@ -138,5 +73,38 @@ export function RoomSection({ title, eyebrow, children }: RoomSectionProps) {
       {title && <h2 className="section-title">{title}</h2>}
       {children}
     </section>
+  );
+}
+
+type LightRowProps = {
+  name: string;
+  status: string;
+  state: 'on' | 'off' | 'silent';
+  disabled: boolean;
+  onClick: () => void;
+  onHold: () => void;
+};
+
+export function LightRow({ name, status, state, disabled, onClick, onHold }: LightRowProps) {
+  return (
+    <Press className="light-row" disabled={disabled} onClick={onClick} onHold={onHold}>
+      <span>{name}</span>
+      <span className="light-status">{status}</span>
+      <StatusMark state={state} />
+    </Press>
+  );
+}
+
+type MoreRowProps = { label: string; note: string; onOpen: () => void };
+
+export function MoreRow({ label, note, onOpen }: MoreRowProps) {
+  return (
+    <Press className="more-row" onClick={onOpen}>
+      <span className="more-text">
+        <span className="more-label">{label}</span>
+        <span className="more-note">{note}</span>
+      </span>
+      <ChevronMark direction="right" />
+    </Press>
   );
 }

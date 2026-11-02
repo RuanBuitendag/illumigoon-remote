@@ -1,16 +1,12 @@
 import { useSyncExternalStore, type ReactNode } from 'react';
-import { BackKey, OptionRow, Press, TextKey } from '../design-system';
+import { BackKey, OptionRow, TextKey } from '../design-system';
 
 type ScreenStackProps = {
   home: ReactNode;
   room: ReactNode;
-  settings: ReactNode;
-  bar: ReactNode;
-  card: ReactNode;
   page: ReactNode;
   notice?: ReactNode;
-  tab: 'rooms' | 'room' | 'settings';
-  hasCard: boolean;
+  isRoomOpen: boolean;
   isPageOpen: boolean;
   // A page that takes the whole window on a laptop.
   isPageWide: boolean;
@@ -24,55 +20,26 @@ function listenToWidth(onChange: () => void) {
   return () => query.removeEventListener('change', onChange);
 }
 
-// From this width All rooms stands beside the room, so the bar no longer needs its tab.
+// From this width Home stands beside the room instead of under it.
 export const useIsWide = () => useSyncExternalStore(listenToWidth, () => window.matchMedia(WIDE).matches);
 
 export function ScreenStack(props: ScreenStackProps) {
-  const { home, room, settings, bar, card, page, notice, tab, hasCard, isPageOpen, isPageWide } = props;
+  const { home, room, page, notice, isRoomOpen, isPageOpen, isPageWide } = props;
   const isWide = useIsWide();
-  const isHomeOpen = isWide || tab === 'rooms';
-  const isRoomOpen = tab === 'room' || (isWide && tab === 'rooms');
-  const isHomeCovered = isPageOpen && (!isWide || isPageWide);
+  const isHomeCovered = isWide ? isPageOpen && isPageWide : isRoomOpen || isPageOpen;
   return (
-    <div className="screen-stack" data-card={hasCard}>
-      <main className="screen screen-tab screen-home" data-open={isHomeOpen} inert={!isHomeOpen || isHomeCovered}>
+    <div className="screen-stack">
+      <main className="screen screen-home" data-pushed={isRoomOpen} inert={isHomeCovered}>
         {home}
       </main>
-      <main className="screen screen-tab screen-pane" data-open={isRoomOpen} inert={!isRoomOpen || isPageOpen}>
+      <main className="screen screen-room" data-open={isRoomOpen} inert={!isRoomOpen || isPageOpen}>
         {room}
       </main>
-      <main
-        className="screen screen-tab screen-pane"
-        data-open={tab === 'settings'}
-        inert={tab !== 'settings' || isPageOpen}
-      >
-        {settings}
-      </main>
-      {bar}
-      {card}
       <main className="screen screen-page" data-open={isPageOpen} data-wide={isPageWide} inert={!isPageOpen}>
         {page}
       </main>
       {notice}
     </div>
-  );
-}
-
-type TabBarProps<Tab extends string> = {
-  tabs: { value: Tab; name: string }[];
-  value: Tab;
-  onChange: (value: Tab) => void;
-};
-
-export function TabBar<Tab extends string>({ tabs, value, onChange }: TabBarProps<Tab>) {
-  return (
-    <nav className="tab-bar">
-      {tabs.map((tab) => (
-        <Press key={tab.value} className="tab-key" isPressed={tab.value === value} onClick={() => onChange(tab.value)}>
-          {tab.name}
-        </Press>
-      ))}
-    </nav>
   );
 }
 

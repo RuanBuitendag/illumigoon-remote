@@ -53,7 +53,7 @@ function TransitionControls({ lights, light }: { lights: Light[]; light: Light }
   );
 }
 
-export const toHexList = ({ default: value }: Parameter) =>
+const toHexList = ({ default: value }: Parameter) =>
   (Array.isArray(value) ? value : [value as Colour]).map(colourToHex);
 
 const familyOf = ({ file, group, shipped }: PaletteEntry) => {

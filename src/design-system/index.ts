@@ -17,13 +17,13 @@ export {
 } from './colour';
 export type { Colour } from './colour';
 export { ColourFill, ColourSlot, SwatchKey } from './colour-chips';
-export { STARTER_COLOUR_SETS, STARTER_COLOURS } from './colour-sets';
+export { STARTER_COLOUR_SETS } from './colour-sets';
 export { useDragOrder } from './drag-order';
 export { Fader } from './fader';
 export { AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
-export { ChevronMark, GripMark, LockMark, SoundMark, tintStyle } from './marks';
+export { ChevronMark, GripMark, LockMark, SoundMark, StatusMark, tintStyle } from './marks';
 export { Eyebrow, ValueText } from './text';
 export { TextArea, TextField } from './text-field';

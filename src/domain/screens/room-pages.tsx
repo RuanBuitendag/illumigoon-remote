@@ -4,6 +4,7 @@ import {
   HeadingRow,
   LightDragList,
   LockStatus,
+  PageFrame,
   PageHint,
   PageSection,
   SelectRow,
@@ -23,7 +24,6 @@ import { renameRoom, setLightOrder } from '../store/household-store';
 import { closePage } from '../store/navigation-store';
 import { useRooms, type Room } from '../store/rooms';
 import { clockText } from '../store/schedules';
-import { AppPage } from './app-page';
 
 const HOUR_MS = 3600000;
 const WEEK_MS = 7 * 24 * HOUR_MS;
@@ -35,6 +35,10 @@ const DEFAULT_LOCK_END = 7 * 60;
 const MAX_LIGHT_NAME = 15;
 const MAX_ROOM_NAME = 40;
 const TAKE_BACK_WAIT_MS = 3000;
+
+function RoomPage({ room, ...page }: { room: Room; title: string; intro?: string; children?: React.ReactNode }) {
+  return <PageFrame {...page} backLabel={room.name} onBack={closePage} />;
+}
 
 function nextMorning() {
   const morning = new Date();
@@ -118,7 +122,8 @@ export function LockPage({ room }: { room: Room }) {
   };
 
   return (
-    <AppPage
+    <RoomPage
+      room={room}
       title="Lock"
       intro="A lock asks everyone else in the house to leave this room's lights alone. It's a courtesy between housemates, so anyone with the house password can still take it back."
     >
@@ -145,7 +150,7 @@ export function LockPage({ room }: { room: Room }) {
         </PageSection>
       )}
       <NightlyLock room={room} password={password} />
-    </AppPage>
+    </RoomPage>
   );
 }
 
@@ -169,7 +174,8 @@ export function TakeBackPage({ room }: { room: Room }) {
   };
 
   return (
-    <AppPage
+    <RoomPage
+      room={room}
       title={`Take back ${room.name}`}
       intro="Someone else is using this room. If you need it now, enter the house password. They'll see that you took it back."
     >
@@ -182,7 +188,7 @@ export function TakeBackPage({ room }: { room: Room }) {
           TAKE IT BACK
         </TextKey>
       </PageSection>
-    </AppPage>
+    </RoomPage>
   );
 }
 
@@ -219,7 +225,7 @@ function MoveLights({ room }: { room: Room }) {
 export function ArrangePage({ room }: { room: Room }) {
   const canMove = room.lights.length > 1;
   return (
-    <AppPage title="Rename and arrange">
+    <RoomPage room={room} title="Rename and arrange">
       <PageSection>
         <Eyebrow>ROOM NAME</Eyebrow>
         <TextField
@@ -247,6 +253,6 @@ export function ArrangePage({ room }: { room: Room }) {
         </LightDragList>
       </PageSection>
       <MoveLights room={room} />
-    </AppPage>
+    </RoomPage>
   );
 }

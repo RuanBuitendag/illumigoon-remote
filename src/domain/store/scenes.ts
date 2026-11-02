@@ -2,7 +2,7 @@ import type { AnimationState } from '../light-network/protocol';
 import { applyState, lightIdOf, type Light } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
 import { cancelWaiting } from './light-timing';
-import { canPlay, lookIdOf, lookNameOf, type Room } from './rooms';
+import { canPlay, lookNameOf, type Room } from './rooms';
 import { momentsOf, offerUndo } from './undo';
 
 export const WHOLE_HOUSE = 'house';
@@ -59,17 +59,6 @@ export function applyScene(scene: Scene, rooms: Room[]) {
   return leftOut;
 }
 
-// A scene shows while every light it saves has the power and the look it saved. Levels can move.
-export function isSceneShowing({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
-  const fleet = rooms.flatMap((room) => room.lights);
-  const showsSaved = (saved: SceneLight) => {
-    const light = fleet.find((candidate) => lightIdOf(candidate) === saved.id);
-    if (light?.isOn !== saved.is_on) return false;
-    return !saved.is_on || lookIdOf(light.animation) === lookIdOf(animationOf(saved));
-  };
-  return lights.length > 0 && lights.every(showsSaved);
-}
-
 function plural(count: number, noun: string) {
   return `${count} ${noun}${count === 1 ? '' : 's'}`;
 }
@@ -94,3 +83,11 @@ export function sceneSummary({ lights }: Pick<Scene, 'lights'>, rooms: Room[]) {
 }
 
 export const roomNameOf = (id: string, rooms: Room[]) => rooms.find((room) => room.id === id)?.name ?? id;
+
+export const roomTag = (name: string) =>
+  name
+    .split(/\s+/)
+    .map((word) => word.charAt(0))
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
