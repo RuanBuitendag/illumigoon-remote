@@ -78,6 +78,23 @@ export const timerEntry = (minutes: number): ScheduleEntry => ({
   state: TURN_OFF,
 });
 
+const timeOfDay = (atUtc: number) =>
+  new Date(atUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
+// Timers still to come on these lights, soonest first.
+export function offTimersOf(lights: Light[]) {
+  const entries = new Map(lights.flatMap(({ schedule }) => schedule.map((entry) => [entry.id, entry] as const)));
+  const waiting = [...entries.values()].filter(
+    ({ at_utc: atUtc, state }) => atUtc !== undefined && atUtc > Date.now() && state.is_on === false,
+  );
+  return waiting.sort((first, second) => (first.at_utc ?? 0) - (second.at_utc ?? 0));
+}
+
+export function offTimerNote(lights: Light[]) {
+  const atUtc = offTimersOf(lights)[0]?.at_utc;
+  return atUtc === undefined ? 'Not set' : `Off at ${timeOfDay(atUtc)}`;
+}
+
 export type RoomSchedule = { entry: ScheduleEntry; title: string; when: string; missingFrom: string[] };
 
 function actionText({ is_on: isOn, animation }: ScheduleChange, lights: Light[]) {
@@ -98,8 +115,7 @@ function daysText(days = EVERY_DAY) {
 
 function whenText({ at, at_utc: atUtc, until, days }: ScheduleEntry) {
   if (atUtc !== undefined) {
-    const time = new Date(atUtc).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-    return `Once at ${time}`;
+    return `Once at ${timeOfDay(atUtc)}`;
   }
   const end = until === undefined ? '' : ` to ${clockText(until)}`;
   return `${clockText(at ?? 0)}${end}, ${daysText(days)}`;

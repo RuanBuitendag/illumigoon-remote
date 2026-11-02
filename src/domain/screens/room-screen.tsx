@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Hero, LevelRow, LightRow, MoreRow, RoomLayout, RoomSection, ScopeTabs } from '../../composites';
 import { useRecording } from '../looks/recordings';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
@@ -14,10 +15,11 @@ import {
   previewOfAnimation,
   type Room,
 } from '../store/rooms';
-import { roomSchedules } from '../store/schedules';
+import { offTimerNote, roomSchedules } from '../store/schedules';
 import { lightCount } from '../store/scenes';
 import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
+import { OffTimerSheet, schedulingLights } from './off-timer-sheet';
 import { RecentLookRow } from './recent-looks';
 import { SceneRow } from './scene-row';
 
@@ -86,8 +88,13 @@ function softwareNote({ lights }: Room, waiting: number) {
 function RoomMore({ room }: { room: Room }) {
   const servers = useLatestVersions((latest) => latest.servers);
   const waiting = room.lights.filter((light) => newVersionOf(light, servers)).length;
+  const [isTiming, setTiming] = useState(false);
+  const timerLights = schedulingLights(room);
   return (
     <RoomSection>
+      {timerLights.length > 0 && (
+        <MoreRow label="Off timer" note={offTimerNote(timerLights)} onOpen={() => setTiming(true)} />
+      )}
       <MoreRow label="Schedules" note={scheduleNote(room)} onOpen={() => openPage('schedules', room.id)} />
       <MoreRow label="Lock" note={lockSummary(room)} onOpen={() => openPage('lock', room.id)} />
       <MoreRow
@@ -96,6 +103,7 @@ function RoomMore({ room }: { room: Room }) {
         onOpen={() => openPage('arrange', room.id)}
       />
       <MoreRow label="Light software" note={softwareNote(room, waiting)} onOpen={() => openPage('software', room.id)} />
+      {isTiming && <OffTimerSheet room={room} onClose={() => setTiming(false)} />}
     </RoomSection>
   );
 }
