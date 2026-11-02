@@ -28,6 +28,7 @@ export type Heartbeat = {
   room_id: string;
   is_on: boolean;
   brightness: number;
+  is_master?: boolean;
   state_hash?: number;
   locked_by?: string;
   lock_until?: number;

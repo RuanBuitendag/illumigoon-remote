@@ -24,6 +24,10 @@ function statusText(light: Light, newVersion: string | null) {
   return `Version ${light.softwareVersion}. ${newVersion} is ready.`;
 }
 
+// With one light in a room, that light leads nothing.
+const masterText = ({ isMaster }: Light, { lights }: Room) =>
+  isMaster && lights.length > 1 ? 'Master of this room. ' : '';
+
 const canPlayPatches = ({ manifests }: Light) => manifests.some(({ id }) => id === 'patch');
 
 function isUpdatable(light: Light, newVersion: string | null) {
@@ -50,7 +54,7 @@ export function LightSoftwarePage({ room }: { room: Room }) {
         {room.lights.map((light) => {
           const newVersion = newVersionOf(light, servers);
           return (
-            <InfoRow key={light.address} label={light.name} note={statusText(light, newVersion)}>
+            <InfoRow key={light.address} label={light.name} note={masterText(light, room) + statusText(light, newVersion)}>
               {isUpdatable(light, newVersion) && <TextKey onClick={() => updateSoftware([light])}>UPDATE</TextKey>}
             </InfoRow>
           );

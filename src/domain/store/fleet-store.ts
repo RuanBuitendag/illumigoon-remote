@@ -36,6 +36,7 @@ export type Light = {
   isOnline: boolean;
   isOn: boolean;
   brightness: number;
+  isMaster: boolean;
   isLockedByOther: boolean;
   isLockedByMe: boolean;
   lockedUntil: number;
@@ -98,6 +99,14 @@ function updateLight(address: string, update: LightUpdate | ((light: Light) => L
   });
 }
 
+const reportedAbout = (heartbeat: Heartbeat) => ({
+  isMaster: heartbeat.is_master ?? false,
+  softwareVersion: heartbeat.firmware_version ?? '',
+  softwareChannel: heartbeat.ota_tag ?? '',
+  autoUpdate: heartbeat.ota_auto ?? false,
+  canSchedule: heartbeat.light_sched_hash !== undefined,
+});
+
 function applyHeartbeat(address: string, heartbeat: Heartbeat) {
   updateLight(address, (light) => {
     const held = Boolean(light.hold) || Date.now() < light.localWriteUntil;
@@ -113,10 +122,7 @@ function applyHeartbeat(address: string, heartbeat: Heartbeat) {
       lockedUntil: heartbeat.lock_until ?? 0,
       lockNonce: heartbeat.lock_nonce ?? '',
       lockSchedule: heartbeat.lock_sched,
-      softwareVersion: heartbeat.firmware_version ?? '',
-      softwareChannel: heartbeat.ota_tag ?? '',
-      autoUpdate: heartbeat.ota_auto ?? false,
-      canSchedule: heartbeat.light_sched_hash !== undefined,
+      ...reportedAbout(heartbeat),
     };
   });
 }
@@ -150,6 +156,7 @@ const newLight = (address: string): Light => ({
   isOnline: false,
   isOn: false,
   brightness: 0,
+  isMaster: false,
   isLockedByOther: false,
   isLockedByMe: false,
   lockedUntil: 0,
