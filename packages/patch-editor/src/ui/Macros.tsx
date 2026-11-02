@@ -76,7 +76,7 @@ export function MacroRack({ ctl }: { ctl: Ctl }) {
         >
           {macros.length
             ? 'drag a macro onto any parameter to bind it'
-            : 'a named knob — right-click its dial to put it on the phone'}
+            : 'a named knob — hold or right-click its dial to put it on the room'}
         </span>
       </div>
 
@@ -203,7 +203,7 @@ function MacroNaming({ ctl, m }: { ctl: Ctl; m: Modulator }) {
       <Blurb>
         Addressed as{' '}
         <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)' }}>{addr}.knob</span>.
-        Right-click the dial to put it on the phone.
+        Hold or right-click the dial to put it on the room.
       </Blurb>
     </div>
   );

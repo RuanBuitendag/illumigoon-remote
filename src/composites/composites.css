@@ -21,7 +21,8 @@
 
 .home-scroll, .room-scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
 .home-header { display: flex; align-items: flex-start; height: 104px; padding: max(52px, env(safe-area-inset-top)) 24px 0; }
-.wordmark { color: var(--text-4); font: 500 11px/1.3 var(--mono); letter-spacing: 0.22em; }
+.wordmark { position: relative; color: var(--text-4); font: 500 11px/1.3 var(--mono); letter-spacing: 0.22em; }
+.wordmark::after { content: ''; position: absolute; inset: -15px 0; }
 .home-column { display: flex; flex-direction: column; gap: 44px; padding: 4px 0 110px; }
 .house-section { padding: 0 24px; }
 .house-note { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 0 24px; font-size: 15px; }

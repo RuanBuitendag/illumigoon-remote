@@ -868,6 +868,8 @@
    so no panel keeps a scroll of its own, and a sheet takes the whole screen while it is open. */
 
 @media (max-width: 899px) {
+  .patch-editor .sheetpath { display: none; }
+  .patch-editor .railsave input { min-height: 44px; }
   .patch-editor { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; }
   .patch-editor input, .patch-editor textarea { -webkit-user-select: text; user-select: text; }
 

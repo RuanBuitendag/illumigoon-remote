@@ -363,6 +363,9 @@ In the table, `pe/` stands for `packages/patch-editor/src/`. A file name with no
 
 ### Slices
 
+All slices are built on branch `life-1885-one-app`. Slice 23 is complete except its pass with Ruan there: Left runs
+firmware with no schedules, so the off timer has not run on a real light.
+
 | # | Slice | Files | Check at 375 px | Lint |
 | -- | -- | -- | -- | -- |
 | 1 | One set of tokens, one breakpoint | `pe/styles.css`, `pe/App.tsx`, `src/design-system/design-system.css`, `scripts/lint/rules.mjs` | Edit opens on the mock in dark and light as before; no colour differs from Home | `lint:rules`, `lint:editor` |

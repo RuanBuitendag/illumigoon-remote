@@ -256,9 +256,9 @@ function tableOf(r: Resolved): string[] {
  */
 /** What is wrong with @p c on its own terms, before the patch has a say. */
 function malformation(c: Control, before: readonly Control[]): string | null {
-  if (!keyIsValid(c.key)) return `the key ${c.key} is not a word the phone can write`;
+  if (!keyIsValid(c.key)) return `the key ${c.key} is not a word the room can write`;
   if (!c.target || c.target.length >= PATH_LEN) return 'the target is too long';
-  if (!CONTROL_TYPES.includes(c.type)) return `a ${c.type} is not a control the phone draws`;
+  if (!CONTROL_TYPES.includes(c.type)) return `a ${c.type} is not a control the room draws`;
   if (before.some(o => o.key === c.key)) return `another control is already called ${c.key}`;
   if (before.some(o => o.target === c.target)) return `${c.target} is already exposed`;
   return null;

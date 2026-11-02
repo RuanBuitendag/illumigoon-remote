@@ -250,7 +250,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
     <Overlay onClose={onClose}>
       <div className="editor-sheet" onClick={e => e.stopPropagation()}>
         <SheetHead icon={<Ico.Copy />} title="LAYER FRAGMENTS" onClose={onClose}>
-          <Mono className="dim sm" title="Set MODULIGHT_FRAGMENTS to keep them somewhere else">
+          <Mono className="dim sm sheetpath" title="Set MODULIGHT_FRAGMENTS to keep them somewhere else">
             {root || '—'}
           </Mono>
         </SheetHead>

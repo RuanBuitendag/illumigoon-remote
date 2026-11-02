@@ -64,7 +64,7 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
       >
         {isSilent ? (
           <HouseNote
-            text="No lights are answering. Check that this phone is on the home Wi-Fi."
+            text="No lights are answering. Check that you are on the home Wi-Fi."
             actionLabel="SEARCH AGAIN"
             onAction={searchAgain}
           />

@@ -9,7 +9,7 @@ export function SearchScreen() {
   const strip = <LookStrip source={SCAN_PREVIEW} shape="room" />;
   if (!hasSearched) return <SearchLayout strip={strip} text="Looking for lights." />;
   return (
-    <SearchLayout strip={strip} text="No lights found. Check that this phone is on the home Wi-Fi.">
+    <SearchLayout strip={strip} text="No lights found. Check that you are on the home Wi-Fi.">
       <TextKey onClick={searchAgain}>SEARCH AGAIN</TextKey>
     </SearchLayout>
   );

@@ -147,7 +147,7 @@ export function SchedulesPage({ room }: { room: Room }) {
   return (
     <PageFrame
       title="Schedules"
-      intro="The lights keep these themselves, so they run with this phone away or switched off."
+      intro="The lights keep these themselves, so they run with this app closed."
       backLabel={room.name}
       onBack={closePage}
     >

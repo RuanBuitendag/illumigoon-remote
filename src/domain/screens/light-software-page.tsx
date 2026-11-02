@@ -19,7 +19,7 @@ function statusText(light: Light, newVersion: string | null) {
   const update = updateText(light);
   if (update) return update;
   if (!light.isOnline) return "Isn't answering";
-  if (light.isLockedByOther) return 'In use on another phone';
+  if (light.isLockedByOther) return 'In use on another device';
   if (!newVersion) return `Version ${light.softwareVersion}`;
   return `Version ${light.softwareVersion}. ${newVersion} is ready.`;
 }

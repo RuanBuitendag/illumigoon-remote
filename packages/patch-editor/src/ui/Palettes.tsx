@@ -205,7 +205,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
     <Overlay onClose={onClose}>
       <div className="editor-sheet" onClick={e => e.stopPropagation()}>
         <SheetHead icon={<Ico.Folder />} title="PALETTES" onClose={onClose}>
-          <Mono className="dim sm" title="Set MODULIGHT_PALETTES to keep them somewhere else">
+          <Mono className="dim sm sheetpath" title="Set MODULIGHT_PALETTES to keep them somewhere else">
             {root || '—'}
           </Mono>
         </SheetHead>

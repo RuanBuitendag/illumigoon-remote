@@ -8,7 +8,8 @@ One web build runs in two shells. `electron/main.mjs` is the laptop shell, and i
 the page, by `packages/patch-editor/src/phone`, from the same `server/library.mjs`.
 
 `packages/patch-editor` is the editor (LIFE-1885). It has its own lint gate, and the domain is the only layer that
-imports it. Its parts move into the three layers below one at a time.
+imports it. There is no separate editor to open: Edit is a page of the app, reached from EDIT on a room's look, the
+same on both sizes. Its parts move into the three layers below one at a time.
 
 ## Layers
 

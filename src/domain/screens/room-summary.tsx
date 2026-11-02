@@ -19,9 +19,9 @@ import { LookStrip } from './look-strip';
 
 function lockedText({ onlineLights }: Room) {
   const until = onlineLights[0]?.lockedUntil ?? 0;
-  if (until <= Date.now()) return 'In use on another phone';
+  if (until <= Date.now()) return 'In use on another device';
   const time = new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
-  return `In use on another phone until ${time}`;
+  return `In use on another device until ${time}`;
 }
 
 function silentText({ lights, onlineLights }: Room) {

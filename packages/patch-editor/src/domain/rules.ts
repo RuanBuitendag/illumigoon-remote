@@ -110,7 +110,7 @@ function checkRow(doc: any, row: any, { problems, notes }: Verdict) {
  */
 function checkSurface(doc: any, rows: any[], problems: string[]) {
   const surface: any[] = Array.isArray(doc?.surface) ? doc.surface : [];
-  if (!surface.length) problems.push('no user surface — the phone would draw nothing');
+  if (!surface.length) problems.push('no user surface — the room would draw nothing');
   const keys = surface.map(c => c?.key);
   if (new Set(keys).size !== keys.length) problems.push('two user controls share a key');
   const targets = surface.map(c => c?.target);

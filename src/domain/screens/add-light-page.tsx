@@ -100,7 +100,7 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
       title="Add a light"
       backLabel="Rooms"
       onBack={closePage}
-      intro="Plug in the new lights and keep this phone nearby. You can set up several in one go."
+      intro="Plug in the new lights and stay close to them. You can set up several in one go."
     >
       {newLights.length === 0 && !isDone && (
         <ScanNote strip={<LookStrip source={SCAN_PREVIEW} shape="room" />}>Looking for new lights.</ScanNote>

@@ -477,7 +477,7 @@ export function UserSurface({ ctl, onEdit }: {
           <div style={{ padding: '6px 4px 4px' }}>
             <Blurb>
               Nothing is exposed yet. Right-click any knob, switch, blend or palette and choose
-              Expose to user — it lands here, in the order the phone will draw it.
+              Expose to user — it lands here, in the order the room will draw it.
             </Blurb>
           </div>
         )}

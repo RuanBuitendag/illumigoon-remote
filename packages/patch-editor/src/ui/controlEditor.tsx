@@ -228,7 +228,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
         )}
 
         {next.type === 'color_picker' && (
-          <Blurb>A single colour: the phone’s colour picker, on this stop.</Blurb>
+          <Blurb>A single colour: the room’s colour picker, on this stop.</Blurb>
         )}
 
         {problem && (
@@ -316,7 +316,7 @@ function NumberFields({ patch, path, spec, d, set }: {
       </div>
       <Blurb>
         The whole parameter runs {spec.min} to {spec.max}
-        {spec.unit ? ` ${spec.unit}` : ''}; it sits at {+base.toFixed(4)} now, which the phone draws
+        {spec.unit ? ` ${spec.unit}` : ''}; it sits at {+base.toFixed(4)} now, which the room draws
         as{' '}
         {
           +(
