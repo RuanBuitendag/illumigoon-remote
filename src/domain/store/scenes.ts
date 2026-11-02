@@ -31,11 +31,12 @@ export function refreshScene(scene: Scene, rooms: Room[], scope: string) {
 export const sceneLookName = (light: Light, animation: AnimationState) =>
   lookNameOf({ ...light, animation, appliedLook: undefined }) ?? undefined;
 
-// A light that cannot play the look keeps its own, and still follows the power and the level.
+// A light that cannot play the look keeps its own, and still follows the power and the level. So
+// does a light the scene turns off, because a look written to it can cost it the one it has saved.
 function applyToLight(light: Light, saved: SceneLight) {
   cancelWaiting(light.address);
   const animation = animationOf(saved);
-  const canShow = canPlay(light, animation);
+  const canShow = saved.is_on && canPlay(light, animation);
   applyState([light], {
     isOn: saved.is_on,
     brightness: saved.brightness,
