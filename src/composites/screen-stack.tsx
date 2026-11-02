@@ -5,11 +5,12 @@ type ScreenStackProps = {
   home: ReactNode;
   room: ReactNode;
   page: ReactNode;
+  notice?: ReactNode;
   isRoomOpen: boolean;
   isPageOpen: boolean;
 };
 
-export function ScreenStack({ home, room, page, isRoomOpen, isPageOpen }: ScreenStackProps) {
+export function ScreenStack({ home, room, page, notice, isRoomOpen, isPageOpen }: ScreenStackProps) {
   return (
     <div className="screen-stack">
       <main className="screen screen-home" data-pushed={isRoomOpen} inert={isRoomOpen}>
@@ -21,7 +22,20 @@ export function ScreenStack({ home, room, page, isRoomOpen, isPageOpen }: Screen
       <main className="screen screen-page" data-open={isPageOpen} inert={!isPageOpen}>
         {page}
       </main>
+      {notice}
     </div>
+  );
+}
+
+type UndoNoticeProps = { text: string; onUndo: () => void; onSave?: () => void };
+
+export function UndoNotice({ text, onUndo, onSave }: UndoNoticeProps) {
+  return (
+    <aside className="undo-notice">
+      <p className="undo-text">{text}</p>
+      {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
+      <TextKey onClick={onUndo}>UNDO</TextKey>
+    </aside>
   );
 }
 

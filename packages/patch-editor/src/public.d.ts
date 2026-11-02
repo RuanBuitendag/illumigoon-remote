@@ -25,6 +25,6 @@ export function PatchEditor(props: {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  onLeave(look: EditedLook | null): void;
+  onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 }): ReactNode;

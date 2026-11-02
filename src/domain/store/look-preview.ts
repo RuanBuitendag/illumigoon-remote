@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import type { AnimationState } from '../light-network/protocol';
 import { withPositions } from '../looks/looks';
-import { isBeforeVersion } from './firmware-versions';
 import {
   appliedLookOf,
   lightIdOf,
@@ -13,22 +12,18 @@ import {
   type LightHoldState,
 } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
+import { gapOf, isOlder } from './light-timing';
 import { useNavigation } from './navigation-store';
 import { canPlay, type Room } from './rooms';
 import { animationOf, sceneLookName } from './scenes';
 
-// Hold a look and the lights show it until the finger lifts. Firmware before this version can run
-// out of memory and restart when a long look replaces a long look. A light also saves its look a
-// second after each change, so a hold is two look changes at most and never repeats itself.
-const FIRST_SAFE_VERSION = '1.2.454';
+// Hold a look and the lights show it until the finger lifts. A long look can restart an older light,
+// and a light saves its look a second after each change, so a hold is two look changes at most and
+// never repeats itself.
 const LONG_LOOK_BYTES = 3400;
-const GAP_MS = 1500;
-const OLDER_GAP_MS = 4000;
 const ARRIVAL: LightArrival = { ms: 300 };
 const LONGEST_HOLD_MS = 15000;
 
-const isOlder = ({ softwareVersion }: Light) => isBeforeVersion(softwareVersion, FIRST_SAFE_VERSION);
-export const gapOf = (light: Light) => (isOlder(light) ? OLDER_GAP_MS : GAP_MS);
 const isLong = (look: AnimationState | null) =>
   look !== null && JSON.stringify(withPositions(look)).length >= LONG_LOOK_BYTES;
 const isSameLook = (first: AnimationState | null, second: AnimationState) =>

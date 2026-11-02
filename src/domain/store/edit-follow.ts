@@ -1,13 +1,13 @@
 import type { AnimationState } from '../light-network/protocol';
 import { applyLook, noteLook, type Light } from './fleet-store';
-import { gapOf } from './look-preview';
+import { gapOf, laterOn } from './light-timing';
 import { canPlay } from './rooms';
 
 // One at a time, so a light never gets a second look before it can take it.
 export function sendInTurn(lights: Light[], lookName: string, look: AnimationState) {
   let sendAt = 0;
   for (const light of lights) {
-    window.setTimeout(() => applyLook([light], lookName, look), sendAt);
+    laterOn(light.address, sendAt, () => applyLook([light], lookName, look));
     sendAt += gapOf(light);
   }
 }

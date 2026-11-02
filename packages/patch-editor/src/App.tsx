@@ -22,7 +22,7 @@ type AppProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  onLeave(look: EditedLook | null): void;
+  onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 };
 
@@ -45,7 +45,8 @@ export default function App(props: AppProps) {
     if (isOpen) return;
     commit();
     disconnect();
-    left.current(editedLook(leaving.current));
+    const { current } = leaving;
+    left.current(editedLook(current), current.savedPatchRef.current === current.patchRef.current);
   }, [isOpen, commit, disconnect, left, leaving]);
 
   return (

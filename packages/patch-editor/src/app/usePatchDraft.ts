@@ -35,6 +35,8 @@ export function usePatchDraft() {
   const patchRef = useRef(patch);
   /** Set by the first write of this session. The light's own copy arriving does not count. */
   const hasEditedRef = useRef(false);
+  /** The patch last written to a file. Every change makes a new patch, so `===` is enough. */
+  const savedPatchRef = useRef<Patch | null>(null);
   /**
    * The patch's name, always current, for the same reason `patchRef` is.
    *
@@ -63,7 +65,7 @@ export function usePatchDraft() {
   }, [putMaster, masterRef]);
 
   return {
-    patch, setPatch, patchRef, patchNameRef, hasEditedRef,
+    patch, setPatch, patchRef, patchNameRef, hasEditedRef, savedPatchRef,
     patchName, setPatchName, patchNotes, setPatchNotes,
     master, masterRef, putMaster, dropMaster,
   };

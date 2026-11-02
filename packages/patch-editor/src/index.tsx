@@ -21,7 +21,7 @@ type PatchEditorProps = {
   onName(name: string): void;
   /** Send a look from the library to lights the host picks. */
   /** The socket has closed. Carries the document on the light if this session changed it. */
-  onLeave(look: EditedLook | null): void;
+  onLeave(look: EditedLook | null, isSaved: boolean): void;
   /** The light cannot be edited. */
   onClose(): void;
 };

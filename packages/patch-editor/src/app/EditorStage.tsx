@@ -39,13 +39,15 @@ const NEAR_FULL = 0.8;
 export function SaveSheet({ draft, say, saveNudge, onClose }: {
   draft: Pick<
     PatchDraft,
-    'patch' | 'patchName' | 'patchNotes' | 'patchNameRef' | 'setPatchName' | 'setPatchNotes'
+    | 'patch' | 'patchName' | 'patchNotes' | 'patchRef' | 'patchNameRef' | 'savedPatchRef'
+    | 'setPatchName' | 'setPatchNotes'
   >;
   say(message: string): void;
   saveNudge: number;
   onClose(): void;
 }) {
-  const { patch, patchName, patchNotes, patchNameRef, setPatchName, setPatchNotes } = draft;
+  const { patch, patchName, patchNotes, patchRef, patchNameRef, savedPatchRef } = draft;
+  const { setPatchName, setPatchNotes } = draft;
   return (
     <div className="editor-overlay" onClick={onClose}>
       <div className="editor-sheet savesheet" onClick={e => e.stopPropagation()}>
@@ -62,6 +64,9 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
               setPatchName(n);
             },
             onNotes: setPatchNotes,
+            onSaved: () => {
+              savedPatchRef.current = patchRef.current;
+            },
           }}
           say={say}
           saveNudge={saveNudge}

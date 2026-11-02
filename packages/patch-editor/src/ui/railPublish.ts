@@ -17,6 +17,7 @@ export interface RailSave {
   notes: string;
   onName(v: string): void;
   onNotes(v: string): void;
+  onSaved(): void;
 }
 
 export interface SaveContext {

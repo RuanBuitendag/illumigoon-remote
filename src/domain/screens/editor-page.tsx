@@ -9,6 +9,7 @@ import { setHeldByEditor } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
 import { closePage, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
+import { momentsOf, offerUndo } from '../store/undo';
 import { useEditorDialogs } from './editor-dialogs';
 
 // The editor is large, so a phone that only sets looks never loads it.
@@ -41,6 +42,10 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   // Chosen once: the editor stays on this light whatever the fleet does while it is open.
   const [light] = useState(() => firstLight(room, scopeAddress));
   const [scope] = useState(scopeAddress);
+  // Lights that are off sit an edit out, so nothing has to go back on them.
+  const [before] = useState(() =>
+    momentsOf(room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : []),
+  );
   const [isOneLight] = useState(() => room !== undefined && lightsInScope(room, scopeAddress).length === 1);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
   const [section, setSection] = useState<EditorSection>('layers');
@@ -60,9 +65,12 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     if (!isOpen) void loadLibrary();
   }, [isOpen]);
 
-  const leave = (look: AnimationState | null) => {
+  const leave = (look: AnimationState | null, isSaved: boolean) => {
     setLeft(true);
-    if (light && look && room) finishEdit(light.address, lightsInScope(room, scope), lookName, look);
+    if (!light || !look || !room) return;
+    const unsaved = isSaved ? undefined : { name: lookName, animation: look };
+    offerUndo({ text: 'Changes are on the light', moments: before, unsaved });
+    finishEdit(light.address, lightsInScope(room, scope), lookName, look);
   };
 
   if (hasLeft || (!light && !isOpen)) return null;

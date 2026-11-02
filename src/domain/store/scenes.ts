@@ -1,7 +1,9 @@
 import type { AnimationState } from '../light-network/protocol';
 import { applyState, lightIdOf, type Light } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
+import { cancelWaiting } from './light-timing';
 import { canPlay, lookNameOf, type Room } from './rooms';
+import { momentsOf, offerUndo } from './undo';
 
 export const WHOLE_HOUSE = 'house';
 
@@ -31,6 +33,7 @@ export const sceneLookName = (light: Light, animation: AnimationState) =>
 
 // A light that cannot play the look keeps its own, and still follows the power and the level.
 function applyToLight(light: Light, saved: SceneLight) {
+  cancelWaiting(light.address);
   const animation = animationOf(saved);
   const canShow = canPlay(light, animation);
   applyState([light], {
@@ -45,6 +48,8 @@ function applyToLight(light: Light, saved: SceneLight) {
 export function applyScene(scene: Scene, rooms: Room[]) {
   const writable = rooms.flatMap((room) => room.writableLights);
   const leftOut: string[] = [];
+  const touched = writable.filter((light) => scene.lights.some(({ id }) => id === lightIdOf(light)));
+  offerUndo({ text: `${scene.name} applied`, moments: momentsOf(touched) });
   for (const saved of scene.lights) {
     const light = writable.find((candidate) => lightIdOf(candidate) === saved.id);
     if (light) applyToLight(light, saved);

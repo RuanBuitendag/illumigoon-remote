@@ -13,6 +13,7 @@ import { ArrangePage, LockPage, TakeBackPage } from './room-pages';
 import { RoomScreen } from './room-screen';
 import { SchedulesPage } from './schedules-page';
 import { SearchScreen } from './search-screen';
+import { UndoBar } from './undo-bar';
 
 const ROOM_PAGES = {
   schedules: SchedulesPage,
@@ -60,6 +61,7 @@ export function App() {
       home={<HomeScreen rooms={rooms} />}
       room={room && <RoomScreen room={room} rooms={rooms} />}
       page={<OpenPage key={pageVisit} rooms={rooms} />}
+      notice={<UndoBar />}
       isRoomOpen={isRoomOpen}
       isPageOpen={isPageOpen}
     />

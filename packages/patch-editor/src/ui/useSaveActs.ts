@@ -46,6 +46,7 @@ export function useSaveActs({ say, save, file, setProblem, listing }: SaveContex
       // must not wipe them.
       const notes = save.notes.trim() || listing.mine.find(r => r.file === file)?.notes;
       await writePreset(file, toPreset(save.patch, save.name, notes));
+      save.onSaved();
       say(`saved to ${file}`);
       await listing.list();
     } catch (e) {
