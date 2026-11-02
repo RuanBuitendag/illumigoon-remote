@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, LevelRow, RoomDragList } from '../../composites';
+import { TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, setBrightness, setPower } from '../store/fleet-store';
@@ -16,7 +17,7 @@ function HouseControls({ rooms }: { rooms: Room[] }) {
   const shownLights = useShownLights(lights);
   if (rooms.length < 2) return null;
   return (
-    <HouseSection title="WHOLE HOUSE">
+    <HouseSection title="WHOLE HOUSE" action={<TextKey onClick={() => openPage('looks')}>LOOKS</TextKey>}>
       <LevelRow
         label="Whole house"
         isOn={isAnyOn(shownLights)}

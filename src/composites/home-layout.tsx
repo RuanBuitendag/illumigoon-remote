@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { AddKey, Eyebrow, LinkKey, Press, TextKey } from '../design-system';
+import { HeadingRow } from './control-rows';
 
 type HomeLayoutProps = {
   wordmark: string;
@@ -20,10 +21,12 @@ export function HomeLayout({ wordmark, onWordmark, children }: HomeLayoutProps) 
   );
 }
 
-export function HouseSection({ title, children }: { title: string; children: ReactNode }) {
+type HouseSectionProps = { title: string; action: ReactNode; children: ReactNode };
+
+export function HouseSection({ title, action, children }: HouseSectionProps) {
   return (
     <section className="house-section">
-      <Eyebrow>{title}</Eyebrow>
+      <HeadingRow heading={<Eyebrow>{title}</Eyebrow>}>{action}</HeadingRow>
       {children}
     </section>
   );

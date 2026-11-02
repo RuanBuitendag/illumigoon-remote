@@ -15,13 +15,12 @@ import { SchedulesPage } from './schedules-page';
 import { SearchScreen } from './search-screen';
 
 const ROOM_PAGES = {
-  looks: LooksPage,
   schedules: SchedulesPage,
   software: LightSoftwarePage,
   lock: LockPage,
   'take-back': TakeBackPage,
   arrange: ArrangePage,
-} satisfies Record<Exclude<PageKind, 'add-light' | 'editor'>, (props: { room: Room }) => ReactNode>;
+} satisfies Record<Exclude<PageKind, 'add-light' | 'editor' | 'looks'>, (props: { room: Room }) => ReactNode>;
 
 function OpenPage({ rooms }: { rooms: Room[] }) {
   const page = useNavigation((navigation) => navigation.page);
@@ -29,6 +28,7 @@ function OpenPage({ rooms }: { rooms: Room[] }) {
   if (page === 'add-light') return <AddLightPage rooms={rooms} />;
   const room = rooms.find(({ id }) => id === roomId);
   if (page === 'editor') return <EditorPage room={room} />;
+  if (page === 'looks') return <LooksPage room={room} rooms={rooms} />;
   if (!page || !room) return null;
   const Page = ROOM_PAGES[page];
   return <Page room={room} />;

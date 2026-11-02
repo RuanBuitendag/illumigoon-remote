@@ -13,7 +13,7 @@ export {
 export { LightDragList, RoomDragList } from './drag-list';
 export { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection } from './home-layout';
 export { LevelRow } from './level-row';
-export { LookElsewhere, LookGroup, LookItem, LookList, LookPreset, LookProblem } from './look-list';
+export { LookElsewhere, LookGroup, LookItem, LookList, LookPreset, LookProblem, WhichLine } from './look-list';
 export { NamingRow } from './naming-row';
 export { ChoiceList, Overlay, OverlayBlock, OverlayText, WhichLights } from './overlay';
 export {

@@ -85,7 +85,6 @@ function PatchRowActions({
   deletable,
   armed,
   onLoad,
-  onSend,
   onCopy,
   onExport,
   onRemove,
@@ -95,7 +94,6 @@ function PatchRowActions({
   deletable: boolean;
   armed: string | null;
   onLoad(doc: Preset, from: string): void;
-  onSend(doc: Preset, name: string): void;
   onCopy(r: LibraryEntry): void;
   onExport(r: LibraryEntry): void;
   onRemove(r: LibraryEntry): void;
@@ -111,15 +109,6 @@ function PatchRowActions({
         title="Put this on the light, over what is there"
       >
         LOAD
-      </button>
-      <button
-        className="pill"
-        style={{ padding: '7px 12px' }}
-        disabled={!got}
-        onClick={() => got && onSend(got.doc, r.name)}
-        title="Send this to other lights, and pick which"
-      >
-        SEND
       </button>
       <span className="grow" />
       <button className="iconbtn sm" title="Copy as JSON" onClick={() => onCopy(r)}>
@@ -144,7 +133,7 @@ function PatchRowActions({
 
 export function PatchRow({
   r, rowKey, got, on, live, presets, deletable, armed,
-  onHover, onChoose, onLoad, onSend, onRemovePreset, onCopy, onExport, onRemove,
+  onHover, onChoose, onLoad, onRemovePreset, onCopy, onExport, onRemove,
 }: {
   r: LibraryEntry;
   rowKey: string;
@@ -157,7 +146,6 @@ export function PatchRow({
   onHover(over: boolean): void;
   onChoose(c: Chosen): void;
   onLoad(doc: Preset, from: string): void;
-  onSend(doc: Preset, name: string): void;
   onRemovePreset(file: string): void;
   onCopy(r: LibraryEntry): void;
   onExport(r: LibraryEntry): void;
@@ -225,7 +213,6 @@ export function PatchRow({
             deletable={deletable}
             armed={armed}
             onLoad={onLoad}
-            onSend={onSend}
             onCopy={onCopy}
             onExport={onExport}
             onRemove={onRemove}

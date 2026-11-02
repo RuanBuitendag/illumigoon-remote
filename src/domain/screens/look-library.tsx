@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { LookElsewhere, LookGroup, LookItem, LookList, LookPreset, LookProblem } from '../../composites';
 import { FileKey, KeyRow, TextKey } from '../../design-system';
-import { applyLook, type Light } from '../store/fleet-store';
+import type { Light } from '../store/fleet-store';
 import {
   addLookFromFile,
   copyLook,
@@ -13,12 +13,12 @@ import {
 } from '../store/look-actions';
 import { useLibrary } from '../store/library-store';
 import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
+import { playLook } from '../store/look-play';
 import { libraryFor, partOfRoomNote, type LibraryLook } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { closePage } from '../store/navigation-store';
 import { isAnyOn, isMixedLook, lookNameOf } from '../store/rooms';
 import { LookStrip } from './look-strip';
-import { PasteLookSheet } from './paste-look-sheet';
 
 const TILE_BRIGHTNESS = 0.85;
 
@@ -99,7 +99,7 @@ function useLibraryNote() {
   return listProblem ?? problem ?? note;
 }
 
-export function LookLibrary({ lights }: { lights: Light[] }) {
+export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () => void }) {
   const mine = useLookFiles((files) => files.mine);
   const examples = useLookFiles((files) => files.examples);
   const shelf = useLookFiles((files) => files.shelf);
@@ -107,14 +107,13 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
   const shownLights = useShownLights(lights);
   const playingName = isMixedLook(shownLights) ? null : lookNameOf(shownLights[0]);
   const [isEditing, setEditing] = useState(false);
-  const [isPasting, setPasting] = useState(false);
   const deleteKey = useArmedDelete();
   useFreshLooks();
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
     if (!animation) return;
     if (name === playingName && isAnyOn(shownLights)) closePage();
-    else applyLook(players, name, animation);
+    else playLook(players, name, animation);
   };
 
   const hold = ({ name, lights: players, animation }: LibraryLook) => {
@@ -135,8 +134,6 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
       />
     ));
 
-  if (isPasting) return <PasteLookSheet onClose={() => setPasting(false)} />;
-
   return (
     <LookList>
       {note && <LookProblem>{note}</LookProblem>}
@@ -156,7 +153,7 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
               <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
                 ADD FROM A FILE
               </FileKey>
-              <TextKey onClick={() => setPasting(true)}>PASTE</TextKey>
+              <TextKey onClick={onPaste}>PASTE</TextKey>
             </KeyRow>
           )}
           {looks.map((look) => (

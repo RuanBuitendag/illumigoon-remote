@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { Defs } from './ui/bits';
 import type { Chosen } from './ui/PatchRail';
 import { useLatest } from './ui/useLatest';
-import { documentOf } from './domain/house';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
 import { useEditor, type OpenLight } from './app/useEditor';
@@ -24,14 +23,13 @@ type AppProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
-  onSendLook(look: EditedLook, name: string): void;
   onLeave(look: EditedLook | null): void;
   onClose(): void;
 };
 
 export default function App(props: AppProps) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
-  const { onSection, onName, onSendLook, onLeave, onClose } = props;
+  const { onSection, onName, onLeave, onClose } = props;
   const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
@@ -103,7 +101,6 @@ export default function App(props: AppProps) {
           chosen={chosen}
           onChoose={setChosen}
           onLoad={editor.applyPreset}
-          onSend={(doc, name) => onSendLook({ type: 'patch', params: documentOf(doc) }, name)}
           say={editor.say}
           saveNudge={dialogs.saveNudge}
           onClose={onSaveClosed}

@@ -46,7 +46,6 @@ export function PatchRail({
   chosen,
   onChoose,
   onLoad,
-  onSend,
   save,
   say,
   saveNudge,
@@ -56,8 +55,6 @@ export function PatchRail({
   onChoose(c: Chosen): void;
   /** Put a patch on the open light. */
   onLoad(doc: Preset, from: string): void;
-  /** Send a patch to lights other than the open one. */
-  onSend(doc: Preset, name: string): void;
   save: RailSave;
   say(message: string): void;
   /** Bumped to put the cursor in the name field — Randomise's "save to library". */
@@ -123,7 +120,6 @@ export function PatchRail({
         onHover={over => setHover(h => (over ? key : h === key ? null : h))}
         onChoose={onChoose}
         onLoad={onLoad}
-        onSend={onSend}
         onRemovePreset={f => void acts.removePreset(f)}
         onCopy={x => void acts.copy(x)}
         onExport={x => void acts.exportOne(x)}

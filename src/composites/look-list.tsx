@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Eyebrow, Press, SoundMark } from '../design-system';
+import { ChevronMark, Eyebrow, Press, SoundMark } from '../design-system';
 import { HeadingRow } from './control-rows';
 
 type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void };
@@ -88,6 +88,15 @@ export function LookGroup({ title, note, action, children }: LookGroupProps) {
       {note && <p className="library-note">{note}</p>}
       {children}
     </section>
+  );
+}
+
+export function WhichLine({ text, onClick }: { text: string; onClick: () => void }) {
+  return (
+    <Press className="which-line" onClick={onClick}>
+      {text}
+      <ChevronMark direction="right" />
+    </Press>
   );
 }
 

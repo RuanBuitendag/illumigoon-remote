@@ -38,7 +38,7 @@ const NEAR_FULL = 0.8;
 
 /** The name, the notes and every shelf: saving a look and loading one are the same sheet. */
 export function SaveSheet({
-  draft, chosen, onChoose, onLoad, onSend, say, saveNudge, onClose,
+  draft, chosen, onChoose, onLoad, say, saveNudge, onClose,
 }: {
   draft: Pick<
     PatchDraft,
@@ -47,7 +47,6 @@ export function SaveSheet({
   chosen: Chosen | null;
   onChoose(chosen: Chosen | null): void;
   onLoad(preset: Preset, from: string): void;
-  onSend(preset: Preset, name: string): void;
   say(message: string): void;
   saveNudge: number;
   onClose(): void;
@@ -64,7 +63,6 @@ export function SaveSheet({
           chosen={chosen?.key ?? null}
           onChoose={onChoose}
           onLoad={onLoad}
-          onSend={onSend}
           save={{
             patch,
             name: patchName,

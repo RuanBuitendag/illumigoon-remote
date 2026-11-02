@@ -10,7 +10,6 @@ import { loadLibrary } from '../store/library-store';
 import { closePage, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
 import { useEditorDialogs } from './editor-dialogs';
-import { WhichLightsSheet } from './which-lights-sheet';
 
 // The editor is large, so a phone that only sets looks never loads it.
 const PatchEditor = lazy(async () => ({ default: (await import('@illumigoon/patch-editor')).PatchEditor }));
@@ -36,8 +35,6 @@ function titleOf(lookName: string, lightName: string | undefined, isOneLight: bo
   return isOneLight ? `${lookName} on ${lightName}` : lookName;
 }
 
-type Sending = { look: AnimationState; lookName: string };
-
 export function EditorPage({ room }: { room: Room | undefined }) {
   const isOpen = useNavigation((navigation) => navigation.isPageOpen);
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
@@ -49,7 +46,6 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   const [section, setSection] = useState<EditorSection>('layers');
   const [isSaving, setSaving] = useState(false);
   const [hasLeft, setLeft] = useState(false);
-  const [sending, setSending] = useState<Sending | null>(null);
   const { dialogs, sheet } = useEditorDialogs();
   const heldAddress = hasLeft ? undefined : light?.address;
 
@@ -94,16 +90,12 @@ export function EditorPage({ room }: { room: Room | undefined }) {
             onSaveClosed={() => setSaving(false)}
             onSection={setSection}
             onName={setLookName}
-            onSendLook={(look, name) => setSending({ look, lookName: name })}
             onLeave={leave}
             onClose={closePage}
           />
         </Suspense>
       )}
       {sheet}
-      {sending && (
-        <WhichLightsSheet {...sending} editedAddress={light?.address} onClose={() => setSending(null)} />
-      )}
     </EditLayout>
   );
 }
