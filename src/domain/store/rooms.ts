@@ -143,11 +143,13 @@ export function lookIdOf(animation: AnimationState | null) {
   return findPatchLook(animation.params)?.id ?? null;
 }
 
+export const OWN_LOOK = 'Your own look';
+
 export function lookNameOf(light: Light | undefined) {
   const animation = light?.animation;
   if (!animation) return null;
   if (light.appliedLook?.shape === lookShape(animation)) return light.appliedLook.name;
-  if (animation.type === 'patch') return findPatchLook(animation.params)?.name ?? 'Your own look';
+  if (animation.type === 'patch') return findPatchLook(animation.params)?.name ?? OWN_LOOK;
   return light.manifests.find(({ id }) => id === animation.type)?.name ?? animation.type;
 }
 

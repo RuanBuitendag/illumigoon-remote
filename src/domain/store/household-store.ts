@@ -20,6 +20,7 @@ export type OldScene = {
   rooms: Record<string, SceneRoom>;
 };
 
+// Waiting to move into the library. See `look-files`.
 export type SavedLook = { id: string; name: string; baseName: string; animation: AnimationState };
 
 type Household = {
@@ -48,11 +49,6 @@ export const useHousehold = create<Household>()(
   ),
 );
 
-const newId = () => crypto.randomUUID();
-
-export function addSavedLook(look: Omit<SavedLook, 'id'>) {
-  useHousehold.setState(({ savedLooks }) => ({ savedLooks: [...savedLooks, { ...look, id: newId() }] }));
-}
 
 export function rememberLightAddress(address: string) {
   useHousehold.setState(({ lightAddresses }) => ({

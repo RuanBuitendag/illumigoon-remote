@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { LookGroup, LookItem, LookList, LookProblem } from '../../composites';
 import { applyLook, type Light } from '../store/fleet-store';
+import { useLibrary } from '../store/library-store';
 import { loadLooks, useLookFiles } from '../store/look-files';
 import { libraryFor, partOfRoomNote, type LibraryLook } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
@@ -30,6 +31,7 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
   const mine = useLookFiles((files) => files.mine);
   const examples = useLookFiles((files) => files.examples);
   const listProblem = useLookFiles((files) => files.listProblem);
+  const problem = useLibrary((library) => library.problem);
   const shownLights = useShownLights(lights);
   const playingName = isMixedLook(shownLights) ? null : lookNameOf(shownLights[0]);
   useFreshLooks();
@@ -46,7 +48,7 @@ export function LookLibrary({ lights }: { lights: Light[] }) {
 
   return (
     <LookList>
-      {listProblem && <LookProblem>{listProblem}</LookProblem>}
+      {(listProblem ?? problem) && <LookProblem>{listProblem ?? problem}</LookProblem>}
       {libraryFor(lights, mine, examples).map(({ title, note, looks }) => (
         <LookGroup key={title} title={title} note={note}>
           {looks.map((look) => (

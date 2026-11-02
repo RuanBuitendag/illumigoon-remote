@@ -20,18 +20,17 @@ export async function library() {
   return shared;
 }
 
-async function attempt(work: () => Promise<void>) {
+export async function attempt(work: () => Promise<void>) {
   try {
     await work();
     useLibrary.setState({ problem: null });
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
-    useLibrary.setState({ problem: `The scene or colour set did not save or load: ${reason}` });
+    useLibrary.setState({ problem: `The library did not save or load: ${reason}` });
   }
 }
 
-
-const unusedFile = (file: string, taken: string[]) => {
+export const unusedFile = (file: string, taken: string[]) => {
   const stem = file.replace(/\.json$/, '');
   let candidate = file;
   for (let number = 2; taken.includes(candidate); number++) candidate = `${stem}-${number}.json`;

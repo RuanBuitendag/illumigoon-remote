@@ -2,10 +2,14 @@ import { create } from 'zustand';
 import type { LibraryEntry, Preset } from '@illumigoon/patch-editor/library';
 import type { AnimationState } from '../light-network/protocol';
 import { PATCH_LOOKS } from '../looks/looks';
-import { library } from './library-store';
+import { useHousehold, type SavedLook } from './household-store';
+import { attempt, library, unusedFile, useLibrary } from './library-store';
 
 // Looks kept as files in the library that every shell answers at `/api`. Mine is the folder a person
 // saves to. Examples are the worked ones that ship with the firmware, and they are read only.
+//
+// A preset file is a patch document, so a patch look is its file. A look that is not a patch rides in
+// `flatLook` beside three empty parts, which makes it a valid file for every reader of the folder.
 
 export type LookFile = {
   file: string;
@@ -34,6 +38,7 @@ type Reading = { doc: Preset | null; error: string | null };
 
 function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, error }: Reading) {
   const params = doc && shared.documentOf(doc);
+  const flatLook = (doc?.flatLook ?? null) as AnimationState | null;
   return {
     file: entry.file,
     name: entry.name,
@@ -43,9 +48,9 @@ function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, 
     isExample,
     version: entry.version ?? null,
     wire: entry.wire,
-    hasSound: params !== null && shared.usesAudio(params),
+    hasSound: params !== null && !flatLook && shared.usesAudio(params),
     doc,
-    animation: params && { type: 'patch', params },
+    animation: flatLook ?? (params && { type: 'patch', params }),
     error,
   } satisfies LookFile;
 }
@@ -100,4 +105,46 @@ export async function loadLooks() {
     loading = null;
   });
   await loading;
+}
+
+function fileOfLook(name: string, notes: string, animation: AnimationState): Preset {
+  if (animation.type === 'patch') return { ...animation.params, name, notes };
+  return { name, notes, layers: {}, modulators: {}, matrix: [], flatLook: animation };
+}
+
+export const saveLook = (name: string, animation: AnimationState, notes = '') =>
+  attempt(async () => {
+    const { slugFileName, writePreset } = await library();
+    await loadLooks();
+    const taken = useLookFiles.getState().mine.map(({ file }) => file);
+    await writePreset(unusedFile(slugFileName(name, 'patch'), taken), fileOfLook(name, notes, animation));
+    await loadLooks();
+  });
+
+const sameLook = ({ doc }: LookFile, { name, animation }: SavedLook) => {
+  if (!doc) return false;
+  const { created: _created, notes: _notes, ...kept } = doc;
+  const { notes: _none, ...saved } = fileOfLook(name, '', animation);
+  return JSON.stringify(kept) === JSON.stringify(saved);
+};
+
+// Looks saved before they were files wait in the household until the folder holds them. Each leaves
+// the household the moment its file is written, so a stop half way neither loses nor repeats one.
+let isMovingLooks = false;
+
+async function moveOldLooks() {
+  if (isMovingLooks) return;
+  isMovingLooks = true;
+  for (const look of useHousehold.getState().savedLooks) {
+    const isThere = useLookFiles.getState().mine.some((file) => sameLook(file, look));
+    if (!isThere) await saveLook(look.name, look.animation, `Your version of ${look.baseName}.`);
+    if (useLibrary.getState().problem !== null) break;
+    useHousehold.setState(({ savedLooks }) => ({ savedLooks: savedLooks.filter(({ id }) => id !== look.id) }));
+  }
+  isMovingLooks = false;
+}
+
+export async function startLooks() {
+  await loadLooks();
+  if (useLookFiles.getState().listProblem === null) await moveOldLooks();
 }

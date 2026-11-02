@@ -12,9 +12,9 @@ import { BLACK_HEX, colourToHex, hexToColour, TextKey, type Colour } from '../..
 import type { Parameter, ParameterValue } from '../light-network/protocol';
 import { changeControl } from '../store/change-control';
 import { setTransition, type Light } from '../store/fleet-store';
-import { addSavedLook } from '../store/household-store';
+import { saveLook } from '../store/look-files';
 import { keepPalette, useLibrary, type PaletteEntry } from '../store/library-store';
-import { currentControls, lookNameOf } from '../store/rooms';
+import { currentControls, lookNameOf, OWN_LOOK } from '../store/rooms';
 import { LookControl } from './look-control';
 
 const MAX_TRANSITION_SECONDS = 10;
@@ -87,7 +87,9 @@ export function LookControls({ lights }: { lights: Light[] }) {
   if (editing) return <ColoursOf lights={lights} parameter={editing} onClose={() => setEditingKey(null)} />;
 
   const keepLook = (name: string) => {
-    if (light.animation) addSavedLook({ name, baseName: lookNameOf(light) ?? '', animation: light.animation });
+    const baseName = lookNameOf(light);
+    const notes = baseName && baseName !== OWN_LOOK ? `Your version of ${baseName}.` : '';
+    if (light.animation) void saveLook(name, light.animation, notes);
     setNaming(false);
   };
 
