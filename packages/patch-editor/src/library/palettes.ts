@@ -38,6 +38,8 @@ export interface PaletteEntry {
   group: string | null;
   /** Which patches this palette was found in. Derived rows only. */
   sources?: string[];
+  /** One of the palettes designed for the lights, which ship with the app. */
+  shipped?: boolean;
   readOnly?: boolean;
   bytes?: number;
   modified?: number;

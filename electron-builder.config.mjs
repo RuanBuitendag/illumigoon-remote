@@ -37,6 +37,7 @@ export default {
   extraResources: [
     { from: 'packages/patch-editor/examples/patches', to: 'examples/patches' },
     { from: 'packages/patch-editor/examples/fragments', to: 'examples/fragments' },
+    { from: 'packages/patch-editor/examples/palettes', to: 'examples/palettes' },
   ],
   win: { target: 'nsis', icon: 'packaging/icon.ico' },
   nsis: { oneClick: true, perMachine: false },

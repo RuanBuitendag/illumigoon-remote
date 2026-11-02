@@ -19,7 +19,7 @@ import { Sheet, SheetFooter } from './sheet';
 const MAX_COLOURS = 8;
 const MAX_UNDO_STEPS = 20;
 
-type NamedColours = { id: string; name: string; colours: string[] };
+type NamedColours = { id: string; name: string; family: string; colours: string[] };
 
 type ColourEditorProps = {
   isPalette: boolean;
@@ -50,23 +50,30 @@ type SwatchSetsProps = {
 };
 
 function SwatchSets({ sets, minimumColours, roomForColours, onPlace, onApplySet }: SwatchSetsProps) {
-  return sets.map(({ id, name, colours }) => (
-    <div key={id}>
-      <div className="swatch-set-heading">
-        <Eyebrow>{name.toUpperCase()}</Eyebrow>
-        <TextKey
-          disabled={colours.length < minimumColours}
-          onClick={() => onApplySet(colours.slice(0, roomForColours))}
-        >
-          {colours.length > roomForColours ? `APPLY FIRST ${roomForColours}` : `APPLY ALL ${colours.length}`}
-        </TextKey>
-      </div>
-      <div className="swatches">
-        {colours.map((colour, index) => (
-          <SwatchKey key={`${id}-${index}`} colour={colour} onClick={() => onPlace(colour)} />
+  return [...new Set(sets.map(({ family }) => family))].map((family) => (
+    <section key={family} className="swatch-family">
+      <h3 className="swatch-family-name">{family}</h3>
+      {sets
+        .filter((set) => set.family === family)
+        .map(({ id, name, colours }) => (
+          <div key={id}>
+            <div className="swatch-set-heading">
+              <Eyebrow>{name.toUpperCase()}</Eyebrow>
+              <TextKey
+                disabled={colours.length < minimumColours}
+                onClick={() => onApplySet(colours.slice(0, roomForColours))}
+              >
+                {colours.length > roomForColours ? `APPLY FIRST ${roomForColours}` : `APPLY ALL ${colours.length}`}
+              </TextKey>
+            </div>
+            <div className="swatches">
+              {colours.map((colour, index) => (
+                <SwatchKey key={`${id}-${index}`} colour={colour} onClick={() => onPlace(colour)} />
+              ))}
+            </div>
+          </div>
         ))}
-      </div>
-    </div>
+    </section>
   ));
 }
 

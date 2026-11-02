@@ -56,8 +56,17 @@ function TransitionControls({ lights, light }: { lights: Light[]; light: Light }
 const toHexList = ({ default: value }: Parameter) =>
   (Array.isArray(value) ? value : [value as Colour]).map(colourToHex);
 
-const toColourSet = ({ file, name, entries, error }: PaletteEntry, index: number) =>
-  error ? [] : [{ id: file ?? `patch-${index}`, name, colours: entries.map((entry) => `#${entry.replace('#', '')}`) }];
+const familyOf = ({ file, group, shipped }: PaletteEntry) => {
+  if (shipped) return group ?? 'Palettes';
+  return file ? 'Yours' : 'From looks';
+};
+
+const toColourSet = (palette: PaletteEntry, index: number) => {
+  const { file, name, entries, error } = palette;
+  if (error) return [];
+  const colours = entries.map((entry) => `#${entry.replace('#', '')}`);
+  return [{ id: file ?? `listed-${index}`, name, family: familyOf(palette), colours }];
+};
 
 function ColoursOf({ lights, parameter, onClose }: { lights: Light[]; parameter: Parameter; onClose: () => void }) {
   const sets = useLibrary((library) => library.palettes).flatMap(toColourSet);

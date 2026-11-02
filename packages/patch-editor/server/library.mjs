@@ -362,6 +362,14 @@ function paletteEntryFor(root, rel, { readOnly = false } = {}) {
 
 export const listPalettes = (root, opts) => list(root, opts, paletteEntryFor);
 
+/** The palettes designed for the lights: read-only, beside the examples, a folder per family. */
+export const shippedPalettesRoot = () => join(dirname(examplesRoot()), 'palettes');
+
+/** No row carries a file, because a shipped palette cannot be replaced or deleted. */
+const listShippedPalettes = () =>
+  listPalettes(shippedPalettesRoot(), { readOnly: true })
+    .map((row) => ({ ...row, file: null, shipped: true }));
+
 /**
  * Write a palette, CANONICALISED.
  *
@@ -852,9 +860,11 @@ function countDocument(counts, doc) {
 
 /** What a kind of root lists, under the key its client reads. */
 const LISTINGS = {
-  // Both halves in one listing. The derived set has no files behind it, so there is
-  // nothing to fetch one-at-a-time and the entries ride along on every row.
-  palette: (root) => ({ palettes: [...listPalettes(root, {}), ...harvestPalettes()] }),
+  // All three in one listing: the user's own, the shipped set, the derived set. The last two
+  // have no files to fetch one-at-a-time, so the entries ride along on every row.
+  palette: (root) => ({
+    palettes: [...listPalettes(root, {}), ...listShippedPalettes(), ...harvestPalettes()],
+  }),
   fragment: (root, opts) => ({ fragments: listFragments(root, opts) }),
   scene: (root, opts) => ({ scenes: listScenes(root, opts) }),
   // Two levels deep, unlike every other root here: `<patch>/<preset>.json`. The patch

@@ -121,20 +121,24 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
   );
 }
 
+/** Saved, shipped, derived: the order the sections run in. */
+const ORIGINS = 'sbd';
+const originOf = (r: PaletteEntry) => (r.shipped ? 'b' : r.readOnly ? 'd' : 's');
+
 function paletteGroups(rows: PaletteEntry[]): Section[] {
   // Keyed on the ORIGIN as well as the group. A derived row now carries the group of the
   // patch it came out of, so keying on the group alone would file a saved palette the user
   // put in a folder called `showcase` in among the read-only ones lifted from `showcase/`.
   const by = new Map<string, PaletteEntry[]>();
   for (const r of rows) {
-    const k = `${r.readOnly ? 'd' : 's'}:${r.group ?? ''}`;
+    const k = `${originOf(r)}:${r.group ?? ''}`;
     (by.get(k) ?? by.set(k, []).get(k)!).push(r);
   }
-  // The store first, then the derived sections — the user's own work is what they came for,
-  // and the lifted set would otherwise bury it.
+  // The store first, then the shipped set, then the derived sections — the user's own work is
+  // what they came for, and the lifted set would otherwise bury it.
   const order = [...by.keys()].sort((a, b) => {
-    const [oa, ob] = [a[0], b[0]];
-    if (oa !== ob) return oa === 's' ? -1 : 1;
+    const gap = ORIGINS.indexOf(a.charAt(0)) - ORIGINS.indexOf(b.charAt(0));
+    if (gap !== 0) return gap;
     const [ga, gb] = [a.slice(2), b.slice(2)];
     return ga === '' ? -1 : gb === '' ? 1 : ga.localeCompare(gb);
   });
@@ -380,8 +384,8 @@ function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
       <button title="Copy the entries as JSON" onClick={() => onCopy(e)}><Ico.Copy /></button>
       {e.file
         ? <button title="Delete from the disk" onClick={() => onDrop(e)}><Ico.X /></button>
-        // Not a disabled delete: a derived palette has no file to delete.
-        : <span style={{ width: 9 }} title="lifted from a patch — save it to keep it" />}
+        // Not a disabled delete: a derived or shipped palette has no file to delete.
+        : <span style={{ width: 9 }} title={e.sources && 'lifted from a patch — save it to keep it'} />}
     </div>
   </div>
   );
