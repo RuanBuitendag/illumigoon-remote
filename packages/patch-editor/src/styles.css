@@ -852,6 +852,31 @@
 .patch-editor .ctltarget { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctlend { height: 6px; border-radius: var(--radius); }
 
+/* ------------------------------------------------------ press targets
+
+   A pointer needs --pointer-target each way (WCAG 2.2 target size, LIFE-1953). A small control
+   keeps its drawn size, and a `::before` grows its hit area around it; `::after` stays free for the
+   underline and the exposed pip. Neighbours sit far enough apart that two hit areas do not meet.
+   The phone block below takes --row instead. */
+
+@media (min-width: 900px) {
+  .patch-editor :where(button, .editor-fader, .numdrag) { position: relative; }
+  .patch-editor :where(button, .editor-fader, .numdrag)::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, var(--pointer-target));
+    height: max(100%, var(--pointer-target));
+    translate: -50% -50%;
+  }
+  .patch-editor .rowacts { gap: var(--space-3); padding-right: var(--space-1); }
+  .patch-editor .rowacts > button { min-width: var(--space-3); display: inline-flex; justify-content: center; }
+  .patch-editor .modchip :is(.src, .drop) { padding-inline: var(--space-2); }
+  .patch-editor :where(select, input:not([type='color'])) { min-height: var(--pointer-target); }
+  .patch-editor .editor-swatch { width: var(--pointer-target); height: var(--pointer-target); }
+}
+
 /* ---------------------------------------------------------- phone
 
    One section at a time instead of three columns, chosen by the tabs under the editor. Each part
@@ -868,6 +893,8 @@
      selector meets the font sizes the panels set inline. */
   .patch-editor button, .patch-editor select { min-width: var(--row); min-height: var(--row); }
   .patch-editor .editor-swatch { width: var(--row); height: var(--row); }
+  .patch-editor :where(input:not([type='color'])) { min-height: var(--row); }
+  .patch-editor .numdrag { display: inline-flex; align-items: center; min-width: var(--row); min-height: var(--row); }
   .patch-editor :is(
     button, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
     .kval, .kunit, .pill, .tog, .blendchip, .modchip .src, .modchip .drop, .mname, .reach, .trg,
