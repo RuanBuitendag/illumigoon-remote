@@ -92,7 +92,7 @@ function checkTokens(file, pattern, rule, from = 0) {
 }
 
 // Reports a declaration whose value `isRaw` says the tokens should hold.
-function checkValues(file, pattern, rule, isRaw, from = 0) {
+function checkValues(file, { pattern, rule, isRaw }, from = 0) {
   const text = fs.readFileSync(file, 'utf8');
   for (const match of text.slice(from).matchAll(pattern)) {
     const [, property, value] = match;
@@ -103,9 +103,9 @@ function checkValues(file, pattern, rule, isRaw, from = 0) {
 }
 
 function checkGeometry(file, from = 0) {
-  checkValues(file, BORDER_PROPERTY, 'raw-line', (value) => LITERAL.test(value), from);
-  checkValues(file, LAYER_PROPERTY, 'raw-layer', (value) => RAW_NUMBER.test(value), from);
-  checkValues(file, MOTION_PROPERTY, 'raw-motion', (value) => RAW_MOTION.test(value), from);
+  checkValues(file, { pattern: BORDER_PROPERTY, rule: 'raw-line', isRaw: (value) => LITERAL.test(value) }, from);
+  checkValues(file, { pattern: LAYER_PROPERTY, rule: 'raw-layer', isRaw: (value) => RAW_NUMBER.test(value) }, from);
+  checkValues(file, { pattern: MOTION_PROPERTY, rule: 'raw-motion', isRaw: (value) => RAW_MOTION.test(value) }, from);
 }
 
 // A media query cannot read a custom property, so each width must be --wide, or one pixel under it.
