@@ -70,7 +70,7 @@ function FileActions({ look, deleteKey }: { look: LookFile; deleteKey: DeleteKey
     <>
       {look.doc && <TextKey onClick={() => void copyLook(look)}>COPY</TextKey>}
       {look.doc && <TextKey onClick={() => void exportLook(look)}>EXPORT</TextKey>}
-      {deleteKey(look.file, () => void removeLook(look))}
+      {!look.isExample && deleteKey(look.file, () => void removeLook(look))}
     </>
   );
 }
@@ -124,6 +124,7 @@ function foundGroups(groups: LibraryGroup[], wanted: string) {
 
 export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () => void }) {
   const mine = useLookFiles((files) => files.mine);
+  const examples = useLookFiles((files) => files.examples);
   const shelf = useLookFiles((files) => files.shelf);
   const note = useLibraryNote();
   const shownLights = useShownLights(lights);
@@ -133,7 +134,7 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
   const wanted = query.trim().toLowerCase();
   const deleteKey = useArmedDelete();
   useFreshLooks();
-  const groups = foundGroups(libraryFor(lights, mine, shelf), wanted);
+  const groups = foundGroups(libraryFor(lights, mine, examples, shelf), wanted);
   const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {

@@ -142,6 +142,11 @@ export function canPlay(light: Light, { type }: AnimationState) {
   return light.manifests.some((manifest) => manifest.id === type);
 }
 
+export function lookIdOf(animation: AnimationState | null) {
+  if (animation?.type !== 'patch') return animation?.type ?? null;
+  return findPatchLook(animation.params)?.id ?? null;
+}
+
 export const OWN_LOOK = 'Custom look';
 
 export function lookNameOf(light: Light | undefined) {

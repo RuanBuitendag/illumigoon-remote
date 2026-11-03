@@ -44,15 +44,12 @@ export function LookItem({ actions, children, ...look }: LookItemProps) {
   );
 }
 
-type RecentLookItemProps = HoldProps & { name: string; hasSound: boolean; strip: ReactNode };
+type RecentLookItemProps = HoldProps & { name: string; strip: ReactNode };
 
-export function RecentLookItem({ name, hasSound, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
+export function RecentLookItem({ name, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
   return (
     <Press className="recent-look" onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
-      <span className="recent-look-head">
-        <span className="recent-look-name">{name}</span>
-        {hasSound && <SoundMark />}
-      </span>
+      <span className="recent-look-name">{name}</span>
       {strip}
     </Press>
   );
