@@ -1,4 +1,4 @@
-import { PageFrame, PageSection, SelectRow, SliderRow } from '../../composites';
+import { ControlList, PageFrame, SelectRow, SliderRow } from '../../composites';
 import { TextKey } from '../../design-system';
 import { applyLook, setTransition, type Light } from '../store/fleet-store';
 import { closePage, useBackLabel } from '../store/navigation-store';
@@ -32,7 +32,7 @@ function TransitionControls({ lights, light }: { lights: Light[]; light: Light }
   const id = styleOf(light);
   const seconds = secondsOf(light);
   return (
-    <PageSection>
+    <ControlList>
       <SelectRow
         label="Style"
         options={light.transitions.map(({ id: value, name }) => ({ value, name }))}
@@ -49,7 +49,7 @@ function TransitionControls({ lights, light }: { lights: Light[]; light: Light }
         onChange={(next) => setTransition(lights, id, secondsAt(next) * 1000)}
       />
       {lights.some(({ isOn }) => isOn) && <TextKey onClick={() => playTransition(lights)}>TRY IT</TextKey>}
-    </PageSection>
+    </ControlList>
   );
 }
 
