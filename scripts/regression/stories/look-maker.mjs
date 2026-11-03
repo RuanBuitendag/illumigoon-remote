@@ -216,4 +216,29 @@ export const lookMaker = [
       expect(!(await editor.getByRole('button', { name: 'LAYERS', exact: true }).isVisible()), 'the phone tabs show on the laptop');
     },
   },
+  {
+    name: 'P2-S12 a drag on a bar moves it from where it was, and a tap sets it',
+    viewport: 'laptop',
+    lights: LOUNGE,
+    async run({ page }) {
+      await openEdit(page);
+      const bar = onTop(page).locator('.patch-editor .fader').first();
+      const thumb = bar.getByRole('slider');
+      const at = async () => Number(await thumb.getAttribute('aria-valuenow'));
+      const box = await bar.boundingBox();
+      const before = await at();
+      const y = box.y + box.height / 2;
+      // A press far from the value, then a short drag: the value moves by the drag, it does not jump.
+      const far = before < 0.5 ? 0.9 : 0.1;
+      await page.mouse.move(box.x + box.width * far, y);
+      await page.mouse.down();
+      await page.mouse.move(box.x + box.width * far + box.width * 0.1, y, { steps: 5 });
+      await page.mouse.up();
+      const dragged = await at();
+      expect(Math.abs(dragged - Math.min(1, before + 0.1)) < 0.03, `a drag took the bar from ${before} to ${dragged}`);
+      await page.mouse.click(box.x + box.width * 0.25, y);
+      const tapped = await at();
+      expect(Math.abs(tapped - 0.25) < 0.03, `a tap at a quarter set the bar to ${tapped}`);
+    },
+  },
 ];

@@ -625,8 +625,9 @@ Chosen: `Fader` in `src/design-system/fader.tsx`, on the Base UI slider. A fine 
 thumb drawn. It carries the editor's marks as `FaderBand` and `FaderDot`, and its halo as `halo`: armed, hot or driven.
 A gradient bar still draws its thumb, as it has no fill.
 Why: the editor's bar was the look to keep. Base UI gives the editor's bars the keyboard, which they lacked. The
-editor's `ui/Fader.tsx` now only turns a parameter into a 0 to 1 position along its taper. A press sets the value
-where it lands, so the editor's drag from where the value was, and shift for fine steps, are gone.
+editor's `ui/Fader.tsx` now only turns a parameter into a 0 to 1 position along its taper. The editor passes
+`isRelative`: a drag moves the value from where it was, shift makes it ten times finer, and a tap that does not move
+sets the value where it lands, as the editor's bar did before. The app's bars set the value where the press lands.
 Date: 2026-11-04
 
 **D45. One sheet**

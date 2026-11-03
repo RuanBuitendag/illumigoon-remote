@@ -97,6 +97,7 @@ Status is the result of the last full run (4 Nov 2026): pass, or known fail with
 | P2-S8 the controls list reads as the room does | Edit CONTROLS | `stories/look-maker.mjs` | pass |
 | P2-S9 start a new look and save what it shows | NEW LOOK, Edit SAVE | `stories/look-maker.mjs` | pass |
 | P2-S10 the laptop shows it all on one screen | Edit on the laptop | `stories/look-maker.mjs` | pass |
+| P2-S12 a drag on a bar moves it from where it was, and a tap sets it | Edit bars | `stories/look-maker.mjs` | pass |
 | P2-S11 a layer added while Edit loads, then undone | Edit undo | `stories/look-maker.mjs` | pass |
 | P3-S1 rename the room and a light | Rename and arrange | `stories/corner-owner.mjs` | pass |
 | P3-S2 schedules on old software say what to do | Schedules, Light software | `stories/corner-owner.mjs` | pass |

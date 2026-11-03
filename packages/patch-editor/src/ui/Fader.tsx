@@ -12,8 +12,10 @@
  * same address has on its Source tab, in the modulator's own editor, or in the matrix.
  *
  * It is the design system's fader (D44), in position space: the bar runs 0..1 along the taper, so a
- * drag moves evenly, as the knob's does. A tap or a drag sets the value where the pointer is, and
- * the arrow keys step it.
+ * drag moves evenly, as the knob's does. Travel is RELATIVE, like the knob's: a drag moves the value
+ * from where it was, and shift makes it finer. A TAP that does not move sets the value where it
+ * landed, because on a phone a tap on the track is how a person asks for a level (LIFE-1934). The
+ * arrow keys step it.
  */
 
 import { Fragment } from 'react';
@@ -74,7 +76,7 @@ modulated by ${mods.map(m => `modulator ${slotNumber(m.src)}`).join(', ')} — s
         `knob, the modulator or the matrix`
       : '') +
     `
-tap or drag to set · arrow keys step · ${doubleClick()} to reset`;
+tap to set · drag sideways · shift for fine · arrow keys step · ${doubleClick()} to reset`;
 
   return (
     <Bar
@@ -90,6 +92,7 @@ tap or drag to set · arrow keys step · ${doubleClick()} to reset`;
       onChange={setAt}
       onCommit={onCommit}
       onReset={reset}
+      isRelative
     >
       {mods.map((m, i) => {
         const [rLo, rHi] = reachOf(m, value, { lo, hi, curve: spec.curve });

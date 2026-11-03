@@ -130,10 +130,20 @@ Features: Edit undo. Contexts: phone, a light that is slow to send its look. Sho
 1. `EDIT`, and at once `Add a layer in the lowest free slot`, while Edit still shows 0 / 8.
 2. The look loads. Ctrl+Z takes the layer away and leaves the look's own layers, on Edit and on the light.
 
-**GAP 2 (E1):** on some runs the first undo goes to an empty look, 0 / 8, and sends it to the light. It is a race
-between the look loading and the edit (`packages/patch-editor/src/app/useHistory.ts` keeps the patch it started
-with as the first step), so the test is skipped: as a known fail it would pass on some runs and make the gate flaky.
+**GAP 2 (E1), fixed 4 Nov 2026:** the first undo once went to an empty look, 0 / 8. The history now starts at the
+look the light reported.
 
 - **Failures:** a slow light.
 - **Wrong actions:** an edit before the look has loaded.
 - **Changes of mind:** undo.
+
+### P2-S12 a drag on a bar moves it from where it was, and a tap sets it
+
+Features: Edit bars. Contexts: laptop. Should take: 1 drag, 1 tap.
+
+1. A press on a bar far from its value, and a short drag: the value moves by the drag and does not jump to the press.
+2. A tap a quarter along the bar sets the value to a quarter.
+
+- **Failures:** none.
+- **Wrong actions:** a press far from the value.
+- **Changes of mind:** none.
