@@ -39,8 +39,11 @@
 .house-section { padding: 0 var(--gutter); }
 .house-note { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: 0 var(--gutter); }
 .home-add { align-self: flex-start; padding: 0 var(--gutter); }
-.undo-notice { position: absolute; left: 12px; right: 12px; bottom: max(14px, env(safe-area-inset-bottom)); z-index: var(--layer-float); display: flex; align-items: center; gap: var(--space-4); padding: var(--space-1) var(--space-4); background: var(--background); box-shadow: var(--float-shadow), 0 0 0 var(--line) var(--track); }
-.undo-text { flex: 1; min-width: 0; padding: var(--space-3) 0; color: var(--text-2); font: var(--type-note); }
+.toast { position: fixed; left: 0; right: 0; bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: var(--layer-float); display: flex; align-items: center; gap: var(--space-3); width: fit-content; max-width: calc(100% - 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--space-4); border-radius: var(--radius); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); }
+.toast[data-over-dock='true'] { bottom: var(--clear-dock); z-index: var(--layer-editor-toast); }
+.toast-text { min-width: 0; padding: var(--space-3) 0; font: var(--type-note); }
+.toast .text-key { min-height: 0; color: inherit; font: var(--type-label); letter-spacing: var(--tracking-label); }
+.toast :focus-visible { outline-color: var(--on-fill); }
 
 .home-screen { display: flex; flex-direction: column; height: 100%; }
 .home-screen > .home-scroll { flex: 1; min-height: 0; height: auto; }
@@ -219,6 +222,6 @@
   .screen-page[data-wide='true'] { left: 0; padding-inline: 0; }
   .room-card[data-open='true'] .room-name { text-decoration: underline var(--mark-line); text-underline-offset: 6px; }
   .screen-stack > .sheet { left: var(--side-column); }
-  .undo-notice { left: 392px; }
+  .toast:not([data-over-dock='true']) { left: var(--side-column); max-width: calc(100% - var(--side-column) - 2 * var(--gutter)); }
   .edit-sections { display: none; }
 }

@@ -546,11 +546,6 @@
 .patch-editor .scopecap .dash.warn { color: var(--warn); }
 .patch-editor .scopecap .dash.accent { color: var(--modulation-soft); }
 
-/* -------------------------------------------------------------- toasts */
-
-.patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: var(--layer-editor-toast); padding: var(--space-3) var(--space-4); border-radius: var(--radius); font: var(--type-note); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); }
-.patch-editor .toast .toastact { margin-left: var(--space-3); padding: 0; border: 0; background: none; color: inherit; font: var(--type-label); letter-spacing: var(--tracking-label); cursor: pointer; }
-
 /* -------------------------------------------------------------- scroll */
 
 .patch-editor ::-webkit-scrollbar { width: 10px; height: 10px; }
@@ -963,5 +958,3 @@
 /* The app's focus ring, over the editor's own `outline: none` on fields and chips (LIFE-1937). */
 .patch-editor :focus-visible,
 .patch-editor textarea.well:focus-visible { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
-/* The toast is ink on paper turned round, so its ring is the paper colour. */
-.patch-editor .toast :focus-visible { outline-color: var(--on-fill); }

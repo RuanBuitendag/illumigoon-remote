@@ -59,6 +59,8 @@
   --edge: calc(-1 * var(--gutter));
   --page-top: max(54px, env(safe-area-inset-top));
   --clear-notice: 110px;
+  /* How far a toast in Edit sits off the bottom, so it clears the dock under it. */
+  --clear-dock: 140px;
   --half-column: 360px;
   --row: 44px;
   --row-tall: 56px;

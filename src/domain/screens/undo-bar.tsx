@@ -1,4 +1,5 @@
-import { UndoNotice } from '../../composites';
+import { Toast } from '../../composites';
+import { TextKey } from '../../design-system';
 import { saveLook } from '../store/look-files';
 import { useNavigation } from '../store/navigation-store';
 import { markUndoSaved, pauseUndo, resumeUndo, undoChange, useUndo } from '../store/undo';
@@ -26,10 +27,9 @@ export function UndoBar() {
   };
 
   return (
-    <UndoNotice
-      text={text}
-      onUndo={isNoteOnly ? undefined : undoChange}
-      onSave={unsaved && (() => void keep())}
-    />
+    <Toast text={text}>
+      {unsaved && <TextKey onClick={() => void keep()}>SAVE</TextKey>}
+      {!isNoteOnly && <TextKey onClick={undoChange}>UNDO</TextKey>}
+    </Toast>
   );
 }

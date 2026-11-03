@@ -41,21 +41,6 @@ export function ScreenStack(props: ScreenStackProps) {
   );
 }
 
-type UndoNoticeProps = { text: string; onUndo?: () => void; onSave?: () => void };
-
-export function UndoNotice({ text, onUndo, onSave }: UndoNoticeProps) {
-  return (
-    <aside className="undo-notice">
-      {/* Said aloud when it changes, without moving focus. */}
-      <p className="undo-text" role="status" aria-live="polite">
-        {text}
-      </p>
-      {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
-      {onUndo && <TextKey onClick={onUndo}>UNDO</TextKey>}
-    </aside>
-  );
-}
-
 type EditLayoutProps<Section extends string> = {
   backLabel: string;
   title: string;

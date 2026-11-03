@@ -1,6 +1,8 @@
 /** What stands inside the frame while a light is open, and what floats over it. */
 
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
+import { Toast } from '../../../../src/composites';
+import { TextKey } from '../../../../src/design-system';
 import { serialisedSize } from '../domain/patchDocument';
 import { drawable, type Ready } from '../domain/connection';
 import type { Patch } from '../domain/patch';
@@ -31,7 +33,7 @@ import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
 import { forgetKeptDraft } from './useKeptDraft';
 import type { Rolls } from './useRolls';
-import type { Toast } from './useToast';
+import type { Toast as ToastLine } from './useToast';
 import { sectionOfSide, type EditorSection } from './useSection';
 
 /** How full a look gets before the size meter shows. */
@@ -435,7 +437,7 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
   gesture: BindGesture;
   dialogs: Dialogs;
   patch: Patch;
-  toast: Toast | null;
+  toast: ToastLine | null;
   ready: Ready;
   onUndo(): void;
 }) {
@@ -469,10 +471,9 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
       )}
 
       {toast && (
-        <div className="toast">
-          <span role="status" aria-live="polite">{toast.text}</span>
-          {toast.canUndo && <button className="toastact" onClick={onUndo}>UNDO</button>}
-        </div>
+        <Toast text={toast.text} isOverDock>
+          {toast.canUndo && <TextKey onClick={onUndo}>UNDO</TextKey>}
+        </Toast>
       )}
     </>
   );
