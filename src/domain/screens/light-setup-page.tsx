@@ -72,7 +72,7 @@ function LightSetup({ light }: { light: Light }) {
     return (
       <PageSection>
         <Eyebrow>{light.name.toUpperCase()}</Eyebrow>
-        <PageHint>Not answering.</PageHint>
+        <PageHint>{"Isn't answering"}</PageHint>
       </PageSection>
     );
   }

@@ -37,10 +37,11 @@ const RECENT_LOOKS = 3;
 const PERCENT = 100;
 
 // The look's name stands under the lights. A light repeats it only when the lights differ.
-// Its switch and its dark strip already say that it is off.
-function lightNote(light: Light, hasOneLook: boolean) {
-  if (!light.isOnline) return "ISN'T ANSWERING";
-  if (light.isLockedByOther) return 'IN USE';
+// Its switch and its dark strip already say that it is off, and the room's lock note that the
+// whole room is in use. A state reads as the rest of the app writes it (D56).
+function lightNote(light: Light, hasOneLook: boolean, isRoomLocked: boolean) {
+  if (!light.isOnline) return "Isn't answering";
+  if (light.isLockedByOther) return isRoomLocked ? '' : 'In use';
   if (!light.isOn || hasOneLook) return '';
   return lookNameOf(light) ?? '';
 }
@@ -74,7 +75,7 @@ function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
           <LightCard
             key={light.address}
             name={light.name}
-            note={lightNote(light, hasOneLook)}
+            note={lightNote(light, hasOneLook, room.isLocked)}
             isChosen={chosen.some(({ address }) => address === light.address)}
             disabled={!canChange}
             strip={
