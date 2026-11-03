@@ -123,12 +123,9 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
       className="row"
       style={{ padding: '10px 12px 12px 16px', justifyContent: 'space-between', flexShrink: 0 }}
     >
-      <div className="row" style={{ gap: 8, minWidth: 0 }}>
-        <span className="livedot" data-on={String(connected)} />
-        <span className="stripnote">
-          {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
-        </span>
-      </div>
+      <span className="stripnote" style={{ minWidth: 0 }}>
+        {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
+      </span>
       <button
         className="row raise"
         style={{ gap: 9, padding: '6px 12px' }}

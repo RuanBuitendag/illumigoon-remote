@@ -432,9 +432,9 @@
 .patch-editor .sw-on { background: none; }
 .patch-editor .sw-on > i { background: var(--fill); }
 
-/* A bypassed node is still there and still says what it is — just out of circuit. */
+/* A bypassed tile is still there and still says what it is — just out of circuit. The fade is
+   its one mark: a row with a bypass switch shows it on the switch alone (ST-15). */
 .patch-editor .bypassed { opacity: 0.4; }
-.patch-editor .bypassed .name, .patch-editor .bypassed .mname { text-decoration: line-through; }
 
 /* ------------------------------------------------------------- palette */
 
@@ -462,8 +462,6 @@
 .patch-editor .mrow { display: flex; align-items: center; height: 46px; padding: 0 20px; border-radius: 2px; flex-shrink: 0; }
 .patch-editor .mrow[data-odd='true'] { background: var(--wash); }
 .patch-editor .mrow:hover { background: var(--wash-strong); }
-.patch-editor .mrow[data-dropped='true'] { opacity: 0.4; }
-.patch-editor .mrow[data-dropped='true'] .dst, .patch-editor .mrow[data-dropped='true'] .src { text-decoration: line-through; }
 .patch-editor .mrow .dst { font: var(--type-value); }
 .patch-editor .warnline { font: var(--type-small-sans); color: var(--warn); }
 .patch-editor .warn     { color: var(--warn); }
@@ -749,7 +747,6 @@
 .patch-editor .stagerow[class*='on'] { background: var(--wash-strong); box-shadow: inset 0 0 0 1px var(--track); }
 .patch-editor .stagerow:not(:first-child) { cursor: pointer; }
 .patch-editor .stagerow:not(:first-child):hover { background: var(--wash); }
-.patch-editor .stagerow.bypassed { opacity: 0.45; }
 .patch-editor .stagelab { width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
 .patch-editor .stagedot { width: 7px; height: 7px; flex-shrink: 0; background: var(--text-2); }
 .patch-editor .stagedot[data-kind='source'] { background: var(--text-5); }
@@ -848,7 +845,6 @@
 .patch-editor .ctlheadname { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-3); }
 .patch-editor .ctlrow { gap: 10px; padding: 8px 10px; min-height: 42px; cursor: pointer; }
 .patch-editor .ctlrow[data-dead='true'] { opacity: 0.45; }
-.patch-editor .ctlrow[data-dead='true'] .ctllabel { text-decoration: line-through; }
 .patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
 .patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctltarget { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

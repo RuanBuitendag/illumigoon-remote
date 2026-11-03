@@ -7,7 +7,8 @@ type RoomCardProps = {
   lookName: string;
   hasSound: boolean;
   power: ReactNode;
-  lightStates: { id: string; name: string; state: 'on' | 'off' | 'silent' }[];
+  // A light whose state the power switch already shows has no mark of its own.
+  lightStates: { id: string; name: string; state: 'on' | 'off' | 'silent' | null }[];
   note: string | null;
   // Keeps the height of the recent looks while they load.
   hasLooks: boolean;
@@ -31,8 +32,8 @@ export function RoomCard(card: RoomCardProps) {
         </span>
         <span className="room-lights">
           {card.lightStates.map(({ id, name, state }) => (
-            <span key={id} className="room-light" data-state={state}>
-              <StatusMark state={state} />
+            <span key={id} className="room-light">
+              {state && <StatusMark state={state} />}
               {name}
             </span>
           ))}

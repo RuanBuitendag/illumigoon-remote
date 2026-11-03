@@ -138,7 +138,6 @@ function MatrixRoute({
   label: string
   warn: string | undefined
 }) {
-  const colour = warn ? 'var(--text-4)' : 'var(--text-1)'
   return (
     <>
       <div className="row" style={{ width: 52, gap: 9 }}>
@@ -153,13 +152,13 @@ function MatrixRoute({
       {/* The NAME when it has one: a patch with three macros on it otherwise reads
           as three rows of `macro`, told apart only by the number in SRC. */}
       <div style={{ width: 118 }}>
-        <span style={{ font: 'var(--type-note)', color: colour }}>{label}</span>
+        <span style={{ font: 'var(--type-note)', color: 'var(--text-1)' }}>{label}</span>
       </div>
       <div className="row" style={{ width: 26 }}>
         <Ico.Arrow />
       </div>
       <div className="col" style={{ width: 236, gap: 7 }}>
-        <span className="dst" style={{ color: colour }}>
+        <span className="dst" style={{ color: 'var(--text-1)' }}>
           {pathName(r.dst)}
         </span>
         {warn && <span className="warnline">{warn}</span>}
@@ -249,7 +248,6 @@ function MatrixLine({ ctl, r, i, drop, note }: {
     <div
       className="mrow"
       data-odd={i % 2 === 1 || undefined}
-      data-dropped={drop ? true : undefined}
     >
       <MatrixRoute r={r} label={modulatorLabel(mod)} warn={warn} />
       <div style={{ width: 74, textAlign: 'right' }}>

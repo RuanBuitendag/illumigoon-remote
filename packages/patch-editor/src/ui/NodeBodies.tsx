@@ -61,12 +61,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
     <div className="col" style={{ padding: '18px 26px 0', gap: 9 }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="head">Trigger</Lab>
-        {warn && (
-          <div className="row" style={{ gap: 7 }}>
-            <span className="livedot" data-warn="true" />
-            <span className="warnline">{warn}</span>
-          </div>
-        )}
+        {warn && <span className="warnline">{warn}</span>}
       </div>
 
       {/* data-path is what the dock's drag hit-tests against; see Ctl.drag. A macro cannot

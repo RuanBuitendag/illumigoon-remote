@@ -56,7 +56,7 @@ function timerText(room: Room) {
   return offTimersOf(lights).length > 0 ? offTimerNote(lights) : null;
 }
 
-type LightStateLine = { id: string; name: string; state: ReturnType<typeof lightState> };
+type LightStateLine = { id: string; name: string; state: ReturnType<typeof lightState> | null };
 
 const stateOfLight = (light: Light): LightStateLine => ({ id: light.address, name: light.name, state: lightState(light) });
 const stateOfWaiting = ({ id, name }: { id: string; name: string }): LightStateLine => ({ id, name, state: 'silent' });
@@ -96,14 +96,20 @@ export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
   const lightStates = [...room.lights.map(stateOfLight), ...waitingLights.map(stateOfWaiting)];
   const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
   const { onlineLights, source, isOn, level, hasSound } = useRoomLook(room);
+  const hasPower = !room.isLocked;
+  // The power switch shows the room's state, so only a light that differs from it gets a mark.
+  const switchState = isOn ? 'on' : 'off';
+  const marked = lightStates.map((line) =>
+    hasPower && line.state === switchState ? { ...line, state: null } : line,
+  );
   return (
     <RoomCard
       name={room.name}
-      power={!room.isLocked && <RoomPower room={room} isOn={isOn} />}
+      power={hasPower && <RoomPower room={room} isOn={isOn} />}
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
       lookName={lookLabel(onlineLights)}
       hasSound={hasSound}
-      lightStates={lightStates}
+      lightStates={marked}
       hasLooks={hasLooks}
       note={timerText(room)}
       isOpen={isOpen}

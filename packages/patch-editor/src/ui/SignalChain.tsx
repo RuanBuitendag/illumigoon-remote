@@ -495,14 +495,8 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
   }
   return (
     <div
-      className={`row rackrow ${sel ? 'raise-hi' : 'flatcard'}${warp.bypass ? ' bypassed' : ''}`}
-      style={{
-        height: 42,
-        padding: '0 11px 0 10px',
-        gap: 12,
-        cursor: 'pointer',
-        position: 'relative',
-      }}
+      className={rackRowClass(sel)}
+      style={RACK_ROW}
       {...drag}
       onClick={onSelect}
     >
@@ -535,6 +529,10 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
   );
 }
 
+/** A filled rack row: the warp and the palette rows share it. */
+const RACK_ROW = { height: 42, padding: '0 11px 0 10px', gap: 12, cursor: 'pointer', position: 'relative' } as const;
+const rackRowClass = (sel: boolean) => `row rackrow ${sel ? 'raise-hi' : 'flatcard'}`;
+
 /**
  * The palette's row in the chain. Warps above it bend the shape before it has a colour; warps
  * under it move the coloured light.
@@ -552,14 +550,8 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
 }) {
   return (
     <div
-      className={`row rackrow ${sel ? 'raise-hi' : 'flatcard'}`}
-      style={{
-        height: 42,
-        padding: '0 11px 0 10px',
-        gap: 12,
-        cursor: 'pointer',
-        position: 'relative',
-      }}
+      className={rackRowClass(sel)}
+      style={RACK_ROW}
       title={title}
       {...row}
     >

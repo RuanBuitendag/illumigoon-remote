@@ -164,7 +164,7 @@ function StageRow({ warps, w, row, colourRow, on, onSelect }: {
   // `upto` is a rack prefix, so a row's band is every row down to and including it.
   const upto = row + 1;
   return (
-    <div className={`stagerow${on ? ' on' : ''}${w.bypass ? ' bypassed' : ''}`}
+    <div className={`stagerow${on ? ' on' : ''}`}
          onClick={() => onSelect(row)}>
       <div className="stagelab">
         <span className="stagedot"

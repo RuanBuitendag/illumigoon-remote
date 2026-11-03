@@ -92,7 +92,6 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
         <span {...exposeProps(ctl.patch, `M${m.slot}.bypass`)}>
           <Switch
             on={!m.bypass}
-            label={m.bypass ? 'bypassed' : 'active'}
             title="Bypass this modulator — every wire it drives, at once. Applies live."
             onChange={v =>
               ctl.setStructural(`M${m.slot}.bypass`, !v, d => {
@@ -172,12 +171,7 @@ function ModTypePicker({ ctl, m, spec }: {
 }
 
 function DeadLine({ dead }: { dead: string }) {
-  return (
-    <div className="row" style={{ gap: 8 }}>
-        <span className="livedot" data-warn="true" />
-        <span className="warnline">{dead}</span>
-      </div>
-  )
+  return <span className="warnline">{dead}</span>
 }
 
 /** A parameter's value on the slot, or the node's default for it. */

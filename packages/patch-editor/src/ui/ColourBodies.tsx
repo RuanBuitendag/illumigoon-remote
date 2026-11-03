@@ -288,16 +288,12 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
           while that block held the layer's output; it was never the layer's to own. */}
       <div className="row" style={{ padding: '14px 16px', justifyContent: 'space-between' }}>
         <span {...exposeProps(ctl.patch, `L${layer.slot}.colour.bypass`)}>
-          <Switch on={!layer.colour.bypass} label={layer.colour.bypass ? 'bypassed' : 'active'}
+          <Switch on={!layer.colour.bypass} label="Colour"
                   title="Bypass the colour stage — applies live, so you can A/B it"
                   onChange={v => ctl.setStructural(`L${layer.slot}.colour.bypass`, !v,
                     d => { d.layers.find(x => x.slot === layer.slot)!.colour.bypass = !v; })} />
         </span>
-        <Blurb className="rt">
-          {layer.colour.bypass
-            ? 'off — the shape draws white, so you can A/B the palette'
-            : 'the palette colours the shape'}
-        </Blurb>
+        <Blurb className="rt">off draws the shape white, so you can A/B the palette</Blurb>
       </div>
       <Hr />
 
