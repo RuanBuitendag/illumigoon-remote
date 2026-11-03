@@ -78,3 +78,46 @@ export function closePage() {
     parentPage ? { page: parentPage, parentPage: null, pageVisit: pageVisit + 1 } : { isPageOpen: false },
   );
 }
+
+// Each screen has an address after the #, so a link can open it (NA-7, NA-17): `#/room/<id>`, `#/room/<id>/looks`,
+// `#/looks` for a page opened from Home. Edit is left out: a link must not take a light from another device.
+const LINKED_PAGES = new Set<PageKind>([
+  'looks',
+  'schedules',
+  'software',
+  'light-setup',
+  'arrange',
+  'transition',
+  'room-settings',
+  'add-light',
+  'history',
+]);
+
+const isLinked = (page: PageKind | null): page is PageKind => page !== null && LINKED_PAGES.has(page);
+
+export function addressOf({ roomId, isRoomOpen, page, isPageOpen, pageRoomId }: Navigation) {
+  const room = isRoomOpen && roomId ? `/room/${encodeURIComponent(roomId)}` : '';
+  if (!isPageOpen || !isLinked(page)) return room ? `#${room}` : '';
+  const pageRoom = pageRoomId ? `/room/${encodeURIComponent(pageRoomId)}` : '';
+  return `#${pageRoom || room}/${page}`;
+}
+
+export function openAddress(address: string) {
+  const [, roomId, page] = /^#(?:\/room\/([^/]+))?(?:\/([a-z-]+))?$/.exec(address) ?? [];
+  const room = roomId ? decodeURIComponent(roomId) : null;
+  if (room) openRoom(room);
+  const kind = page as PageKind | undefined;
+  if (kind && isLinked(kind)) openPage(kind, room);
+}
+
+// The address follows the screens without adding history steps, so a back gesture never walks through them.
+export function keepAddress() {
+  openAddress(window.location.hash);
+  useNavigation.subscribe((state) => {
+    const address = addressOf(state);
+    if (address !== window.location.hash) {
+      window.history.replaceState(null, '', address || `${window.location.pathname}${window.location.search}`);
+    }
+  });
+  window.addEventListener('hashchange', () => openAddress(window.location.hash));
+}
