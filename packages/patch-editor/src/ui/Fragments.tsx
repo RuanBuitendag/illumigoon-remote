@@ -134,7 +134,7 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
   const save = async () => {
     if (!layer || !capture) { ctl.say('select a layer to save'); return; }
     if (!name.trim()) { ctl.say('give it a name first'); return; }
-    if (!(await confirmReplace(clash, file))) return;
+    if (!(await confirmReplace(clash))) return;
     await attempt(async () => {
       await writeFragment(file, toFragment(capture.patch, name, notes));
       setLeft(capture.dropped);
@@ -241,7 +241,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   };
 
   const drop = async (e: FragmentEntry) => {
-    if (!(await confirmDelete(e.name, root, e.file))) return;
+    if (!(await confirmDelete(e.name))) return;
     await attempt(async () => {
       await deleteFragment(e.file);
       await refresh();
@@ -292,7 +292,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 
         {sections.map(({ key, label, group, list }) => (
           <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
-            <ShelfHeading label={label} emphasis={!!group} count={list.length} />
+            <ShelfHeading label={label} emphasis={!!group} />
 
             {list.map((e, i) => (
               <FragmentRow

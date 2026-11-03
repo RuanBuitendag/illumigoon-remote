@@ -195,7 +195,7 @@ function PaletteSheets({ ctl, nav, master, onRecallMaster, onClose }: {
         onRecall={(entries, name) => {
           const reached = onRecallMaster(entries);
           ctl.say(
-            reached ? `${name} recalled onto every layer` : `${name} recalled — not connected`,
+            reached ? `${name} on every layer` : `${name} on every layer — not connected`,
           );
           onClose();
         }}
@@ -221,8 +221,8 @@ function PaletteSheets({ ctl, nav, master, onRecallMaster, onClose }: {
           });
           ctl.say(
             reached
-              ? `${name} recalled onto ${layerName(layer.slot)}`
-              : `${name} recalled — not connected`,
+              ? `${name} on ${layerName(layer.slot)}`
+              : `${name} on ${layerName(layer.slot)} — not connected`,
           );
           onClose();
         }}

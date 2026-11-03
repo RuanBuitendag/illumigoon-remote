@@ -6,7 +6,7 @@
 import { useEffect, type ReactNode } from 'react';
 import { Sheet } from '../../../../src/composites';
 import { ask } from '../host';
-import { Lab, Mono } from './bits';
+import { Lab } from './bits';
 import { suspend } from './live';
 
 /** Run a write, and hand what went wrong to the sheet's own error line. */
@@ -18,16 +18,12 @@ export async function attempt(work: () => Promise<void>, onError: (message: stri
   }
 }
 
-/** Ask before a file on disk goes. `root` is the folder as the server printed it. */
-export const confirmDelete = (name: string, root: string, file: string) =>
-  ask(
-    `Delete ${name}?\n\n${root}${root.includes('\\') ? '\\' : '/'}${file} is removed from the ` +
-      `disk.`,
-  );
+/** Ask before something saved goes. Nothing brings it back, so the question says so. */
+export const confirmDelete = (name: string) => ask(`Delete ${name}?\n\nNothing brings it back.`);
 
-/** Ask before a save lands on a name that already has a file. */
-export const confirmReplace = async (clash: { name: string } | undefined, file: string) =>
-  !clash || ask(`${clash.name} already exists at ${file}.\n\nReplace it?`);
+/** Ask before a save lands on a name that is already saved. */
+export const confirmReplace = async (clash: { name: string } | undefined) =>
+  !clash || ask(`${clash.name} is already saved.\n\nReplace it?`);
 
 /**
  * One of Edit's shelves, on the app's one sheet (LIFE-1950), and the one place the frame loop is held.
@@ -39,8 +35,8 @@ export const confirmReplace = async (clash: { name: string } | undefined, file: 
 export function EditorSheet({ icon, title, detail, onClose, children }: {
   icon: ReactNode;
   title: string;
-  /** What the head says beside the name: a count, a folder. */
-  detail: ReactNode;
+  /** What the head says beside the name, if anything. */
+  detail?: ReactNode;
   onClose(): void;
   children: ReactNode;
 }) {
@@ -54,7 +50,7 @@ export function EditorSheet({ icon, title, detail, onClose, children }: {
 
 /** The bar a save form is: what is saved, the fields, and the button. */
 export function SaveBar({ label, ready, clash, onSave, children }: {
-  label: ReactNode;
+  label?: ReactNode;
   ready: boolean;
   clash: boolean;
   onSave(): void;
@@ -62,7 +58,7 @@ export function SaveBar({ label, ready, clash, onSave, children }: {
 }) {
   return (
     <div className="row" style={{ gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-5)', flexShrink: 0 }}>
-      <Lab className="dim">{label}</Lab>
+      {label && <Lab className="dim">{label}</Lab>}
       {children}
       <button className="pill raise" data-primary="true" disabled={!ready} onClick={onSave}>
         {clash ? 'REPLACE' : 'SAVE'}
@@ -99,18 +95,27 @@ export function SaveField({ value, placeholder, disabled, wide, font, colour, on
   );
 }
 
-/** The heading over a group of shelf rows: its name, a hairline, how many. */
-export function ShelfHeading({ label, emphasis, count }: {
+/** The heading over a group of shelf rows: its name, a hairline, and the group's one key, if it has one. */
+export function ShelfHeading({ label, emphasis, action }: {
   label: string;
   emphasis: boolean;
-  count: number;
+  action?: ReactNode;
 }) {
   return (
     <div className="row" style={{ gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4) var(--space-1)' }}>
       <Lab className={emphasis ? 'mid' : 'dim'}>{label}</Lab>
       <span style={{ flexGrow: 1, height: 1, background: 'var(--track)' }} />
-      <Mono className="dim sm">{count}</Mono>
+      {action}
     </div>
+  );
+}
+
+/** The key that turns a group of saved rows into rows that delete, and back. */
+export function ManageKey({ managing, onToggle }: { managing: boolean; onToggle(): void }) {
+  return (
+    <button className="pill" data-primary={managing || undefined} onClick={onToggle}>
+      {managing ? 'DONE' : 'MANAGE'}
+    </button>
   );
 }
 
@@ -122,7 +127,7 @@ export function ShelfNotice({ label, colour, children }: {
 }) {
   return (
     <div className="col" style={{ gap: 'var(--space-half)' }}>
-      <ShelfHeading label={label} emphasis={false} count={0} />
+      <ShelfHeading label={label} emphasis={false} />
       <div style={{ padding: 'var(--space-half) var(--space-4) var(--space-1)', font: 'var(--type-small-sans)', color: colour }}>
         {children}
       </div>

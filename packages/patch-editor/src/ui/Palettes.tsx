@@ -1,43 +1,47 @@
 /**
- * The palette sheet: a folder of colour sets, and every palette already inside a patch.
+ * The palette sheet: the colour sets a person saved, the ones that ship, and the ones inside looks.
  *
- * RECALL IS A STRUCTURAL SEND, for the same reason loading a preset is: the entries array is
+ * Each palette is a strip and a name, and a tap puts its colours on. Nothing else is on a row: no
+ * file, no hex codes, no count (LIFE-1935). The one already playing carries the selected mark.
+ *
+ * A TAP IS A STRUCTURAL SEND, for the same reason loading a preset is: the entries array is
  * not an addressable parameter path, so there is no `light_apply_params` that could carry it.
  * `ctl.structural` mutates the draft and pushes the document.
  *
- * RECALL WRITES ENTRIES AND NOTHING ELSE. `hueShift`, `saturation` and `value` sit in
+ * IT WRITES ENTRIES AND NOTHING ELSE. `hueShift`, `saturation` and `value` sit in
  * `colour.palette.params` beside the entries and are deliberately left alone — they are
  * modulation targets, and a matrix row may be driving any of them. A recall that reset them
  * would silently undo a rack the user tuned, and the colours are what they came here for.
  *
- * The rows under `in patches` have no file behind them. They are derived from the patch roots
+ * The rows under FROM LOOKS have no file behind them. They are derived from the patch roots
  * on every listing, so they cannot be deleted — saving one is how it becomes a real file.
  */
 
 import {
-  attempt, confirmDelete, confirmReplace, SaveBar, SaveField, EditorSheet, ShelfHeading,
+  attempt, confirmDelete, confirmReplace, EditorSheet, ManageKey, SaveBar, SaveField, ShelfHeading,
 } from './Sheet';
-import { Icon } from '../../../../src/design-system';
+import { ColourFill, Icon, Picked } from '../../../../src/design-system';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LIMITS } from '../domain/catalog';
 import {
   deletePalette, gradientOf, listPalettes, paletteFileNameFor, paletteId,
   toPaletteDoc, writePalette, type PaletteEntry,
 } from '../library/palettes';
-import { Hr, Lab, Mono, Blurb } from './bits';
+import { Hr } from './bits';
 import type { Ctl } from './ctl';
 
 interface Section {
   key: string;
   label: string;
-  group: string;
-  derived: boolean;
+  /** The person's own palettes, which MANAGE can delete. */
+  mine: boolean;
   list: PaletteEntry[];
 }
 
-/** The folder of palettes, and the ones lifted out of the patches. */
+const COULD_NOT_READ = 'Could not read the palettes. The ones on this layer still play.';
+
+/** The folder of palettes, and the ones lifted out of the looks. */
 function usePaletteShelf() {
-  const [root, setRoot] = useState('');
   const [rows, setRows] = useState<PaletteEntry[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(true);
@@ -45,12 +49,10 @@ function usePaletteShelf() {
   const refresh = useCallback(async () => {
     setBusy(true);
     try {
-      const r = await listPalettes();
-      setRoot(r.root);
-      setRows(r.palettes);
+      setRows((await listPalettes()).palettes);
       setError(null);
-    } catch (e: any) {
-      setError(e.message ?? String(e));
+    } catch {
+      setError(COULD_NOT_READ);
       setRows([]);
     }
     setBusy(false);
@@ -58,14 +60,14 @@ function usePaletteShelf() {
 
   useEffect(() => { queueMicrotask(refresh); }, [refresh]);
 
-  return { root, rows, error, setError, busy, refresh };
+  return { rows, error, setError, busy, refresh };
 }
 
-/** The save form: what is on the layer, under a name. */
-function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
+/** The save form: a name for the colours on the layer, and SAVE. */
+function PaletteSaveForm({ ctl, where, entries, rows, onSaved, onError }: {
   ctl: Ctl;
+  where: 'layer' | 'master';
   entries: string[];
-  wrap: boolean;
   rows: PaletteEntry[];
   onSaved(): Promise<void>;
   onError(message: string): void;
@@ -73,52 +75,32 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
   const [name, setName] = useState('');
 
   const file = useMemo(() => paletteFileNameFor(name), [name]);
-  const saved = useMemo(() => rows.filter(r => r.file), [rows]);
-  const clash = useMemo(() => saved.find(r => r.file === file), [saved, file]);
+  const clash = useMemo(() => rows.find(r => r.file && r.file === file), [rows, file]);
 
   const save = async () => {
-    if (!name.trim()) { ctl.say('give it a name first'); return; }
-    if (!entries.length) { ctl.say('nothing to save — this layer has no palette'); return; }
-    if (!(await confirmReplace(clash, file))) return;
+    if (!name.trim()) { ctl.say('Name the colours first'); return; }
+    if (!entries.length) { ctl.say('This layer has no colours to save'); return; }
+    if (!(await confirmReplace(clash))) return;
     await attempt(async () => {
       await writePalette(file, toPaletteDoc(entries, name));
-      ctl.say(`palette saved to ${file}`);
+      ctl.say(`${name.trim()} saved`);
       setName('');
       await onSaved();
-    }, onError);
+    }, () => onError(`Could not save ${name.trim()}`));
   };
 
   return (
-    <>
-      <SaveBar
-        label="Save this"
-        clash={!!clash}
-        onSave={save}
-        ready={!!name.trim() && !!entries.length}
-      >
-        <div
-          className="palstrip"
-          style={{ width: 150, background: `linear-gradient(90deg, ${gradientOf(entries, wrap)})` }}
-        />
-        <SaveField
-          value={name}
-          wide
-          placeholder="Ember"
-          onChange={setName}
-          onEnter={save}
-          font="var(--type-note)"
-          colour="var(--text-1)"
-        />
-        <Mono className="dim sm">{entries.length} stops</Mono>
-      </SaveBar>
-
-      <div className="row" style={{ gap: 'var(--space-2)', padding: '0 var(--space-5) var(--space-4)', flexShrink: 0 }}>
-        <Mono className="dim sm">{file}</Mono>
-        <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
-          the colours only — hue, saturation and value stay with the layer
-        </span>
-      </div>
-    </>
+    <SaveBar clash={!!clash} onSave={save} ready={!!name.trim() && !!entries.length}>
+      <SaveField
+        value={name}
+        wide
+        placeholder={where === 'master' ? 'Name the colours on MASTER' : 'Name the colours on this layer'}
+        onChange={setName}
+        onEnter={save}
+        font="var(--type-note)"
+        colour="var(--text-1)"
+      />
+    </SaveBar>
   );
 }
 
@@ -126,17 +108,17 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
 const ORIGINS = 'sbd';
 const originOf = (r: PaletteEntry) => (r.shipped ? 'b' : r.readOnly ? 'd' : 's');
 
+/**
+ * The person's own first, then the shipped sets by their names, then every palette found in a
+ * look under one heading. The looks' folders are the engine's filing, not a name anybody gave.
+ */
 function paletteGroups(rows: PaletteEntry[]): Section[] {
-  // Keyed on the ORIGIN as well as the group. A derived row now carries the group of the
-  // patch it came out of, so keying on the group alone would file a saved palette the user
-  // put in a folder called `showcase` in among the read-only ones lifted from `showcase/`.
   const by = new Map<string, PaletteEntry[]>();
   for (const r of rows) {
-    const k = `${originOf(r)}:${r.group ?? ''}`;
+    const origin = originOf(r);
+    const k = origin === 'd' ? 'd:' : `${origin}:${r.group ?? ''}`;
     (by.get(k) ?? by.set(k, []).get(k)!).push(r);
   }
-  // The store first, then the shipped set, then the derived sections — the user's own work is
-  // what they came for, and the lifted set would otherwise bury it.
   const order = [...by.keys()].sort((a, b) => {
     const gap = ORIGINS.indexOf(a.charAt(0)) - ORIGINS.indexOf(b.charAt(0));
     if (gap !== 0) return gap;
@@ -145,21 +127,18 @@ function paletteGroups(rows: PaletteEntry[]): Section[] {
   });
 
   return order.map<Section>((key) => {
-    const derived = key[0] === 'd';
+    const origin = key.charAt(0);
     const group = key.slice(2);
     return {
       key,
-      group,
-      derived,
+      mine: origin === 's',
       list: by.get(key)!,
-      label: derived
-        ? `${group === 'in patches' ? 'your patches' : group} · lifted from a patch, read-only`
-        : group || 'the palette store',
+      label: origin === 'd' ? 'FROM LOOKS' : group || 'MINE',
     };
   });
 }
 
-export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
+export function PaletteSheet({ ctl, where, entries, onRecall, onClose }: {
   ctl: Ctl;
   /**
    * Whose palette this is: the selected layer's, or MASTER's, which every layer plays (LIFE-846).
@@ -169,233 +148,100 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
   /** The selected layer's palette — what SAVE captures and what a row compares itself to. */
   entries: string[];
   /**
-   * The layer's topology, for the preview at the top only.
-   *
-   * A STORED PALETTE HAS NO TOPOLOGY — it is a list of colours, and whether they run as a
-   * gradient or a wheel is the layer's business, same as the hue and value transforms. So the
-   * rows below are drawn clamped and recall never touches the switch.
+   * The layer's topology. A stored palette has none: whether its colours run as a gradient or a
+   * wheel is the layer's business, so the strips are drawn clamped and a tap never touches it.
    */
   wrap: boolean;
   onRecall(entries: string[], name: string): void;
   onClose(): void;
 }) {
-  const { root, rows, error, setError, busy, refresh } = usePaletteShelf();
+  const { rows, error, setError, busy, refresh } = usePaletteShelf();
+  const [managing, setManaging] = useState(false);
 
   const drop = async (e: PaletteEntry) => {
     if (!e.file) return;
-    if (!(await confirmDelete(e.name, root, e.file))) return;
+    if (!(await confirmDelete(e.name))) return;
     const file = e.file;
     await attempt(async () => {
       await deletePalette(file);
       await refresh();
-    }, setError);
+    }, () => setError(`Could not delete ${e.name}`));
   };
-
-  const copy = async (e: PaletteEntry) => {
-    try {
-      await navigator.clipboard.writeText(JSON.stringify(e.entries));
-      ctl.say('copied as JSON');
-    } catch {
-      ctl.say('could not reach the clipboard');
-    }
-  };
-
-  // ---------------------------------------------------------------- groups
 
   const here = paletteId(entries);
-
   const groups = useMemo(() => paletteGroups(rows), [rows]);
 
   return (
-    <EditorSheet
-      icon={<Icon.Folder />}
-      title="PALETTES"
-      onClose={onClose}
-      detail={
-        <Mono className="dim sm sheetpath" title="Set MODULIGHT_PALETTES to keep them somewhere else">
-          {root || '—'}
-        </Mono>
-      }
-    >
+    <EditorSheet icon={<Icon.Folder />} title="PALETTES" onClose={onClose}>
       <PaletteSaveForm
         ctl={ctl}
+        where={where}
         entries={entries}
-        wrap={wrap}
         rows={rows}
         onSaved={refresh}
         onError={setError}
       />
+      {error && <div className="warnline palerror">{error}</div>}
       <Hr />
 
-      {/* ---- columns ---- */}
-      <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
-        <div style={{ width: 186 }}>
-          <Lab className="dim">PALETTE</Lab>
-        </div>
-        <div style={{ width: 206 }}>
-          <Lab className="dim">NAME</Lab>
-        </div>
-        <div style={{ width: 62, textAlign: 'right' }}>
-          <Lab className="dim">STOPS</Lab>
-        </div>
-        <div className="grow" style={{ paddingLeft: 'var(--space-5)' }}>
-          <Lab className="dim">WHERE</Lab>
-        </div>
-        <div style={{ width: 128 }} />
-      </div>
-      <Hr />
+      <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) var(--space-5)' }}>
+        {busy && rows.length === 0 && <div className="libempty">Reading the palettes…</div>}
 
-      <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
-        {busy && rows.length === 0 && <div className="libempty">Reading the folder…</div>}
-
-        {!busy && !error && rows.length === 0 && (
-          <div className="libempty">
-            No palettes yet, and nothing to lift out of a patch.
-            <br />
-            Mix one in the colour panel, name it above, and press SAVE.
-          </div>
-        )}
-
-        {groups.map(({ key, label, group, derived, list }) => (
-          <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
-            <ShelfHeading label={label} emphasis={!!group || !!derived} count={list.length} />
-
-            {list.map((e, i) => (
-              <PaletteRow
-                key={`${key}/${e.file ?? e.name}/${i}`}
-                e={e}
-                odd={i % 2 === 1}
-                here={here}
-                where={where}
-                onRecall={onRecall}
-                onCopy={copy}
-                onDrop={drop}
-              />
-            ))}
+        {groups.map(({ key, label, mine, list }) => (
+          <div key={key} className="col" style={{ gap: 'var(--space-2)' }}>
+            <ShelfHeading
+              label={label}
+              emphasis={mine}
+              action={mine && <ManageKey managing={managing} onToggle={() => setManaging(m => !m)} />}
+            />
+            <div className="palgrid">
+              {list.map((e, i) => (
+                <PaletteTile
+                  key={`${key}/${e.file ?? e.name}/${i}`}
+                  e={e}
+                  on={!e.error && e.entries.length > 0 && paletteId(e.entries) === here}
+                  deleting={managing && mine}
+                  onRecall={onRecall}
+                  onDrop={drop}
+                />
+              ))}
+            </div>
           </div>
         ))}
-      </div>
-
-      <div className="grow" />
-      <Hr />
-
-      <div className="row" style={{ padding: 'var(--space-4) var(--space-5)', gap: 'var(--space-4)', flexShrink: 0 }}>
-        {error ? (
-          <div className="row" style={{ gap: 'var(--space-2)' }}>
-            <span className="livedot" data-warn="true" />
-            <span className="warnline">{error}</span>
-          </div>
-        ) : (
-          <Blurb>
-            RECALL replaces the colours on{' '}
-            {where === 'master' ? 'every layer' : 'the selected layer'} and sends the patch. Rows
-            under <span style={{ fontFamily: 'var(--mono)' }}>in patches</span> are derived every
-            time this opens — save one to keep it.
-          </Blurb>
-        )}
       </div>
     </EditorSheet>
   );
 }
 
-function PaletteName({
-  e,
-  on,
-  where,
-}: {
+/**
+ * One palette: its strip and its name, as one key. A tap puts the colours on; under MANAGE, a tap
+ * on one of the person's own asks to delete it.
+ *
+ * The strip draws only the colours the light keeps. Past LIMITS().PALETTE the engine drops the
+ * rest, so drawing them would show colours that never reach the strip.
+ */
+function PaletteTile({ e, on, deleting, onRecall, onDrop }: {
   e: PaletteEntry;
   on: boolean;
-  where: 'layer' | 'master';
-}) {
-  return (
-    <div className="col" style={{ width: 206, gap: 'var(--space-2)', paddingRight: 'var(--space-4)' }}>
-      <span
-        className="libname"
-        title={e.name}
-        style={{ font: 'var(--type-note)', color: e.error ? 'var(--text-4)' : 'var(--text-1)' }}
-      >
-        {e.name}
-      </span>
-      {/* The one already on the layer says so, so a recall that would change
-          nothing is visible before it is pressed. */}
-      {on ? (
-        <Lab className="dim">{where === 'master' ? 'ON MASTER' : 'ON THIS LAYER'}</Lab>
-      ) : (
-        <Mono className="dim sm libfile" title={e.entries.map(c => `#${c}`).join(' ')}>
-          {e.entries
-            .slice(0, 4)
-            .map(c => `#${c}`)
-            .join(' ')}
-          {e.entries.length > 4 ? ' …' : ''}
-        </Mono>
-      )}
-    </div>
-  );
-}
-
-function PaletteCount({ e }: { e: PaletteEntry }) {
-  const over = e.entries.length > LIMITS().PALETTE;
-  return (
-    <div style={{ width: 62, textAlign: 'right' }}>
-      {/* Over LIMITS().PALETTE the engine keeps that many and drops the rest,
-          so the count is the warning. The number is the DEVICE's, never a
-          local copy -- it moves when the firmware's cap does. */}
-      <span style={{
-        font: 'var(--type-small)',
-        color: over ? 'var(--warn)' : 'var(--text-5)',
-      }} title={over ? `the engine keeps the first ${LIMITS().PALETTE}` : undefined}>
-        {e.error ? '—' : e.entries.length}
-      </span>
-    </div>
-  );
-}
-
-/** Why the palette could not be read, or where it came from. */
-function PaletteNotes({ e }: { e: PaletteEntry }) {
-  return (
-    <div className="col grow libnotes" style={{ gap: 'var(--space-2)', paddingLeft: 'var(--space-5)', paddingRight: 'var(--space-4)' }}>
-      {e.error
-        ? <span className="warnline">{e.error}</span>
-        : <span className="libnote" title={(e.sources ?? [e.file ?? '']).join('\n')}>
-            {e.sources ? e.sources.join(', ') : e.file}
-          </span>}
-    </div>
-  );
-}
-
-function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
-  e: PaletteEntry;
-  odd: boolean;
-  here: string;
-  where: 'layer' | 'master';
+  deleting: boolean;
   onRecall(entries: string[], name: string): void;
-  onCopy(e: PaletteEntry): void;
   onDrop(e: PaletteEntry): void;
 }) {
-  const on = !e.error && e.entries.length > 0 && paletteId(e.entries) === here;
+  const kept = e.entries.slice(0, LIMITS().PALETTE);
+  const broken = !!e.error || !kept.length;
   return (
-  <div className="mrow librow palrow"
-       data-odd={odd || undefined}
-       onDoubleClick={() => !e.error && onRecall(e.entries, e.name)}>
-    <div style={{ width: 186, paddingRight: 'var(--space-4)' }}>
-      <div className="palstrip"
-           style={{ background: `linear-gradient(90deg, ${gradientOf(e.entries)})` }} />
-    </div>
-
-    <PaletteName e={e} on={on} where={where} />
-    <PaletteCount e={e} />
-
-    <PaletteNotes e={e} />
-
-    <div className="row libacts" style={{ width: 128, justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
-      <button className="pill" disabled={!!e.error || !e.entries.length}
-              onClick={() => onRecall(e.entries, e.name)}>RECALL</button>
-      <button title="Copy the entries as JSON" onClick={() => onCopy(e)}><Icon.Copy /></button>
-      {e.file
-        ? <button title="Delete from the disk" onClick={() => onDrop(e)}><Icon.X /></button>
-        // Not a disabled delete: a derived or shipped palette has no file to delete.
-        : <span style={{ width: 9 }} title={e.sources && 'lifted from a patch — save it to keep it'} />}
-    </div>
-  </div>
+    <button
+      className="paltile"
+      disabled={broken && !deleting}
+      aria-label={deleting ? `Delete ${e.name}` : e.name}
+      onClick={() => (deleting ? onDrop(e) : onRecall(e.entries, e.name))}
+    >
+      <ColourFill className="palstrip" paint={broken ? undefined : `linear-gradient(90deg, ${gradientOf(kept)})`} />
+      <span className="palname">
+        <Picked isOn={on}>{e.name}</Picked>
+        {deleting && <Icon.X c="currentColor" />}
+      </span>
+      {e.error && <span className="palnote">Could not read these colours.</span>}
+    </button>
   );
 }
