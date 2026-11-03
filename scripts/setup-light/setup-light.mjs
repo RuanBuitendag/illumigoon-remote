@@ -1,11 +1,16 @@
 // `npm run setup-light`: finds each light that has no Wi-Fi, tests it, gives it the home Wi-Fi, then tests it there.
-// The password for the home Wi-Fi is typed at the prompt and is not stored. `--list` only shows what the laptop sees.
+// The password for the home Wi-Fi is asked once and kept in PASSWORD_FILE, which later runs read without asking.
+// `--list` only shows what the laptop sees.
 // `--address <host:port>` skips the laptop's Wi-Fi and uses a simulated light at that address.
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { createInterface } from 'node:readline';
 import { connect, flash, send, watch } from './light.mjs';
 import { currentWifi, lightNetworks, onLightWifi, scanForLightNetworks, sleep } from './wifi.mjs';
 
 const LIGHT_ADDRESS = '192.168.4.1';
+const PASSWORD_FILE = join(homedir(), '.illumigoon', 'home-wifi-password');
 const HOME_SUBNET = '192.168.0';
 const SCAN_BATCH = 40;
 const SEND_FLUSH_MS = 1000;
@@ -157,6 +162,14 @@ async function setUp(network, home, details) {
   return { ...light, problem };
 }
 
+async function homePassword() {
+  if (existsSync(PASSWORD_FILE)) return readFileSync(PASSWORD_FILE, 'utf8').trim();
+  const typed = await promptHidden('Home Wi-Fi password, asked once and then kept');
+  mkdirSync(dirname(PASSWORD_FILE), { recursive: true });
+  writeFileSync(PASSWORD_FILE, typed);
+  return typed;
+}
+
 async function main() {
   const home = simulated ? { name: 'Simulated Wi-Fi' } : currentWifi();
   console.log(`The laptop is on ${home.name}, ${home.band ?? 'unknown band'}.`);
@@ -171,7 +184,7 @@ async function main() {
   }
   console.log(`Found ${networks.join(', ')}.`);
   const wifiName = await prompt('Home Wi-Fi name, it must be 2.4 GHz', home.name);
-  const wifiPassword = await promptHidden('Home Wi-Fi password');
+  const wifiPassword = await homePassword();
   let room = '';
   const results = [];
   for (const network of networks) {
