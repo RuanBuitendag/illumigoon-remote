@@ -142,8 +142,11 @@ export const cornerOwner = [
       const before = lights['10.0.0.11'].received.length;
       await press(transition, 'TRY IT');
       await until(() => lights['10.0.0.11'].received.length > before, 'TRY IT to play the look again');
+      // A reload keeps the screen's address, so it opens on Transition again (LIFE-1954).
       await page.reload();
-      await openRoomSettings(page);
+      await onTop(page).getByRole('heading', { name: 'Transition', level: 1 }).waitFor();
+      await press(onTop(page), 'Lounge');
+      await press(onTop(page), 'Room settings');
       await see(onTop(page), 'Wipe, 10.0 s');
     },
   },

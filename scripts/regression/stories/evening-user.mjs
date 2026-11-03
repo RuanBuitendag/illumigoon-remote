@@ -119,8 +119,9 @@ export const eveningUser = [
       await name.fill('Test fast candle');
       await press(onTop(page), 'KEEP');
       await see(onTop(page), 'Test fast candle');
+      // A reload keeps the screen's address, so the Lounge opens again (LIFE-1954).
       await page.reload();
-      await openLounge(page);
+      await onTop(page).getByRole('heading', { name: 'Lounge', level: 1 }).waitFor();
       await onTop(page).getByText('Test fast candle').first().waitFor();
       await press(onTop(page), 'LOOKS');
       await onTop(page).getByRole('button', { name: /^Test fast candle.*PLAYING/ }).waitFor();
