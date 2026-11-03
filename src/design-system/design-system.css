@@ -52,6 +52,8 @@
   --space-5: 24px;
   --space-6: 32px;
   --space-7: 64px;
+  /* Half a step, for the inside of a small chip: a badge's padding, a mark beside its word. */
+  --space-half: 2px;
   --section: var(--space-6);
   --gutter: var(--space-5);
   --edge: calc(-1 * var(--gutter));
@@ -60,6 +62,10 @@
   --half-column: 360px;
   --row: 44px;
   --row-tall: 56px;
+  /* A rack tile in Edit that carries a dial: the floor that keeps a rack of them level. */
+  --rack-tile-dial: 132px;
+  /* The smallest press target for a mouse or trackpad (WCAG 2.2 target size). A thumb takes --row. */
+  --pointer-target: 24px;
   --pad-height: 220px;
   --palette-width: 148px;
   --radius: 2px;
@@ -75,6 +81,16 @@
   --layer-cover: 4;
   --layer-float: 5;
   --layer-over-editor: 200;
+  /* Edit's own stacking, inside the Edit page, lowest first: the strip over the canvas, the dock and
+     the exposed pip, the dim behind a dialog, a dragged tile, the catcher under a popup, the popup,
+     the toast. The app's sheets over Edit sit at --layer-over-editor, beside the dragged tile. */
+  --layer-editor-strip: 1;
+  --layer-editor-raised: 2;
+  --layer-editor-overlay: 150;
+  --layer-editor-drag: 200;
+  --layer-editor-catcher: 240;
+  --layer-editor-popup: 250;
+  --layer-editor-toast: 300;
   /* Motion (D36). Press for a touch, settle for a control that changes state, push for a screen,
      glow for the slow light colour on a fader. */
   --ease-out: ease-out;
@@ -84,6 +100,8 @@
   --duration-glow: 900ms;
   --opacity-disabled: 0.4;
   --opacity-behind: 0.3;
+  /* A mark a step under the word it qualifies: a unit beside its value, a sign beside its source. */
+  --opacity-quiet: 0.7;
   /* The laptop width. A media query cannot read a custom property, so scripts/lint/rules.mjs
      checks every @media width against this one, and screen-stack.tsx reads WIDE from layout.ts. */
   --wide: 900px;
