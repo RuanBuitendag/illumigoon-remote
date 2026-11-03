@@ -10,10 +10,10 @@ that prove they hold.
 | -- | -- |
 | Tokens | `src/design-system/design-system.css`, the `:root` block, with light values under `prefers-color-scheme: light` |
 | Fonts | `src/design-system/index.ts` imports Geist and Geist Mono from `@fontsource` |
-| Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader`, `TextField`, marks, text, colour chips and pad, LED strip |
-| Composites | `src/composites`, with `composites.css`. Primitives put together, with no data |
+| Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `TextField`, `Icon` and `IconFrame`, marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
+| Composites | `src/composites`, with `composites.css`. Primitives put together, with no data, among them `Sheet` with `SheetBody` and `Toast` |
 | The editor's look | `packages/patch-editor/src/styles.css`, and inline styles in `packages/patch-editor/src` |
-| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D43 |
+| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D50 |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
 | Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing and controls |
 
@@ -41,7 +41,8 @@ So the editor's look becomes the one look:
    layers, durations, opacities and line widths.
 2. Move the editor's recipes (washes, hairlines, labels, the chosen-item underline, tabs) into primitives in
    `src/design-system`.
-3. Move the app's screens onto those primitives, so one job has one component.
+3. Move the app's screens onto those primitives, so one job has one component. The fader, sheet, toast, swatch,
+   selected mark and icons are done, and the editor uses them too (LIFE-1950, D44 to D50).
 4. Turn on the lint for the editor's spacing and controls once the tokens exist.
 
 `decisions.md` already takes the editor's side wherever the two differ.

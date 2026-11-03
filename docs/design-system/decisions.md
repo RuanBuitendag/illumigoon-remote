@@ -53,7 +53,7 @@ Date: 2026-11-03
 See the icon table for numbers.
 
 Chosen: One master, fixed stroke.
-Why: `src/design-system/marks.tsx` and `packages/patch-editor/src/ui/bits.tsx` draw each glyph once, with one line width (`--mark-line`). The two sets become one.
+Why: `src/design-system/icons.tsx` draws each glyph once, in `IconFrame`, with one fine round-capped line. It is the one set for the app and the editor (D49).
 Date: 2026-11-03
 
 ### Colour and type
@@ -614,3 +614,67 @@ Chosen: Review by eye on demand.
 Why: This is what happens now: there is no kitchen-sink page and no baseline. The owner rule keeps screenshots out of every gate.
 Date: 2026-11-03
 
+### One component per job (LIFE-1950)
+
+The audit (CM-2, CM-4, BR-8) found six jobs done twice, once in the app and once in the editor. Each now has one
+component in `src/design-system` or `src/composites`, with the editor's look, and both sides use it.
+
+**D44. One fader**
+
+Chosen: `Fader` in `src/design-system/fader.tsx`, on the Base UI slider. A fine track and its fill, with no ticks and no
+thumb drawn. It carries the editor's marks as `FaderBand` and `FaderDot`, and its halo as `halo`: armed, hot or driven.
+A gradient bar still draws its thumb, as it has no fill.
+Why: the editor's bar was the look to keep. Base UI gives the editor's bars the keyboard, which they lacked. The
+editor's `ui/Fader.tsx` now only turns a parameter into a 0 to 1 position along its taper. A press sets the value
+where it lands, so the editor's drag from where the value was, and shift for fine steps, are gone.
+Date: 2026-11-04
+
+**D45. One sheet**
+
+Chosen: `Sheet` in `src/composites/sheet.tsx`, on `Dialog` in `src/design-system/dialog.tsx`, which wraps the Base UI
+dialog. A head with the name and the way out (its own keys, or a cross), over `SheetBody`. A form is
+`--dialog-width` wide and a table `--dialog-wide`; on the phone a sheet is the whole screen.
+Why: the editor's dialog on a scrim was the look to keep. Base UI moves the focus in, keeps Tab inside and gives the
+focus back on close (story K-2). The dialog stays where it is rendered, so it keeps the styles and stacking of the
+screen that opened it.
+Date: 2026-11-04
+
+**D46. One toast**
+
+Chosen: `Toast` in `src/composites/toast.tsx`: paper text on an ink bar, at the foot of the screen, one at a time
+(D20). In the editor it sits over the dock.
+Why: the editor's toast was the look to keep. The app's undo notice moved onto it, with SAVE and UNDO as its keys.
+Date: 2026-11-04
+
+**D47. One swatch**
+
+Chosen: `Swatch` in `src/design-system/colour-chips.tsx`: a box painted one colour, with a fine edge. Given `onPick`,
+it is a key that opens the system colour picker. Its size comes from where it sits.
+Why: the two were nearly the same. The editor's system picker drew its own grey frame, which is gone, so a swatch
+looks the same in both.
+Date: 2026-11-04
+
+**D48. One selected mark**
+
+Chosen: `Picked` in `src/design-system/text.tsx`. Under a choice, bright text with a line `--mark-gap` under it; a row
+of tabs moves the line down onto the tab rule. Down the side of a selected row, a `--line-strong` rule.
+Why: the editor's choices, tabs and selected rows drew three marks of their own, and the app a fourth. The line now
+sits where the editor drew it.
+Date: 2026-11-04
+
+**D49. One icon set**
+
+Chosen: `Icon` and `IconFrame` in `src/design-system/icons.tsx`, the editor's glyphs. The app's chevron, grip, lock and
+cross marks are gone; the app draws its icons in `currentColor`. The editor's modulator icons stay in the editor,
+drawn in `IconFrame`.
+Why: the editor's fine round-capped line was the look to keep (D2).
+Date: 2026-11-04
+
+**D50. Where the editor takes its look from**
+
+Chosen: the editor imports the app's two look doors, `src/design-system/index.ts` and `src/composites/index.ts`, and
+no other app file. The rule `the-app-only-through-its-look-doors` in `packages/patch-editor/.dependency-cruiser.cjs`
+checks it.
+Why: one component per job needs the editor to use the app's components. Logic that only the editor needs stays in
+the editor.
+Date: 2026-11-04
