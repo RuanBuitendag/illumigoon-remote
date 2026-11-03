@@ -172,7 +172,7 @@
     },
     {
       "src": 9,
-      "dst": "L0.warp1.spread",
+      "dst": "L0.warp0.spread",
       "depth": 0.8
     },
     {
@@ -218,7 +218,7 @@
       "max": 100,
       "step": 1,
       "unit": "%",
-      "target": "L0.warp1.shift",
+      "target": "L0.warp0.shift",
       "lo": 0,
       "hi": 1,
       "default": 0
