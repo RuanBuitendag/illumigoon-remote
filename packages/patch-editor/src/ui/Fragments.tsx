@@ -20,7 +20,7 @@
  */
 
 import {
-  attempt, confirmDelete, confirmReplace, SaveBar, SaveField, SheetHead, ShelfHeading, ShelfNotice,
+  attempt, confirmDelete, confirmReplace, SaveBar, SaveField, EditorSheet, ShelfHeading, ShelfNotice,
 } from './Sheet';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -30,7 +30,7 @@ import {
 import {
   deleteFragment, fragmentFileNameFor, listFragments, listStarters, readFragment, writeFragment,
 } from '../library/fragment-store';
-import { Hr, Lab, Mono, Ico, Overlay, layerName } from './bits';
+import { Hr, Lab, Mono, Ico, layerName } from './bits';
 import type { Layer } from '../domain/patch';
 import type { Ctl } from './ctl';
 
@@ -248,65 +248,66 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   };
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="editor-sheet" onClick={e => e.stopPropagation()}>
-        <SheetHead icon={<Ico.Copy />} title="LAYER FRAGMENTS" onClose={onClose}>
-          <Mono className="dim sm sheetpath" title="Set MODULIGHT_FRAGMENTS to keep them somewhere else">
-            {root || '—'}
-          </Mono>
-        </SheetHead>
+    <EditorSheet
+      icon={<Ico.Copy />}
+      title="LAYER FRAGMENTS"
+      onClose={onClose}
+      detail={
+        <Mono className="dim sm sheetpath" title="Set MODULIGHT_FRAGMENTS to keep them somewhere else">
+          {root || '—'}
+        </Mono>
+      }
+    >
+      <FragmentSaveForm
+        ctl={ctl}
+        layer={layer}
+        rows={rows}
+        onSaved={refresh}
+        onError={setError}
+      />
+      <Hr />
 
-        <FragmentSaveForm
-          ctl={ctl}
-          layer={layer}
-          rows={rows}
-          onSaved={refresh}
-          onError={setError}
-        />
-        <Hr />
-
-        {/* ---- columns ---- */}
-        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
-          <div style={{ width: 210 }}>
-            <Lab className="dim">NAME</Lab>
-          </div>
-          <div className="grow">
-            <Lab className="dim">NOTES</Lab>
-          </div>
-          <div style={{ width: 92, textAlign: 'right' }}>
-            <Lab className="dim">RACK</Lab>
-          </div>
-          <div style={{ width: 108, textAlign: 'right' }}>
-            <Lab className="dim">SAVED</Lab>
-          </div>
-          <div style={{ width: 122 }} />
+      {/* ---- columns ---- */}
+      <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
+        <div style={{ width: 210 }}>
+          <Lab className="dim">NAME</Lab>
         </div>
-        <Hr />
-
-        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
-          <FragmentNotices busy={busy} isEmpty={rows.length === 0} hasStarters={starters.length > 0}
-                           error={error} starterError={starterError} />
-
-          {sections.map(({ key, label, group, list }) => (
-            <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
-              <ShelfHeading label={label} emphasis={!!group} count={list.length} />
-
-              {list.map((e, i) => (
-                <FragmentRow
-                  key={`${key}/${e.file}`}
-                  ctl={ctl}
-                  e={e}
-                  odd={i % 2 === 1}
-                  onPull={pull}
-                  onDrop={drop}
-                />
-              ))}
-            </div>
-          ))}
-          <div style={{ height: 14 }} />
+        <div className="grow">
+          <Lab className="dim">NOTES</Lab>
         </div>
+        <div style={{ width: 92, textAlign: 'right' }}>
+          <Lab className="dim">RACK</Lab>
+        </div>
+        <div style={{ width: 108, textAlign: 'right' }}>
+          <Lab className="dim">SAVED</Lab>
+        </div>
+        <div style={{ width: 122 }} />
       </div>
-    </Overlay>
+      <Hr />
+
+      <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
+        <FragmentNotices busy={busy} isEmpty={rows.length === 0} hasStarters={starters.length > 0}
+                         error={error} starterError={starterError} />
+
+        {sections.map(({ key, label, group, list }) => (
+          <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
+            <ShelfHeading label={label} emphasis={!!group} count={list.length} />
+
+            {list.map((e, i) => (
+              <FragmentRow
+                key={`${key}/${e.file}`}
+                ctl={ctl}
+                e={e}
+                odd={i % 2 === 1}
+                onPull={pull}
+                onDrop={drop}
+              />
+            ))}
+          </div>
+        ))}
+        <div style={{ height: 14 }} />
+      </div>
+    </EditorSheet>
   );
 }
 

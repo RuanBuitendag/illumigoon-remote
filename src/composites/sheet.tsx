@@ -1,44 +1,47 @@
-import { type ReactNode, useEffect } from 'react';
-import { Eyebrow } from '../design-system';
+import type { ReactNode } from 'react';
+import { CrossMark, Dialog, Eyebrow, Press } from '../design-system';
 
 type SheetProps = {
+  // Names the sheet in its head, and to a screen reader.
   label: string;
-  title: ReactNode;
-  actions: ReactNode;
-  // Stays in view while the rest of the sheet scrolls.
-  pinned?: ReactNode;
+  icon?: ReactNode;
+  // What the head says beside the name: a count, a folder.
+  detail?: ReactNode;
+  // The sheet's own keys, such as CANCEL and SAVE. A sheet without them closes with a cross.
+  actions?: ReactNode;
+  // Room for a table. Without it the sheet is the width of a form.
+  isWide?: boolean;
   children: ReactNode;
-  // What the quiet way out does: CANCEL or CLOSE. Escape does the same.
+  // What the quiet way out does. Escape and a press outside the sheet do the same.
   onClose: () => void;
 };
 
-// Escape is the change of mind on a keyboard, the same as the sheet's own way out.
-function useEscape(onClose: () => void) {
-  useEffect(() => {
-    const close = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape' || event.defaultPrevented) return;
-      event.preventDefault();
-      onClose();
-    };
-    window.addEventListener('keydown', close);
-    return () => window.removeEventListener('keydown', close);
-  }, [onClose]);
-}
-
-export function Sheet({ label, title, actions, pinned, children, onClose }: SheetProps) {
-  useEscape(onClose);
+// The one sheet, in the app and in Edit: a head with the name and the way out, over what the sheet holds.
+export function Sheet({ label, icon, detail, actions, isWide, children, onClose }: SheetProps) {
   return (
-    <section className="sheet" role="dialog" aria-label={label}>
-      <div className="sheet-pinned">
-        <div className="sheet-heading">
-          <h2 className="sheet-title">{title}</h2>
-          {actions}
+    <Dialog label={label} isWide={isWide} onClose={onClose}>
+      <div className="sheet-head">
+        <div className="sheet-name">
+          {icon}
+          <h2 className="sheet-title">{label}</h2>
         </div>
-        {pinned}
+        <div className="sheet-keys">
+          {detail}
+          {actions ?? (
+            <Press className="sheet-close" label="Close" onClick={onClose}>
+              <CrossMark />
+            </Press>
+          )}
+        </div>
       </div>
       {children}
-    </section>
+    </Dialog>
   );
+}
+
+// The part of a sheet that scrolls, with the sheet's margins: a form, a question, a list of choices.
+export function SheetBody({ children }: { children: ReactNode }) {
+  return <div className="sheet-body">{children}</div>;
 }
 
 export function SheetFooter({ children }: { children: ReactNode }) {

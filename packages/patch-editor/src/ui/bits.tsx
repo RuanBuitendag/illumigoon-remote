@@ -1,11 +1,9 @@
 /** Shared primitives: the bloom filter every accent stroke uses, icons, small controls. */
 
-import { useEffect, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
-import { suspend } from './live';
 import { useRowDrag } from './useRowDrag';
-import { useLatest } from './useLatest';
 
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
@@ -97,30 +95,6 @@ export const Blurb = ({ children, className = '', title }: TextProps) => (
 
 export const Hr = () => <div className="hr" />;
 export const Vr = () => <div className="vr" />;
-
-/**
- * The scrim every sheet sits on, and the one place the frame loop is held.
- *
- * All four sheets had written this div themselves, which meant four copies of the
- * click-outside-to-close rule and nowhere to put anything that is true of a sheet in
- * general. Holding `live`'s loop is the first such thing: a sheet covers the editor, so
- * the dots and bars behind it are animating a picture nobody can see, under a
- * full-viewport `backdrop-filter` that re-blurs the window every time they move.
- *
- * Mounting the overlay and holding the loop are the same statement, so a sheet added
- * later cannot render the scrim and forget the hold.
- */
-export function Overlay({ onClose, children }: { onClose(): void; children: ReactNode }) {
-  useEffect(() => suspend(), []);
-  // Escape closes it, as a click outside it does.
-  const close = useLatest(onClose);
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close.current(); };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [close]);
-  return <div className="editor-overlay" onClick={onClose}>{children}</div>;
-}
 
 export function Seg<T extends string>({ items, value, onChange, tight, labels }: {
   items: readonly T[];

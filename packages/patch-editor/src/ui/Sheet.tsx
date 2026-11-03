@@ -1,11 +1,13 @@
 /**
- * What the shelf sheets share: the head, the save bar, the group heading, and how a write that
+ * What the shelf sheets share: the sheet, the save bar, the group heading, and how a write that
  * failed or a file about to go is put to the person.
  */
 
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
+import { Sheet } from '../../../../src/composites';
 import { ask } from '../host';
-import { Ico, Lab, Mono } from './bits';
+import { Lab, Mono } from './bits';
+import { suspend } from './live';
 
 /** Run a write, and hand what went wrong to the sheet's own error line. */
 export async function attempt(work: () => Promise<void>, onError: (message: string) => void) {
@@ -27,23 +29,26 @@ export const confirmDelete = (name: string, root: string, file: string) =>
 export const confirmReplace = async (clash: { name: string } | undefined, file: string) =>
   !clash || ask(`${clash.name} already exists at ${file}.\n\nReplace it?`);
 
-export function SheetHead({ icon, title, onClose, children }: {
+/**
+ * One of Edit's shelves, on the app's one sheet (LIFE-1950), and the one place the frame loop is held.
+ *
+ * A sheet covers the editor, so the dots and bars behind it would animate a picture nobody can see.
+ * Mounting the sheet and holding the loop are the same statement, so a sheet added later cannot
+ * forget the hold.
+ */
+export function EditorSheet({ icon, title, detail, onClose, children }: {
   icon: ReactNode;
   title: string;
+  /** What the head says beside the name: a count, a folder. */
+  detail: ReactNode;
   onClose(): void;
   children: ReactNode;
 }) {
+  useEffect(() => suspend(), []);
   return (
-    <div className="sheethead">
-      <div className="row" style={{ gap: 'var(--space-3)' }}>
-        {icon}
-        <span style={{ font: 'var(--type-label)', letterSpacing: 'var(--tracking-label)' }}>{title}</span>
-      </div>
-      <div className="row" style={{ gap: 'var(--space-4)' }}>
-        {children}
-        <button className="sheetx" title="Close (Esc)" onClick={onClose}><Ico.X c="var(--text-4)" /></button>
-      </div>
-    </div>
+    <Sheet label={title} icon={icon} detail={detail} isWide onClose={onClose}>
+      {children}
+    </Sheet>
   );
 }
 

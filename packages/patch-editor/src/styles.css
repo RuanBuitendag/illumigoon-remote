@@ -23,8 +23,7 @@
   background: var(--background);
 }
 
-.patch-editor button { font: inherit; color: inherit; background: none; border: none; padding: 0; cursor: pointer; }
-.patch-editor input { font: inherit; color: inherit; background: none; border: none; outline: none; }
+/* Buttons and fields take the app's reset in design-system.css, so the app's keys keep their look in here. */
 
 /* ------------------------------------------------------- elevation recipes */
 
@@ -456,11 +455,6 @@
 
 /* -------------------------------------------------------------- matrix */
 
-.patch-editor .editor-overlay { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: center; justify-content: center; z-index: var(--layer-editor-overlay); }
-.patch-editor .editor-sheet { width: 940px; max-height: 84vh; display: flex; flex-direction: column; background: var(--background); border: var(--line) solid var(--track); border-radius: var(--radius); box-shadow: var(--float-shadow); overflow: hidden; }
-.patch-editor .sheethead { display: flex; align-items: center; justify-content: space-between; height: var(--row-tall); flex-shrink: 0; padding: 0 var(--space-5); border-bottom: var(--line) solid var(--track); }
-/* The press lands on the drawn ×: the cross sits in the middle of its target, not at one edge. */
-.patch-editor .sheethead .sheetx { display: inline-flex; align-items: center; justify-content: center; }
 .patch-editor .mrow { display: flex; align-items: center; height: var(--row); padding: 0 var(--space-5); border-radius: var(--radius); flex-shrink: 0; }
 .patch-editor .mrow[data-odd='true'] { background: var(--wash); }
 .patch-editor .mrow:hover { background: var(--wash-strong); }
@@ -483,10 +477,7 @@
    The house view: the house in the middle, Scenes on the right, the patch rail on the left
    (LIFE-863). Built from the same elevation ladder as the editor: the send bar is the one raised
    thing in the middle, a chosen light is `raise-hi`, everything else sits flat. */
-.patch-editor .savesheet { width: 460px; padding: var(--space-4) var(--space-5) var(--space-5); }
-.patch-editor .savesheet .panel { border: 0; }
-.patch-editor .savehead { display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-.patch-editor .savehead h2 { margin: 0; font: var(--type-title); }
+.patch-editor .sheet-body .panel { border: 0; }
 
 /* A native select, like the blend chip, so the menu is the platform's. */
 
@@ -930,15 +921,10 @@
   .patch-editor .body .grow:empty { display: none; }
   .patch-editor .tabs { flex-wrap: wrap; }
 
-  /* A sheet is the whole screen, and each row of a table wraps onto its own lines. */
-  .patch-editor .editor-overlay { padding: 0; }
-  .patch-editor .editor-sheet { width: 100% !important; height: 100dvh; max-height: 100dvh; border: 0; }
-  .patch-editor .savesheet { padding-top: max(var(--space-4), env(safe-area-inset-top)); }
-  .patch-editor .editor-sheet .sheethead { height: auto; min-height: var(--row-tall); flex-wrap: wrap; gap: var(--space-2); padding: var(--space-3) var(--space-4); }
-  .patch-editor .editor-sheet .sheethead > .row { flex-wrap: wrap; min-width: 0; }
-  .patch-editor .editor-sheet .sheetcols { display: none; }
-  .patch-editor .editor-sheet > .row { flex-wrap: wrap; height: auto !important; }
-  .patch-editor .editor-sheet input { min-width: 0; max-width: 100%; }
+  /* A sheet is the whole screen (the app's Sheet), and each row of a table wraps onto its own lines. */
+  .patch-editor .dialog .sheetcols { display: none; }
+  .patch-editor .dialog > .row { flex-wrap: wrap; height: auto !important; }
+  .patch-editor .dialog input { min-width: 0; max-width: 100%; }
   .patch-editor .mrow { height: auto; min-height: var(--row-tall); flex-wrap: wrap; gap: var(--space-1) var(--space-3); padding-top: var(--space-3); padding-bottom: var(--space-3); }
   .patch-editor .librow .libacts { opacity: 1; }
   .patch-editor .modeditor { flex-direction: column; }

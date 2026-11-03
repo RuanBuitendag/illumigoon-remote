@@ -36,3 +36,12 @@ export function GripMark() {
 export function StatusMark({ state }: { state: 'on' | 'off' | 'silent' }) {
   return <i className="status-mark" data-state={state} />;
 }
+
+// The way out of a sheet.
+export function CrossMark() {
+  return (
+    <svg className="mark" width="9" height="9" viewBox="0 0 9 9" aria-hidden="true">
+      <path d="M1 1l7 7M8 1l-7 7" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+    </svg>
+  );
+}

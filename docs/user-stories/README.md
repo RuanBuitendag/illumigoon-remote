@@ -71,7 +71,7 @@ A worker runs `--only` for the area it touched. The full `npm test` runs once pe
 | 3 | E12 | Fixed 4 Nov 2026: Escape closes the Check dialog that Clear all layers opens, as CANCEL does | P2-S6 |
 | 4 | E13 | The fragments panel shows file names, "1 mod · 2 row" and "48 h ago" | P2-S7 |
 | 5 | new | Fixed 4 Nov 2026: on the phone each CONTROLS row in Edit shows its name | P2-S8 |
-| 7 | new | An app sheet opens without the focus, so Tab still walks the screen behind it | K-2 |
+| 7 | new | Fixed 4 Nov 2026: an app sheet takes the focus, keeps Tab inside, and gives the focus back on close | K-2 |
 | 6 | new | Fixed 4 Nov 2026: Escape closes the Save scene sheet and every other app sheet, as CANCEL does | P3-S4 |
 
 ## Coverage
@@ -111,7 +111,7 @@ Status is the result of the last full run (4 Nov 2026): pass, or known fail with
 | P5-S3 a long name with an emoji | Rename and arrange | `stories/other-contexts.mjs` | pass |
 | LIFE-1953 every control is 44 px, nothing scrolls sideways, at 320, 375 and 1440 wide | every page and sheet but Edit | `stories/tap-targets.mjs` | pass |
 | K-1 open the Lounge, play Starfield and go back with the keyboard alone | Tab and Enter routes | `stories/keyboard-routes.mjs` | pass |
-| K-2 a sheet takes the focus, and Escape gives it back | sheet focus | `stories/keyboard-routes.mjs` | known fail, GAP 7 |
+| K-2 a sheet takes the focus, and Escape gives it back | sheet focus | `stories/keyboard-routes.mjs` | pass |
 | K-3 an address opens its screen, also after a reload | screen addresses | `stories/keyboard-routes.mjs` | pass |
 
 The other journeys in `journeys.mjs` (Home, room power, a light that dies, the Looks page, the level, Edit, the

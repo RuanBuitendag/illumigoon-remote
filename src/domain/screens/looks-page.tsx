@@ -54,24 +54,27 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
   };
 
   const close = () => setSheet(null);
-  if (sheet?.kind === 'paste') return <PasteLookSheet onClose={close} />;
-  if (sheet?.kind === 'rename') return <RenameLookSheet look={sheet.look} onClose={close} />;
-  if (sheet?.kind === 'which') {
-    const chosen = lights.map(({ address }) => address);
-    return <WhichLightsSheet rooms={rooms} room={room} picked={chosen} onDone={pick} onClose={close} />;
-  }
+  const chosen = lights.map(({ address }) => address);
+  // The sheet opens over the page, so the key that opened it is still there to take the focus back.
   return (
-    <PageFrame title="Looks" intro="Tap to play. Hold to try." backLabel={backLabel} onBack={closePage}>
-      <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
-      <LookLibrary
-        lights={lights}
-        query={query}
-        isEditing={isEditing}
-        onQuery={setQuery}
-        onEditing={setEditing}
-        onPaste={() => setSheet({ kind: 'paste' })}
-        onRename={(look) => setSheet({ kind: 'rename', look })}
-      />
-    </PageFrame>
+    <>
+      {sheet?.kind === 'paste' && <PasteLookSheet onClose={close} />}
+      {sheet?.kind === 'rename' && <RenameLookSheet look={sheet.look} onClose={close} />}
+      {sheet?.kind === 'which' && (
+        <WhichLightsSheet rooms={rooms} room={room} picked={chosen} onDone={pick} onClose={close} />
+      )}
+      <PageFrame title="Looks" intro="Tap to play. Hold to try." backLabel={backLabel} onBack={closePage}>
+        <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
+        <LookLibrary
+          lights={lights}
+          query={query}
+          isEditing={isEditing}
+          onQuery={setQuery}
+          onEditing={setEditing}
+          onPaste={() => setSheet({ kind: 'paste' })}
+          onRename={(look) => setSheet({ kind: 'rename', look })}
+        />
+      </PageFrame>
+    </>
   );
 }

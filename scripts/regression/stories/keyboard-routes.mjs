@@ -38,7 +38,6 @@ export const keyboardRoutes = [
   },
   {
     name: 'K-2 a sheet takes the focus, and Escape gives it back to the screen',
-    fails: 'a sheet opens without the focus, so Tab still walks the screen behind it',
     viewport: 'laptop',
     lights: LOUNGE,
     async run({ page }) {

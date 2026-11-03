@@ -15,8 +15,8 @@ import {
   type MatrixRow,
 } from '../domain/patch'
 import {
-  Hr, Lab, Mono, Ico, Overlay, Switch, pathName, slotNumber, } from './bits';
-import { SheetHead } from './Sheet';
+  Hr, Lab, Mono, Ico, Switch, pathName, slotNumber, } from './bits';
+import { EditorSheet } from './Sheet';
 import type { Ctl } from './ctl';
 import { M } from './dock';
 import { DepthDrag } from './modEditor';
@@ -32,82 +32,83 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   const inert = inertRows(ctl.patch);
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="editor-sheet" onClick={e => e.stopPropagation()}>
-        <SheetHead icon={<Ico.Link />} title="MODULATION MATRIX" onClose={onClose}>
-          <Mono>
-            {ctl.patch.matrix.length} / {LIMITS().MATRIX}
-          </Mono>
-        </SheetHead>
-
-        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
-          <div style={{ width: 52 }}>
-            <Lab className="dim">NO.</Lab>
-          </div>
-          <div style={{ width: 118 }}>
-            <Lab className="dim">FROM</Lab>
-          </div>
-          <div style={{ width: 26 }} />
-          <div style={{ width: 236 }}>
-            <Lab className="dim">MOVES</Lab>
-          </div>
-          <div style={{ width: 74, textAlign: 'right' }}>
-            <Lab className="dim">BY</Lab>
-          </div>
-          <div style={{ width: 120, textAlign: 'right' }}>
-            <Lab className="dim">GOES FROM–TO</Lab>
-          </div>
-          <div style={{ width: 54, textAlign: 'right' }}>
-            <Lab className="dim">SWING</Lab>
-          </div>
-          <div style={{ width: 46, textAlign: 'right' }}>
-            <Lab className="dim">HOW</Lab>
-          </div>
-          <div style={{ width: 58, textAlign: 'right' }}>
-            <Lab className="dim">AT ENDS</Lab>
-          </div>
-          <div className="grow" />
+    <EditorSheet
+      icon={<Ico.Link />}
+      title="MODULATION MATRIX"
+      onClose={onClose}
+      detail={
+        <Mono>
+          {ctl.patch.matrix.length} / {LIMITS().MATRIX}
+        </Mono>
+      }
+    >
+      <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
+        <div style={{ width: 52 }}>
+          <Lab className="dim">NO.</Lab>
         </div>
-        <Hr />
-
-        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
-          {ctl.patch.matrix.length === 0 && (
-            <div
-              style={{
-                padding: 'var(--space-6) var(--space-5)',
-                textAlign: 'center',
-                font: 'var(--type-small-sans)',
-                color: 'var(--text-5)',
-              }}
-            >
-              No rows yet. Drag a modulator from the bar onto any knob.
-            </div>
-          )}
-
-          {ctl.patch.matrix.map((r, i) => (
-            <MatrixLine
-              key={r.id}
-              ctl={ctl}
-              r={r}
-              i={i}
-              drop={dropped.get(r.id)}
-              note={dangling.get(r.id) ?? inert.get(r.id)}
-            />
-          ))}
+        <div style={{ width: 118 }}>
+          <Lab className="dim">FROM</Lab>
         </div>
-
+        <div style={{ width: 26 }} />
+        <div style={{ width: 236 }}>
+          <Lab className="dim">MOVES</Lab>
+        </div>
+        <div style={{ width: 74, textAlign: 'right' }}>
+          <Lab className="dim">BY</Lab>
+        </div>
+        <div style={{ width: 120, textAlign: 'right' }}>
+          <Lab className="dim">GOES FROM–TO</Lab>
+        </div>
+        <div style={{ width: 54, textAlign: 'right' }}>
+          <Lab className="dim">SWING</Lab>
+        </div>
+        <div style={{ width: 46, textAlign: 'right' }}>
+          <Lab className="dim">HOW</Lab>
+        </div>
+        <div style={{ width: 58, textAlign: 'right' }}>
+          <Lab className="dim">AT ENDS</Lab>
+        </div>
         <div className="grow" />
-        <Hr />
-        <div style={{ padding: 'var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
-          <Lab className="dim">Each row moves one setting with one source</Lab>
-          <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
-            BY is how far, in the setting’s own numbers. <M>both</M> swings it above and below
-            where it is set; <M>up</M> only above. <M>scales</M> multiplies the setting instead of
-            adding to it. At its ends a setting stops, wraps round or folds back.
-          </span>
-        </div>
       </div>
-    </Overlay>
+      <Hr />
+
+      <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
+        {ctl.patch.matrix.length === 0 && (
+          <div
+            style={{
+              padding: 'var(--space-6) var(--space-5)',
+              textAlign: 'center',
+              font: 'var(--type-small-sans)',
+              color: 'var(--text-5)',
+            }}
+          >
+            No rows yet. Drag a modulator from the bar onto any knob.
+          </div>
+        )}
+
+        {ctl.patch.matrix.map((r, i) => (
+          <MatrixLine
+            key={r.id}
+            ctl={ctl}
+            r={r}
+            i={i}
+            drop={dropped.get(r.id)}
+            note={dangling.get(r.id) ?? inert.get(r.id)}
+          />
+        ))}
+      </div>
+
+      <div className="grow" />
+      <Hr />
+      <div style={{ padding: 'var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+        <Lab className="dim">Each row moves one setting with one source</Lab>
+        <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
+          BY is how far, in the setting’s own numbers. <M>both</M> swings it above and below
+          where it is set; <M>up</M> only above. <M>scales</M> multiplies the setting instead of
+          adding to it. At its ends a setting stops, wraps round or folds back.
+        </span>
+      </div>
+    </EditorSheet>
   )
 }
 

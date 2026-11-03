@@ -1,7 +1,7 @@
 /** What stands inside the frame while a light is open, and what floats over it. */
 
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
-import { Toast } from '../../../../src/composites';
+import { Sheet, SheetBody, Toast } from '../../../../src/composites';
 import { TextKey } from '../../../../src/design-system';
 import { serialisedSize } from '../domain/patchDocument';
 import { drawable, type Ready } from '../domain/connection';
@@ -53,12 +53,8 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
   const { patch, patchName, patchNotes, patchNameRef, markSaved } = draft;
   const { setPatchName, setPatchNotes } = draft;
   return (
-    <div className="editor-overlay" onClick={onClose}>
-      <div className="editor-sheet savesheet" onClick={e => e.stopPropagation()}>
-        <div className="savehead">
-          <h2>Save</h2>
-          <button className="pill" onClick={onClose}>DONE</button>
-        </div>
+    <Sheet label="Save" actions={<TextKey onClick={onClose}>DONE</TextKey>} onClose={onClose}>
+      <SheetBody>
         <SavePanel
           save={{
             patch,
@@ -77,8 +73,8 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
           say={say}
           saveNudge={saveNudge}
         />
-      </div>
-    </div>
+      </SheetBody>
+    </Sheet>
   );
 }
 

@@ -15,7 +15,7 @@
  */
 
 import {
-  attempt, confirmDelete, confirmReplace, SaveBar, SaveField, SheetHead, ShelfHeading,
+  attempt, confirmDelete, confirmReplace, SaveBar, SaveField, EditorSheet, ShelfHeading,
 } from './Sheet';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LIMITS } from '../domain/catalog';
@@ -23,7 +23,7 @@ import {
   deletePalette, gradientOf, listPalettes, paletteFileNameFor, paletteId,
   toPaletteDoc, writePalette, type PaletteEntry,
 } from '../library/palettes';
-import { Hr, Lab, Mono, Ico, Overlay, Blurb } from './bits';
+import { Hr, Lab, Mono, Ico, Blurb } from './bits';
 import type { Ctl } from './ctl';
 
 interface Section {
@@ -206,93 +206,94 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
   const groups = useMemo(() => paletteGroups(rows), [rows]);
 
   return (
-    <Overlay onClose={onClose}>
-      <div className="editor-sheet" onClick={e => e.stopPropagation()}>
-        <SheetHead icon={<Ico.Folder />} title="PALETTES" onClose={onClose}>
-          <Mono className="dim sm sheetpath" title="Set MODULIGHT_PALETTES to keep them somewhere else">
-            {root || '—'}
-          </Mono>
-        </SheetHead>
+    <EditorSheet
+      icon={<Ico.Folder />}
+      title="PALETTES"
+      onClose={onClose}
+      detail={
+        <Mono className="dim sm sheetpath" title="Set MODULIGHT_PALETTES to keep them somewhere else">
+          {root || '—'}
+        </Mono>
+      }
+    >
+      <PaletteSaveForm
+        ctl={ctl}
+        entries={entries}
+        wrap={wrap}
+        rows={rows}
+        onSaved={refresh}
+        onError={setError}
+      />
+      <Hr />
 
-        <PaletteSaveForm
-          ctl={ctl}
-          entries={entries}
-          wrap={wrap}
-          rows={rows}
-          onSaved={refresh}
-          onError={setError}
-        />
-        <Hr />
-
-        {/* ---- columns ---- */}
-        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
-          <div style={{ width: 186 }}>
-            <Lab className="dim">PALETTE</Lab>
-          </div>
-          <div style={{ width: 206 }}>
-            <Lab className="dim">NAME</Lab>
-          </div>
-          <div style={{ width: 62, textAlign: 'right' }}>
-            <Lab className="dim">STOPS</Lab>
-          </div>
-          <div className="grow" style={{ paddingLeft: 'var(--space-5)' }}>
-            <Lab className="dim">WHERE</Lab>
-          </div>
-          <div style={{ width: 128 }} />
+      {/* ---- columns ---- */}
+      <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
+        <div style={{ width: 186 }}>
+          <Lab className="dim">PALETTE</Lab>
         </div>
-        <Hr />
-
-        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
-          {busy && rows.length === 0 && <div className="libempty">Reading the folder…</div>}
-
-          {!busy && !error && rows.length === 0 && (
-            <div className="libempty">
-              No palettes yet, and nothing to lift out of a patch.
-              <br />
-              Mix one in the colour panel, name it above, and press SAVE.
-            </div>
-          )}
-
-          {groups.map(({ key, label, group, derived, list }) => (
-            <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
-              <ShelfHeading label={label} emphasis={!!group || !!derived} count={list.length} />
-
-              {list.map((e, i) => (
-                <PaletteRow
-                  key={`${key}/${e.file ?? e.name}/${i}`}
-                  e={e}
-                  odd={i % 2 === 1}
-                  here={here}
-                  where={where}
-                  onRecall={onRecall}
-                  onCopy={copy}
-                  onDrop={drop}
-                />
-              ))}
-            </div>
-          ))}
+        <div style={{ width: 206 }}>
+          <Lab className="dim">NAME</Lab>
         </div>
-
-        <div className="grow" />
-        <Hr />
-
-        <div className="row" style={{ padding: 'var(--space-4) var(--space-5)', gap: 'var(--space-4)', flexShrink: 0 }}>
-          {error ? (
-            <div className="row" style={{ gap: 'var(--space-2)' }}>
-              <span className="livedot" data-warn="true" />
-              <span className="warnline">{error}</span>
-            </div>
-          ) : (
-            <Blurb>
-              RECALL replaces the colours on{' '}
-              {where === 'master' ? 'every layer' : 'the selected layer'} and sends the patch. Rows
-              under <span style={{ fontFamily: 'var(--mono)' }}>in patches</span> are derived every
-              time this opens — save one to keep it.
-            </Blurb>
-          )}
+        <div style={{ width: 62, textAlign: 'right' }}>
+          <Lab className="dim">STOPS</Lab>
         </div>
+        <div className="grow" style={{ paddingLeft: 'var(--space-5)' }}>
+          <Lab className="dim">WHERE</Lab>
+        </div>
+        <div style={{ width: 128 }} />
       </div>
-    </Overlay>
+      <Hr />
+
+      <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
+        {busy && rows.length === 0 && <div className="libempty">Reading the folder…</div>}
+
+        {!busy && !error && rows.length === 0 && (
+          <div className="libempty">
+            No palettes yet, and nothing to lift out of a patch.
+            <br />
+            Mix one in the colour panel, name it above, and press SAVE.
+          </div>
+        )}
+
+        {groups.map(({ key, label, group, derived, list }) => (
+          <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
+            <ShelfHeading label={label} emphasis={!!group || !!derived} count={list.length} />
+
+            {list.map((e, i) => (
+              <PaletteRow
+                key={`${key}/${e.file ?? e.name}/${i}`}
+                e={e}
+                odd={i % 2 === 1}
+                here={here}
+                where={where}
+                onRecall={onRecall}
+                onCopy={copy}
+                onDrop={drop}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="grow" />
+      <Hr />
+
+      <div className="row" style={{ padding: 'var(--space-4) var(--space-5)', gap: 'var(--space-4)', flexShrink: 0 }}>
+        {error ? (
+          <div className="row" style={{ gap: 'var(--space-2)' }}>
+            <span className="livedot" data-warn="true" />
+            <span className="warnline">{error}</span>
+          </div>
+        ) : (
+          <Blurb>
+            RECALL replaces the colours on{' '}
+            {where === 'master' ? 'every layer' : 'the selected layer'} and sends the patch. Rows
+            under <span style={{ fontFamily: 'var(--mono)' }}>in patches</span> are derived every
+            time this opens — save one to keep it.
+          </Blurb>
+        )}
+      </div>
+    </EditorSheet>
   );
 }
 
