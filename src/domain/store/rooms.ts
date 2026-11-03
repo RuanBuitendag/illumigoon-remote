@@ -94,11 +94,10 @@ export const patchLights = (lights: Light[]) => lights.filter(playsPatches);
 
 export const ALL_LIGHTS = 'all';
 
-// With nothing chosen, lights that show different looks start on the first one, so its settings are open.
+// With nothing chosen, every light that can be changed is in scope, so lights with different looks read as Mixed.
 export function lightsInScope({ writableLights }: Room, scopeAddress: string | null) {
   const scoped = writableLights.filter(({ address }) => address === scopeAddress);
-  if (scoped.length > 0) return scoped;
-  return scopeAddress === null && isMixedLook(writableLights) ? writableLights.slice(0, 1) : writableLights;
+  return scoped.length > 0 ? scoped : writableLights;
 }
 
 // A patch brings its controls in its document, and `default` is the current position of each one.
@@ -197,12 +196,20 @@ export function lookNameOf(light: Light | undefined) {
   const animation = light?.animation;
   if (!animation) return null;
   const same = namesOfSame(animation);
-  const applied = light.appliedLook?.shape === lookShape(animation) ? light.appliedLook.name : undefined;
-  if (applied && (same.length === 0 || same.includes(applied))) return applied;
-  if (same[0]) return same[0];
-  if (animation.type === 'patch') return patchName(animation);
-  return light.manifests.find(({ id }) => id === animation.type)?.name ?? typeName(animation.type);
+  return appliedName(light, animation, same) ?? same[0] ?? ownName(light, animation);
 }
+
+// The name given on this phone, while the light plays that look and no saved look says otherwise.
+function appliedName(light: Light, animation: AnimationState, same: string[]) {
+  const { appliedLook } = light;
+  if (appliedLook?.shape !== lookShape(animation)) return undefined;
+  return same.length === 0 || same.includes(appliedLook.name) ? appliedLook.name : undefined;
+}
+
+const ownName = (light: Light, animation: AnimationState) =>
+  animation.type === 'patch'
+    ? patchName(animation)
+    : (light.manifests.find(({ id }) => id === animation.type)?.name ?? typeName(animation.type));
 
 // The look the lights play, by name, so lights that differ only in their positions still have one.
 // Lights that are off count only when none is on.

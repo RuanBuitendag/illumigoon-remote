@@ -1,5 +1,5 @@
 import type { EditorSection } from '@illumigoon/patch-editor';
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { lazy, type ReactNode, Suspense, useEffect, useState } from 'react';
 import { EditLayout } from '../../composites';
 import { APP_IDENTITY } from '../light-network/app-identity';
 import type { AnimationState } from '../light-network/protocol';
@@ -37,8 +37,8 @@ function titleOf(lookName: string, lightName: string | undefined, isOneLight: bo
 }
 
 // Edit plays on one light, and the others in scope take the look when the person leaves.
-function whereOf(lightName: string | undefined, room: Room | undefined, lights: Light[]) {
-  if (!lightName || !room) return undefined;
+function whereOf(lightName: string | undefined, room: Room | undefined, lights: Light[], isOneLight: boolean) {
+  if (isOneLight || !lightName || !room) return undefined;
   if (lights.length < 2) return `On ${lightName}`;
   return `On ${lightName}, then all ${lights.length} ${room.name} lights when you leave`;
 }
@@ -49,80 +49,157 @@ function noteOpened(address: string, lookName: string, look: AnimationState) {
   if (light) noteState(light, { isOn: true, lookName: lookName || undefined, animation: look });
 }
 
-export function EditorPage({ room }: { room: Room | undefined }) {
-  const isOpen = useNavigation((navigation) => navigation.isPageOpen);
-  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  // Chosen once: the editor stays on this light whatever the fleet does while it is open.
-  const [light] = useState(() => firstLight(room, scopeAddress));
-  const [scope] = useState(scopeAddress);
-  // Lights that are off sit an edit out, so nothing has to go back on them.
-  const [playing] = useState(() =>
-    room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : [],
-  );
-  const [before] = useState(() => momentsOf(playing));
-  const [isOneLight] = useState(() => room !== undefined && lightsInScope(room, scopeAddress).length === 1);
-  const backLabel = useBackLabel(room);
-  const [lookName, setLookName] = useState(light?.lookName ?? '');
-  const [section, setSection] = useState<EditorSection>('layers');
-  const [isSaving, setSaving] = useState(false);
-  const [hasLeft, setLeft] = useState(false);
-  const { dialogs, sheet } = useEditorDialogs();
-  const heldAddress = hasLeft ? undefined : light?.address;
+type EditScope = { light: EditorLight; room: Room; scope: string | null; before: ReturnType<typeof momentsOf> };
 
+// The others in scope take the look, and UNDO stays until the person saves, undoes or changes more.
+function leaveEdit({ light, room, scope, before }: EditScope, { name, look, isSaved }: { name: string; look: AnimationState; isSaved: boolean }) {
+  const unsaved = isSaved ? undefined : { name, animation: look };
+  offerUndo({ text: 'Changes are on the light', moments: before, unsaved });
+  pauseUndo();
+  finishEdit(light.address, lightsInScope(room, scope), name, look);
+}
+
+async function askToLeave(isUnsaved: boolean, lookName: string, dialogs: ReturnType<typeof useEditorDialogs>['dialogs']) {
+  const name = lookName.trim() || 'this look';
+  if (isUnsaved && !(await dialogs.ask(`Leave without saving ${name}? The lights keep playing it.`))) return;
+  closePage();
+}
+
+// Lights that are off sit an edit out, so nothing has to go back on them.
+const litLights = (room: Room | undefined, scopeAddress: string | null) =>
+  room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : [];
+
+const isOneLightIn = (room: Room | undefined, scopeAddress: string | null) =>
+  room !== undefined && lightsInScope(room, scopeAddress).length === 1;
+
+// Chosen once: the editor stays on this light whatever the fleet does while it is open.
+function editStart(room: Room | undefined, scopeAddress: string | null) {
+  const playing = litLights(room, scopeAddress);
+  return {
+    light: firstLight(room, scopeAddress),
+    scope: scopeAddress,
+    playing,
+    before: momentsOf(playing),
+    isOneLight: isOneLightIn(room, scopeAddress),
+  };
+}
+
+// While Edit is open its own socket holds the light, and after it the home screen reads the
+// scenes and palettes again, because the editor can change them.
+function useEditorHold(heldAddress: string | undefined, isOpen: boolean) {
   useEffect(() => {
     if (!heldAddress) return undefined;
     setHeldByEditor(heldAddress, true);
     return () => setHeldByEditor(heldAddress, false);
   }, [heldAddress]);
 
-  // The editor can change scenes and palettes, so the home screen reads them again after it.
   useEffect(() => {
     if (!isOpen) void loadLibrary();
   }, [isOpen]);
+}
+
+type EditorLight = NonNullable<ReturnType<typeof firstLight>>;
+
+type EditorPaneProps = {
+  light: EditorLight;
+  isOpen: boolean;
+  section: EditorSection;
+  isSaving: boolean;
+  dialogs: ReturnType<typeof useEditorDialogs>['dialogs'];
+  onSaving: (isSaving: boolean) => void;
+  onSection: (section: EditorSection) => void;
+  onName: (name: string) => void;
+  onUnsaved: (isUnsaved: boolean) => void;
+  onLeave: (look: AnimationState | null, isSaved: boolean) => void;
+};
+
+function EditorPane({ light, onSaving, ...props }: EditorPaneProps) {
+  return (
+    <Suspense>
+      <PatchEditor
+        {...props}
+        light={light}
+        api={editorApi}
+        identity={APP_IDENTITY}
+        onSaveOpen={() => onSaving(true)}
+        onSaveClosed={() => onSaving(false)}
+        onOpened={(look) => noteOpened(light.address, light.lookName ?? '', look)}
+        onClose={closePage}
+      />
+    </Suspense>
+  );
+}
+
+type EditFrameProps = {
+  backLabel: string;
+  isOneLight: boolean;
+  lookName: string;
+  lightName: string | undefined;
+  room: Room | undefined;
+  playing: Light[];
+  section: EditorSection;
+  sheet: ReactNode;
+  children: ReactNode;
+  onSection: (section: EditorSection) => void;
+  onSave: () => void;
+  onBack: () => void;
+};
+
+// The page around the editor. With no light on there is nothing to save.
+function EditFrame({ lookName, lightName, isOneLight, room, playing, sheet, children, onSave, ...frame }: EditFrameProps) {
+  return (
+    <EditLayout
+      {...frame}
+      title={titleOf(lookName, lightName, isOneLight)}
+      where={whereOf(lightName, room, playing, isOneLight)}
+      sections={SECTIONS}
+      onSave={lightName ? onSave : undefined}
+    >
+      {children}
+      {sheet}
+    </EditLayout>
+  );
+}
+
+export function EditorPage({ room }: { room: Room | undefined }) {
+  const isOpen = useNavigation((navigation) => navigation.isPageOpen);
+  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
+  const [{ light, scope, playing, before, isOneLight }] = useState(() => editStart(room, scopeAddress));
+  const backLabel = useBackLabel(room);
+  const [lookName, setLookName] = useState(light?.lookName ?? '');
+  const [section, setSection] = useState<EditorSection>('layers');
+  const [isSaving, setSaving] = useState(false);
+  const [hasLeft, setLeft] = useState(false);
+  const { dialogs, sheet } = useEditorDialogs();
+  const [isUnsaved, setUnsaved] = useState(false);
+  useEditorHold(hasLeft ? undefined : light?.address, isOpen);
 
   const leave = (look: AnimationState | null, isSaved: boolean) => {
     setLeft(true);
-    if (!light || !look || !room) return;
-    const unsaved = isSaved ? undefined : { name: lookName, animation: look };
-    offerUndo({ text: 'Changes are on the light', moments: before, unsaved });
-    // Stays until the person saves, undoes or makes another change.
-    pauseUndo();
-    finishEdit(light.address, lightsInScope(room, scope), lookName, look);
+    if (light && look && room) leaveEdit({ light, room, scope, before }, { name: lookName, look, isSaved });
   };
 
+  // The lights keep an unsaved look, but nothing else does, so a person is asked before it goes.
+  const back = () => void askToLeave(isUnsaved, lookName, dialogs);
+
   if (hasLeft || (!light && !isOpen)) return null;
+  const frame = { backLabel, isOneLight, lookName, room, playing, section, onSection: setSection, onSave: () => setSaving(true) };
   return (
-    <EditLayout
-      backLabel={backLabel}
-      title={titleOf(lookName, light?.name, isOneLight)}
-      where={isOneLight ? undefined : whereOf(light?.name, room, playing)}
-      sections={SECTIONS}
-      section={section}
-      onSection={setSection}
-      onBack={closePage}
-      onSave={light && (() => setSaving(true))}
-    >
+    <EditFrame {...frame} lightName={light?.name} onBack={back} sheet={sheet}>
       {light && (
-        <Suspense>
-          <PatchEditor
-            light={light}
-            api={editorApi}
-            identity={APP_IDENTITY}
-            dialogs={dialogs}
-            isOpen={isOpen}
-            section={section}
-            isSaving={isSaving}
-            onSaveOpen={() => setSaving(true)}
-            onSaveClosed={() => setSaving(false)}
-            onSection={setSection}
-            onName={setLookName}
-            onOpened={(look) => noteOpened(light.address, light.lookName ?? '', look)}
-            onLeave={leave}
-            onClose={closePage}
-          />
-        </Suspense>
+        <EditorPane
+          light={light}
+          isOpen={isOpen}
+          section={section}
+          isSaving={isSaving}
+          dialogs={dialogs}
+          onSaving={setSaving}
+          onSection={setSection}
+          onName={setLookName}
+          onUnsaved={setUnsaved}
+          onLeave={leave}
+        />
       )}
-      {sheet}
-    </EditLayout>
+    </EditFrame>
   );
 }

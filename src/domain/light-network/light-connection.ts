@@ -123,33 +123,37 @@ export class LightConnection {
     this.manifestTimer = window.setTimeout(() => this.requestManifests(), MANIFEST_RETRY_MS);
   }
 
+  // What each message from the light does, once the light has said who it is.
+  private readonly handlers: Record<string, (payload: unknown) => void> = {
+    heartbeat_ws: (payload) => this.onHeartbeat(payload as Heartbeat),
+    light_state_res: (payload) => this.events.onState(payload as LightStateResponse),
+    light_manifests_res: (payload) => this.onManifests((payload as { manifests: Manifest[] }).manifests),
+    light_transitions_res: (payload) =>
+      this.events.onTransitions((payload as { transitions: Transition[] }).transitions),
+    device_config_res: (payload) => this.events.onConfig(payload as ConfigValue),
+    light_schedule_res: (payload) =>
+      this.events.onSchedule((payload as { entries?: ScheduleEntry[] }).entries ?? []),
+  };
+
   private handle(type: string, payload: unknown) {
-    if (type === 'device_info_res') {
-      const isNew = !this.hasIdentity;
-      this.hasIdentity = true;
-      this.events.onDeviceInfo(payload as DeviceInfo);
-      if (isNew) {
-        this.events.onReady();
-        this.sendUnsent();
-        this.readLight();
-      }
-    } else if (!this.hasIdentity) {
-      return;
-    } else if (type === 'heartbeat_ws') {
-      this.onHeartbeat(payload as Heartbeat);
-    } else if (type === 'light_state_res') {
-      this.events.onState(payload as LightStateResponse);
-    } else if (type === 'light_manifests_res') {
-      this.hasManifests = true;
-      window.clearTimeout(this.manifestTimer);
-      this.events.onManifests((payload as { manifests: Manifest[] }).manifests);
-    } else if (type === 'light_transitions_res') {
-      this.events.onTransitions((payload as { transitions: Transition[] }).transitions);
-    } else if (type === 'device_config_res') {
-      this.events.onConfig(payload as ConfigValue);
-    } else if (type === 'light_schedule_res') {
-      this.events.onSchedule((payload as { entries?: ScheduleEntry[] }).entries ?? []);
-    }
+    if (type === 'device_info_res') this.onDeviceInfo(payload as DeviceInfo);
+    else if (this.hasIdentity) this.handlers[type]?.(payload);
+  }
+
+  private onDeviceInfo(info: DeviceInfo) {
+    const isNew = !this.hasIdentity;
+    this.hasIdentity = true;
+    this.events.onDeviceInfo(info);
+    if (!isNew) return;
+    this.events.onReady();
+    this.sendUnsent();
+    this.readLight();
+  }
+
+  private onManifests(manifests: Manifest[]) {
+    this.hasManifests = true;
+    window.clearTimeout(this.manifestTimer);
+    this.events.onManifests(manifests);
   }
 
   private onHeartbeat(heartbeat: Heartbeat) {

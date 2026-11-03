@@ -116,10 +116,30 @@ function offNote(lights: Light[]) {
   return lights.length === 1 && first ? `${first.name} is off.` : 'These lights are off.';
 }
 
+// Level shows here only when one light of several is chosen; the room level sits at the top.
+function LookSettings({ room, lights, light }: { room: Room; lights: Light[]; light: Light }) {
+  return (
+    <RoomSection>
+      {lights.length === 1 && room.writableLights.length > 1 && (
+        <SliderRow
+          label="Level"
+          valueText={String(Math.round(light.brightness * PERCENT))}
+          value={light.brightness}
+          min={0}
+          max={1}
+          step={0.01}
+          onChange={(next) => setBrightness(lights, next)}
+        />
+      )}
+      <LookControls lights={lights} />
+    </RoomSection>
+  );
+}
+
 function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
   const shownLights = useShownLights(lights);
   const isMixed = isMixedLook(shownLights);
-  const isOn = isAnyOn(shownLights);
+  const canChange = !isMixed && isAnyOn(shownLights);
   const edited = isMixed ? undefined : editedLook(lights[0]);
   const light = lights[0];
   if (!light) return null;
@@ -130,29 +150,14 @@ function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
         <LookHeading
           name={lookTitle(shownLights)}
           onReset={edited ? reset : undefined}
-          onEdit={!isMixed && isOn ? () => openPage('editor', room.id) : undefined}
+          onEdit={canChange ? () => openPage('editor', room.id) : undefined}
           onLooks={() => openPage('looks', room.id)}
         />
         <RecentLookRow room={room} lights={lights} limit={RECENT_LOOKS} />
         {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
-        {!isMixed && !isOn && <QuietNote>{offNote(lights)}</QuietNote>}
+        {!isMixed && !canChange && <QuietNote>{offNote(lights)}</QuietNote>}
       </RoomSection>
-      {!isMixed && isOn && (
-        <RoomSection>
-          {lights.length === 1 && room.writableLights.length > 1 && (
-            <SliderRow
-              label="Level"
-              valueText={String(Math.round(light.brightness * PERCENT))}
-              value={light.brightness}
-              min={0}
-              max={1}
-              step={0.01}
-              onChange={(next) => setBrightness(lights, next)}
-            />
-          )}
-          <LookControls lights={lights} />
-        </RoomSection>
-      )}
+      {canChange && <LookSettings room={room} lights={lights} light={light} />}
     </>
   );
 }
@@ -171,14 +176,9 @@ function RoomMore({ room }: { room: Room }) {
   );
 }
 
-// Nothing is chosen until a light is tapped, so lights with different looks open as Mixed.
-function chosenLights(room: Room, scopeAddress: string | null) {
-  return scopeAddress === null ? room.writableLights : lightsInScope(room, scopeAddress);
-}
-
 export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  const chosen = chosenLights(room, scopeAddress);
+  const chosen = lightsInScope(room, scopeAddress);
   const shownLights = useShownLights(room.onlineLights);
   const { writableLights } = room;
   const isOn = isAnyOn(shownLights);

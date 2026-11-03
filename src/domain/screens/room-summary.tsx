@@ -39,13 +39,6 @@ export function RoomLockNote({ room }: { room: Room }) {
   );
 }
 
-function silentText({ lights, onlineLights }: Room) {
-  const silent = lights.filter((light) => !light.isOnline);
-  if (silent.length === 0) return null;
-  if (onlineLights.length === 0) return lights.length === 1 ? "This light isn't answering" : "These lights aren't answering";
-  return silent.length === 1 ? `${silent[0]?.name} isn't answering` : `${silent.length} lights aren't answering`;
-}
-
 function lookLabel(lights: Light[]) {
   if (isMixedLook(lights)) return 'Mixed';
   return lookNameOf(lights[0]) ?? '';
@@ -63,37 +56,49 @@ const stateOfWaiting = ({ id, name }: { id: string; name: string }): LightStateL
 
 type RoomSummaryProps = { room: Room; waitingLights: { id: string; name: string }[] };
 
+// What the card draws for the look: the first light that answers stands for the room.
+function useRoomLook(room: Room) {
+  const onlineLights = useShownLights(room.onlineLights);
+  const animation = onlineLights[0]?.animation ?? null;
+  const lookId = lookIdOf(animation);
+  return {
+    onlineLights,
+    source: previewOfAnimation(animation),
+    isOn: isAnyOn(onlineLights),
+    level: highestBrightness(onlineLights),
+    hasSound: Boolean(lookId && movesToMusic(lookId)),
+  };
+}
+
+function RoomPower({ room, isOn }: { room: Room; isOn: boolean }) {
+  const { writableLights } = room;
+  return (
+    <PowerKey
+      label={`${room.name} power`}
+      isOn={isOn}
+      disabled={writableLights.length === 0}
+      onChange={(next) => setPower(writableLights, next)}
+    />
+  );
+}
+
 // Lights that have not answered yet keep their place on the card, as lights that do not answer.
 export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
   const { writableLights } = room;
   const hasLooks = useHousehold((household) => (household.recentLooks[room.id]?.length ?? 0) > 0);
   const lightStates = [...room.lights.map(stateOfLight), ...waitingLights.map(stateOfWaiting)];
   const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
-  const onlineLights = useShownLights(room.onlineLights);
-  const first = onlineLights[0];
-  const source = previewOfAnimation(first?.animation ?? null);
-  const isOn = isAnyOn(onlineLights);
-  const level = highestBrightness(onlineLights);
-  const lookId = lookIdOf(first?.animation ?? null);
+  const { onlineLights, source, isOn, level, hasSound } = useRoomLook(room);
   return (
     <RoomCard
       name={room.name}
-      power={
-        !room.isLocked && (
-          <PowerKey
-            label={`${room.name} power`}
-            isOn={isOn}
-            disabled={writableLights.length === 0}
-            onChange={(next) => setPower(writableLights, next)}
-          />
-        )
-      }
+      power={!room.isLocked && <RoomPower room={room} isOn={isOn} />}
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
       lookName={lookLabel(onlineLights)}
-      hasSound={Boolean(lookId && movesToMusic(lookId))}
+      hasSound={hasSound}
       lightStates={lightStates}
       hasLooks={hasLooks}
-      note={silentText(room) ?? timerText(room)}
+      note={timerText(room)}
       isOpen={isOpen}
       onOpen={room.lights.length > 0 ? () => openRoom(room.id) : undefined}
       onLooks={writableLights.length > 0 ? () => openPage('looks', room.id) : undefined}

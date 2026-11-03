@@ -14,6 +14,30 @@ type SaveSceneSheetProps = {
   onClose: () => void;
 };
 
+type SceneScopeProps = {
+  rooms: Room[];
+  scope: string;
+  captured: ReturnType<typeof captureScene>;
+  isKeeping: boolean;
+  onScope: (scope: string) => void;
+};
+
+// What a new scene keeps: the whole house or one room, unless saved lights were handed in.
+function SceneScope({ rooms, scope, captured, isKeeping, onScope }: SceneScopeProps) {
+  return (
+    <>
+      {!isKeeping && (
+        <OverlayBlock label="Saves">
+          <ChoiceList choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]} value={scope} onChange={onScope} />
+        </OverlayBlock>
+      )}
+      <OverlayBlock label="What it will do">
+        <OverlayText>{sceneSummary(captured, rooms)}</OverlayText>
+      </OverlayBlock>
+    </>
+  );
+}
+
 export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: SaveSceneSheetProps) {
   const [name, setName] = useState(renaming?.name ?? '');
   const [scope, setScope] = useState(room?.id ?? WHOLE_HOUSE);
@@ -39,22 +63,7 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
       }
     >
       <TextField size="large" label="Scene name" placeholder="Name" value={name} onChange={setName} />
-      {!renaming && (
-        <>
-          {!keeping && (
-            <OverlayBlock label="Saves">
-              <ChoiceList
-                choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]}
-                value={scope}
-                onChange={setScope}
-              />
-            </OverlayBlock>
-          )}
-          <OverlayBlock label="What it will do">
-            <OverlayText>{sceneSummary(captured, rooms)}</OverlayText>
-          </OverlayBlock>
-        </>
-      )}
+      {!renaming && <SceneScope rooms={rooms} scope={scope} captured={captured} isKeeping={Boolean(keeping)} onScope={setScope} />}
     </Overlay>
   );
 }

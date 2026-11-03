@@ -89,6 +89,90 @@ function formStart(entry: ScheduleEntry | undefined) {
   };
 }
 
+// The look a light starts with: the chosen scene's, the one this entry already gives it, or none.
+function startState(light: Light, entry: ScheduleEntry, sceneChanges: Map<string, ScheduleEntry['state']> | undefined, keepsOwn: boolean) {
+  if (sceneChanges) return sceneChanges.get(light.address);
+  if (keepsOwn) return light.schedule.find(({ id }) => id === entry.id)?.state ?? entry.state;
+  return entry.state;
+}
+
+type FormTimes = { at: number; until: number; days: number; timer: number };
+
+function entryOf(kind: Kind, { at, until, days, timer }: FormTimes) {
+  if (kind === 'on') return dailyEntry(at, days, TURN_ON);
+  if (kind === 'off') return dailyEntry(at, days, TURN_OFF);
+  if (kind === 'between') return windowEntry({ at, until }, days, TURN_ON);
+  return timerEntry(timer);
+}
+
+// A changed schedule keeps its id and whether it is on.
+const keptIdentity = (entry: ScheduleEntry | undefined) => entry && { id: entry.id, enabled: entry.enabled };
+
+type WhenFieldsProps = {
+  kind: Kind;
+  at: number;
+  until: number;
+  days: number;
+  onAt: (at: number) => void;
+  onUntil: (until: number) => void;
+  onDays: (days: number) => void;
+};
+
+function WhenFields({ kind, at, until, days, onAt, onUntil, onDays }: WhenFieldsProps) {
+  const isWindow = kind === 'between';
+  return (
+    <>
+      <TimeField label={isWindow ? 'From' : 'At'} value={at} onChange={onAt} />
+      {isWindow && <TimeField label="Until" value={until} onChange={onUntil} />}
+      <DayPicker
+        days={DAYS_IN_ORDER.map(({ bit, name }) => ({ name, isOn: Boolean(days & (1 << bit)) }))}
+        onToggle={(index) => onDays(days ^ (1 << (DAYS_IN_ORDER[index]?.bit ?? 0)))}
+      />
+    </>
+  );
+}
+
+// A schedule that turns the lights on can start the chosen scene, or keep the look it gives now.
+function sceneStartFor(kind: Kind, sceneId: string, changes: ReturnType<typeof useSceneChoices>['changes']) {
+  const startsLight = kind === 'on' || kind === 'between';
+  return {
+    sceneChanges: startsLight ? changes.get(sceneId) : undefined,
+    keepsOwn: startsLight && sceneId === SAME_AS_NOW,
+  };
+}
+
+// One entry id across the room, with the state each light takes in the scene.
+function saveSchedule(lights: Light[], entry: ScheduleEntry, start: ReturnType<typeof sceneStartFor>) {
+  for (const light of lights) {
+    const state = startState(light, entry, start.sceneChanges, start.keepsOwn);
+    if (state) writeSchedule([light], { ...entry, state });
+  }
+}
+
+type KindFieldsProps = Omit<WhenFieldsProps, 'kind'> & {
+  kind: Kind;
+  timer: number;
+  sceneId: string;
+  sceneOptions: { value: string; name: string }[];
+  canChooseScene: boolean;
+  onTimer: (timer: number) => void;
+  onScene: (sceneId: string) => void;
+};
+
+function KindFields({ timer, sceneId, sceneOptions, canChooseScene, onTimer, onScene, ...when }: KindFieldsProps) {
+  if (when.kind === 'timer') {
+    return <SelectRow label="Turn off after" options={TIMERS} value={timer} onChange={onTimer} />;
+  }
+  return (
+    <>
+      {when.kind !== 'off' && canChooseScene && (
+        <SelectRow label="Shows" options={sceneOptions} value={sceneId} onChange={onScene} />
+      )}
+      <WhenFields {...when} />
+    </>
+  );
+}
+
 function ScheduleForm({ room, changing, onDone }: ScheduleFormProps) {
   const entryNow = changing?.entry;
   const start = formStart(entryNow);
@@ -102,31 +186,10 @@ function ScheduleForm({ room, changing, onDone }: ScheduleFormProps) {
   const sameAsNow = { value: SAME_AS_NOW, name: changing?.title ?? '' };
   const sceneOptions = start.startsLook ? [sameAsNow, ...options] : options;
   const lights = room.writableLights.filter((light) => light.canSchedule);
-  const startsLight = kind === 'on' || kind === 'between';
-  const sceneChanges = startsLight ? changes.get(sceneId) : undefined;
 
-  const entries = {
-    on: () => dailyEntry(at, days, TURN_ON),
-    off: () => dailyEntry(at, days, TURN_OFF),
-    between: () => windowEntry({ at, until }, days, TURN_ON),
-    timer: () => timerEntry(timer),
-  };
-
-  const stateOf = (light: Light, entry: ScheduleEntry) => {
-    if (sceneChanges) return sceneChanges.get(light.address);
-    if (startsLight && sceneId === SAME_AS_NOW) {
-      return light.schedule.find(({ id }) => id === entry.id)?.state ?? entry.state;
-    }
-    return entry.state;
-  };
-
-  // One entry id across the room, with the state each light takes in the scene.
   const save = () => {
-    const entry = { ...entries[kind](), ...(entryNow && { id: entryNow.id, enabled: entryNow.enabled }) };
-    for (const light of lights) {
-      const state = stateOf(light, entry);
-      if (state) writeSchedule([light], { ...entry, state });
-    }
+    const entry = { ...entryOf(kind, { at, until, days, timer }), ...keptIdentity(entryNow) };
+    saveSchedule(lights, entry, sceneStartFor(kind, sceneId, changes));
     onDone();
   };
 
@@ -134,21 +197,21 @@ function ScheduleForm({ room, changing, onDone }: ScheduleFormProps) {
     <PageSection>
       <Eyebrow>{changing ? 'CHANGE SCHEDULE' : 'NEW SCHEDULE'}</Eyebrow>
       <SelectRow label="What" options={KINDS} value={kind} onChange={setKind} />
-      {kind === 'timer' ? (
-        <SelectRow label="Turn off after" options={TIMERS} value={timer} onChange={setTimer} />
-      ) : (
-        <>
-          {kind !== 'off' && options.length > 1 && (
-            <SelectRow label="Shows" options={sceneOptions} value={sceneId} onChange={setSceneId} />
-          )}
-          <TimeField label={kind === 'between' ? 'From' : 'At'} value={at} onChange={setAt} />
-          {kind === 'between' && <TimeField label="Until" value={until} onChange={setUntil} />}
-          <DayPicker
-            days={DAYS_IN_ORDER.map(({ bit, name }) => ({ name, isOn: Boolean(days & (1 << bit)) }))}
-            onToggle={(index) => setDays(days ^ (1 << (DAYS_IN_ORDER[index]?.bit ?? 0)))}
-          />
-        </>
-      )}
+      <KindFields
+        kind={kind}
+        at={at}
+        until={until}
+        days={days}
+        timer={timer}
+        sceneId={sceneId}
+        sceneOptions={sceneOptions}
+        canChooseScene={options.length > 1}
+        onAt={setAt}
+        onUntil={setUntil}
+        onDays={setDays}
+        onTimer={setTimer}
+        onScene={setSceneId}
+      />
       <ActionKey disabled={lights.length === 0 || (kind !== 'timer' && days === 0)} onClick={save}>
         Save
       </ActionKey>
