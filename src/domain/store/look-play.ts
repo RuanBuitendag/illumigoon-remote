@@ -1,4 +1,8 @@
 import type { AnimationState } from '../light-network/protocol';
+import { NEW_LOOK } from '../looks/looks';
+import { openPage, setScope } from './navigation-store';
+
+const NEW_LOOK_NAME = 'New look';
 import { applyLook, noteLook, setPower, type Light } from './fleet-store';
 import { rememberRecentLook } from './household-store';
 import { cancelWaiting, gapOf, laterOn } from './light-timing';
@@ -10,6 +14,18 @@ function wakeThenPlay(light: Light, name: string, animation: AnimationState) {
   setPower([light], true);
   noteLook(light.address, name, animation);
   laterOn(light.address, gapOf(light), () => applyLook([light], name, animation));
+}
+
+// A new look starts on the lights from the starter, and the editor opens on the room of the first
+// light that answers. Only lights that are on and online can be edited, so the rest only play it.
+export function startNewLook(lights: Light[]) {
+  const editable = lights.filter(({ isOnline, isOn }) => isOnline && isOn);
+  const [first] = editable;
+  if (!first) return false;
+  playLook(editable, NEW_LOOK_NAME, NEW_LOOK);
+  setScope(editable.length === 1 ? first.address : null);
+  openPage('editor', first.roomId);
+  return true;
 }
 
 // The one way a tap puts a look on lights.

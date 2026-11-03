@@ -1,4 +1,5 @@
 import type { AnimationState, Parameter } from '../light-network/protocol';
+import newLook from './new-look.json';
 
 export type PatchLook = { id: string; name: string; document: Record<string, unknown> };
 
@@ -15,6 +16,9 @@ function toLook([path, file]: [string, PatchFile]): PatchLook {
 export const PATCH_LOOKS = Object.entries(patchFiles)
   .map(toLook)
   .sort((a, b) => a.name.localeCompare(b.name));
+
+// What NEW LOOK puts on the strip: one slow layer, so the editor opens on something to change.
+export const NEW_LOOK: AnimationState = { type: 'patch', params: newLook };
 
 // The modulators that hear the microphone. The patch says so itself, so no list of looks can go stale.
 const LISTENING_MODULATORS = new Set(['audio_band', 'tempo', 'beat']);

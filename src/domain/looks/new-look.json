@@ -1,0 +1,20 @@
+{
+  "layers": {
+    "0": {
+      "emitter": { "type": "perlin", "params": {} },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": { "entries": ["000018", "1b2a6b", "3fa9c9", "bff4ff"], "params": {} }
+      },
+      "opacity": 1,
+      "blend": "add",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": { "type": "lfo", "params": { "rate": 0.15 } }
+  },
+  "matrix": [{ "src": 0, "dst": "L0.emitter.offset", "depth": 4, "bipolar": true }],
+  "surface": []
+}

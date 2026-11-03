@@ -21,7 +21,7 @@ import {
 } from '../store/look-actions';
 import { useLibrary } from '../store/library-store';
 import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
-import { playLook } from '../store/look-play';
+import { playLook, startNewLook } from '../store/look-play';
 import { libraryFor, partOfRoomNote, type LibraryGroup, type LibraryLook } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { closePage } from '../store/navigation-store';
@@ -134,6 +134,7 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
   const deleteKey = useArmedDelete();
   useFreshLooks();
   const groups = foundGroups(libraryFor(lights, mine, shelf), wanted);
+  const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
     if (!animation) return;
@@ -170,6 +171,13 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
           title === 'Mine' && <TextKey onClick={() => setEditing(!isEditing)}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>
         }
       >
+        {title === 'Mine' && !isEditing && (
+          <KeyRow>
+            <TextKey disabled={!canEdit} onClick={() => startNewLook(lights)}>
+              NEW LOOK
+            </TextKey>
+          </KeyRow>
+        )}
         {isEditing && title === 'Mine' && (
           <KeyRow>
             <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
