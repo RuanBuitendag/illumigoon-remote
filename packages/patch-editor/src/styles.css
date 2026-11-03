@@ -684,6 +684,125 @@
 .patch-editor .layerrow.raise-hi .fader-fill { background: var(--fill); }
 .patch-editor .layerrow[data-muted='true'] .fader-fill { background: var(--text-5); box-shadow: none; }
 
+/* ------------------------------------------------------- warp stage previews
+
+   A measuring tape laid along the strip, not a render — see Stages.tsx. Deliberately not
+   styled like `.gradstrip`, which IS the palette: this one is inset and hairlined so the
+   two do not read as the same kind of picture. */
+.patch-editor .stagestrip {
+  border-radius: var(--radius);
+}
+.patch-editor .stages { display: flex; flex-direction: column; gap: var(--space-1); }
+.patch-editor .stagerow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  box-shadow: inset 0 0 0 1px var(--track);
+}
+.patch-editor .stagerow[class*='on'] { background: var(--wash-strong); box-shadow: inset 0 0 0 1px var(--track); }
+.patch-editor .stagerow:not(:first-child) { cursor: pointer; }
+.patch-editor .stagerow:not(:first-child):hover { background: var(--wash); }
+.patch-editor .stagelab { width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2); }
+.patch-editor .stagedot { width: 7px; height: 7px; flex-shrink: 0; background: var(--text-2); }
+.patch-editor .stagedot[data-kind='source'] { background: var(--text-5); }
+/* A gate is the other kind of node in the same rack: it cuts coverage instead of moving
+   the coordinate, and the strip beside it shows what it removed rather than where it
+   went. Warm against the accent so the two read as different jobs, not two states. */
+.patch-editor .stagedot[data-kind='gate'] { background: var(--warn); }
+/* Where the palette lands, not a stage: it moves no coordinate, so it carries no strip and is
+   not a thing to click through to. */
+.patch-editor .stagedot[data-kind='colour'] { background: var(--text-1); }
+/* A colour effect: the third job in the rack. It changes the light's colour and moves nothing,
+   so its strip repeats the one above -- the dot is what says it did something. A ring in the
+   palette's own colours, so it reads as acting on colour rather than as another Colour row. */
+.patch-editor .stagedot[data-kind='recolour'] { background: none; box-shadow: inset 0 0 0 2px var(--text-2); }
+.patch-editor .stagerow.editor-mark { cursor: default; padding-block: var(--space-2); }
+.patch-editor .stagerow.editor-mark:hover { background: none; }
+.patch-editor .stagename {
+  flex-grow: 1;
+  font: var(--type-note);
+  color: var(--text-1);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.patch-editor .stagename.dim { color: var(--text-4); }
+.patch-editor .stageslot { font: var(--type-small); color: var(--text-5); }
+.patch-editor .stagecap { font: var(--type-small-sans); color: var(--text-5); }
+
+/* ------------------------------------------------ the user surface (LIFE-867) */
+
+/* A pip on anything a user control exposes, so the surface stays visible while the patch is built.
+   The accent, because what a person can steer is modulation of a kind: a hand on the patch. */
+.patch-editor [data-exposed='true'] { position: relative; }
+.patch-editor [data-exposed='true']::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 0;
+  background: var(--modulation);
+  pointer-events: none;
+  z-index: var(--layer-editor-raised);
+}
+/* Hovering a row on the User tab lights what it drives. */
+.patch-editor [data-surfacelit='true'] { outline: var(--line) solid var(--modulation-soft); outline-offset: var(--space-half); border-radius: var(--radius); }
+/* A native select draws no ::after, so the blend chip carries its pip on a wrapper. */
+.patch-editor .exposewrap { display: inline-flex; }
+
+.patch-editor .popcatch { position: fixed; inset: 0; z-index: var(--layer-editor-catcher); }
+.patch-editor .surfacemenu, .patch-editor .surfacepop { position: fixed; z-index: var(--layer-editor-popup); border-radius: var(--radius); background: var(--background); border: var(--line) solid var(--track); box-shadow: var(--float-shadow); }
+.patch-editor .surfacemenu { padding: var(--space-2); display: flex; flex-direction: column; gap: var(--line); }
+.patch-editor .surfacemenu > button {
+  text-align: left;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  font: var(--type-note);
+  color: var(--text-3);
+}
+.patch-editor .surfacemenu > button:hover:not(:disabled) { background: var(--modulation-ghost); color: var(--text-1); }
+.patch-editor .surfacemenu > button:disabled { color: var(--text-5); cursor: default; }
+.patch-editor .surfacemenu .menunote { padding: var(--space-2) var(--space-3); font: var(--type-small-sans); color: var(--text-5); }
+.patch-editor .surfacepop {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  max-height: calc(100vh - 16px);
+  overflow-y: auto;
+}
+.patch-editor .popfield { display: flex; flex-direction: column; gap: var(--space-2); }
+.patch-editor .popin {
+  background: var(--wash);
+  border: 0;
+  border-radius: var(--radius);
+  padding: var(--space-2) var(--space-3);
+  min-width: 0;
+  font: var(--type-note);
+  color: var(--text-1);
+  user-select: text;
+}
+.patch-editor .popin:disabled { color: var(--text-5); }
+.patch-editor select.popin { appearance: none; -webkit-appearance: none; cursor: pointer; }
+.patch-editor .rangebar { position: relative; height: 12px; }
+.patch-editor .rangebar > i {
+  position: absolute; top: 3px; bottom: 3px; border-radius: var(--radius);
+  background: var(--modulation-dim); box-shadow: 0 0 6px var(--modulation-ghost);
+}
+.patch-editor .rangebar > b { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: calc(-1 * var(--line)); background: var(--text-1); }
+
+.patch-editor .ctlsection { display: flex; flex-direction: column; gap: var(--space-1); }
+.patch-editor .ctlhead { gap: var(--space-2); height: 26px; padding: 0 var(--space-1); border-radius: var(--radius); }
+.patch-editor .ctlhead[draggable='true'] { cursor: grab; }
+.patch-editor .ctlhead[data-dragover='true'], .patch-editor .ctlrow[data-dragover='true'], .patch-editor .ctlend[data-dragover='true'] {
+  box-shadow: inset 0 2px 0 var(--modulation-soft);
+}
+.patch-editor .ctlheadname { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-3); }
+.patch-editor .ctlrow { gap: var(--space-2); padding: var(--space-2) var(--space-3); min-height: var(--row); cursor: pointer; }
+.patch-editor .ctlrow[data-dead='true'] { opacity: var(--opacity-disabled); }
+.patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
 .patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctltarget { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .patch-editor .ctlend { height: 6px; border-radius: var(--radius); }
