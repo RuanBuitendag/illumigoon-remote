@@ -170,6 +170,15 @@ export const lookMaker = [
       await see(page, 'YOUR FRAGMENTS');
       expect((await page.getByText(/\.json/).count()) === 0, 'the fragments panel shows file names');
       expect((await page.getByText(/\d+ mod · \d+ row/).count()) === 0, 'the fragments panel shows engine counts');
+      // A key keeps its words on one line, also on the phone.
+      const broken = await page.evaluate(() =>
+        [...document.querySelectorAll('button[aria-label^="Add "]')].filter((key) => {
+          const range = document.createRange();
+          range.selectNodeContents(key);
+          return new Set([...range.getClientRects()].map(({ top }) => Math.round(top))).size > 1;
+        }).length,
+      );
+      expect(broken === 0, `${broken} + ADD keys break over two lines`);
     },
   },
   {
