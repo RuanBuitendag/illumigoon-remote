@@ -38,6 +38,7 @@ export class LightConnection {
   private manifestTimer: number | undefined;
   private writeTimer: number | undefined;
   private readonly pendingWrites = new Map<string, () => void>();
+  private readonly unsentWrites = new Map<string, () => void>();
 
   constructor(address: string, events: LightEvents) {
     this.events = events;
@@ -54,9 +55,21 @@ export class LightConnection {
     return this.wire.send(type, payload, target);
   }
 
+  // A look written while the socket is down goes out when the light is back, or that light alone
+  // keeps the old look while the screen shows the new one (LIFE-1931).
+  sendState(writeKey: string, type: string, payload: object) {
+    if (this.send(type, payload)) return;
+    // A new look replaces the look, the power and the controls written before it, but not the brightness.
+    if ('animation' in payload) {
+      for (const key of this.unsentWrites.keys()) if (key !== 'brightness') this.unsentWrites.delete(key);
+    }
+    this.unsentWrites.delete(writeKey);
+    this.unsentWrites.set(writeKey, () => this.sendState(writeKey, type, payload));
+  }
+
   // For drags: a light takes the latest value at a steady rate, not one message per touch event.
   sendSampled(writeKey: string, type: string, payload: object) {
-    this.pendingWrites.set(writeKey, () => this.send(type, payload));
+    this.pendingWrites.set(writeKey, () => this.sendState(writeKey, type, payload));
     this.writeTimer ??= window.setTimeout(() => this.flushWrites(), WRITE_SAMPLE_MS);
   }
 
@@ -79,6 +92,12 @@ export class LightConnection {
     this.writeTimer = undefined;
     for (const write of this.pendingWrites.values()) write();
     this.pendingWrites.clear();
+  }
+
+  private sendUnsent() {
+    const writes = [...this.unsentWrites.values()];
+    this.unsentWrites.clear();
+    for (const write of writes) write();
   }
 
   private onLink(at: string) {
@@ -111,6 +130,7 @@ export class LightConnection {
       this.events.onDeviceInfo(payload as DeviceInfo);
       if (isNew) {
         this.events.onReady();
+        this.sendUnsent();
         this.readLight();
       }
     } else if (!this.hasIdentity) {

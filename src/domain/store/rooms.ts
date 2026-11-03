@@ -152,8 +152,15 @@ export function lookNameOf(light: Light | undefined) {
   return light.manifests.find(({ id }) => id === animation.type)?.name ?? animation.type;
 }
 
+// A patch's name is a label, and a light can report the document without it, so it never makes lights differ.
+function signatureOf(animation: Light['animation']) {
+  if (animation?.type !== 'patch') return JSON.stringify(animation);
+  const { name: _name, ...params } = animation.params;
+  return JSON.stringify({ ...animation, params });
+}
+
 export function isMixedLook(lights: Light[]) {
-  const signatures = new Set(lights.map(({ animation }) => JSON.stringify(animation)));
+  const signatures = new Set(lights.map(({ animation }) => signatureOf(animation)));
   return signatures.size > 1;
 }
 

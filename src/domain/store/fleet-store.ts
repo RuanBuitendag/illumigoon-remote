@@ -297,7 +297,7 @@ const holdLocalWrite = () => Date.now() + LOCAL_WRITE_HOLD_MS;
 
 export function setPower(lights: Light[], isOn: boolean) {
   for (const { address } of lights) {
-    connections.get(address)?.send('light_set_state', { is_on: isOn });
+    connections.get(address)?.sendState('power', 'light_set_state', { is_on: isOn });
     updateLight(address, { isOn, localWriteUntil: holdLocalWrite() });
   }
 }
@@ -345,7 +345,7 @@ export function noteLook(address: string, lookName: string, animation: Animation
 
 export function applyLook(lights: Light[], lookName: string, animation: AnimationState) {
   for (const { address } of lights) {
-    connections.get(address)?.send('light_set_state', { is_on: true, animation: withPositions(animation) });
+    connections.get(address)?.sendState('look', 'light_set_state', { is_on: true, animation: withPositions(animation) });
     noteLook(address, lookName, animation);
   }
 }
@@ -373,7 +373,7 @@ export function applyState(lights: Light[], lightState: LightState) {
   const { isOn, brightness, animation } = lightState;
   const state = { is_on: isOn, brightness, ...(animation && { animation: withPositions(animation) }) };
   for (const light of lights) {
-    connections.get(light.address)?.send('light_set_state', state);
+    connections.get(light.address)?.sendState('look', 'light_set_state', state);
     noteState(light, lightState);
     if (animation) updateLight(light.address, { lookWrittenAt: Date.now() });
   }
