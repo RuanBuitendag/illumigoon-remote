@@ -18,7 +18,7 @@
 
 import { Fragment, useRef } from 'react';
 import type { ParamSpec } from '../domain/catalog';
-import { clamp, clamp01, fineOf } from './bits';
+import { clamp, clamp01, fineOf, slotNumber } from './bits';
 import { doubleClick } from './touch';
 import { format, reachOf, toPos, toValue, useModDots, type KnobMod } from './Knob';
 
@@ -99,7 +99,7 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
     (spec.desc ? `\n${spec.desc}` : '') +
     `\n\n${spec.min} … ${spec.max}   default ${spec.def}` +
     (mods.length
-      ? `\nmodulated by ${mods.map(m => `M${m.src}`).join(', ')} — set depth on the Source tab's ` +
+      ? `\nmodulated by ${mods.map(m => `modulator ${slotNumber(m.src)}`).join(', ')} — set depth on the Source tab's ` +
         `knob, the modulator or the matrix`
       : '') +
     `\ntap to set · drag sideways · shift for fine · ${doubleClick()} to reset`;

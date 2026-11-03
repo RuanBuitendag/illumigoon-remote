@@ -5,6 +5,7 @@ import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
 import { suspend } from './live';
 import { useRowDrag } from './useRowDrag';
+import { useLatest } from './useLatest';
 
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
@@ -111,6 +112,13 @@ export const Vr = () => <div className="vr" />;
  */
 export function Overlay({ onClose, children }: { onClose(): void; children: ReactNode }) {
   useEffect(() => suspend(), []);
+  // Escape closes it, as a click outside it does.
+  const close = useLatest(onClose);
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close.current(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [close]);
   return <div className="editor-overlay" onClick={onClose}>{children}</div>;
 }
 
@@ -203,8 +211,39 @@ export const StructField = ({ node, field, value, onChange }: {
 
 // -------------------------------------------------------------------- budget
 
-/** A layer as a person reads it. `slot` counts from 0, and the name counts from 1. */
-export const layerName = (slot: number) => `Layer ${slot + 1}`;
+/**
+ * Where each layer sits in the stack as it is drawn, so the number a person reads matches the
+ * list in every place it is said (LIFE-1934). The slot stays the identity underneath: rows and
+ * paths still address it, and it is never renumbered.
+ */
+let drawnPlace = new Map<number, number>();
+
+/** Called with the patch's layers whenever they change. */
+export function numberLayers(layers: readonly { slot: number; order: number }[]) {
+  const sorted = [...layers].sort((a, b) => a.order - b.order);
+  drawnPlace = new Map(sorted.map((L, i) => [L.slot, i + 1]));
+}
+
+/** The number a layer is drawn with. */
+export const layerNumber = (slot: number) => drawnPlace.get(slot) ?? slot + 1;
+
+export const layerName = (slot: number) => `Layer ${layerNumber(slot)}`;
+
+/**
+ * Macros and modulators share sixteen slots, so slot numbers read 1, 4, 7 in either rack. Each is
+ * numbered by its place among its own kind instead, so the racks count 1, 2, 3 (LIFE-1934).
+ */
+let slotPlace = new Map<number, number>();
+
+/** Called with the patch's modulators whenever they change. */
+export function numberSlots(modulators: readonly { slot: number; type: string }[]) {
+  const counts = { macro: 0, wired: 0 };
+  const sorted = [...modulators].sort((a, b) => a.slot - b.slot);
+  slotPlace = new Map(sorted.map(m => [m.slot, ++counts[m.type === 'macro' ? 'macro' : 'wired']]));
+}
+
+/** The number a macro or modulator is drawn with. */
+export const slotNumber = (slot: number) => slotPlace.get(slot) ?? slot + 1;
 
 /** A parameter's address in words: `L0.emitter.speed` reads `Layer 1 emitter speed`. */
 export const pathName = (path: string) =>

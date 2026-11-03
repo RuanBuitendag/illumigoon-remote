@@ -4,10 +4,10 @@ import { LIMITS, nodeById, structuralFor, nodesOfKind } from '../domain/catalog'
 import { TRIGGER_BLURBS } from '../domain/presentation';
 import {
   makeWarp, makeModulator, pathOf, defaultsFor, structDefaultsFor, triggerPath, triggerSources,
-  triggerWarning, type Layer,
+  triggerWarning, type Layer, type Patch,
 } from '../domain/patch';
 import { dropControls } from '../domain/surface';
-import { Lab, Seg, StructField, Blurb, layerName } from './bits';
+import { Lab, Seg, StructField, Blurb, layerName, slotNumber } from './bits';
 import { StageStrip } from './Stages';
 import { unlessReached, type Ctl } from './ctl';
 import { Param } from './Param';
@@ -90,11 +90,11 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
               className={`tog ${wired === o.slot ? '' : 'well'}`}
               data-on={wired === o.slot}
               style={{ width: 26 }}
-              title={`${o.type} in slot ${o.slot} — click to ` +
-                `${wired === o.slot ? 'unwire' : 'wire'}`}
+              title={`${o.type} ${slotNumber(o.slot)} — tap to ` +
+                `${wired === o.slot ? 'stop it firing this layer' : 'make it fire this layer'}`}
               onClick={() => wire(wired === o.slot ? null : o.slot)}
             >
-              {o.slot}
+              {slotNumber(o.slot)}
             </button>
           ))}
           <button
@@ -111,14 +111,31 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
           style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
         >
           {sources.length === 0
-            ? 'nothing in this patch has an edge — periodic, threshold or an LFO'
-            : 'or drag a TRG slot here'}
+            ? 'nothing here sends a beat yet: + adds one'
+            : 'each number is a modulator that sends a beat, marked TRG in the rack; tap one to fire this layer on it'}
         </span>
       </div>
 
       {TRIGGER_BLURBS[layer.emitter.type] && <Blurb>{TRIGGER_BLURBS[layer.emitter.type]}</Blurb>}
     </div>
   )
+}
+
+/**
+ * An emitter that waits for a trigger starts with one, so a new spawner shows something at once:
+ * the first beat already in the patch, or a new metronome when there is none (LIFE-1934).
+ */
+function startTrigger(d: Patch, L: Layer) {
+  const [beat] = triggerSources(d);
+  if (beat) {
+    L.emitter.trigger = { src: beat.slot, out: 0 };
+    return;
+  }
+  const used = new Set(d.modulators.map(m => m.slot));
+  const free = [...Array(LIMITS().MODS).keys()].find(i => !used.has(i));
+  if (free === undefined) return;
+  d.modulators.push(makeModulator(free, 'periodic'));
+  L.emitter.trigger = { src: free, out: 0 };
 }
 
 // ============================================================ signal chain
@@ -139,6 +156,7 @@ export function EmitterBody({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
             ctl.structural(d => {
               const L = d.layers.find(x => x.slot === layer.slot)!
               L.emitter = { type, params: defaultsFor(type), struct: structDefaultsFor(type) }
+              if (nodeById(type)?.takesTrigger) startTrigger(d, L)
               // Rows aimed at the old emitter's parameters cannot resolve on the new one.
               d.matrix = d.matrix.filter(r => !r.dst.startsWith(`L${layer.slot}.emitter.`))
               // So cannot a user control on one; left, it would steer whichever key the new one

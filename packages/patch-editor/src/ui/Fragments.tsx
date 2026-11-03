@@ -232,7 +232,8 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
       ctl.say(reached
         ? `${e.name} pulled into ${layerName(slot)}`
         : `${e.name} pulled into ${layerName(slot)} — not connected`);
-      // Left open on purpose: building by composition means pulling two or three in a row.
+      // Closed, so the result shows: on a phone the sheet covers the strip it landed on.
+      onClose();
     } catch (err: any) {
       setError(err.message ?? String(err));
     }

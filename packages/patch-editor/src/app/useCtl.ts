@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { readPath } from '../domain/patch';
 import type { Clip } from '../domain/layerops';
 import { unlessReached, type Ctl } from '../ui/ctl';
+import { numberLayers, numberSlots } from '../ui/bits';
 import type { BindGesture } from './useBindGesture';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
@@ -12,13 +13,14 @@ import type { PatchWrites } from './usePatchWrites';
 type MasterActs = Pick<Ctl, 'addMasterPalette' | 'setMasterPalette' | 'removeMasterPalette'
   | 'setMasterMode' | 'setMasterCount' | 'reshuffleMaster'>;
 
-export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
+export function useCtl({ draft, writes, nav, gesture, masterActs, say, sayUndoable }: {
   draft: Pick<PatchDraft, 'patch' | 'master'>;
   writes: PatchWrites;
   nav: Navigation;
   gesture: BindGesture;
   masterActs: MasterActs;
   say(message: string): void;
+  sayUndoable(message: string): void;
 }) {
   const { patch, master } = draft;
   const { setParam, commit, setStructural, setLocal, pushDoc, structural, sampleStructural } =
@@ -57,6 +59,11 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
   }, [structural, say]);
 
   const baseOf = useCallback((path: string) => readPath(patch, path), [patch]);
+
+  // Before anything below draws a layer's number.
+  // Before anything below draws a number: every place that says one reads these.
+  numberLayers(patch.layers);
+  numberSlots(patch.modulators);
 
   const ctl: Ctl = useMemo(
     () => ({
@@ -109,6 +116,7 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
       trace: drag ? null : trace,
       setTrace,
       say,
+      sayUndoable,
     }),
     [
       patch,
@@ -149,6 +157,7 @@ export function useCtl({ draft, writes, nav, gesture, masterActs, say }: {
       setScope,
       setSel,
       say,
+      sayUndoable,
     ],
   );
 

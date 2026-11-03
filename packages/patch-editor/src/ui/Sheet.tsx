@@ -41,7 +41,7 @@ export function SheetHead({ icon, title, onClose, children }: {
       </div>
       <div className="row" style={{ gap: 18 }}>
         {children}
-        <button onClick={onClose}><Ico.X c="var(--text-4)" /></button>
+        <button className="sheetx" title="Close (Esc)" onClick={onClose}><Ico.X c="var(--text-4)" /></button>
       </div>
     </div>
   );

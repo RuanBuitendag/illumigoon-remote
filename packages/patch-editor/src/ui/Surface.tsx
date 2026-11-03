@@ -28,11 +28,10 @@ import {
   keptControls,
   resolveTarget,
   seedControl,
-  surfaceBytes,
   whyDropped,
 } from '../domain/surface';
 import { type Control } from '../domain/control';
-import { Blurb, Hr, Ico, Lab, Mono, RowGrip, pathName } from './bits';
+import { Blurb, Hr, Ico, Lab, Mono, RowGrip, pathName, slotNumber } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 
 // ---------------------------------------------------------------- exposing
@@ -129,7 +128,7 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
               onClose();
             }}
           >
-            Move with {m.slot + 1} {m.type}
+            Move with {m.label || m.name || m.type} {slotNumber(m.slot)}
           </button>
         ))}
       </div>
@@ -328,7 +327,6 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
         <span className="ctllabel">{c.label}</span>
         <Mono className="dim sm ctltarget">{pathName(c.target)}</Mono>
       </div>
-      <Mono className="dim sm">{c.key}</Mono>
     </div>
   );
 }
@@ -371,9 +369,11 @@ function AddSection({ taken, onAdd }: { taken: readonly string[]; onAdd(name: st
   );
 }
 
-export function UserSurface({ ctl, onEdit }: {
+export function UserSurface({ ctl, onEdit, onAdd }: {
   ctl: Ctl;
   onEdit(control: Control, x: number, y: number): void;
+  /** Starts picking the setting a new control moves. */
+  onAdd(): void;
 }) {
   const list = ctl.patch.surface ?? [];
   const kept = keptControls(ctl.patch);
@@ -468,7 +468,6 @@ export function UserSurface({ ctl, onEdit }: {
   };
 
   const drag = { dragging, over, setDragging, setOver, dropOn };
-  const bytes = surfaceBytes(ctl.patch);
 
   return (
     <>
@@ -478,11 +477,6 @@ export function UserSurface({ ctl, onEdit }: {
           <Mono className={kept.length >= cap ? 'sm warn' : 'dim sm'}>
             {kept.length} / {cap}
           </Mono>
-          {bytes > 0 && (
-            <Mono className="dim sm" title="What the surface adds to the document">
-              +{(bytes / 1024).toFixed(1)} KB
-            </Mono>
-          )}
         </div>
       </div>
       <Hr />
@@ -500,7 +494,8 @@ export function UserSurface({ ctl, onEdit }: {
         )}
 
         {sections.map(s => {
-          if (s.name === null && !s.controls.length && !list.length) return null;
+          // An empty Ungrouped heading is a row with nothing in it; it shows while a drag can use it.
+          if (s.name === null && !s.controls.length && !dragging) return null;
           const key = s.name ?? '\0ungrouped';
           return (
             <SurfaceSection
@@ -520,6 +515,12 @@ export function UserSurface({ ctl, onEdit }: {
           );
         })}
 
+        {kept.length < cap && (
+          <button className="ghostrow well" style={{ justifyContent: 'center' }} onClick={onAdd}>
+            <Ico.Plus c="var(--text-5)" />
+            <Lab className="dim">Control</Lab>
+          </button>
+        )}
         <AddSection taken={[...docGroups, ...empty]} onAdd={name => setEmpty(e => [...e, name])} />
       </div>
       <div className="grow" />

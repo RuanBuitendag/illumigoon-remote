@@ -91,7 +91,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
     desc: 'How fast a shape leaves the origin. Negative launches it the other way.',
   },
   'spawner.acceleration': {
-    unit: 'strip/s²',
+    unit: 'strip/s per s',
     desc:
       'Constant push after launch. Negative pulls back toward the origin end, which is what ' +
       'makes an arc.',
@@ -127,11 +127,15 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
       'used when Colour By is Speed.',
   },
   'spawner.maxAlive': {
+    label: 'Most at once',
     step: 1,
     desc:
       'How many shapes may exist at once. A spawn past the cap recycles the oldest rather than ' +
       'being refused.',
   },
+
+  // A macro is a hand on a dial, and 0 to 100 is how a person reads one (LIFE-1934).
+  'macro.knob': { percent: true },
 
   'particles.origin': { unit: 'strip', desc: 'The centre of the region particles are born in.' },
   'particles.spread': {
@@ -155,7 +159,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
       'birth — this is what turns one launch into a spray.',
   },
   'particles.acceleration': {
-    unit: 'strip/s²',
+    unit: 'strip/s per s',
     desc: 'Constant pull on every particle. Negative pulls back toward the 0 end.',
   },
   'particles.drag': {
@@ -198,6 +202,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
       'used when Colour By is Speed.',
   },
   'particles.maxAlive': {
+    label: 'Most at once',
     step: 1,
     desc: 'How many particles may exist at once. Past the cap the oldest is recycled.',
   },
@@ -222,7 +227,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   },
   'bodies.softness': { desc: 'The fraction of a ball’s radius spent fading out.' },
   'bodies.gravity': {
-    unit: 'strip/s²',
+    unit: 'strip/s per s',
     desc: 'Constant pull. Negative pulls toward the 0 end, positive toward the 1 end.',
   },
   'bodies.drag': {

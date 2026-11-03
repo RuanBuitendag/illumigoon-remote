@@ -116,7 +116,7 @@ export function Randomise({
               ? 'Nothing rolled yet'
               : entry.seed === null
                 ? 'Before rolling'
-                : `Roll ${history.at + 1}`}
+                : `Roll ${history.at}`}
           </Lab>
           {entry && entry.seed !== null && (
             <Mono className="dim sm">seed {seedLabel(entry.seed)}</Mono>
@@ -286,7 +286,7 @@ function RollStrip({ history, start, shown, onStep }: {
               title={
                 (e.seed === null
                   ? 'The patch before the first roll'
-                  : `Roll ${i + 1} · seed ${seedLabel(e.seed)}`) +
+                  : `Roll ${i} · seed ${seedLabel(e.seed)}`) +
                 (e.tweaked ? ' · edited since it landed' : '')
               }
             >
@@ -313,7 +313,8 @@ function RollStrip({ history, start, shown, onStep }: {
         })}
       </div>
       <Mono className="sm">
-        {history.at + 1} / {history.entries.length}
+        {/* The first entry is the patch from before rolling, so it is not counted as a roll. */}
+        {Math.max(0, history.at)} / {Math.max(0, history.entries.length - 1)}
       </Mono>
     </div>
   );

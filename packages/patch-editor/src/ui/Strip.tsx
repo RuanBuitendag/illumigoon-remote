@@ -26,10 +26,12 @@ const hex = (h: number) => (h >>> 0).toString(16).padStart(8, '0');
 
 const TAPE: LedShape = { padding: 20, spread: 5, chip: 3.4, glow: 1.25 };
 
-export function Strip({ deviceCatalogHash, meter }: {
+export function Strip({ deviceCatalogHash, meter, head }: {
   deviceCatalogHash?: number;
   /** Beside what the strip says about itself, for what must be seen while editing. */
   meter?: ReactNode;
+  /** Over the strip on every section: which light is live, and undo. */
+  head?: ReactNode;
 }) {
   const status = useSyncExternalStore(subscribePreview, previewStatus);
   const cells = useRef<HTMLCanvasElement | null>(null);
@@ -52,11 +54,11 @@ export function Strip({ deviceCatalogHash, meter }: {
   const mismatch = running && deviceCatalogHash !== undefined
     && status.catalogHash !== deviceCatalogHash >>> 0;
 
-  const silent = running && status.usesAudio;
   return (
     <div className="strip">
-      {(mismatch || silent || meter) && (
+      {(mismatch || meter || head) && (
         <div className="striphead">
+          {head}
           {meter}
           {mismatch && (
             <span
@@ -66,7 +68,6 @@ export function Strip({ deviceCatalogHash, meter }: {
               this engine is not this light&rsquo;s firmware
             </span>
           )}
-          {silent && <span className="stripwarn">audio is not simulated</span>}
         </div>
       )}
 

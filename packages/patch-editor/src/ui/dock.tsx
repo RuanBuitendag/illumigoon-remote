@@ -14,7 +14,7 @@ import {
   type Patch,
   } from '../domain/patch'
 import {
-  Lab, Mono, Ico, ModIcon, RackToggle,
+  Lab, Mono, Ico, ModIcon, RackToggle, slotNumber,
   } from './bits';
 import { onFrame, sample } from './live';
 import { useCollapsed } from './collapsed';
@@ -135,7 +135,7 @@ export const freeSlot = (patch: Patch): number | undefined => {
 
 const tileTitle = (m: Modulator, drives: number) =>
   `${m.label || m.name ? `${m.label || m.name} · ` : ''}${m.type}`
-  + (drives ? ` — drives ${drives}; ${pointAt()} to see which` : ' — drag onto a parameter to bind');
+  + (drives ? ` — drives ${drives}; ${pointAt()} to see which` : ' — drag onto a setting, or tap here and then on the setting');
 
 function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: number }) {
   return (
@@ -146,7 +146,7 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
           color: dead ? 'var(--text-5)' : 'var(--modulation-soft)',
         }}
       >
-        {m.slot + 1}
+        {slotNumber(m.slot)}
       </span>
       <ModIcon type={m.type} dead={dead} />
       {/* A NAMED SLOT SAYS ITS NAME. Three macros in a row all reading `macro` is three

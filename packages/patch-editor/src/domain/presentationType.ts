@@ -1,6 +1,8 @@
 /** What the editor knows about a parameter beyond what the firmware says of it. */
 
 export interface Presentation {
+  /** A plainer name than the one the firmware publishes, where that one is a code word. */
+  label?: string;
   /** Caption when the section heading already carries the context. */
   short?: string;
   /**
@@ -40,4 +42,6 @@ export interface Presentation {
   soft?: [number, number];
   /** Rendered with more decimals than the default two. */
   step?: number;
+  /** Shown as 0 to 100 across its range rather than as the number the light stores. */
+  percent?: boolean;
 }

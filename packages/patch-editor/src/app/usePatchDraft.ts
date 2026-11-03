@@ -37,6 +37,12 @@ export function usePatchDraft() {
   const hasEditedRef = useRef(false);
   /** The patch last written to a file. Every change makes a new patch, so `===` is enough. */
   const savedPatchRef = useRef<Patch | null>(null);
+  /** Bumped on each save, so what reads `savedPatchRef` draws again. */
+  const [saves, setSaves] = useState(0);
+  const markSaved = useCallback(() => {
+    savedPatchRef.current = patchRef.current;
+    setSaves(n => n + 1);
+  }, []);
   /**
    * The patch's name, always current, for the same reason `patchRef` is.
    *
@@ -65,7 +71,7 @@ export function usePatchDraft() {
   }, [putMaster, masterRef]);
 
   return {
-    patch, setPatch, patchRef, patchNameRef, hasEditedRef, savedPatchRef,
+    patch, setPatch, patchRef, patchNameRef, hasEditedRef, savedPatchRef, saves, markSaved,
     patchName, setPatchName, patchNotes, setPatchNotes,
     master, masterRef, putMaster, dropMaster,
   };

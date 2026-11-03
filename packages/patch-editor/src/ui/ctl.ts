@@ -295,4 +295,6 @@ export interface Ctl {
   setTrace(slot: number | null): void
 
   say(message: string): void
+  /** A line with UNDO on it, for a change a person may not have meant. */
+  sayUndoable(message: string): void
 }

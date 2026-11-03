@@ -11,7 +11,7 @@ import { useSection, type EditorSection } from './app/useSection';
 
 export type { EditedLook, EditorSection, OpenLight };
 
-type AppProps = {
+export type EditorPageProps = {
   light: OpenLight;
   /** False once the page has been left: the socket closes, and `onLeave` says it is done. */
   isOpen: boolean;
@@ -24,13 +24,17 @@ type AppProps = {
   onName(name: string): void;
   /** The light has said what it plays, and the editor shows it. */
   onOpened(look: EditedLook): void;
+  /** Whether the look has changes no file holds yet. */
+  onUnsaved?(isUnsaved: boolean): void;
+  /** The socket has closed. Carries the document on the light if this session changed it. */
   onLeave(look: EditedLook | null, isSaved: boolean): void;
+  /** The light cannot be edited. */
   onClose(): void;
 };
 
-export default function App(props: AppProps) {
+export default function App(props: EditorPageProps) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
-  const { onSection, onName, onOpened, onLeave, onClose } = props;
+  const { onSection, onName, onOpened, onUnsaved, onLeave, onClose } = props;
   const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
@@ -46,6 +50,12 @@ export default function App(props: AppProps) {
   useEffect(() => {
     if (isEditing) opened.current(lookOf(current.current));
   }, [isEditing, opened, current]);
+
+  const unsaved = useLatest(onUnsaved);
+  const { patch, saves, hasEditedRef, savedPatchRef } = draft;
+  useEffect(() => {
+    unsaved.current?.(hasEditedRef.current && savedPatchRef.current !== patch);
+  }, [patch, saves, hasEditedRef, savedPatchRef, unsaved]);
 
   // Decided here and not by unmounting: what is still waiting goes out before the socket closes.
   const { commit } = writes;
@@ -79,6 +89,7 @@ export default function App(props: AppProps) {
           info={info}
           hb={hb}
           label={label}
+          history={editor.history}
           onLeave={onClose}
           onSave={() => {
             onSaveOpen();
@@ -100,6 +111,10 @@ export default function App(props: AppProps) {
           dialogs={dialogs}
           patch={draft.patch}
           toast={editor.toast}
+          onUndo={() => {
+            editor.hush();
+            editor.history.undo();
+          }}
           ready={ready}
         />
       )}

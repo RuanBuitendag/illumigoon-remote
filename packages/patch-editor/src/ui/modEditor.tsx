@@ -20,6 +20,7 @@ import {
   Hr, Lab, Mono, Blurb, Seg, Ico, Switch, StructField, depthAfterDrag, fineOf, type DragRange,
   layerName,
   pathName,
+  slotNumber,
 } from './bits';
 import { dropControls, modulatorOfTarget } from '../domain/surface';
 import { exposeProps } from './Surface';
@@ -56,7 +57,7 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
         <div className="col" style={{ gap: 12, width: 300, flexShrink: 0 }}>
           <div className="row" style={{ gap: 11, justifyContent: 'space-between' }}>
             <div className="row" style={{ gap: 11 }}>
-              <Mono className="accent">{m.slot + 1}</Mono>
+              <Mono className="accent">{slotNumber(m.slot)}</Mono>
               {/* The rack it is sitting in, said out loud — the same editor opens under both. */}
               <Lab className="head">{m.type === 'macro' ? 'Macro' : 'Modulator'}</Lab>
             </div>

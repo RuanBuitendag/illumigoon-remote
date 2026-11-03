@@ -2,6 +2,7 @@
 
 import {
   LIMITS,
+  type Overflow,
   } from '../domain/catalog'
 import {
   specForPath,
@@ -14,13 +15,16 @@ import {
   type MatrixRow,
 } from '../domain/patch'
 import {
-  Hr, Lab, Mono, Ico, Overlay, Switch, } from './bits';
+  Hr, Lab, Mono, Ico, Overlay, Switch, pathName, slotNumber, } from './bits';
 import { SheetHead } from './Sheet';
 import type { Ctl } from './ctl';
 import { M } from './dock';
 import { DepthDrag } from './modEditor';
 
 // =================================================================== matrix
+
+/** What a setting does at the end of its range, in words. */
+const OVERFLOW_WORDS: Record<Overflow, string> = { clamp: 'stops', wrap: 'wraps', fold: 'folds' };
 
 export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   const dropped = droppedRows(ctl.patch);
@@ -38,29 +42,29 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 
         <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
           <div style={{ width: 52 }}>
-            <Lab className="dim">SRC</Lab>
+            <Lab className="dim">NO.</Lab>
           </div>
           <div style={{ width: 118 }}>
-            <Lab className="dim">SOURCE</Lab>
+            <Lab className="dim">FROM</Lab>
           </div>
           <div style={{ width: 26 }} />
           <div style={{ width: 236 }}>
-            <Lab className="dim">DESTINATION</Lab>
+            <Lab className="dim">MOVES</Lab>
           </div>
           <div style={{ width: 74, textAlign: 'right' }}>
-            <Lab className="dim">DEPTH</Lab>
+            <Lab className="dim">BY</Lab>
           </div>
           <div style={{ width: 120, textAlign: 'right' }}>
-            <Lab className="dim">REACHES</Lab>
+            <Lab className="dim">GOES FROM–TO</Lab>
           </div>
           <div style={{ width: 54, textAlign: 'right' }}>
-            <Lab className="dim">POL</Lab>
+            <Lab className="dim">SWING</Lab>
           </div>
           <div style={{ width: 46, textAlign: 'right' }}>
-            <Lab className="dim">OP</Lab>
+            <Lab className="dim">HOW</Lab>
           </div>
           <div style={{ width: 58, textAlign: 'right' }}>
-            <Lab className="dim">OVF</Lab>
+            <Lab className="dim">AT ENDS</Lab>
           </div>
           <div className="grow" />
         </div>
@@ -95,11 +99,11 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         <div className="grow" />
         <Hr />
         <div style={{ padding: '17px 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
-          <Lab className="dim">Depth is in the parameter’s own units</Lab>
+          <Lab className="dim">Each row moves one setting with one source</Lab>
           <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
-            The device resolves <M>target = base + v × depth</M> every frame, clamped, wrapped or
-            folded by whatever the parameter is. <M>bi</M> takes the source at ±1; <M>uni</M> remaps
-            it to 0–1 first; <M>mul</M> scales the base instead of offsetting it.
+            BY is how far, in the setting’s own numbers. <M>both</M> swings it above and below
+            where it is set; <M>up</M> only above. <M>scales</M> multiplies the setting instead of
+            adding to it. At its ends a setting stops, wraps round or folds back.
           </span>
         </div>
       </div>
@@ -142,7 +146,7 @@ function MatrixRoute({
           className="src"
           style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}
         >
-          {r.src}
+          {slotNumber(r.src)}
         </span>
         <span className="srcdot" />
       </div>
@@ -156,7 +160,7 @@ function MatrixRoute({
       </div>
       <div className="col" style={{ width: 236, gap: 7 }}>
         <span className="dst" style={{ color: colour }}>
-          {r.dst}
+          {pathName(r.dst)}
         </span>
         {warn && <span className="warnline">{warn}</span>}
       </div>
@@ -208,8 +212,8 @@ function MatrixLine({ ctl, r, i, drop, note }: {
         disabled={!srcBipolar}
         title={
           srcBipolar
-            ? 'Bipolar takes the source at ±1; unipolar remaps it to 0–1 first'
-            : 'This source is one-way (0–1) — there is no negative half to fold'
+            ? 'both: the source swings the setting above and below where it is; up: only above'
+            : 'This source only rises from 0, so it only moves the setting up'
         }
         onClick={() =>
           ctl.structural(
@@ -219,11 +223,11 @@ function MatrixLine({ ctl, r, i, drop, note }: {
           )
         }
       >
-        {r.bipolar && srcBipolar ? 'bi' : 'uni'}
+        {r.bipolar && srcBipolar ? 'both' : 'up'}
       </MatrixToggle>
       <MatrixToggle
         width={46}
-        title="add offsets the base; multiply scales it"
+        title="adds: moves the setting up and down; scales: multiplies it"
         onClick={() =>
           ctl.structural(
             edit(row => {
@@ -232,10 +236,10 @@ function MatrixLine({ ctl, r, i, drop, note }: {
           )
         }
       >
-        {r.op === 'multiply' ? 'mul' : 'add'}
+        {r.op === 'multiply' ? 'scales' : 'adds'}
       </MatrixToggle>
       <div style={{ width: 58, textAlign: 'right' }}>
-        <Lab className="dim">{resolved?.spec.overflow ?? '—'}</Lab>
+        <Lab className="dim">{resolved ? OVERFLOW_WORDS[resolved.spec.overflow] : '—'}</Lab>
       </div>
       <div className="grow" />
       <span style={{ marginRight: 14 }}>

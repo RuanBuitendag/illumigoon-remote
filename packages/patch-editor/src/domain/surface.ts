@@ -570,12 +570,6 @@ export function readSurface(raw: unknown): Control[] {
   return raw.flatMap(o => readControl(o) ?? []);
 }
 
-/** What the surface adds to the document, in bytes. */
-export function surfaceBytes(patch: Patch): number {
-  const s = serialiseSurface(patch);
-  return s.length ? new TextEncoder().encode(`,"surface":${JSON.stringify(s)}`).length : 0;
-}
-
 // ------------------------------------------------------- following the graph
 
 /** The layer slot a target lives on, or null. */

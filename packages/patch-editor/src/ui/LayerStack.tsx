@@ -10,7 +10,7 @@ import {
 } from '../domain/layerops';
 import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Ico, RowGrip, layerName } from './bits';
+import { Hr, Lab, Mono, Ico, RowGrip, layerName, layerNumber } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
@@ -22,14 +22,14 @@ import { exposeProps } from './Surface';
  * go too, and a strip that changes in three places off one press should say so rather than
  * leave the dock quietly emptier than it was.
  */
-function tale(head: string, r: Removal, reached: Reached, note = ''): string {
+function tale(head: string, r: Removal, reached: Reached): string {
   const took: string[] = [];
   if (r.rows) took.push(`${r.rows} row${r.rows === 1 ? '' : 's'}`);
   if (r.mods.length) took.push(`mod ${r.mods.join(', ')}`);
   // The one thing a removal takes that someone else will notice: it is gone from their phone.
   if (r.controls.length)
     took.push(`the room control${r.controls.length === 1 ? '' : 's'} ${r.controls.join(', ')}`);
-  return `${head}${took.length ? ` with ${took.join(', ')}` : ''}${note}${unlessReached(reached)}`;
+  return `${head}${took.length ? ` with ${took.join(', ')}` : ''}${unlessReached(reached)}`;
 }
 
 /** What can be done to a layer as a whole: lifted, copied, pasted, duplicated and removed. */
@@ -91,9 +91,9 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
   };
 
   /**
-   * No confirmation, on purpose: the layer goes into the clipboard on its way out, so Paste
-   * puts it back. That is the only undo this editor has, and it is worth more than a dialog
-   * people learn to click through — see the note on the pull warning in `App.tsx`.
+   * No confirmation, on purpose: the line that reports it carries UNDO, which is worth more
+   * than a dialog people learn to click through. The layer still goes into the clipboard on its
+   * way out, so Paste can put it somewhere else.
    */
   const remove = (slot: number) => {
     lift(slot);
@@ -102,7 +102,7 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
     const reached = ctl.structural(d => { report.push(removeLayer(d, slot)); });
     if (ctl.sel === slot) ctl.selectLayer(next);
     const [removal] = report;
-    if (removal) ctl.say(tale(`${layerName(slot)} removed`, removal, reached, ' — paste to put it back'));
+    if (removal) ctl.sayUndoable(tale(`${layerName(slot)} removed`, removal, reached));
   };
 
   /** Wholesale and unrecoverable — the one gesture here that does ask. */
@@ -112,15 +112,14 @@ function useLayerActions(ctl: Ctl, ordered: readonly Layer[]) {
     const sure = await ask(
       `Remove all ${n} layer${n === 1 ? '' : 's'}?\n\n` +
       'Each one takes the modulators that only drove it. A modulator you have not pointed at ' +
-      'a layer yet stays. Only the last layer you copied can be pasted back, so copy anything ' +
-      'you want to keep first.',
+      'a layer yet stays. UNDO brings them back.',
     );
     if (!sure) return;
     const report: Removal[] = [];
     const reached = ctl.structural(d => { report.push(clearLayers(d)); });
     ctl.selectLayer(null);
     const [removal] = report;
-    if (removal) ctl.say(tale('stack cleared', removal, reached));
+    if (removal) ctl.sayUndoable(tale('stack cleared', removal, reached));
   };
 
   return { onTop, copy, paste, duplicate, remove, clear };
@@ -166,14 +165,6 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
       <div className="panelhead">
         <Lab className="head">Layers</Lab>
         <div className="row" style={{ gap: 10 }}>
-          {ctl.patch.layers.length > 0 && (
-            <button
-              title="Remove every layer, and the modulators that only drove them"
-              onClick={() => void acts.clear()}
-            >
-              <Lab className="dim">Clear</Lab>
-            </button>
-          )}
           <Mono className="dim sm">
             {ctl.patch.layers.length} / {LIMITS().SLOTS}
           </Mono>
@@ -253,6 +244,17 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
           <Ico.Copy />
           <Lab className="dim">Fragments</Lab>
         </div>
+
+        {/* At the end of the list, away from the count and the +, and it asks first. */}
+        {ctl.patch.layers.length > 0 && (
+          <div
+            className="ghostrow well"
+            onClick={() => void acts.clear()}
+            title="Remove every layer, and the modulators that only drove them"
+          >
+            <Lab className="dim">Clear all layers</Lab>
+          </div>
+        )}
       </div>
 
       <div className="grow" />
@@ -378,7 +380,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             color: selected ? 'var(--text-1)' : 'var(--text-3)',
           }}
         >
-          {L.slot + 1}
+          {layerNumber(L.slot)}
         </span>
         <span className="name grow">{L.emitter.type}</span>
         {/* The actions show on hover or when this row is the selected one. */}

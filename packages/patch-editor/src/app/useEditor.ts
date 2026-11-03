@@ -10,6 +10,7 @@ import { useBindGesture, type Gesture } from './useBindGesture';
 import { useConnection } from './useConnection';
 import { useCtl } from './useCtl';
 import { useDialogs } from './useDialogs';
+import { useHistory } from './useHistory';
 import { useKeptDraft } from './useKeptDraft';
 import { useLongPress } from './useLongPress';
 import { useMasterPalette } from './useMasterPalette';
@@ -24,7 +25,7 @@ import { useToast } from './useToast';
 export type OpenLight = { url: string; name: string; lookName?: string };
 
 export function useEditor(light: OpenLight | undefined) {
-  const { toast, say } = useToast();
+  const { toast, say, sayUndoable, hush } = useToast();
 
   /** The in-flight gesture, held in a ref so pointerup reads the target the last move set. */
   const dragRef = useRef<Gesture | null>(null);
@@ -38,7 +39,8 @@ export function useEditor(light: OpenLight | undefined) {
   usePresetLoad({ ...draft, ...writes, ...nav, link, say });
   const rolled = useRolls({ ...draft, ...writes, ...nav, say });
   const gesture = useBindGesture({ ...draft, ...writes, dragRef, say });
-  const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say });
+  const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say, sayUndoable });
+  const history = useHistory({ draft, writes, nav, say });
   const dialogs = useDialogs();
   useKeptDraft({ draft, ready, pushScene: writes.pushScene, leftPatch: nav.leftPatch, say });
 
@@ -63,7 +65,7 @@ export function useEditor(light: OpenLight | undefined) {
   });
 
   return {
-    toast, say, draft, connection, writes, nav, masterActs, rolled, gesture, ctl,
+    toast, say, hush, history, draft, connection, writes, nav, masterActs, rolled, gesture, ctl,
     dialogs, longPress, canEdit, hb,
   };
 }

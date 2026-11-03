@@ -457,6 +457,8 @@
 .patch-editor .editor-overlay { position: fixed; inset: 0; background: var(--scrim); display: flex; align-items: center; justify-content: center; z-index: 150; }
 .patch-editor .editor-sheet { width: 940px; max-height: 84vh; display: flex; flex-direction: column; background: var(--background); border: 1px solid var(--track); border-radius: 2px; box-shadow: var(--float-shadow); overflow: hidden; }
 .patch-editor .sheethead { display: flex; align-items: center; justify-content: space-between; height: 56px; flex-shrink: 0; padding: 0 20px; border-bottom: 1px solid var(--track); }
+/* The press lands on the drawn ×: the cross sits in the middle of its target, not at one edge. */
+.patch-editor .sheethead .sheetx { display: inline-flex; align-items: center; justify-content: center; }
 .patch-editor .mrow { display: flex; align-items: center; height: 46px; padding: 0 20px; border-radius: 2px; flex-shrink: 0; }
 .patch-editor .mrow[data-odd='true'] { background: var(--wash); }
 .patch-editor .mrow:hover { background: var(--wash-strong); }
@@ -547,6 +549,7 @@
 /* -------------------------------------------------------------- toasts */
 
 .patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: 300; padding: 11px 18px; border-radius: 2px; font: var(--type-note); background: var(--text-1); color: var(--background); box-shadow: var(--float-shadow); }
+.patch-editor .toast .toastact { margin-left: 14px; padding: 0; border: 0; background: none; color: inherit; font: var(--type-label); letter-spacing: var(--tracking-label); cursor: pointer; }
 
 /* -------------------------------------------------------------- scroll */
 

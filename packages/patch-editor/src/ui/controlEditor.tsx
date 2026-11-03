@@ -1,7 +1,7 @@
 /** The sheet that edits one control of the user surface. */
 
 import { useState } from 'react';
-import { LIMITS } from '../domain/catalog';
+import { LIMITS, type ParamSpec } from '../domain/catalog';
 import { readPath, type Patch } from '../domain/patch';
 import {
   choicesFor,
@@ -16,6 +16,7 @@ import {
 import { type Control } from '../domain/control';
 import { Blurb, Ico, Lab, Mono, Seg, Switch } from './bits';
 import { unlessReached, type Ctl } from './ctl';
+import { format } from './Knob';
 import { words, num, arrange, Catch, placed } from './Surface';
 
 /** What the popover holds while it is open. Numbers as text, so a half-typed `-0.` stays put. */
@@ -202,10 +203,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
 
         <SectionField d={d} set={set} groups={groups} />
 
-        <Mono className="dim sm">
-          key <span style={{ color: 'var(--text-4)' }}>{next.key}</span>
-          {isNew ? ' — fixed once made, because a Scene stores by it' : ''}
-        </Mono>
+        {r?.kind === 'float' && <NowLine patch={patch} path={r.path!} spec={r.spec!} />}
 
         {r?.kind === 'float' && (
           <NumberFields patch={patch} path={r.path!} spec={r.spec!} d={d} set={set} />
@@ -259,6 +257,17 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
 }
 
 /** A number control's range, shown on the parameter's own range, and how it reads on the phone. */
+/** Where the setting is now, read again on every change so turning it shows here (LIFE-1934). */
+function NowLine({ patch, path, spec }: { patch: Patch; path: string; spec: ParamSpec }) {
+  const value = readPath(patch, path) ?? spec.def;
+  return (
+    <Mono className="dim sm">
+      now <span style={{ color: 'var(--text-1)' }}>{format(value, spec)}</span>
+      {spec.unit ? ` ${spec.unit}` : ''}
+    </Mono>
+  );
+}
+
 function NumberFields({ patch, path, spec, d, set }: {
   patch: Patch; path: string; spec: { min: number; max: number; def: number; unit?: string };
   d: Draft; set(p: Partial<Draft>): void;

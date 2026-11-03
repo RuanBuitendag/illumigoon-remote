@@ -1,6 +1,6 @@
 /** The binding gesture: a modulator dragged onto a parameter or a trigger. */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { MutableRefObject } from 'react';
 import { LIMITS, nodeById } from '../domain/catalog';
 import {
@@ -15,7 +15,7 @@ import { unlessReached, type DragSrc } from '../ui/ctl';
 import type { PatchDraft } from './usePatchDraft';
 import type { PatchWrites } from './usePatchWrites';
 
-export type Gesture = { src: DragSrc; hot: string | null };
+export type Gesture = { src: DragSrc; hot: string | null; moved?: boolean };
 
 /**
  * A TRIGGER, which shares this gesture and nothing else.
@@ -70,6 +70,9 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
    */
   const [trace, setTrace] = useState<number | null>(null);
   const [ghost, setGhost] = useState<{ x: number; y: number } | null>(null);
+  /** A slot tapped rather than dragged, waiting for the setting it should move. */
+  const [picked, setPicked] = useState<DragSrc | null>(null);
+  const letGo = useCallback(() => { setPicked(null); setDrag(null); }, []);
 
   const beginDrag = useCallback((src: DragSrc, x: number, y: number) => {
     dragRef.current = { src, hot: null };
@@ -86,6 +89,7 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
    */
   const dragMove = useCallback((x: number, y: number) => {
     setGhost({ x, y });
+    if (dragRef.current) dragRef.current.moved = true;
     const el = document.elementFromPoint(x, y)?.closest('[data-path]');
     const path = el?.getAttribute('data-path') ?? null;
     if (dragRef.current) dragRef.current.hot = path;
@@ -125,11 +129,45 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
     // land in the same frame, and state would still be showing the previous target.
     const gesture = dragRef.current;
     dragRef.current = null;
-    setDrag(null); setGhost(null); setHot(null);
+    setGhost(null); setHot(null);
+    // A TAP picks the slot instead: the next tap on a parameter binds it, for a finger that
+    // cannot drag from the rack to a knob on another part of the screen (LIFE-1934).
+    if (gesture && !gesture.moved) {
+      setPicked(gesture.src);
+      say('Now tap a setting to move it with this');
+      return;
+    }
+    setDrag(null);
     if (gesture?.hot) bind(gesture.src, gesture.hot);
-  }, [bind, dragRef]);
+  }, [bind, dragRef, say]);
+
+  useTapToBind(picked, letGo, bind);
 
   return { drag, hot, trace, setTrace, ghost, beginDrag, dragMove, dragEnd, bind };
 }
 
 export type BindGesture = ReturnType<typeof useBindGesture>;
+
+/**
+ * While a slot is picked, the next press anywhere ends it: on a parameter it binds, and
+ * anywhere else it lets go. Caught before the press reaches the knob, so the knob does not move.
+ */
+function useTapToBind(
+  picked: DragSrc | null,
+  letGo: () => void,
+  bind: (src: DragSrc, target: string) => void,
+) {
+  useEffect(() => {
+    if (!picked) return undefined;
+    const onPress = (e: PointerEvent) => {
+      const path = (e.target as Element | null)?.closest?.('[data-path]')?.getAttribute('data-path');
+      letGo();
+      if (!path) return;
+      e.preventDefault();
+      e.stopPropagation();
+      bind(picked, path);
+    };
+    window.addEventListener('pointerdown', onPress, true);
+    return () => window.removeEventListener('pointerdown', onPress, true);
+  }, [picked, letGo, bind]);
+}

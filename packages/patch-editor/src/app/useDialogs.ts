@@ -1,6 +1,6 @@
 /** What is open over the editor: the sheets, the expose menu and the control editor. */
 
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { MouseEvent } from 'react';
 import type { Control } from '../domain/control';
 import { exposeTargetOf, type ExposeAt } from '../ui/Surface';
@@ -33,7 +33,26 @@ export function useDialogs() {
     if (exposeAtPoint(e.target, e.clientX, e.clientY)) e.preventDefault();
   }, [exposeAtPoint]);
 
+  /**
+   * ADD A CONTROL by tapping the setting it moves (LIFE-1934). While picking, the next press on
+   * anything exposable opens its menu, as a right-click or a long press would; a press anywhere
+   * else stops picking.
+   */
+  const [isPicking, setPicking] = useState(false);
+  useEffect(() => {
+    if (!isPicking) return undefined;
+    const onPress = (e: PointerEvent) => {
+      setPicking(false);
+      if (!e.target || !exposeAtPoint(e.target, e.clientX, e.clientY)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    window.addEventListener('pointerdown', onPress, true);
+    return () => window.removeEventListener('pointerdown', onPress, true);
+  }, [isPicking, exposeAtPoint]);
+
   return {
+    isPicking, setPicking,
     showMatrix, setShowMatrix, showPalettes, setShowPalettes, showFragments, setShowFragments,
     saveNudge, nudgeSave, exposeAt, setExposeAt, editingControl, setEditingControl,
     exposeAtPoint, exposeUnderPointer,

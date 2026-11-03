@@ -11,7 +11,7 @@ import { Boundary } from '../ui/Boundary';
 import { SurfaceMenu, UserSurface } from '../ui/Surface';
 import { ControlEditor } from '../ui/controlEditor';
 import { BUDGET } from '../domain/catalog';
-import { Budget, Blurb, Hr, Lab, ModIcon, Vr, layerName } from '../ui/bits';
+import { Budget, Blurb, Hr, Lab, ModIcon, Mono, Vr, layerName, slotNumber } from '../ui/bits';
 import { Inspector, SideColumn } from '../ui/inspector';
 import { LayerPanel } from '../ui/LayerStack';
 import { MacroRack } from '../ui/Macros';
@@ -26,10 +26,12 @@ import { Strip } from '../ui/Strip';
 import type { Ctl, Reached } from '../ui/ctl';
 import type { BindGesture } from './useBindGesture';
 import type { Dialogs } from './useDialogs';
+import type { History } from './useHistory';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
 import { forgetKeptDraft } from './useKeptDraft';
 import type { Rolls } from './useRolls';
+import type { Toast } from './useToast';
 import { sectionOfSide, type EditorSection } from './useSection';
 
 /** How full a look gets before the size meter shows. */
@@ -39,14 +41,14 @@ const NEAR_FULL = 0.8;
 export function SaveSheet({ draft, say, saveNudge, onClose }: {
   draft: Pick<
     PatchDraft,
-    | 'patch' | 'patchName' | 'patchNotes' | 'patchRef' | 'patchNameRef' | 'savedPatchRef'
+    | 'patch' | 'patchName' | 'patchNotes' | 'patchNameRef' | 'markSaved'
     | 'setPatchName' | 'setPatchNotes'
   >;
   say(message: string): void;
   saveNudge: number;
   onClose(): void;
 }) {
-  const { patch, patchName, patchNotes, patchRef, patchNameRef, savedPatchRef } = draft;
+  const { patch, patchName, patchNotes, patchNameRef, markSaved } = draft;
   const { setPatchName, setPatchNotes } = draft;
   return (
     <div className="editor-overlay" onClick={onClose}>
@@ -66,7 +68,7 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
             },
             onNotes: setPatchNotes,
             onSaved: () => {
-              savedPatchRef.current = patchRef.current;
+              markSaved();
               forgetKeptDraft();
             },
           }}
@@ -144,6 +146,10 @@ function SidePanel({ ctl, nav, patch, rolled, dialogs, connected, deviceName, on
       <UserSurface
         ctl={ctl}
         onEdit={(control, x, y) => dialogs.setEditingControl({ control, isNew: false, x, y })}
+        onAdd={() => {
+          dialogs.setPicking(true);
+          ctl.say('Now tap the knob, switch, blend or palette it should move');
+        }}
       />
     );
   }
@@ -235,6 +241,24 @@ function SizeMeter({ patch }: { patch: Patch }) {
   return bytes > BUDGET.NVS * NEAR_FULL ? <Budget bytes={bytes} w={120} /> : null;
 }
 
+/** Said on every section: which light the edit is live on, and the way back from a change. */
+function StripHead({ deviceName, history }: { deviceName: string; history: History }) {
+  return (
+    <>
+      <Mono className="dim sm">live on {deviceName}</Mono>
+      <span className="grow" />
+      <button className="pill" disabled={!history.canUndo} onClick={history.undo}
+              title="Undo the last change (Ctrl+Z)">
+        UNDO
+      </button>
+      <button className="pill" disabled={!history.canRedo} onClick={history.redo}
+              title="Redo what was undone (Ctrl+Shift+Z)">
+        REDO
+      </button>
+    </>
+  );
+}
+
 /** One part of the editor. Stays mounted while another section shows, so nothing is lost. */
 function Part({ id, section, children }: {
   id: EditorSection;
@@ -246,7 +270,7 @@ function Part({ id, section, children }: {
 
 export function EditorStage({
   ctl, nav, rolled, dialogs, patch, master, audio, onRecallMaster,
-  section, info, hb, label, onLeave, onSave,
+  section, info, hb, label, history, onLeave, onSave,
 }: {
   ctl: Ctl;
   nav: Navigation;
@@ -260,6 +284,7 @@ export function EditorStage({
   info: DeviceInfo | null;
   hb: Heartbeat | null;
   label: string;
+  history: History;
   onLeave(): void;
   onSave(): void;
 }) {
@@ -272,7 +297,11 @@ export function EditorStage({
     <>
       {/* Outside the boundary: it draws from the engine, not the catalog, so a light the
           editor cannot render controls for can still be watched. */}
-      <Strip deviceCatalogHash={info?.catalog_hash} meter={<SizeMeter patch={patch} />} />
+      <Strip
+        deviceCatalogHash={info?.catalog_hash}
+        meter={<SizeMeter patch={patch} />}
+        head={<StripHead deviceName={deviceName} history={history} />}
+      />
 
       {/*
        * Every control down here is built from the node catalog the light published, so a light
@@ -368,7 +397,7 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
       <div className="modslot raise-hi" data-dragging="true" style={{ width: 170 }}>
         <div className="row" style={{ gap: 9 }}>
           <span style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}>
-            {draggingMod.slot + 1}
+            {slotNumber(draggingMod.slot)}
           </span>
           <ModIcon type={draggingMod.type} />
           <span className="mname">{draggingMod.type}</span>
@@ -385,13 +414,14 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
 }
 
 /** What floats over the editor, outside the frame. */
-export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready }: {
+export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onUndo }: {
   ctl: Ctl;
   gesture: BindGesture;
   dialogs: Dialogs;
   patch: Patch;
-  toast: string | null;
+  toast: Toast | null;
   ready: Ready;
+  onUndo(): void;
 }) {
   const { exposeAt, setExposeAt, editingControl, setEditingControl } = dialogs;
   return (
@@ -422,7 +452,12 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready }: {
         />
       )}
 
-      {toast && <div className="toast">{toast}</div>}
+      {toast && (
+        <div className="toast">
+          {toast.text}
+          {toast.canUndo && <button className="toastact" onClick={onUndo}>UNDO</button>}
+        </div>
+      )}
     </>
   );
 }

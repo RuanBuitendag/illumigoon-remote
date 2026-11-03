@@ -50,7 +50,8 @@ const sameDocument = (patch: Patch, other: Patch) =>
 type KeptDraftProps = {
   draft: Pick<
     PatchDraft,
-    'patch' | 'patchName' | 'patchRef' | 'patchNameRef' | 'hasEditedRef' | 'savedPatchRef' | 'setPatchName'
+    'patch' | 'patchName' | 'patchRef' | 'patchNameRef' | 'hasEditedRef' | 'savedPatchRef' | 'saves'
+    | 'setPatchName'
   >;
   ready: Ready;
   pushScene: PatchWrites['pushScene'];
@@ -59,8 +60,9 @@ type KeptDraftProps = {
 };
 
 export function useKeptDraft({ draft, ready, pushScene, leftPatch, say }: KeptDraftProps) {
-  const { patch, patchName, patchRef, patchNameRef, hasEditedRef, savedPatchRef, setPatchName } = draft;
+  const { patch, patchName, patchRef, patchNameRef, hasEditedRef, savedPatchRef, saves, setPatchName } = draft;
 
+  // `saves` too: a save cancels a copy still waiting to be written.
   useEffect(() => {
     if (!hasEditedRef.current || savedPatchRef.current === patch) return undefined;
     const timer = window.setTimeout(
@@ -68,7 +70,7 @@ export function useKeptDraft({ draft, ready, pushScene, leftPatch, say }: KeptDr
       KEEP_AFTER_MS,
     );
     return () => window.clearTimeout(timer);
-  }, [patch, patchName, hasEditedRef, savedPatchRef]);
+  }, [patch, patchName, saves, hasEditedRef, savedPatchRef]);
 
   // Asked once, when the light has said what it plays: a copy the light still plays needs no offer.
   const asked = useRef(false);

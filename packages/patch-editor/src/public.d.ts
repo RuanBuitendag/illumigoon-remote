@@ -27,6 +27,8 @@ export function PatchEditor(props: {
   onName(name: string): void;
   /** The light has said what it plays, and the editor shows it. */
   onOpened(look: EditedLook): void;
+  /** Whether the look has changes no file holds yet. */
+  onUnsaved?(isUnsaved: boolean): void;
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 }): ReactNode;

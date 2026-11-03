@@ -13,9 +13,9 @@ import type { PatchWrites } from './usePatchWrites';
 
 export function useRolls({
   say, side, setSel, setScope, setFxRows, setEditingMod,
-  patchRef, patchNameRef, setPatchName, setPatchNotes, dropMaster, structural, pushScene,
+  patchRef, dropMaster, structural, pushScene,
 }: Pick<Navigation, 'side' | 'setSel' | 'setScope' | 'setFxRows' | 'setEditingMod'>
-  & Pick<PatchDraft, 'patchRef' | 'patchNameRef' | 'setPatchName' | 'setPatchNotes' | 'dropMaster'>
+  & Pick<PatchDraft, 'patchRef' | 'dropMaster'>
   & Pick<PatchWrites, 'structural' | 'pushScene'>
   & { say(message: string): void }) {
   const [rollOpts, setRollOpts] = useState<RollOptions>({ habits: 0.5, density: 0.5, keep: [] });
@@ -76,27 +76,15 @@ export function useRolls({
       );
       setRolls(h);
       const released = dropMaster();
+      // The look keeps its name: a roll is a change to it, and Save names it if it should not be.
       const sent = landRoll(next, keptParts(opts).length > 0);
-      patchNameRef.current = `roll-${seedLabel(seed)}`;
-      setPatchName(patchNameRef.current);
-      setPatchNotes('');
       say(
         sent
-          ? `roll ${h.at + 1} · seed ${seedLabel(seed)}${released}`
+          ? `roll ${h.at} · seed ${seedLabel(seed)}${released}`
           : 'rolled here only — no connection, so the lights are unchanged',
       );
     },
-    [
-      habits,
-      landRoll,
-      say,
-      setRolls,
-      dropMaster,
-      patchRef,
-      patchNameRef,
-      setPatchName,
-      setPatchNotes,
-    ],
+    [habits, landRoll, say, setRolls, dropMaster, patchRef],
   );
 
   const rollStep = useCallback((i: number) => {
@@ -106,16 +94,14 @@ export function useRolls({
     setRolls({ ...h, at: i });
     const released = dropMaster();
     const sent = landRoll(e.patch, false);
-    patchNameRef.current = e.seed === null ? '' : `roll-${seedLabel(e.seed)}`;
-    setPatchName(patchNameRef.current);
     say(
       !sent
         ? 'stepped here only — no connection, so the lights are unchanged'
         : e.seed === null
           ? `back to the patch from before rolling${released}`
-          : `roll ${i + 1}${released}`,
+          : `roll ${i}${released}`,
     );
-  }, [landRoll, say, setRolls, dropMaster, patchRef, patchNameRef, setPatchName]);
+  }, [landRoll, say, setRolls, dropMaster, patchRef]);
 
   // Habits are counted by the sidecar, asked once the first time the tab opens.
   useEffect(() => {

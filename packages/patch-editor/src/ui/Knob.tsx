@@ -17,7 +17,7 @@
 import { useCallback, useEffect, useRef, type SVGProps } from 'react';
 import { useLatest } from './useLatest';
 import type { ParamSpec } from '../domain/catalog';
-import { clamp, clamp01, DRAG_SPAN, fineOf, depthAfterDrag } from './bits';
+import { clamp, clamp01, DRAG_SPAN, fineOf, depthAfterDrag, slotNumber } from './bits';
 import { onFrame } from './live';
 import { doubleClick } from './touch';
 
@@ -156,6 +156,7 @@ export interface KnobProps {
 
 /** Decimals follow the step, so `maxAlive` reads 24 and `softness` reads 0.030. */
 export function format(v: number, spec: ParamSpec): string {
+  if (spec.percent) return String(Math.round(((v - spec.min) / (spec.max - spec.min || 1)) * 100));
   const step = spec.step ?? 0.01;
   if (step >= 1) return String(Math.round(v));
   const dp = Math.min(3, Math.max(0, Math.ceil(-Math.log10(step))));
@@ -171,8 +172,8 @@ function KnobTitle({ spec, bound }: { spec: ParamSpec; bound: boolean }) {
     <title>
       {spec.label}
       {spec.desc ? `\n${spec.desc}` : ''}
-      {`\n\n${spec.min} … ${spec.max}${spec.unit ? ` ${spec.unit}` : ''}`
-       + `   default ${spec.def}   ${spec.overflow}`}
+      {`\n\n${format(spec.min, spec)} … ${format(spec.max, spec)}${spec.unit ? ` ${spec.unit}` : ''}`
+       + `   default ${format(spec.def, spec)}   ${spec.overflow}`}
       {bound ? '\ndrag a ring to set its depth' : ''}
       {`\n${doubleClick()} to reset`}
     </title>
@@ -324,7 +325,7 @@ function ModChip({ m, onPolarity, onUnbind }: {
         // and inert -- a control that moves and changes nothing is the worse lie.
         disabled={!m.srcBipolar}
         title={
-          `Modulator ${m.src + 1} · depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}` +
+          `Modulator ${slotNumber(m.src)} · depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}` +
           (m.srcBipolar
             ? ` · ${m.bipolar ? 'bipolar (±1)' : 'unipolar (0–1)'}\nclick to switch polarity`
             : ' · source is one-way (0–1)\npolarity is fixed: there is no negative half to fold')
