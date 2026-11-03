@@ -3,12 +3,12 @@ import { applyLook, noteLook, type Light } from './fleet-store';
 import { gapOf, laterOn } from './light-timing';
 import { canPlay } from './rooms';
 
-// One at a time, so a light never gets a second look before it can take it.
+// Each light waits only for its own last look, so it never gets a second look before it can take it,
+// and the others in the room do not wait in a line behind it.
 export function sendInTurn(lights: Light[], lookName: string, look: AnimationState) {
-  let sendAt = 0;
   for (const light of lights) {
-    laterOn(light.address, sendAt, () => applyLook([light], lookName, look));
-    sendAt += gapOf(light);
+    const wait = Math.max(0, light.lookWrittenAt + gapOf(light) - Date.now());
+    laterOn(light.address, wait, () => applyLook([light], lookName, look));
   }
 }
 
