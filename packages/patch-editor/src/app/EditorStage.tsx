@@ -470,7 +470,7 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
 
       {toast && (
         <div className="toast">
-          {toast.text}
+          <span role="status" aria-live="polite">{toast.text}</span>
           {toast.canUndo && <button className="toastact" onClick={onUndo}>UNDO</button>}
         </div>
       )}

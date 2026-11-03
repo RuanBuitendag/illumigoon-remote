@@ -61,7 +61,9 @@ type BottomNoticeProps = HouseNoteProps & { laterLabel?: string; onLater?: () =>
 export function BottomNotice({ text, actionLabel, onAction, laterLabel, onLater }: BottomNoticeProps) {
   return (
     <footer className="bottom-notice">
-      <span>{text}</span>
+      <span role="status" aria-live="polite">
+        {text}
+      </span>
       <LinkKey onClick={onAction}>{actionLabel}</LinkKey>
       {onLater && <LinkKey onClick={onLater}>{laterLabel}</LinkKey>}
     </footer>

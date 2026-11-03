@@ -118,6 +118,7 @@ function movedOrder(ids: string[], from: number, to: number) {
 
 // The list has moved by the time this runs, so the dragged item slides from where the finger left it.
 function settle(element: HTMLElement, { left, top }: DOMRect) {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
   const landed = element.getBoundingClientRect();
   const transform = `translate(${left - landed.left}px, ${top - landed.top}px)`;
   element.animate([{ transform }, { transform: 'none' }], { duration: SETTLE_MS, easing: 'ease-out' });

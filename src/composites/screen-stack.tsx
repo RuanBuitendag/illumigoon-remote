@@ -48,7 +48,10 @@ type UndoNoticeProps = { text: string; onUndo?: () => void; onSave?: () => void 
 export function UndoNotice({ text, onUndo, onSave }: UndoNoticeProps) {
   return (
     <aside className="undo-notice">
-      <p className="undo-text">{text}</p>
+      {/* Said aloud when it changes, without moving focus. */}
+      <p className="undo-text" role="status" aria-live="polite">
+        {text}
+      </p>
       {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
       {onUndo && <TextKey onClick={onUndo}>UNDO</TextKey>}
     </aside>

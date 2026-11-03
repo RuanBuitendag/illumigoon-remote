@@ -29,6 +29,8 @@
   --size-heading: 1.25rem;
   --size-title: 1.75rem;
   --size-page: 2.25rem;
+  /* Text fields on a touch screen: Safari zooms in on anything smaller. */
+  --size-field: 1rem;
   --weight-light: 300;
   --weight-regular: 400;
   --weight-medium: 500;
@@ -62,6 +64,10 @@
   --palette-width: 148px;
   --radius: 2px;
   --mark-line: 1.5px;
+  /* The keyboard focus ring: the ink colour, so it is neutral in both themes (LIFE-1937). */
+  --focus: var(--text-1);
+  --focus-line: 2px;
+  --focus-gap: 2px;
   --wash: rgba(255, 255, 255, 0.045);
   --wash-strong: rgba(255, 255, 255, 0.09);
   --scrim: rgba(9, 9, 10, 0.72);
@@ -84,7 +90,7 @@
     --text-1: #161618;
     --text-2: #2c2c30;
     --text-3: #5c5c61;
-    --text-4: #76767b;
+    --text-4: #6a6a6f;
     --text-5: #88888c;
     --track: rgba(0, 0, 0, 0.12);
     --tick: rgba(0, 0, 0, 0.2);
@@ -141,6 +147,27 @@ button[data-held='true'] { transform: translateY(-2px) scale(1.015); }
 }
 input { padding: 0; -webkit-user-select: text; user-select: text; border: 0; border-radius: 0; outline: 0; background: none; }
 input::placeholder { color: var(--text-5); }
+
+/* Focus. Every control reached by keyboard shows the same ring. The slider's real input is hidden
+   inside its thumb, so the thumb carries the ring for it. */
+:focus-visible,
+.fader-thumb:has(:focus-visible) { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
+:focus:not(:focus-visible) { outline: 0; }
+
+/* A finger on iPhone: a text field under 16 px makes Safari zoom in when it is tapped. */
+@media (pointer: coarse) {
+  input, textarea, select { font-size: var(--size-field); }
+}
+
+/* Reduced motion (D36). Colour and opacity still fade; nothing slides, grows or springs. The LED
+   strips are content and keep drawing. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-property: opacity, visibility, color, background-color, border-color, box-shadow, filter !important;
+    scroll-behavior: auto !important;
+  }
+  button[data-held='true'] { transform: none; }
+}
 
 /* Marks */
 

@@ -7,6 +7,17 @@
 .screen-page { z-index: 3; overflow-y: auto; padding: var(--page-top) var(--gutter) var(--space-7); }
 .screen-page::before { content: ''; position: sticky; top: calc(-1 * var(--page-top)); z-index: 3; display: block; height: var(--page-top); margin: calc(-1 * var(--page-top)) var(--edge) 0; background: var(--background); }
 .screen-room[data-open='true'], .screen-page[data-open='true'] { transform: none; box-shadow: var(--push-shadow); }
+/* D36: under reduced motion the push becomes a fade, and a screen opens in place. On the laptop the
+   room stands beside Home and does not move, so only the page fades there. */
+@media (prefers-reduced-motion: reduce) {
+  .screen-home[data-pushed='true'] { transform: none; }
+  .screen-page { transform: none; opacity: 0; visibility: hidden; transition: opacity 550ms var(--push), visibility 0s linear 550ms; }
+  .screen-page[data-open='true'] { opacity: 1; visibility: visible; transition: opacity 550ms var(--push); }
+}
+@media (prefers-reduced-motion: reduce) and (max-width: 899px) {
+  .screen-room { transform: none; opacity: 0; visibility: hidden; transition: opacity 550ms var(--push), visibility 0s linear 550ms; }
+  .screen-room[data-open='true'] { opacity: 1; visibility: visible; transition: opacity 550ms var(--push); }
+}
 .edit-layout { position: fixed; inset: 0; z-index: 4; display: flex; flex-direction: column; padding: var(--page-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
 .edit-header { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
 .edit-header .text-key { min-width: var(--row); justify-content: flex-end; }

@@ -867,10 +867,12 @@
   .patch-editor button, .patch-editor select { min-width: 44px; min-height: 44px; }
   .patch-editor .editor-swatch { width: 44px; height: 44px; }
   .patch-editor :is(
-    button, select, input, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
+    button, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
     .kval, .kunit, .pill, .tog, .blendchip, .modchip .src, .modchip .drop, .mname, .reach, .trg,
     .detail, .ctlglyph, .ctllabel, .ctlheadname
   ) { font-size: var(--size-note); }
+  /* A text field under 16 px makes Safari zoom in when it is tapped. */
+  .patch-editor :is(input, textarea, select) { font-size: var(--size-field); }
   .patch-editor :is([style*='--type-small'], [style*='--type-label']) {
     font-size: var(--size-note) !important;
   }
@@ -925,3 +927,11 @@
   .patch-editor .centre > .row:first-child { height: auto !important; flex-wrap: wrap; gap: 8px 14px; padding: 12px 16px !important; }
   .patch-editor .centre > .row:first-child > .row { flex-wrap: wrap; row-gap: 6px; }
 }
+
+/* ------------------------------------------------------------- focus */
+
+/* The app's focus ring, over the editor's own `outline: none` on fields and chips (LIFE-1937). */
+.patch-editor :focus-visible,
+.patch-editor textarea.well:focus-visible { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
+/* The toast is ink on paper turned round, so its ring is the paper colour. */
+.patch-editor .toast :focus-visible { outline-color: var(--background); }
