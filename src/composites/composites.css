@@ -94,7 +94,7 @@
 .light-tape .led-strip-room { height: 56px; margin: 0 var(--edge); }
 .room-scroll .scene-shelf { margin-top: var(--section); padding: 0; }
 .section-title { font: var(--type-title); }
-.library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); scroll-margin-top: 88px; }
+.library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: 88px; }
 .library-group { display: flex; flex-direction: column; gap: var(--space-5); }
 .library-group > .heading-row { margin-bottom: calc(-1 * var(--space-4)); }
 .library-group > .note { margin-bottom: calc(-1 * var(--space-2)); }

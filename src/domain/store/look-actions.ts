@@ -18,14 +18,34 @@ function sayNote(note: string) {
   noteTimer = setTimeout(() => useLookActions.setState({ note: null }), NOTE_MS);
 }
 
-export async function copyLook({ name, doc }: LookFile) {
+// True once the look is on the clipboard. The key says so itself, so the list does not move.
+export async function copyLook({ doc }: LookFile) {
   try {
     await navigator.clipboard.writeText(JSON.stringify(doc, null, 2));
-    sayNote(`${name} copied`);
+    return true;
   } catch {
     sayNote('Could not reach the clipboard');
+    return false;
   }
 }
+
+// What the clipboard holds when it looks like a copied look, or nothing.
+export async function copiedLookText() {
+  try {
+    const text = (await navigator.clipboard.readText()).trim();
+    return text.startsWith('{') ? text : '';
+  } catch {
+    return '';
+  }
+}
+
+export const renameLook = ({ file, doc }: LookFile, name: string, notes: string) =>
+  attempt(async () => {
+    if (!doc) return;
+    const { writePreset } = await library();
+    await writePreset(file, { ...doc, name, notes });
+    await loadLooks();
+  });
 
 export const exportLook = ({ doc }: LookFile) =>
   attempt(async () => {
