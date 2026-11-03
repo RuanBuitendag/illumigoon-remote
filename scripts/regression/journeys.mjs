@@ -83,10 +83,12 @@ export const journeys = [
     lights: { '10.0.0.1': desk, '10.0.0.2': lamp },
     async run({ page, lights }) {
       await see(page, 'Desk');
+      // Home marks a light that stops answering on its room card; the light's name stays in place.
+      const silentDesk = page.locator('.room-light', { hasText: 'Desk' }).locator('.status-mark[data-state=silent]');
       lights['10.0.0.1'].powerOff();
-      await see(page, /Desk isn.t answering/);
+      await silentDesk.waitFor({ timeout: 30000 });
       lights['10.0.0.1'].powerOn();
-      await page.getByText(/Desk isn.t answering/).waitFor({ state: 'hidden', timeout: 30000 });
+      await silentDesk.waitFor({ state: 'hidden', timeout: 30000 });
     },
   },
   {
@@ -240,7 +242,7 @@ export const journeys = [
     lights: { '10.0.0.2': lamp },
     async run({ page }) {
       await see(page, 'Lamp');
-      await page.getByRole('button', { name: /looks/i }).first().click();
+      await page.getByRole('button', { name: /^Bedroom look: / }).click();
       await see(page, 'On Bedroom');
     },
   },
@@ -249,13 +251,17 @@ export const journeys = [
     lights: { '10.0.0.2': patchLamp },
     async run({ page }) {
       await see(page, 'Lamp');
-      await page.getByRole('button', { name: /looks/i }).first().click();
+      await page.getByRole('button', { name: /^Bedroom look: / }).click();
       await see(page, 'Candle');
       await see(page, 'Solid colour');
       for (const gone of ['Lava lamp', 'Black Hole', 'Simple looks', 'Examples', 'Most used']) {
         if ((await page.getByText(gone, { exact: true }).count()) > 0) throw new Error(`${gone} is on the page`);
       }
       await page.getByText('Candle', { exact: true }).first().click();
+      await see(page, 'Playing Candle');
+      // Most used keeps the order the page opened with, so a play shows there the next time it opens.
+      await page.getByRole('button', { name: 'Rooms', exact: true }).click();
+      await page.getByRole('button', { name: /^Bedroom look: / }).click();
       await see(page, 'Most used');
     },
   },

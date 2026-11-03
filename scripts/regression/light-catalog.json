@@ -1,0 +1,1862 @@
+{
+ "emitters": [
+  {
+   "id": "line",
+   "name": "Line",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "centre",
+     "label": "Centre",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "fold",
+     "unit": "strip"
+    },
+    {
+     "key": "length",
+     "label": "Length",
+     "min": 0,
+     "max": 1,
+     "def": 0.2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "softness",
+     "label": "Softness",
+     "min": 0,
+     "max": 0.5,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ]
+  },
+  {
+   "id": "block",
+   "name": "Block",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "level",
+     "label": "Fill Level",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "softness",
+     "label": "Softness",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ],
+   "settings": [
+    {
+     "key": "fromEnd",
+     "label": "From End",
+     "type": "bool",
+     "def": false
+    }
+   ]
+  },
+  {
+   "id": "wave",
+   "name": "Wave",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "freq",
+     "label": "Frequency",
+     "min": 0,
+     "max": 40,
+     "def": 3,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2.5,
+     "unit": "cyc"
+    },
+    {
+     "key": "phase",
+     "label": "Phase",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    }
+   ]
+  },
+  {
+   "id": "perlin",
+   "name": "Perlin",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "scale",
+     "label": "Scale",
+     "min": 0.01,
+     "max": 200,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 4,
+     "unit": "cyc"
+    },
+    {
+     "key": "evolve",
+     "label": "Evolve",
+     "min": 0,
+     "max": 5,
+     "def": 0.2,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "/s"
+    },
+    {
+     "key": "time",
+     "label": "Time",
+     "min": -1000000,
+     "max": 1000000,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "soft": [
+      -20,
+      20
+     ]
+    },
+    {
+     "key": "offset",
+     "label": "Drift",
+     "min": -1000000,
+     "max": 1000000,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip",
+     "soft": [
+      -20,
+      20
+     ]
+    }
+   ]
+  },
+  {
+   "id": "spawner",
+   "name": "Spawner",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "origin",
+     "label": "Origin",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "velocity",
+     "label": "Launch Speed",
+     "min": -4,
+     "max": 4,
+     "def": 0.35,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "acceleration",
+     "label": "Acceleration",
+     "min": -8,
+     "max": 8,
+     "def": 0.6,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s\u00c2\u00b2"
+    },
+    {
+     "key": "drag",
+     "label": "Drag",
+     "min": 0,
+     "max": 8,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "/s"
+    },
+    {
+     "key": "length",
+     "label": "Length",
+     "min": 0,
+     "max": 0.5,
+     "def": 0.06,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip",
+     "step": 0.005
+    },
+    {
+     "key": "softness",
+     "label": "Softness",
+     "min": 0,
+     "max": 0.3,
+     "def": 0.03,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip",
+     "step": 0.005
+    },
+    {
+     "key": "lifetime",
+     "label": "Lifetime",
+     "min": 0,
+     "max": 20,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "s"
+    },
+    {
+     "key": "fadeOut",
+     "label": "Fade",
+     "min": 0,
+     "max": 1,
+     "def": 0.25,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "speedRef",
+     "label": "Colour Speed",
+     "min": 0.1,
+     "max": 8,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "maxAlive",
+     "label": "Max Alive",
+     "min": 1,
+     "max": 64,
+     "def": 24,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    }
+   ],
+   "settings": [
+    {
+     "key": "colouring",
+     "label": "Colour By",
+     "options": [
+      "age",
+      "speed",
+      "index"
+     ],
+     "def": "speed"
+    },
+    {
+     "key": "sustain",
+     "label": "Sustain",
+     "type": "bool",
+     "def": false
+    }
+   ],
+   "trigger": true
+  },
+  {
+   "id": "particles",
+   "name": "Particles",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "origin",
+     "label": "Origin",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "spread",
+     "label": "Spread",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "count",
+     "label": "Count",
+     "min": 0,
+     "max": 32,
+     "def": 12,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    },
+    {
+     "key": "rate",
+     "label": "Rate",
+     "min": 0,
+     "max": 240,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2.5,
+     "unit": "/s"
+    },
+    {
+     "key": "speed",
+     "label": "Speed",
+     "min": -4,
+     "max": 4,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "speedVary",
+     "label": "Speed Vary",
+     "min": 0,
+     "max": 4,
+     "def": 1.2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "acceleration",
+     "label": "Gravity",
+     "min": -8,
+     "max": 8,
+     "def": -0.6,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s\u00c2\u00b2"
+    },
+    {
+     "key": "drag",
+     "label": "Drag",
+     "min": 0,
+     "max": 8,
+     "def": 1.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "/s"
+    },
+    {
+     "key": "bounce",
+     "label": "Bounce",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "min": 0,
+     "max": 0.2,
+     "def": 0.012,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip",
+     "step": 0.001
+    },
+    {
+     "key": "sizeVary",
+     "label": "Size Vary",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "softness",
+     "label": "Softness",
+     "min": 0,
+     "max": 1,
+     "def": 0.6,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "lifetime",
+     "label": "Lifetime",
+     "min": 0.05,
+     "max": 12,
+     "def": 1.2,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "s"
+    },
+    {
+     "key": "lifeVary",
+     "label": "Life Vary",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "fade",
+     "label": "Fade",
+     "min": 0,
+     "max": 1,
+     "def": 0.7,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "speedRef",
+     "label": "Colour Speed",
+     "min": 0.1,
+     "max": 8,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "maxAlive",
+     "label": "Max Alive",
+     "min": 1,
+     "max": 160,
+     "def": 96,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    }
+   ],
+   "settings": [
+    {
+     "key": "colouring",
+     "label": "Colour By",
+     "options": [
+      "age",
+      "speed",
+      "random"
+     ],
+     "def": "age"
+    }
+   ],
+   "trigger": true
+  },
+  {
+   "id": "bodies",
+   "name": "Bodies",
+   "kind": "emitter",
+   "params": [
+    {
+     "key": "count",
+     "label": "Count",
+     "min": 1,
+     "max": 16,
+     "def": 5,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    },
+    {
+     "key": "origin",
+     "label": "Origin",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "spread",
+     "label": "Spread",
+     "min": 0,
+     "max": 1,
+     "def": 0.8,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "size",
+     "label": "Size",
+     "min": 0,
+     "max": 0.15,
+     "def": 0.035,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip",
+     "step": 0.001
+    },
+    {
+     "key": "sizeVary",
+     "label": "Size Vary",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "softness",
+     "label": "Softness",
+     "min": 0,
+     "max": 1,
+     "def": 0.35,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "gravity",
+     "label": "Gravity",
+     "min": -8,
+     "max": 8,
+     "def": -1.2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s\u00c2\u00b2"
+    },
+    {
+     "key": "drag",
+     "label": "Drag",
+     "min": 0,
+     "max": 8,
+     "def": 0.15,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "/s"
+    },
+    {
+     "key": "bounce",
+     "label": "Bounce",
+     "min": 0,
+     "max": 1,
+     "def": 0.8,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "collide",
+     "label": "Collide",
+     "min": 0,
+     "max": 1,
+     "def": 0.9,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "kick",
+     "label": "Kick",
+     "min": 0,
+     "max": 4,
+     "def": 1.2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    },
+    {
+     "key": "kickVary",
+     "label": "Kick Vary",
+     "min": 0,
+     "max": 1,
+     "def": 0.4,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "speedRef",
+     "label": "Colour Speed",
+     "min": 0.1,
+     "max": 8,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip/s"
+    }
+   ],
+   "settings": [
+    {
+     "key": "colouring",
+     "label": "Colour By",
+     "options": [
+      "index",
+      "speed",
+      "height"
+     ],
+     "def": "index"
+    }
+   ],
+   "trigger": true
+  }
+ ],
+ "warps": [
+  {
+   "id": "translate",
+   "name": "Translate",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "offset",
+     "label": "Offset",
+     "min": -1,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "strip"
+    }
+   ],
+   "settings": [
+    {
+     "key": "wrap",
+     "label": "Wrap",
+     "type": "bool",
+     "def": true
+    }
+   ]
+  },
+  {
+   "id": "mirror",
+   "name": "Mirror",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "centre",
+     "label": "Centre",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ]
+  },
+  {
+   "id": "tile",
+   "name": "Tile",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "count",
+     "label": "Count",
+     "min": 1,
+     "max": 16,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    }
+   ]
+  },
+  {
+   "id": "scale",
+   "name": "Scale",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "zoom",
+     "label": "Zoom",
+     "min": -8,
+     "max": 8,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "centre",
+     "label": "Centre",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ]
+  },
+  {
+   "id": "ripple",
+   "name": "Ripple",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "amp",
+     "label": "Amount",
+     "min": 0,
+     "max": 0.5,
+     "def": 0.05,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "strip"
+    },
+    {
+     "key": "freq",
+     "label": "Frequency",
+     "min": 0,
+     "max": 40,
+     "def": 3,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2.5,
+     "unit": "cyc"
+    },
+    {
+     "key": "phase",
+     "label": "Phase",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    }
+   ]
+  },
+  {
+   "id": "pinch",
+   "name": "Pinch",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "centre",
+     "label": "Centre",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "amount",
+     "label": "Amount",
+     "min": -1,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ]
+  },
+  {
+   "id": "wipe",
+   "name": "Wipe",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "at",
+     "label": "Edge",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "soft",
+     "label": "Soft",
+     "min": 0,
+     "max": 1,
+     "def": 0.05,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ],
+   "gate": true
+  },
+  {
+   "id": "window",
+   "name": "Window",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "from",
+     "label": "From",
+     "min": 0,
+     "max": 1,
+     "def": 0.25,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "to",
+     "label": "To",
+     "min": 0,
+     "max": 1,
+     "def": 0.75,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    },
+    {
+     "key": "soft",
+     "label": "Soft",
+     "min": 0,
+     "max": 1,
+     "def": 0.02,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "strip"
+    }
+   ],
+   "gate": true
+  },
+  {
+   "id": "dissolve",
+   "name": "Dissolve",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "progress",
+     "label": "Amount",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "cells",
+     "label": "Cells",
+     "min": 1,
+     "max": 512,
+     "def": 64,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "step": 1
+    },
+    {
+     "key": "seed",
+     "label": "Seed",
+     "min": 0,
+     "max": 64,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    }
+   ],
+   "gate": true
+  },
+  {
+   "id": "comb",
+   "name": "Comb",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "count",
+     "label": "Count",
+     "min": 1,
+     "max": 32,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    },
+    {
+     "key": "duty",
+     "label": "Duty",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "soft",
+     "label": "Soft",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ],
+   "gate": true
+  },
+  {
+   "id": "hue",
+   "name": "Hue",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "shift",
+     "label": "Shift",
+     "min": -1,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "spread",
+     "label": "Spread",
+     "min": -4,
+     "max": 4,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "turns"
+    }
+   ],
+   "recolour": true
+  },
+  {
+   "id": "saturation",
+   "name": "Saturation",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "amount",
+     "label": "Amount",
+     "min": 0,
+     "max": 2,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    }
+   ],
+   "recolour": true
+  },
+  {
+   "id": "invert",
+   "name": "Invert",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "amount",
+     "label": "Amount",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ],
+   "recolour": true
+  },
+  {
+   "id": "posterize",
+   "name": "Posterize",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "levels",
+     "label": "Levels",
+     "min": 2,
+     "max": 16,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "step": 1
+    },
+    {
+     "key": "soft",
+     "label": "Soft",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ],
+   "recolour": true
+  },
+  {
+   "id": "duotone",
+   "name": "Duotone",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "shadow",
+     "label": "Shadow",
+     "min": 0,
+     "max": 1,
+     "def": 0.66,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "light",
+     "label": "Light",
+     "min": 0,
+     "max": 1,
+     "def": 0.08,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "balance",
+     "label": "Balance",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "soft",
+     "label": "Soft",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "amount",
+     "label": "Amount",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ],
+   "recolour": true
+  },
+  {
+   "id": "blur",
+   "name": "Blur",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "radius",
+     "label": "Radius",
+     "min": 0,
+     "max": 0.5,
+     "def": 0.05,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "strip"
+    }
+   ]
+  },
+  {
+   "id": "fade",
+   "name": "Fade",
+   "kind": "warp",
+   "params": [
+    {
+     "key": "attack",
+     "label": "Attack",
+     "min": 0,
+     "max": 8,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "s"
+    },
+    {
+     "key": "release",
+     "label": "Release",
+     "min": 0,
+     "max": 8,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "s"
+    },
+    {
+     "key": "cells",
+     "label": "Grain",
+     "min": 16,
+     "max": 256,
+     "def": 128,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "step": 1
+    }
+   ]
+  }
+ ],
+ "colours": [
+  {
+   "id": "colour",
+   "name": "Colour",
+   "kind": "colour",
+   "params": [
+    {
+     "key": "paletteOffset",
+     "label": "Palette Offset",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "paletteSpan",
+     "label": "Palette Span",
+     "min": 0,
+     "max": 4,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "indexBias",
+     "label": "Index Shift",
+     "min": -1,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap"
+    }
+   ]
+  },
+  {
+   "id": "palette",
+   "name": "Palette",
+   "kind": "colour",
+   "params": [
+    {
+     "key": "hueShift",
+     "label": "Hue",
+     "min": -1,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "saturation",
+     "label": "Saturation",
+     "min": 0,
+     "max": 2,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "value",
+     "label": "Value",
+     "min": 0,
+     "max": 2,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    }
+   ]
+  }
+ ],
+ "modulators": [
+  {
+   "id": "lfo",
+   "name": "LFO",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "rate",
+     "label": "Rate",
+     "min": 0,
+     "max": 40,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "Hz"
+    },
+    {
+     "key": "phase",
+     "label": "Phase",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "wrap",
+     "unit": "turns"
+    },
+    {
+     "key": "duty",
+     "label": "Duty Cycle",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "noise",
+     "label": "Noise",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "noiseRate",
+     "label": "Noise Rate",
+     "min": 0,
+     "max": 40,
+     "def": 2,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "Hz"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "settings": [
+    {
+     "key": "wave",
+     "label": "Wave",
+     "options": [
+      "sine",
+      "triangle",
+      "ramp_up",
+      "ramp_down",
+      "square",
+      "sample_hold",
+      "perlin"
+     ],
+     "def": "sine"
+    }
+   ],
+   "trigger": true,
+   "source": true,
+   "bipolar": true
+  },
+  {
+   "id": "envelope",
+   "name": "Envelope",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "attack",
+     "label": "Attack",
+     "min": 0,
+     "max": 8,
+     "def": 0.01,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3.5,
+     "unit": "s",
+     "step": 0.005
+    },
+    {
+     "key": "decay",
+     "label": "Decay",
+     "min": 0,
+     "max": 8,
+     "def": 0.25,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "s"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "settings": [
+    {
+     "key": "shape",
+     "label": "Curve",
+     "options": [
+      "linear",
+      "smooth",
+      "expo_in",
+      "expo_out"
+     ],
+     "def": "smooth"
+    }
+   ],
+   "source": true
+  },
+  {
+   "id": "audio_band",
+   "name": "Audio Band",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "lo",
+     "label": "Band Low",
+     "min": 1,
+     "max": 512,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "bin",
+     "step": 1
+    },
+    {
+     "key": "hi",
+     "label": "Band High",
+     "min": 1,
+     "max": 512,
+     "def": 7,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "bin",
+     "step": 1
+    },
+    {
+     "key": "sensitivity",
+     "label": "Sensitivity",
+     "min": 0.1,
+     "max": 30,
+     "def": 1.5,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "threshold",
+     "label": "Threshold",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "squelch",
+     "label": "Squelch",
+     "min": 0,
+     "max": 1,
+     "def": 0.05,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "smoothing",
+     "label": "Smoothing",
+     "min": 0,
+     "max": 2,
+     "def": 0.02,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2.5,
+     "unit": "s"
+    },
+    {
+     "key": "agcRelease",
+     "label": "Auto-Gain Release",
+     "min": 0.1,
+     "max": 20,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "unit": "s"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ]
+  },
+  {
+   "id": "periodic",
+   "name": "Periodic",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "period",
+     "label": "Period",
+     "min": 0.01,
+     "max": 60,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3.5,
+     "unit": "s"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "trigger": true
+  },
+  {
+   "id": "threshold",
+   "name": "Threshold",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "level",
+     "label": "Trip Level",
+     "min": 0,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "hysteresis",
+     "label": "Hysteresis",
+     "min": 0,
+     "max": 1,
+     "def": 0.1,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "trigger": true,
+   "source": true
+  },
+  {
+   "id": "macro",
+   "name": "Macro",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "knob",
+     "label": "Value",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ]
+  },
+  {
+   "id": "math",
+   "name": "Math",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "hysteresis",
+     "label": "Hysteresis",
+     "min": 0,
+     "max": 1,
+     "def": 0.05,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "settings": [
+    {
+     "key": "op",
+     "label": "Operator",
+     "options": [
+      "add",
+      "sub",
+      "abs_diff",
+      "mul",
+      "min",
+      "max",
+      "gt",
+      "lt"
+     ],
+     "def": "sub"
+    }
+   ],
+   "trigger": true,
+   "source": true,
+   "sourceB": true,
+   "bipolar": true
+  },
+  {
+   "id": "delay",
+   "name": "Delay",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "time",
+     "label": "Time",
+     "min": 0,
+     "max": 8,
+     "def": 0.3,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3.5,
+     "unit": "s",
+     "step": 0.005
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "trigger": true,
+   "source": true,
+   "sourceB": true
+  },
+  {
+   "id": "tempo",
+   "name": "Tempo",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "slow",
+     "label": "Slow BPM",
+     "min": 40,
+     "max": 240,
+     "def": 70,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "BPM",
+     "step": 1
+    },
+    {
+     "key": "fast",
+     "label": "Fast BPM",
+     "min": 40,
+     "max": 240,
+     "def": 170,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "BPM",
+     "step": 1
+    },
+    {
+     "key": "smoothing",
+     "label": "Smoothing",
+     "min": 0,
+     "max": 20,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2.5,
+     "unit": "s"
+    },
+    {
+     "key": "sensitivity",
+     "label": "Sensitivity",
+     "min": 0.25,
+     "max": 16,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "threshold",
+     "label": "Threshold",
+     "min": 0,
+     "max": 0.02,
+     "def": 0.002,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "step": 0.0005
+    },
+    {
+     "key": "hold",
+     "label": "Hold",
+     "min": 1,
+     "max": 16,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "beats",
+     "step": 1
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ]
+  },
+  {
+   "id": "beat",
+   "name": "Beat",
+   "kind": "modulator",
+   "params": [
+    {
+     "key": "decay",
+     "label": "Decay",
+     "min": 0.05,
+     "max": 1,
+     "def": 0.5,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "nudge",
+     "label": "Nudge",
+     "min": -150,
+     "max": 150,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "ms",
+     "step": 1
+    },
+    {
+     "key": "sensitivity",
+     "label": "Sensitivity",
+     "min": 0.25,
+     "max": 16,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 3,
+     "unit": "\u00c3\u2014"
+    },
+    {
+     "key": "threshold",
+     "label": "Threshold",
+     "min": 0,
+     "max": 0.02,
+     "def": 0.002,
+     "mod": true,
+     "overflow": "clamp",
+     "curve": 2,
+     "step": 0.0005
+    },
+    {
+     "key": "hold",
+     "label": "Hold",
+     "min": 1,
+     "max": 16,
+     "def": 4,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "beats",
+     "step": 1
+    },
+    {
+     "key": "slew",
+     "label": "Slew",
+     "min": 0,
+     "max": 2,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "s"
+    }
+   ],
+   "settings": [
+    {
+     "key": "every",
+     "label": "Every",
+     "options": [
+      "beat",
+      "bar"
+     ],
+     "def": "beat"
+    },
+    {
+     "key": "shape",
+     "label": "Curve",
+     "options": [
+      "linear",
+      "smooth",
+      "expo_in",
+      "expo_out"
+     ],
+     "def": "expo_in"
+    }
+   ],
+   "trigger": true
+  }
+ ],
+ "indices": [
+  "density",
+  "u",
+  "position"
+ ],
+ "blends": [
+  {
+   "index": 0,
+   "id": "add"
+  },
+  {
+   "index": 1,
+   "id": "over"
+  },
+  {
+   "index": 2,
+   "id": "screen"
+  },
+  {
+   "index": 3,
+   "id": "multiply"
+  },
+  {
+   "index": 4,
+   "id": "erase"
+  },
+  {
+   "index": 5,
+   "id": "mask"
+  }
+ ],
+ "limits": {
+  "slots": 8,
+  "modulators": 16,
+  "warps": 8,
+  "matrix": 32,
+  "palette": 32,
+  "surface": 16,
+  "paths": {
+   "param": "L<slot>.<emitter|colour|palette|layer|warp0..7>.<key>",
+   "modulator": "M<index>.<key>",
+   "layerFlag": "L<slot>.<mute|solo|order|blend>",
+   "bypass": "L<slot>.<colour|warp0..7>.bypass, M<index>.bypass, R<row>.bypass, G.warp0..7.bypass",
+   "global": "G.<opacity|speed>, G.warp0..7.<key>",
+   "surface": "any param path; L<slot>.<mute|solo|blend>; a bypass; <node path>.<setting>; L<slot>.palette.entries[.<n>]"
+  },
+  "layer": {
+   "id": "layer",
+   "name": "Layer",
+   "kind": "layer",
+   "params": [
+    {
+     "key": "opacity",
+     "label": "Opacity",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    }
+   ]
+  },
+  "global": {
+   "id": "global",
+   "name": "Master",
+   "kind": "global",
+   "params": [
+    {
+     "key": "opacity",
+     "label": "Opacity",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "speed",
+     "label": "Speed",
+     "min": 0,
+     "max": 4,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp",
+     "unit": "\u00c3\u2014"
+    }
+   ]
+  }
+ },
+ "catalogHash": 3160481149
+}
