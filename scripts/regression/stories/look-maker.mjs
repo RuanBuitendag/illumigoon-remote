@@ -244,7 +244,11 @@ export const lookMaker = [
       await page.mouse.up();
       const dragged = await at();
       expect(Math.abs(dragged - Math.min(1, before + 0.1)) < 0.03, `a drag took the bar from ${before} to ${dragged}`);
-      await page.mouse.click(box.x + box.width * 0.25, y);
+      // The row can reflow once the drag lands, so the tap reads the bar where it is now.
+      await page.waitForTimeout(300);
+      const now = await bar.boundingBox();
+      await page.mouse.click(now.x + now.width * 0.25, now.y + now.height / 2);
+      await until(async () => Math.abs((await at()) - 0.25) < 0.03, 'a tap at a quarter to set the bar to a quarter');
       const tapped = await at();
       expect(Math.abs(tapped - 0.25) < 0.03, `a tap at a quarter set the bar to ${tapped}`);
     },
