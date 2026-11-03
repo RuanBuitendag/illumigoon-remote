@@ -29,6 +29,7 @@ import {
   libraryFor,
   partOfRoomNote,
   playingRow,
+  sharedPartOfRoomNote,
   type LibraryGroup,
   type LibraryLook,
 } from '../store/look-library';
@@ -171,6 +172,11 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
   useWarmPreviews(library.flatMap(({ looks }) => looks));
   const groups = foundGroups(library, wanted);
   const playing = playingRow(groups, playingName);
+  const sharedNote = sharedPartOfRoomNote(library, lights);
+  const lookNote = (look: LibraryLook) => {
+    const note = look.animation && partOfRoomNote(look, lights);
+    return note === sharedNote ? null : note;
+  };
   const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
@@ -226,7 +232,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
             key={look.id}
             name={look.name}
             description={look.description}
-            note={look.animation && partOfRoomNote(look, lights)}
+            note={lookNote(look)}
             hasSound={look.hasSound}
             isPlaying={`${title}/${look.id}` === playing}
             disabled={isEditing || !look.animation}
@@ -247,6 +253,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
     <>
       <LookSearch value={query} onChange={onQuery} />
       <LookList search={wanted}>
+        {sharedNote && <LookProblem>{sharedNote}</LookProblem>}
         {note && <LookProblem>{note}</LookProblem>}
         {groups.length === 0 && <LookProblem>{`No look matches ${query.trim()}.`}</LookProblem>}
         {groups.map(groupRows)}

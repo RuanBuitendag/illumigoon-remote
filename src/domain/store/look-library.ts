@@ -172,3 +172,11 @@ export function partOfRoomNote(look: LibraryLook, lights: Light[]) {
   if (look.lights.length === lights.length) return null;
   return `Plays on ${look.lights.map(({ name }) => name).join(', ')} only`;
 }
+
+// When every look that plays leaves out the same lights, the page says so once, not under each look.
+export function sharedPartOfRoomNote(groups: LibraryGroup[], lights: Light[]) {
+  const playable = groups.flatMap(({ looks }) => looks.filter(({ animation }) => animation));
+  const notes = playable.map((look) => partOfRoomNote(look, lights));
+  const [first] = notes;
+  return first && notes.every((note) => note === first) ? first : null;
+}
