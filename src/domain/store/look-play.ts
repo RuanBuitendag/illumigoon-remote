@@ -8,7 +8,7 @@ import { rememberRecentLook, useHousehold } from './household-store';
 import { useLibrary } from './library-store';
 import { cancelWaiting, gapOf, laterOn } from './light-timing';
 import { saveLook, useLookFiles } from './look-files';
-import { editedLook, lookNameOf, OWN_LOOK } from './rooms';
+import { editedLook, isSameAnimation, lookNameOf, OWN_LOOK } from './rooms';
 import { momentsOf, offerUndo, showNotice } from './undo';
 
 // A look written to a light that is off can replace the one it has saved when the light is short of
@@ -77,15 +77,16 @@ export function suggestedLookName(light: Light | undefined) {
 }
 
 // SAVE AS NEW: the look on the lights becomes a file in Mine, and the lights go by its name from now.
+// The look is the one a light that is on shows, and only lights that show that same look take its name.
 export async function saveAsNewLook(lights: Light[], name: string) {
-  const [light] = lights;
+  const light = lights.find(({ isOn, animation }) => isOn && animation) ?? lights.find(({ animation }) => animation);
   const animation = light?.animation;
   if (!light || !animation) return;
   const origin = originOf(light);
   await saveLook(name, animation, origin ? `Your version of ${origin}.` : '');
   if (useLibrary.getState().problem !== null) return;
   for (const shown of lights) {
-    if (shown.animation) noteState(shown, { isOn: shown.isOn, lookName: name, animation: shown.animation });
+    if (isSameAnimation(shown.animation, animation)) noteState(shown, { isOn: shown.isOn, lookName: name, animation });
   }
   showNotice(`${name} is in Mine`);
 }

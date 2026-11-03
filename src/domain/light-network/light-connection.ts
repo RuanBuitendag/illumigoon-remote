@@ -79,8 +79,12 @@ export class LightConnection {
 
   // Edit holds its own socket to this light, and its writes look like changes from elsewhere here.
   // Each one would ask for a state report, so while held this connection leaves the light alone.
+  // A look that waits to go out would land on top of Edit's own writes, so it is dropped.
   setHeld(isHeld: boolean) {
     this.isHeld = isHeld;
+    if (!isHeld) return;
+    this.unsentWrites.clear();
+    this.pendingWrites.clear();
   }
 
   close() {
