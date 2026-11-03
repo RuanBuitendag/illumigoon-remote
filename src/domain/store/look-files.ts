@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type { LibraryEntry, Preset, ServerLibrary, Shelf } from '@illumigoon/patch-editor/library';
 import type { AnimationState } from '../light-network/protocol';
 import { PATCH_LOOKS } from '../looks/looks';
-import { useHousehold, type SavedLook } from './household-store';
+import { useHousehold, type RecentLook, type SavedLook } from './household-store';
 import { attempt, library, unusedFile, useLibrary } from './library-store';
 
 // Looks kept as files in the library that every shell answers at `/api`. Mine is the folder a person
@@ -93,16 +93,16 @@ function readChanged(shared: Shared, entries: LibraryEntry[], known: LookFile[],
 
 const folderOf = ({ file, name, familyId, version }: LookFile) => ({ file, name, familyId, version });
 
-// A look that leaves Mine leaves Recent too. A shipped look of the same name stays.
-function forgetGoneLooks(before: LookFile[], after: LookFile[]) {
-  const kept = new Set([...after.map(({ name }) => name), ...PATCH_LOOKS.map(({ name }) => name)]);
-  const gone = new Set(before.map(({ name }) => name).filter((name) => !kept.has(name)));
-  if (gone.size === 0) return;
-  useHousehold.setState(({ recentLooks }) => ({
-    recentLooks: Object.fromEntries(
-      Object.entries(recentLooks).map(([roomId, looks]) => [roomId, looks.filter(({ name }) => !gone.has(name))]),
-    ),
-  }));
+// A saved look that is no longer in Mine, the examples or the shipped looks leaves Recent too. That
+// holds for a look deleted on another day or on another device. A flat look is not a file, so it stays.
+function forgetGoneLooks(mine: LookFile[], examples: LookFile[]) {
+  const kept = new Set([...mine, ...examples, ...PATCH_LOOKS].map(({ name }) => name));
+  const isKept = ({ name, animation }: RecentLook) => animation.type !== 'patch' || kept.has(name);
+  const { recentLooks } = useHousehold.getState();
+  if (Object.values(recentLooks).every((looks) => looks.every(isKept))) return;
+  useHousehold.setState({
+    recentLooks: Object.fromEntries(Object.entries(recentLooks).map(([roomId, looks]) => [roomId, looks.filter(isKept)])),
+  });
 }
 
 async function readLooks() {
@@ -120,7 +120,7 @@ async function readLooks() {
     ]);
     const shelf = shared.shelfOf(mine.map(folderOf), presets, useLookFiles.getState().server);
     useLookFiles.setState({ mine, examples: shownExamples, shelf, listProblem: null });
-    forgetGoneLooks(known.mine, mine);
+    forgetGoneLooks(mine, shownExamples);
   } catch (error) {
     useLookFiles.setState({ listProblem: `The looks did not load: ${reasonOf(error)}` });
   }
