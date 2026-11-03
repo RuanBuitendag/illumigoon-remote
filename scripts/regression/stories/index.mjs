@@ -3,5 +3,6 @@ import { eveningUser } from './evening-user.mjs';
 import { lookMaker } from './look-maker.mjs';
 import { cornerOwner } from './corner-owner.mjs';
 import { otherContexts } from './other-contexts.mjs';
+import { tapTargets } from './tap-targets.mjs';
 
-export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts];
+export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets];

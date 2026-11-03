@@ -187,6 +187,7 @@
 .page-section > .text-key { align-self: flex-start; }
 .info-row { display: flex; align-items: center; gap: var(--space-4); min-height: var(--row-tall); }
 .info-row .more-text, .info-open { flex: 1; min-width: 0; }
+.info-open { align-self: stretch; }
 .day-picker { display: flex; justify-content: space-between; }
 .day-key { width: var(--row); height: var(--row); color: var(--text-4); text-align: center; }
 .page-status { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-5); color: var(--text-2); }

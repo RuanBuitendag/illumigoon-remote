@@ -8,7 +8,12 @@ import { createServer } from 'vite';
 import { freshLibrary, madeUpLibrary } from './made-up-library.mjs';
 
 const PORT = 5198;
-const VIEWPORTS = { phone: { width: 375, height: 812 }, laptop: { width: 1280, height: 800 } };
+const VIEWPORTS = {
+  phone: { width: 375, height: 812 },
+  smallPhone: { width: 320, height: 640 },
+  laptop: { width: 1280, height: 800 },
+  largeLaptop: { width: 1440, height: 900 },
+};
 export const SHOTS = join(tmpdir(), 'illumigoon-regression');
 
 function startUrl({ lights, known }, ownWifi) {

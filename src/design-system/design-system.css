@@ -232,7 +232,6 @@ input::placeholder { color: var(--text-5); }
 .action-key { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); color: var(--text-1); font: var(--type-heading); }
 .key-row { display: flex; align-items: center; gap: var(--space-5); }
 .link-key { position: relative; text-decoration: underline; text-underline-offset: 3px; }
-.link-key::after { content: ''; position: absolute; inset: -14px -4px; }
 .add-key { min-height: var(--row); color: var(--text-3); white-space: nowrap; }
 .back-key { display: flex; align-items: center; gap: var(--space-3); min-height: var(--row); color: var(--text-3); }
 
@@ -248,7 +247,7 @@ input::placeholder { color: var(--text-5); }
 
 /* A thumb needs --row each way (LIFE-1953). A short word key keeps its look, and its hit area grows around it. */
 .text-key, .option { position: relative; }
-.text-key::after, .option::after, .colour-slot::after { content: ''; position: absolute; top: 50%; left: 50%; width: max(100%, var(--row)); height: max(100%, var(--row)); translate: -50% -50%; }
+.text-key::after, .option::after, .colour-slot::after, .link-key::after { content: ''; position: absolute; top: 50%; left: 50%; width: max(100%, var(--row)); height: max(100%, var(--row)); translate: -50% -50%; }
 
 /* Fader */
 

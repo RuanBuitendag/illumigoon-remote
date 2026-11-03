@@ -108,6 +108,7 @@ Status is the result of the last full run (3 Nov 2026): pass, or known fail with
 | P5-S1 play a look while one light is off | silent light, Looks page | `stories/other-contexts.mjs` | pass |
 | P5-S2 the Lounge on the laptop | room screen, Looks page | `stories/other-contexts.mjs` | pass |
 | P5-S3 a long name with an emoji | Rename and arrange | `stories/other-contexts.mjs` | pass |
+| LIFE-1953 every control is 44 px, nothing scrolls sideways, at 320, 375 and 1440 wide | every page and sheet but Edit | `stories/tap-targets.mjs` | pass |
 
 The other journeys in `journeys.mjs` (Home, room power, a light that dies, the Looks page, the level, Edit, the
 software notice) stay as they are and back these stories up.
