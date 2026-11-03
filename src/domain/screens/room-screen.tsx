@@ -19,6 +19,7 @@ import {
   editedLook,
   highestBrightness,
   isAnyOn,
+  hasOneLookName,
   isMixedLook,
   lightsInScope,
   lookNameOf,
@@ -65,7 +66,7 @@ function ChooseAllKey({ room, chosen }: { room: Room; chosen: Light[] }) {
 function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
   const lights = useShownLights(room.lights);
   const hasPowers = lights.length > 1;
-  const hasOneLook = !isMixedLook(lights.filter(({ isOnline }) => isOnline));
+  const hasOneLook = hasOneLookName(lights.filter(({ isOnline }) => isOnline));
   return (
     <RoomSection eyebrow="LIGHTS" action={<ChooseAllKey room={room} chosen={chosen} />}>
       {lights.map((light) => {
@@ -106,9 +107,9 @@ function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
 }
 
 function lookTitle(lights: Light[]) {
-  if (isMixedLook(lights)) return 'Mixed';
+  if (!hasOneLookName(lights)) return 'Mixed';
   const name = lookNameOf(lights[0]) ?? '';
-  return editedLook(lights[0]) ? `${name}, changed` : name;
+  return isMixedLook(lights) || editedLook(lights[0]) ? `${name}, changed` : name;
 }
 
 function offNote(lights: Light[]) {

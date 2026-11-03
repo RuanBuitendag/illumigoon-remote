@@ -7,7 +7,6 @@ import { lookShape } from '../looks/look-catalog';
 import { withPositions } from '../looks/looks';
 import { loadLatestVersions } from './firmware-versions';
 import { forgetLightAddress, rememberLightAddress, useHousehold } from './household-store';
-import { cancelWaiting } from './light-timing';
 import type {
   AnimationState,
   ConfigValue,
@@ -351,9 +350,7 @@ export function applyLook(lights: Light[], lookName: string, animation: Animatio
   }
 }
 
-// Edit sends its own writes from here on, so a look still waiting for this light would land on top of them.
 export function setHeldByEditor(address: string, isHeld: boolean) {
-  if (isHeld) cancelWaiting(address);
   connections.get(address)?.setHeld(isHeld);
 }
 

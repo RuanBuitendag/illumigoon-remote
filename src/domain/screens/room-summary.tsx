@@ -8,7 +8,7 @@ import { openPage, openRoom, useNavigation } from '../store/navigation-store';
 import {
   highestBrightness,
   isAnyOn,
-  isMixedLook,
+  hasOneLookName,
   lightState,
   lookIdOf,
   lookNameOf,
@@ -47,8 +47,7 @@ const hasReported = ({ animation, manifests, isLockedByOther }: Light) =>
 // While lights still report, the card names no look, so it does not change name as each one answers.
 function lookLabel(lights: Light[]) {
   if (!lights.every(hasReported)) return '';
-  if (isMixedLook(lights)) return 'Mixed';
-  return lookNameOf(lights[0]) ?? '';
+  return hasOneLookName(lights) ? (lookNameOf(lights[0]) ?? '') : 'Mixed';
 }
 
 function timerText(room: Room) {

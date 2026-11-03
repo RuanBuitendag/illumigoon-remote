@@ -3,9 +3,9 @@ import { lazy, type ReactNode, Suspense, useEffect, useState } from 'react';
 import { EditLayout } from '../../composites';
 import { APP_IDENTITY } from '../light-network/app-identity';
 import type { AnimationState } from '../light-network/protocol';
-import { finishEdit } from '../store/edit-follow';
+import { finishEdit, holdForEdit } from '../store/edit-follow';
 import { editorApi } from '../store/editor-host';
-import { noteState, setHeldByEditor, useFleet, type Light } from '../store/fleet-store';
+import { noteState, useFleet, type Light } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
 import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
@@ -89,8 +89,8 @@ function editStart(room: Room | undefined, scopeAddress: string | null) {
 function useEditorHold(heldAddress: string | undefined, isOpen: boolean) {
   useEffect(() => {
     if (!heldAddress) return undefined;
-    setHeldByEditor(heldAddress, true);
-    return () => setHeldByEditor(heldAddress, false);
+    holdForEdit(heldAddress, true);
+    return () => holdForEdit(heldAddress, false);
   }, [heldAddress]);
 
   useEffect(() => {

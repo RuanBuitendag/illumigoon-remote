@@ -228,6 +228,10 @@ export function playingLookName(lights: Light[]) {
 export const playsExactly = (lights: Light[], animation: AnimationState) =>
   lights.some(({ isOn }) => isOn) && lights.every((light) => !light.isOn || isSameAnimation(light.animation, animation));
 
+// Lights that differ only in their positions or edits still go by one name, so the room says that
+// name once, and "Mixed" only when the names differ.
+export const hasOneLookName = (lights: Light[]) => new Set(lights.map((light) => lookNameOf(light))).size <= 1;
+
 // A patch's name is a label, and a light can report the document without it, so it never makes lights differ.
 export function isMixedLook(lights: Light[]) {
   const signatures = new Set(lights.map(({ animation }) => animationKey(animation)));

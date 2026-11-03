@@ -98,6 +98,8 @@
 .room-section { display: flex; flex-direction: column; margin-top: var(--section); }
 .room-section .recent-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
 .light-card { margin-bottom: var(--space-2); }
+/* A light that cannot be chosen says why in its note, so the row is not also faded. */
+.light-pick:disabled, .light-tape:disabled { opacity: 1; }
 .light-card-top { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--row); }
 .light-pick { flex: 1; display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--row); color: var(--text-4); }
 .light-note { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

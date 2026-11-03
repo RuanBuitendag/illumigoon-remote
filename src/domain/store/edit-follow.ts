@@ -1,6 +1,6 @@
 import type { AnimationState } from '../light-network/protocol';
-import { applyLook, noteLook, type Light } from './fleet-store';
-import { gapOf, laterOn } from './light-timing';
+import { applyLook, noteLook, setHeldByEditor, type Light } from './fleet-store';
+import { cancelWaiting, gapOf, laterOn } from './light-timing';
 import { canPlay } from './rooms';
 
 // Each light waits only for its own last look, so it never gets a second look before it can take it,
@@ -21,4 +21,10 @@ export function finishEdit(edited: string, scope: Light[], lookName: string, loo
     (light) => light.address !== edited && light.isOnline && light.isOn && canPlay(light, look),
   );
   sendInTurn(others, lookName, look);
+}
+
+// Edit sends its own writes from here on, so a look still waiting for this light would land on top of them.
+export function holdForEdit(address: string, isHeld: boolean) {
+  if (isHeld) cancelWaiting(address);
+  setHeldByEditor(address, isHeld);
 }
