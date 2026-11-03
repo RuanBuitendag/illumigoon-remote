@@ -18,7 +18,7 @@ export { ColourPad } from './colour-pad';
 export { STARTER_COLOUR_SETS } from './colour-sets';
 export { Dialog } from './dialog';
 export { useDragOrder } from './drag-order';
-export { Fader } from './fader';
+export { Fader, FaderBand, FaderDot } from './fader';
 export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
 export { WIDE } from './layout';
 export { LedStrip } from './led-strip';

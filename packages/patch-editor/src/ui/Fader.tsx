@@ -11,19 +11,20 @@
  * difference would be worse than neither. A row's depth and polarity are set on the knob the
  * same address has on its Source tab, in the modulator's own editor, or in the matrix.
  *
- * Travel is RELATIVE, like the knob's: a drag moves the value from where it was, and a full
- * sweep is the bar's own width. A TAP that does not move sets the value where it landed, because
- * on a phone a tap on the track is how a person asks for a level (LIFE-1934).
+ * It is the design system's fader (D44), in position space: the bar runs 0..1 along the taper, so a
+ * drag moves evenly, as the knob's does. A tap or a drag sets the value where the pointer is, and
+ * the arrow keys step it.
  */
 
-import { Fragment, useRef } from 'react';
+import { Fragment } from 'react';
+import { Fader as Bar, FaderBand, FaderDot } from '../../../../src/design-system';
 import type { ParamSpec } from '../domain/catalog';
-import { clamp, clamp01, fineOf, slotNumber } from './bits';
+import { clamp, clamp01, slotNumber } from './bits';
 import { doubleClick } from './touch';
 import { format, reachOf, toPos, toValue, useModDots, type KnobMod } from './Knob';
 
-/** Further than this, in pixels, and a press is a drag rather than a tap. */
-const TAP_SLOP = 4;
+/** Fine enough that a drag along the widest bar never steps. */
+const POSITION_STEP = 0.001;
 
 export interface FaderProps {
   spec: ParamSpec;
@@ -47,83 +48,56 @@ const placeOnBar = (el: HTMLSpanElement, _i: number, position: number) => {
 
 export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, lit }: FaderProps) {
   const [lo, hi] = spec.soft ?? [spec.min, spec.max];
-  const f = toPos(value, lo, hi, spec.curve);
-
-  const drag = useRef<{ x: number; left: number; from: number; span: number; moved: boolean } | null>(
-    null,
-  );
   const dots = useModDots({ mods, value, lo, hi, curve: spec.curve }, placeOnBar);
-
-  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    // The primary button only, as `Knob`: a right-click opens the user-surface menu, not a drag.
-    if (e.button !== 0) return;
-    e.preventDefault();
-    e.stopPropagation();
-    e.currentTarget.setPointerCapture(e.pointerId);
-    const { left, width } = e.currentTarget.getBoundingClientRect();
-    drag.current = { x: e.clientX, left, from: f, span: width || 1, moved: false };
-  };
 
   const setAt = (t: number) => {
     const next = clamp(toValue(clamp01(t), lo, hi, spec.curve), spec.min, spec.max);
     onChange(spec.step && spec.step >= 1 ? Math.round(next) : next);
   };
 
-  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d) return;
-    if (!d.moved && Math.abs(e.clientX - d.x) < TAP_SLOP) return;
-    d.moved = true;
-    // In POSITION, not value, for the reason the knob gives: a taper would otherwise crawl at
-    // one end and leap at the other.
-    setAt(d.from + ((e.clientX - d.x) / d.span) * fineOf(e));
-  };
-
-  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
-    const d = drag.current;
-    if (!d) return;
-    drag.current = null;
-    if (!d.moved && e.type === 'pointerup') setAt((e.clientX - d.left) / d.span);
-    onCommit?.();
-  };
-
-  const reset = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const reset = () => {
     onChange(spec.def);
     onCommit?.();
   };
 
+  const said = `${format(value, spec)}${spec.unit ? ` ${spec.unit}` : ''}`;
   const title =
-    `${spec.label} ${format(value, spec)}${spec.unit ? ` ${spec.unit}` : ''}` +
-    (spec.desc ? `\n${spec.desc}` : '') +
-    `\n\n${spec.min} … ${spec.max}   default ${spec.def}` +
+    `${spec.label} ${said}` +
+    (spec.desc ? `
+${spec.desc}` : '') +
+    `
+
+${spec.min} … ${spec.max}   default ${spec.def}` +
     (mods.length
-      ? `\nmodulated by ${mods.map(m => `modulator ${slotNumber(m.src)}`).join(', ')} — set depth on the Source tab's ` +
+      ? `
+modulated by ${mods.map(m => `modulator ${slotNumber(m.src)}`).join(', ')} — set depth on the Source tab's ` +
         `knob, the modulator or the matrix`
       : '') +
-    `\ntap to set · drag sideways · shift for fine · ${doubleClick()} to reset`;
+    `
+tap or drag to set · arrow keys step · ${doubleClick()} to reset`;
 
   return (
-    <div className="editor-fader" title={title}
-         data-armed={armed || undefined} data-hot={hot || undefined} data-lit={lit || undefined}
-         onPointerDown={onPointerDown} onPointerMove={onPointerMove}
-         onPointerUp={endDrag} onPointerCancel={endDrag} onDoubleClick={reset}>
-      <span className="track" />
-      <span className="fill" style={{ width: `calc(${f * 100}% - 2px)` }} />
+    <Bar
+      label={spec.label}
+      value={toPos(value, lo, hi, spec.curve)}
+      min={0}
+      max={1}
+      step={POSITION_STEP}
+      isLit={false}
+      halo={lit ? 'driven' : hot ? 'hot' : armed ? 'armed' : undefined}
+      valueText={said}
+      title={title}
+      onChange={setAt}
+      onCommit={onCommit}
+      onReset={reset}
+    >
       {mods.map((m, i) => {
         const [rLo, rHi] = reachOf(m, value, { lo, hi, curve: spec.curve });
         return (
           <Fragment key={m.id}>
-            <span
-              className="reach"
-              data-inert={m.inert || undefined}
-              style={{ left: `${rLo * 100}%`, width: `${(rHi - rLo) * 100}%` }}
-            />
+            <FaderBand from={rLo} to={rHi} isInert={m.inert} />
             {m.liveAt && (
-              <span
-                className="dot"
-                style={{ display: 'none' }}
+              <FaderDot
                 ref={el => {
                   dots.current[i] = el;
                 }}
@@ -132,6 +106,6 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
           </Fragment>
         );
       })}
-    </div>
+    </Bar>
   );
 }
