@@ -23,10 +23,12 @@ export type History = { canUndo: boolean; canRedo: boolean; undo(): void; redo()
 const isTyping = (target: EventTarget | null) =>
   target instanceof HTMLElement && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
 
-export function useHistory({ draft, writes, nav, say }: {
+export function useHistory({ draft, writes, nav, isEditing, say }: {
   draft: Pick<PatchDraft, 'patch' | 'patchRef' | 'hasEditedRef'>;
   writes: Pick<PatchWrites, 'pushScene'>;
   nav: Pick<Navigation, 'leftPatch' | 'sel'>;
+  /** Whether the light has answered what it plays. */
+  isEditing: boolean;
   say(message: string): void;
 }): History {
   const { patch, patchRef, hasEditedRef } = draft;
@@ -61,11 +63,27 @@ export function useHistory({ draft, writes, nav, say }: {
       rested.current = patch;
       return undefined;
     }
-    if (hasEditedRef.current && patch !== rested.current)
+    // Until the first edit, a new patch is the look arriving, never a step: the look loading late
+    // must not leave the empty patch it replaced as the first undo (E1).
+    if (!hasEditedRef.current) {
+      rested.current = patch;
+      return undefined;
+    }
+    if (patch !== rested.current)
       setCounts(c => (c.isMoving ? c : { ...c, isMoving: true }));
     const timer = window.setTimeout(keep, SETTLE_MS);
     return () => window.clearTimeout(timer);
   }, [patch, keep, hasEditedRef]);
+
+  // The history starts at the look the light reported. The opening pull replaces an edit made
+  // while it was out, so a step from before it would undo to the empty patch it replaced (E1).
+  useEffect(() => {
+    if (!isEditing) return;
+    past.current = [];
+    future.current = [];
+    rested.current = patchRef.current;
+    recount();
+  }, [isEditing, patchRef, recount]);
 
   const go = useCallback((from: RefObject<Patch[]>, to: RefObject<Patch[]>, word: string) => {
     keep();

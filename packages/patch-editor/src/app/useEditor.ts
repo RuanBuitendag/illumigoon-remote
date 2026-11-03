@@ -40,7 +40,7 @@ export function useEditor(light: OpenLight | undefined) {
   const rolled = useRolls({ ...draft, ...writes, ...nav, say });
   const gesture = useBindGesture({ ...draft, ...writes, dragRef, say });
   const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say, sayUndoable });
-  const history = useHistory({ draft, writes, nav, say });
+  const history = useHistory({ draft, writes, nav, isEditing: ready.at === 'editing', say });
   const dialogs = useDialogs();
   useKeptDraft({ draft, ready, pushScene: writes.pushScene, leftPatch: nav.leftPatch, say });
 
