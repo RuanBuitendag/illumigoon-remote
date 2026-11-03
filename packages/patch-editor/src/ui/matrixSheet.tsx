@@ -40,7 +40,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
           </Mono>
         </SheetHead>
 
-        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
           <div style={{ width: 52 }}>
             <Lab className="dim">NO.</Lab>
           </div>
@@ -70,11 +70,11 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         </div>
         <Hr />
 
-        <div className="scroll" style={{ padding: '6px 6px 0' }}>
+        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
           {ctl.patch.matrix.length === 0 && (
             <div
               style={{
-                padding: '48px 20px',
+                padding: 'var(--space-6) var(--space-5)',
                 textAlign: 'center',
                 font: 'var(--type-small-sans)',
                 color: 'var(--text-5)',
@@ -98,7 +98,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 
         <div className="grow" />
         <Hr />
-        <div style={{ padding: '17px 20px', display: 'flex', flexDirection: 'column', gap: 9 }}>
+        <div style={{ padding: 'var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
           <Lab className="dim">Each row moves one setting with one source</Lab>
           <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
             BY is how far, in the setting’s own numbers. <M>both</M> swings it above and below
@@ -140,7 +140,7 @@ function MatrixRoute({
 }) {
   return (
     <>
-      <div className="row" style={{ width: 52, gap: 9 }}>
+      <div className="row" style={{ width: 52, gap: 'var(--space-2)' }}>
         <span
           className="src"
           style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}
@@ -157,7 +157,7 @@ function MatrixRoute({
       <div className="row" style={{ width: 26 }}>
         <Ico.Arrow />
       </div>
-      <div className="col" style={{ width: 236, gap: 7 }}>
+      <div className="col" style={{ width: 236, gap: 'var(--space-2)' }}>
         <span className="dst" style={{ color: 'var(--text-1)' }}>
           {pathName(r.dst)}
         </span>
@@ -261,7 +261,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
         <Lab className="dim">{resolved ? OVERFLOW_WORDS[resolved.spec.overflow] : '—'}</Lab>
       </div>
       <div className="grow" />
-      <span style={{ marginRight: 14 }}>
+      <span style={{ marginRight: 'var(--space-3)' }}>
         <Switch
           on={!r.bypass}
           title="Bypass this one wire — applies live"

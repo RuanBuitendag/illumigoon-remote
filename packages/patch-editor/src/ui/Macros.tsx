@@ -54,9 +54,9 @@ export function MacroRack({ ctl }: { ctl: Ctl }) {
     <div className="dock">
       <div
         className="row rackhead"
-        style={{ height: 34, padding: '0 18px', justifyContent: 'space-between' }}
+        style={{ height: 'var(--space-6)', padding: '0 var(--space-4)', justifyContent: 'space-between' }}
       >
-        <div className="row" style={{ gap: 14 }}>
+        <div className="row" style={{ gap: 'var(--space-3)' }}>
           <RackToggle
             shut={shut}
             onToggle={() => {
@@ -176,9 +176,9 @@ function MacroNaming({ ctl, m }: { ctl: Ctl; m: Modulator }) {
     '';
 
   return (
-    <div className="col" style={{ gap: 8, paddingTop: 2 }}>
+    <div className="col" style={{ gap: 'var(--space-2)', paddingTop: 'var(--space-half)' }}>
       <Lab className="dim">Name — what it says on the knob</Lab>
-      <div className="row well" style={{ padding: '9px 12px' }}>
+      <div className="row well" style={{ padding: 'var(--space-2) var(--space-3)' }}>
         <input
           value={text}
           spellCheck={false}

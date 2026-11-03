@@ -35,11 +35,11 @@ export function SheetHead({ icon, title, onClose, children }: {
 }) {
   return (
     <div className="sheethead">
-      <div className="row" style={{ gap: 13 }}>
+      <div className="row" style={{ gap: 'var(--space-3)' }}>
         {icon}
         <span style={{ font: 'var(--type-label)', letterSpacing: 'var(--tracking-label)' }}>{title}</span>
       </div>
-      <div className="row" style={{ gap: 18 }}>
+      <div className="row" style={{ gap: 'var(--space-4)' }}>
         {children}
         <button className="sheetx" title="Close (Esc)" onClick={onClose}><Ico.X c="var(--text-4)" /></button>
       </div>
@@ -56,7 +56,7 @@ export function SaveBar({ label, ready, clash, onSave, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="row" style={{ gap: 14, padding: '15px 20px', flexShrink: 0 }}>
+    <div className="row" style={{ gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-5)', flexShrink: 0 }}>
       <Lab className="dim">{label}</Lab>
       {children}
       <button className="pill raise" data-primary="true" disabled={!ready} onClick={onSave}>
@@ -80,7 +80,7 @@ export function SaveField({ value, placeholder, disabled, wide, font, colour, on
 }) {
   return (
     <div className={wide ? 'row well grow' : 'row well'}
-         style={{ padding: '10px 13px', width: wide ? undefined : 232 }}>
+         style={{ padding: 'var(--space-3)', width: wide ? undefined : 232 }}>
       <input
         value={value}
         placeholder={placeholder}
@@ -101,7 +101,7 @@ export function ShelfHeading({ label, emphasis, count }: {
   count: number;
 }) {
   return (
-    <div className="row" style={{ gap: 10, padding: '12px 14px 5px' }}>
+    <div className="row" style={{ gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4) var(--space-1)' }}>
       <Lab className={emphasis ? 'mid' : 'dim'}>{label}</Lab>
       <span style={{ flexGrow: 1, height: 1, background: 'var(--track)' }} />
       <Mono className="dim sm">{count}</Mono>
@@ -116,9 +116,9 @@ export function ShelfNotice({ label, colour, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="col" style={{ gap: 2 }}>
+    <div className="col" style={{ gap: 'var(--space-half)' }}>
       <ShelfHeading label={label} emphasis={false} count={0} />
-      <div style={{ padding: '2px 14px 4px', font: 'var(--type-small-sans)', color: colour }}>
+      <div style={{ padding: 'var(--space-half) var(--space-4) var(--space-1)', font: 'var(--type-small-sans)', color: colour }}>
         {children}
       </div>
     </div>

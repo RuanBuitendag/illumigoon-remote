@@ -111,7 +111,7 @@ function PaletteSaveForm({ ctl, entries, wrap, rows, onSaved, onError }: {
         <Mono className="dim sm">{entries.length} stops</Mono>
       </SaveBar>
 
-      <div className="row" style={{ gap: 10, padding: '0 20px 14px', flexShrink: 0 }}>
+      <div className="row" style={{ gap: 'var(--space-2)', padding: '0 var(--space-5) var(--space-4)', flexShrink: 0 }}>
         <Mono className="dim sm">{file}</Mono>
         <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
           the colours only — hue, saturation and value stay with the layer
@@ -225,7 +225,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
         <Hr />
 
         {/* ---- columns ---- */}
-        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
           <div style={{ width: 186 }}>
             <Lab className="dim">PALETTE</Lab>
           </div>
@@ -235,14 +235,14 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
           <div style={{ width: 62, textAlign: 'right' }}>
             <Lab className="dim">STOPS</Lab>
           </div>
-          <div className="grow" style={{ paddingLeft: 20 }}>
+          <div className="grow" style={{ paddingLeft: 'var(--space-5)' }}>
             <Lab className="dim">WHERE</Lab>
           </div>
           <div style={{ width: 128 }} />
         </div>
         <Hr />
 
-        <div className="scroll" style={{ padding: '6px 6px 0' }}>
+        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
           {busy && rows.length === 0 && <div className="libempty">Reading the folder…</div>}
 
           {!busy && !error && rows.length === 0 && (
@@ -254,7 +254,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
           )}
 
           {groups.map(({ key, label, group, derived, list }) => (
-            <div key={key} className="col" style={{ gap: 2 }}>
+            <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
               <ShelfHeading label={label} emphasis={!!group || !!derived} count={list.length} />
 
               {list.map((e, i) => (
@@ -276,9 +276,9 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
         <div className="grow" />
         <Hr />
 
-        <div className="row" style={{ padding: '15px 20px', gap: 16, flexShrink: 0 }}>
+        <div className="row" style={{ padding: 'var(--space-4) var(--space-5)', gap: 'var(--space-4)', flexShrink: 0 }}>
           {error ? (
-            <div className="row" style={{ gap: 9 }}>
+            <div className="row" style={{ gap: 'var(--space-2)' }}>
               <span className="livedot" data-warn="true" />
               <span className="warnline">{error}</span>
             </div>
@@ -306,7 +306,7 @@ function PaletteName({
   where: 'layer' | 'master';
 }) {
   return (
-    <div className="col" style={{ width: 206, gap: 7, paddingRight: 14 }}>
+    <div className="col" style={{ width: 206, gap: 'var(--space-2)', paddingRight: 'var(--space-4)' }}>
       <span
         className="libname"
         title={e.name}
@@ -351,7 +351,7 @@ function PaletteCount({ e }: { e: PaletteEntry }) {
 /** Why the palette could not be read, or where it came from. */
 function PaletteNotes({ e }: { e: PaletteEntry }) {
   return (
-    <div className="col grow libnotes" style={{ gap: 7, paddingLeft: 20, paddingRight: 14 }}>
+    <div className="col grow libnotes" style={{ gap: 'var(--space-2)', paddingLeft: 'var(--space-5)', paddingRight: 'var(--space-4)' }}>
       {e.error
         ? <span className="warnline">{e.error}</span>
         : <span className="libnote" title={(e.sources ?? [e.file ?? '']).join('\n')}>
@@ -375,7 +375,7 @@ function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
   <div className="mrow librow palrow"
        data-odd={odd || undefined}
        onDoubleClick={() => !e.error && onRecall(e.entries, e.name)}>
-    <div style={{ width: 186, paddingRight: 16 }}>
+    <div style={{ width: 186, paddingRight: 'var(--space-4)' }}>
       <div className="palstrip"
            style={{ background: `linear-gradient(90deg, ${gradientOf(e.entries)})` }} />
     </div>
@@ -385,7 +385,7 @@ function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
 
     <PaletteNotes e={e} />
 
-    <div className="row libacts" style={{ width: 128, justifyContent: 'flex-end', gap: 12 }}>
+    <div className="row libacts" style={{ width: 128, justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
       <button className="pill" disabled={!!e.error || !e.entries.length}
               onClick={() => onRecall(e.entries, e.name)}>RECALL</button>
       <button title="Copy the entries as JSON" onClick={() => onCopy(e)}><Ico.Copy /></button>

@@ -460,19 +460,19 @@ function KnobReadout({ spec, value, mods, bare, onPolarity, onUnbind }: Pick<
   KnobProps, 'spec' | 'value' | 'bare' | 'onPolarity' | 'onUnbind'
 > & { mods: NonNullable<KnobProps['mods']> }) {
   return (
-    <div className="col" style={{ alignItems: 'center', gap: 6 }}>
+    <div className="col" style={{ alignItems: 'center', gap: 'var(--space-1)' }}>
       {!bare && <span className="lab">{spec.short ?? spec.label}</span>}
       {/*
         The unit sits beside the value rather than only in the tooltip, because it is the
         half of the answer that stops a person having to hover at all: `0.35` under Launch
         Speed reads as a fraction of something, and `0.35 strip/s` does not.
       */}
-      <div className="row" style={{ gap: 3, alignItems: 'baseline' }}>
+      <div className="row" style={{ gap: 'var(--space-half)', alignItems: 'baseline' }}>
         <span className="kval">{format(value, spec)}</span>
         {spec.unit ? <span className="kunit">{spec.unit}</span> : null}
       </div>
       {mods.length > 0 && (
-        <div className="row" style={{ gap: 4, flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className="row" style={{ gap: 'var(--space-1)', flexWrap: 'wrap', justifyContent: 'center' }}>
           {mods.map(m => (
             <ModChip key={m.id} m={m} onPolarity={onPolarity} onUnbind={onUnbind} />
           ))}

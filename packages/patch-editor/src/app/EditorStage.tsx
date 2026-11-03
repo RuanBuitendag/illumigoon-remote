@@ -163,7 +163,7 @@ function SidePanel({ ctl, nav, patch, rolled, dialogs, connected, deviceName, on
     <>
       <div className="panelhead"><Lab className="head">{side === 'fx' ? 'Effects' : 'Colour'}</Lab></div>
       <Hr />
-      <div style={{ padding: '18px 16px' }}>
+      <div style={{ padding: 'var(--space-4)' }}>
         <Blurb>No layer selected. Add one on the left, or roll one on the Roll tab.</Blurb>
       </div>
     </>
@@ -411,14 +411,14 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
   return (
     <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }}>
       <div className="modslot raise-hi" data-dragging="true" style={{ width: 170 }}>
-        <div className="row" style={{ gap: 9 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <span style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}>
             {slotNumber(draggingMod.slot)}
           </span>
           <ModIcon type={draggingMod.type} />
           <span className="mname">{draggingMod.type}</span>
         </div>
-        <div className="col" style={{ gap: 8 }}>
+        <div className="col" style={{ gap: 'var(--space-2)' }}>
           <div className="meter well">
             <i style={{ width: '50%' }} />
           </div>

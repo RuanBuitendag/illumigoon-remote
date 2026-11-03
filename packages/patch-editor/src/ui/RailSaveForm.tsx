@@ -32,7 +32,7 @@ function publishLines(publishing: boolean, verdict: Verdict): string[] {
 /** One short line per action, so nobody has to guess what a button does. */
 function SaveMeans({ lines }: { lines: string[] }) {
   return (
-    <div className="col" style={{ gap: 4 }}>
+    <div className="col" style={{ gap: 'var(--space-1)' }}>
       {lines.map(line => <Blurb key={line}>{line}</Blurb>)}
     </div>
   );
@@ -48,7 +48,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
     return (
       <button
         className="pill"
-        style={{ padding: '8px 12px' }}
+        style={{ padding: 'var(--space-2) var(--space-3)' }}
         disabled
         title="waiting for the patch server — it sleeps, so the first publish of the day is slow"
       >
@@ -60,7 +60,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
   // offer onto the screen for as long as a disk read takes.
   if (!verdict)
     return (
-      <button className="pill" style={{ padding: '8px 12px' }} disabled>
+      <button className="pill" style={{ padding: 'var(--space-2) var(--space-3)' }} disabled>
         PUBLISH
       </button>
     );
@@ -68,7 +68,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
   // is how a patch comes back after the server loses its disk (#65).
   if (verdict.unchanged) {
     return (
-      <button className="pill" style={{ padding: '8px 12px' }}
+      <button className="pill" style={{ padding: 'var(--space-2) var(--space-3)' }}
               disabled={!save.name.trim()} onClick={() => onPublish('version')}
               title="Send this document again — the server already has it, so nothing changes">
         RE-PUBLISH v{verdict.identity?.version}
@@ -79,7 +79,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
     <>
       {verdict.offered.map((kind, i) => (
         <button key={kind} className="pill" data-primary={i === 0 ? 'true' : undefined}
-                style={{ padding: '8px 12px' }}
+                style={{ padding: 'var(--space-2) var(--space-3)' }}
                 disabled={!save.name.trim()} onClick={() => onPublish(kind)}
                 title={PUBLISH_MEANS[kind]}>
           {publishLabel(kind, verdict)}
@@ -123,10 +123,10 @@ function PresetCopyRow({ canCapture, presetCount, onCapture, onCopy }: {
     <>
       {/* Saving WHERE THE KNOBS ARE, as distinct from saving the patch. A patch is the
           instrument; a preset is a set of positions on it, and many belong to one patch. */}
-      <div className="row" style={{ gap: 8 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <button
           className="pill sm"
-          style={{ padding: '5px 10px' }}
+          style={{ padding: 'var(--space-1) var(--space-3)' }}
           disabled={!canCapture}
           onClick={() => onCapture()}
           title="Save where the controls are now as a preset of this patch"
@@ -139,7 +139,7 @@ function PresetCopyRow({ canCapture, presetCount, onCapture, onCopy }: {
         <span className="grow" />
         <button
           className="pill sm"
-          style={{ padding: '5px 10px' }}
+          style={{ padding: 'var(--space-1) var(--space-3)' }}
           onClick={() => onCopy()}
           title="Copy the patch on the light as JSON"
         >
@@ -179,7 +179,7 @@ export function RailSaveForm({
   const saveMeans = clash ? `Puts this over ${name} in Mine` : `Keeps ${name} in Mine`;
   return (
     <div className="railsave">
-      <div className="row" style={{ gap: 8 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <input
           ref={nameInput}
           className="well"
@@ -203,11 +203,11 @@ export function RailSaveForm({
         }}
       />
       {size > BUDGET.NVS && <Blurb>{budgetNote(size)}</Blurb>}
-      <div className="row" style={{ gap: 18 }}>
+      <div className="row" style={{ gap: 'var(--space-4)' }}>
         <button
           className="pill"
           data-primary="true"
-          style={{ padding: '8px 12px' }}
+          style={{ padding: 'var(--space-2) var(--space-3)' }}
           disabled={!save.name.trim()}
           onClick={() => onSave()}
           title={saveMeans}

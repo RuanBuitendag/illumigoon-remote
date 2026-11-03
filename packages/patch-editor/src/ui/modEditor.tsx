@@ -51,9 +51,9 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
       <Hr />
       <div
         className="modeditor"
-        style={{ padding: '16px 18px 20px', display: 'flex', gap: 26, alignItems: 'flex-start' }}
+        style={{ padding: 'var(--space-4) var(--space-4) var(--space-5)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start' }}
       >
-        <div className="col" style={{ gap: 12, width: 300, flexShrink: 0 }}>
+        <div className="col" style={{ gap: 'var(--space-3)', width: 300, flexShrink: 0 }}>
           <ModHead ctl={ctl} m={m} onClose={onClose} />
 
           {m.type !== 'macro' && <ModTypePicker ctl={ctl} m={m} spec={spec} />}
@@ -82,13 +82,13 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
 /** The slot number, which rack it is in, its bypass and its delete. */
 function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void }) {
   return (
-    <div className="row" style={{ gap: 11, justifyContent: 'space-between' }}>
-      <div className="row" style={{ gap: 11 }}>
+    <div className="row" style={{ gap: 'var(--space-3)', justifyContent: 'space-between' }}>
+      <div className="row" style={{ gap: 'var(--space-3)' }}>
         <Mono className="accent">{slotNumber(m.slot)}</Mono>
         {/* The rack it is sitting in, said out loud — the same editor opens under both. */}
         <Lab className="head">{m.type === 'macro' ? 'Macro' : 'Modulator'}</Lab>
       </div>
-      <div className="row" style={{ gap: 14 }}>
+      <div className="row" style={{ gap: 'var(--space-3)' }}>
         <span {...exposeProps(ctl.patch, `M${m.slot}.bypass`)}>
           <Switch
             on={!m.bypass}
@@ -267,9 +267,9 @@ function SourceWire({ ctl, m, others, wire, label }: {
   const src = wire === 'a' ? m.source : m.sourceB;
 
   return (
-    <div className="col" style={{ gap: 9, paddingTop: 4 }}>
+    <div className="col" style={{ gap: 'var(--space-2)', paddingTop: 'var(--space-1)' }}>
       <Lab className="dim">{label}</Lab>
-      <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+      <div className="row" style={{ gap: 'var(--space-1)', flexWrap: 'wrap' }}>
         {others.length === 0 ? (
           <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
             no other modulator loaded
@@ -369,7 +369,7 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
   const slotSwings = srcBipolarOf(ctl.patch, slot);
   if (!reach.total) {
     return (
-      <div className="col" style={{ gap: 9, minWidth: 210 }}>
+      <div className="col" style={{ gap: 'var(--space-2)', minWidth: 210 }}>
         <Lab className="dim">Drives</Lab>
         <Blurb>
           Nothing yet. Drag this onto a dial, or hold the dial.
@@ -378,12 +378,12 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
     );
   }
   return (
-    <div className="col" style={{ gap: 10, minWidth: 250 }}>
+    <div className="col" style={{ gap: 'var(--space-2)', minWidth: 250 }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="dim">Drives</Lab>
         <Mono className="dim sm">{reach.total}</Mono>
       </div>
-      <div className="col" style={{ gap: 3 }}>
+      <div className="col" style={{ gap: 'var(--space-half)' }}>
         {reach.rows.map(r => {
           const resolved = specForPath(ctl.patch, r.dst);
           return (
@@ -442,7 +442,7 @@ function ModParams({ ctl, m, spec }: {
 }) {
   return (
     <div
-      style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexGrow: 1, minWidth: 0 }}
+      style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)', flexGrow: 1, minWidth: 0 }}
     >
       {/*
         A MACRO OFFERS ITS KNOB AND NOTHING ELSE. `slew` is real and still in the
@@ -450,7 +450,7 @@ function ModParams({ ctl, m, spec }: {
         is a smoothing time, not a thing a person reaches for while playing, and a macro
         with two dials on it reads as two controls. See LIFE-743 for why it exists.
       */}
-      <div style={{ display: 'flex', gap: 12, flexGrow: 1, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: 'var(--space-3)', flexGrow: 1, flexWrap: 'wrap' }}>
         {spec.params
           .filter(ps => m.type !== 'macro' || ps.key === 'knob')
           .map(ps => (

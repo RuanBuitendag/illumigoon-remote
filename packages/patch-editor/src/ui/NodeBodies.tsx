@@ -58,7 +58,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
   };
 
   return (
-    <div className="col" style={{ padding: '18px 26px 0', gap: 9 }}>
+    <div className="col" style={{ padding: 'var(--space-4) var(--space-5) 0', gap: 'var(--space-2)' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="head">Trigger</Lab>
         {warn && <span className="warnline">{warn}</span>}
@@ -78,7 +78,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
         data-hot={ctl.hot === path || undefined}
         data-lit={(ctl.trace !== null && wired === ctl.trace) || undefined}
       >
-        <div className="row" style={{ gap: 6, flexWrap: 'wrap' }}>
+        <div className="row" style={{ gap: 'var(--space-1)', flexWrap: 'wrap' }}>
           {sources.map(o => (
             <button
               key={o.slot}
@@ -143,7 +143,7 @@ export function EmitterBody({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
   const spec = nodeById(layer.emitter.type);
   return (
     <>
-      <div style={{ padding: '24px 26px 0', flexShrink: 0 }}>
+      <div style={{ padding: 'var(--space-5) var(--space-5) 0', flexShrink: 0 }}>
         <Seg
           items={nodesOfKind('emitter').map(e => e.id)}
           value={layer.emitter.type}
@@ -161,7 +161,7 @@ export function EmitterBody({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
           }
         />
         {spec?.blurb && (
-          <div style={{ paddingTop: 12 }}>
+          <div style={{ paddingTop: 'var(--space-3)' }}>
             <Blurb>{spec.blurb}</Blurb>
           </div>
         )}
@@ -171,9 +171,9 @@ export function EmitterBody({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
       {spec?.takesTrigger && <TriggerRow ctl={ctl} layer={layer} />}
 
       <div
-        style={{ padding: '22px 26px 24px', display: 'flex', alignItems: 'flex-start', gap: 16 }}
+        style={{ padding: 'var(--space-5)', display: 'flex', alignItems: 'flex-start', gap: 'var(--space-4)' }}
       >
-        <div style={{ display: 'flex', gap: 12, flexGrow: 1, flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-3)', flexGrow: 1, flexWrap: 'wrap' }}>
           {spec?.params.map(ps => (
             <Param
               key={ps.key}
@@ -221,7 +221,7 @@ export function WarpBody({ ctl, host, i }: { ctl: Ctl; host: RackHost; i: number
   const inert = warpSpec.recolour && colour !== undefined
     && i < Math.min(colour.layer.colour.at ?? host.warps.length, host.warps.length);
   return (
-    <div style={{ padding: '18px 16px 22px', display: 'flex', flexDirection: 'column', gap: 14 }}>
+    <div style={{ padding: 'var(--space-4) var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       <Seg
         items={nodesOfKind('warp').map(w => w.id)}
         value={warp.type}
@@ -245,7 +245,7 @@ export function WarpBody({ ctl, host, i }: { ctl: Ctl; host: RackHost; i: number
           Above Colour there is no colour yet, so this does nothing. Drag it under the Colour row.
         </Blurb>
       )}
-      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 28, flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', alignItems: 'flex-start', gap: 'var(--space-5)', flexWrap: 'wrap' }}>
         {warpSpec.params.map(ps => (
           <Param
             key={ps.key}
@@ -278,7 +278,7 @@ export function WarpBody({ ctl, host, i }: { ctl: Ctl; host: RackHost; i: number
       {warpSpec.recolour ? (
         <Lab className="dim">changes colour only &#183; see the strip</Lab>
       ) : (
-        <div className="col" style={{ gap: 5, paddingTop: 4 }}>
+        <div className="col" style={{ gap: 'var(--space-1)', paddingTop: 'var(--space-1)' }}>
           <StageStrip warps={host.warps} upto={i} height={16} />
           <StageStrip warps={host.warps} upto={i + 1} height={16} />
           <Lab className="dim">in &#183; out of warp{i}</Lab>

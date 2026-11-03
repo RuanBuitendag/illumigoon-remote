@@ -129,7 +129,7 @@ export function Stages({ warps, colourAt, sel, onSelect }: {
           <span className="stagedot" data-kind="source" />
           <span className="stagename dim">source space</span>
         </div>
-        <div className="col grow" style={{ gap: 6, minWidth: 0 }}>
+        <div className="col grow" style={{ gap: 'var(--space-1)', minWidth: 0 }}>
           <StageStrip warps={warps} upto={0} />
           <span className="stagecap">the shape&rsquo;s own coordinate, before anything</span>
         </div>
@@ -172,7 +172,7 @@ function StageRow({ warps, w, row, colourRow, on, onSelect }: {
         <span className="stagename">{w.type}</span>
         <span className="stageslot">warp{row}</span>
       </div>
-      <div className="col grow" style={{ gap: 6, minWidth: 0 }}>
+      <div className="col grow" style={{ gap: 'var(--space-1)', minWidth: 0 }}>
         <StageStrip warps={warps} upto={upto} />
         <span className="stagecap">{stageCaption(w, row, colourRow, upto === warps.length)}</span>
       </div>

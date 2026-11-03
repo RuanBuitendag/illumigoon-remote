@@ -159,8 +159,8 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
         )}
       </SaveBar>
 
-      <div className="col" style={{ gap: 7, padding: '0 20px 14px', flexShrink: 0 }}>
-        <div className="row" style={{ gap: 10 }}>
+      <div className="col" style={{ gap: 'var(--space-2)', padding: '0 var(--space-5) var(--space-4)', flexShrink: 0 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <Mono className="dim sm">{file}</Mono>
           <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
             a slash makes a group — <span style={{ fontFamily: 'var(--mono)' }}>fire/Ember</span>
@@ -266,7 +266,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         <Hr />
 
         {/* ---- columns ---- */}
-        <div className="row sheetcols" style={{ height: 30, padding: '0 20px', flexShrink: 0 }}>
+        <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
           <div style={{ width: 210 }}>
             <Lab className="dim">NAME</Lab>
           </div>
@@ -283,12 +283,12 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         </div>
         <Hr />
 
-        <div className="scroll" style={{ padding: '6px 6px 0' }}>
+        <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) 0' }}>
           <FragmentNotices busy={busy} isEmpty={rows.length === 0} hasStarters={starters.length > 0}
                            error={error} starterError={starterError} />
 
           {sections.map(({ key, label, group, list }) => (
-            <div key={key} className="col" style={{ gap: 2 }}>
+            <div key={key} className="col" style={{ gap: 'var(--space-half)' }}>
               <ShelfHeading label={label} emphasis={!!group} count={list.length} />
 
               {list.map((e, i) => (
@@ -353,7 +353,7 @@ function FragmentNotices({ busy, isEmpty, hasStarters, error, starterError }: {
 
 function FragmentName({ e }: { e: FragmentEntry }) {
   return (
-    <div className="col" style={{ width: 210, gap: 7 }}>
+    <div className="col" style={{ width: 210, gap: 'var(--space-2)' }}>
       <span
         className="libname"
         title={e.name}
@@ -375,7 +375,7 @@ function FragmentActions({ e, why, onPull, onDrop }: {
   e: FragmentEntry; why: string | null; onPull(e: FragmentEntry): void; onDrop(e: FragmentEntry): void;
 }) {
   return (
-    <div className="row libacts" style={{ width: 122, justifyContent: 'flex-end', gap: 12 }}>
+    <div className="row libacts" style={{ width: 122, justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
       <button
         className="pill"
         disabled={!!e.error || !!why}
@@ -414,7 +414,7 @@ function FragmentRow({ ctl, e, odd, onPull, onDrop }: {
     >
       <FragmentName e={e} />
 
-      <div className="col grow libnotes" style={{ gap: 7, paddingRight: 14 }}>
+      <div className="col grow libnotes" style={{ gap: 'var(--space-2)', paddingRight: 'var(--space-4)' }}>
         <span className="libnote" title={e.error ?? e.notes}>
           {e.error ?? e.notes}
         </span>

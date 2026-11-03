@@ -29,10 +29,10 @@ function NodeKnobs({ ctl, title, bottom, slot, node, values }: {
   return (
     <div
       style={{
-        padding: `18px 16px ${bottom}px`,
+        padding: `var(--space-4) var(--space-4) ${bottom}px`,
         display: 'flex',
         flexDirection: 'column',
-        gap: 14,
+        gap: 'var(--space-3)',
       }}
     >
       <Lab className="head">{title}</Lab>
@@ -58,7 +58,7 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
 }) {
   const warns = full && !locked
   return (
-    <div className="row" style={{ gap: 10 }}>
+    <div className="row" style={{ gap: 'var(--space-2)' }}>
       {/* `dim` is dropped rather than overridden, so there is no question of which
           colour rule wins. */}
       <Mono
@@ -88,7 +88,7 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
         <button
           className="iconbtn"
           disabled={full}
-          style={{ opacity: full ? 0.3 : 1 }}
+          style={{ opacity: full ? 'var(--opacity-behind)' : 1 }}
           title={
             full
               ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
@@ -149,7 +149,7 @@ function PaletteStops({
 
   return (
     <div
-      style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 14 }}
+      style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
       {...expose?.(null)}
     >
       <div className="row" style={{ justifyContent: 'space-between' }}>
@@ -164,7 +164,7 @@ function PaletteStops({
 
       {children}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-half)' }}>
         {entries.map((c, i) => (
           <div className="swrow" key={i} {...expose?.(i)}>
             <input
@@ -195,7 +195,7 @@ function PaletteStops({
               <button
                 title="Remove stop"
                 disabled={entries.length <= 1}
-                style={{ opacity: entries.length <= 1 ? 0.3 : 1 }}
+                style={{ opacity: entries.length <= 1 ? 'var(--opacity-behind)' : 1 }}
                 onClick={() => onChange(entries.filter((_, j) => j !== i))}
               >
                 <Ico.X />
@@ -225,7 +225,7 @@ export function MasterColourBody({
   if (!entries) return null
   return (
     <>
-      <div style={{ padding: '14px 16px' }}>
+      <div style={{ padding: 'var(--space-4)' }}>
         <Blurb>
           Every layer plays from these stops. Index, mapping, transform and wrap stay each
           layer&rsquo;s own, and removing the row gives every layer its own palette back.
@@ -233,7 +233,7 @@ export function MasterColourBody({
       </div>
       <Hr />
 
-      <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <Lab className="head">Deal</Lab>
           {ctl.masterMode !== 'all' && (
@@ -286,7 +286,7 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
     <>
       {/* The colour stage's own on/off, with the stage it switches. It hung under the layer row
           while that block held the layer's output; it was never the layer's to own. */}
-      <div className="row" style={{ padding: '14px 16px', justifyContent: 'space-between' }}>
+      <div className="row" style={{ padding: 'var(--space-4)', justifyContent: 'space-between' }}>
         <span {...exposeProps(ctl.patch, `L${layer.slot}.colour.bypass`)}>
           <Switch on={!layer.colour.bypass} label="Colour"
                   title="Bypass the colour stage — applies live, so you can A/B it"
@@ -297,7 +297,7 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
       </div>
       <Hr />
 
-      <div style={{ padding: '18px 16px', display: 'flex', flexDirection: 'column', gap: 13 }}>
+      <div style={{ padding: 'var(--space-4)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <Lab className="dim">Index</Lab>
         {/* The device publishes its index names as plain strings; the document's field is a
             union. `deserialise` is what actually validates one, so the cast is the boundary
@@ -327,7 +327,7 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
           ? `L${layer.slot}.palette.entries` : `L${layer.slot}.palette.entries.${i}`)}
         locked={overridden}
         note={overridden && (
-          <div className="row" style={{ gap: 12, justifyContent: 'space-between' }}>
+          <div className="row" style={{ gap: 'var(--space-3)', justifyContent: 'space-between' }}>
             <Blurb>
               {ctl.masterMode === 'all'
                 ? 'Palette from Master — every layer plays its stops.'

@@ -72,7 +72,7 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
   )
   const shown = history.entries.slice(start, start + THUMBS);
   return (
-    <div className="col" style={{ padding: '14px 16px', gap: 12 }}>
+    <div className="col" style={{ padding: 'var(--space-4)', gap: 'var(--space-3)' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="head">{rollTitle(entry, history.at)}</Lab>
         {entry && entry.seed !== null && (
@@ -80,7 +80,7 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
         )}
       </div>
 
-      <div className="row" style={{ gap: 6 }}>
+      <div className="row" style={{ gap: 'var(--space-1)' }}>
         <button
           className="pill row"
           data-primary="true"
@@ -89,8 +89,8 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
             flexGrow: 1,
             height: 34,
             justifyContent: 'center',
-            gap: 9,
-            opacity: everything ? 0.4 : 1,
+            gap: 'var(--space-2)',
+            opacity: everything ? 'var(--opacity-disabled)' : 1,
           }}
           title={
             everything
@@ -121,14 +121,14 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
   return (
     <div
       className="row"
-      style={{ padding: '10px 12px 12px 16px', justifyContent: 'space-between', flexShrink: 0 }}
+      style={{ padding: 'var(--space-3) var(--space-3) var(--space-3) var(--space-4)', justifyContent: 'space-between', flexShrink: 0 }}
     >
       <span className="stripnote" style={{ minWidth: 0 }}>
         {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
       </span>
       <button
         className="row raise"
-        style={{ gap: 9, padding: '6px 12px' }}
+        style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
         onClick={onSave}
         title="Save this patch to the library"
       >
@@ -207,7 +207,7 @@ export function Randomise({
                 onStep={onStep} />
       <Hr />
 
-      <div className="col" style={{ padding: '14px 16px 16px', gap: 16 }}>
+      <div className="col" style={{ padding: 'var(--space-4)', gap: 'var(--space-4)' }}>
         <Amount
           spec={HABITS}
           value={opts.habits}
@@ -232,12 +232,12 @@ export function Randomise({
       </div>
       <Hr />
 
-      <div className="col" style={{ padding: '12px 16px 14px', gap: 9 }}>
+      <div className="col" style={{ padding: 'var(--space-3) var(--space-4) var(--space-4)', gap: 'var(--space-2)' }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <Lab className="head">Scope</Lab>
           <Blurb>a locked part survives the roll</Blurb>
         </div>
-        <div className="col" style={{ gap: 3 }}>
+        <div className="col" style={{ gap: 'var(--space-half)' }}>
           {PARTS.map(part => (
             <ScopeRow
               key={part}
@@ -265,7 +265,7 @@ function Amount({ spec, value, lo, hi, off, onChange }: {
   return (
     <div
       className="col"
-      style={{ gap: 8, opacity: off ? 0.4 : 1, pointerEvents: off ? 'none' : undefined }}
+      style={{ gap: 'var(--space-2)', opacity: off ? 'var(--opacity-disabled)' : 1, pointerEvents: off ? 'none' : undefined }}
     >
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="mid">{spec.label}</Lab>
@@ -289,8 +289,8 @@ function RollStrip({ history, start, shown, onStep }: {
   history: History; start: number; shown: History['entries']; onStep(index: number): void;
 }) {
   return (
-    <div className="row" style={{ gap: 10 }}>
-      <div className="row" style={{ gap: 4, flexGrow: 1, minWidth: 0 }}>
+    <div className="row" style={{ gap: 'var(--space-2)' }}>
+      <div className="row" style={{ gap: 'var(--space-1)', flexGrow: 1, minWidth: 0 }}>
         {shown.map((e, k) => {
           const i = start + k
           const current = i === history.at
@@ -299,7 +299,7 @@ function RollStrip({ history, start, shown, onStep }: {
               key={i}
               className="col"
               onClick={() => onStep(i)}
-              style={{ flex: '1 1 0', minWidth: 0, gap: 4, alignItems: 'center', padding: 0 }}
+              style={{ flex: '1 1 0', minWidth: 0, gap: 'var(--space-1)', alignItems: 'center', padding: 0 }}
               title={
                 (e.seed === null
                   ? 'The patch before the first roll'
@@ -311,10 +311,10 @@ function RollStrip({ history, start, shown, onStep }: {
                 style={{
                   alignSelf: 'stretch',
                   height: 8,
-                  borderRadius: 1,
+                  borderRadius: 'var(--radius)',
                   background: swatch(e.patch),
-                  opacity: current ? 1 : 0.5,
-                  outline: current ? '1px solid var(--text-1)' : undefined,
+                  opacity: current ? 1 : 'var(--opacity-disabled)',
+                  outline: current ? 'var(--line) solid var(--text-1)' : undefined,
                   outlineOffset: 2,
                                   }}
               />
@@ -344,7 +344,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
   return (
     <div
       className="row flatcard"
-      style={{ height: 32, gap: 10, padding: '0 5px' }}
+      style={{ height: 'var(--space-6)', gap: 'var(--space-2)', padding: '0 var(--space-1)' }}
     >
       <button
         className="tog"

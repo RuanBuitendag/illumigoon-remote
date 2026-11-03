@@ -67,7 +67,7 @@ const INSPECTORS: { [K in NodeRef['kind']]: Kind<Extract<NodeRef, { kind: K }>> 
   },
   warp: {
     head: ({ host, node }) => (
-      <div className="row" style={{ gap: 10 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="head">{host.warps[node.i]?.type}</Lab>
         <Mono className="dim sm">warp{node.i}</Mono>
       </div>
@@ -76,7 +76,7 @@ const INSPECTORS: { [K in NodeRef['kind']]: Kind<Extract<NodeRef, { kind: K }>> 
   },
   emitter: {
     head: ({ layer }) => (
-      <div className="row" style={{ gap: 10 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="head">Emitter</Lab>
         <Mono className="dim sm">{layer?.emitter.type}</Mono>
       </div>
@@ -105,7 +105,7 @@ export function SideColumn({ side, onSide, children }: {
 }) {
   return (
     <div className="panel" style={{ width: 348, flexShrink: 0 }}>
-      <div className="sidetabs" style={{ padding: '8px 12px 0', flexShrink: 0 }}>
+      <div className="sidetabs" style={{ padding: 'var(--space-2) var(--space-3) 0', flexShrink: 0 }}>
         <Tabs items={SIDES} value={side} onChange={onSide} labels={SIDE_NAMES} />
       </div>
       {children}
@@ -133,7 +133,7 @@ export function Inspector({ ctl, layer, host, onBrowsePalettes }: {
           <Lab className="head">{colour ? 'Colour' : 'Effects'}</Lab>
         </div>
         <Hr />
-        <div style={{ padding: '18px 16px' }}>
+        <div style={{ padding: 'var(--space-4)' }}>
           <Blurb>
             {colour
               ? `The mix has no colour of its own. Add Colour at the top of ${MASTER_NAME}’s FX ` +

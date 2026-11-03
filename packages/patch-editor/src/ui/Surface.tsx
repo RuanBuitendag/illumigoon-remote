@@ -323,7 +323,7 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
     >
       <RowGrip />
       <span className="ctlglyph">{GLYPH[c.type] ?? '?'}</span>
-      <div className="col grow" style={{ gap: 5, minWidth: 0 }}>
+      <div className="col grow" style={{ gap: 'var(--space-1)', minWidth: 0 }}>
         <span className="ctllabel">{c.label}</span>
         <Mono className="dim sm ctltarget">{pathName(c.target)}</Mono>
       </div>
@@ -346,7 +346,7 @@ function AddSection({ taken, onAdd }: { taken: readonly string[]; onAdd(name: st
     );
   }
   return (
-    <div className="row" style={{ gap: 8 }}>
+    <div className="row" style={{ gap: 'var(--space-2)' }}>
       <input
         className="popin grow"
         autoFocus
@@ -473,7 +473,7 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
     <>
       <div className="panelhead">
         <Lab className="head">Room controls</Lab>
-        <div className="row" style={{ gap: 10 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <Mono className={kept.length >= cap ? 'sm warn' : 'dim sm'}>
             {kept.length} / {cap}
           </Mono>
@@ -482,10 +482,10 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
       <Hr />
       <div
         className="scroll"
-        style={{ padding: '12px 12px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}
+        style={{ padding: 'var(--space-3) var(--space-3) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}
       >
         {!list.length && (
-          <div style={{ padding: '6px 4px 4px' }}>
+          <div style={{ padding: 'var(--space-2) var(--space-1) var(--space-1)' }}>
             <Blurb>
               Nothing shows on the room yet. Hold any knob, switch, blend or palette and choose
               Show on the room. On a laptop, right-click it.
@@ -553,7 +553,7 @@ function SurfaceSection({
         onDelete={onDelete}
       />
 
-      <div className="col" style={{ gap: 3 }}>
+      <div className="col" style={{ gap: 'var(--space-half)' }}>
         {s.controls.map(c => (
           <ControlRow
             key={c.key}

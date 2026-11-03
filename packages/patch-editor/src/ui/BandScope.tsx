@@ -136,7 +136,7 @@ export function BandScope({ feed, slot, threshold, squelch }: {
 
   return (
     <div className="col scope">
-      <div className="row" style={{ gap: 8 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="mid">Hearing</Lab>
         <span className="grow" />
         <span className={`tilenote${heard === 'quiet' || heard === 'noband' ? ' warn' : ''}`}>

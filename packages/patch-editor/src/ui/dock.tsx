@@ -51,7 +51,7 @@ function LiveMeter({ mod }: { mod: Modulator }) {
   useEffect(() => {
     if (!live) {
       const el = bar.current;
-      if (el) { el.style.width = '0%'; el.style.opacity = '0.25'; }
+      if (el) { el.style.width = '0%'; el.style.opacity = 'var(--opacity-behind)'; }
       return;
     }
     return onFrame(t => {
@@ -59,7 +59,7 @@ function LiveMeter({ mod }: { mod: Modulator }) {
       if (!el) return;
       const v = sample(held.current, t);
       el.style.width = v === undefined ? '0%' : `calc(${(v * 100).toFixed(1)}% - 2px)`;
-      el.style.opacity = v === undefined ? '0.25' : '1';
+      el.style.opacity = v === undefined ? 'var(--opacity-behind)' : '1';
     });
   }, [live, held]);
 
@@ -139,7 +139,7 @@ const tileTitle = (m: Modulator, drives: number) =>
 
 function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: number }) {
   return (
-    <div className="row" style={{ gap: 9 }}>
+    <div className="row" style={{ gap: 'var(--space-2)' }}>
       <span
         style={{
           font: 'var(--type-small)',
@@ -223,7 +223,7 @@ function tileDrag(ctl: Ctl, slot: number, dragging: boolean) {
 function TileBody({ ctl, m, played }: { ctl: Ctl; m: Modulator; played: boolean }) {
   if (played) return <MacroDial ctl={ctl} m={m} />;
   return (
-    <div className="col" style={{ gap: 8 }}>
+    <div className="col" style={{ gap: 'var(--space-2)' }}>
       <LiveMeter mod={m} />
       <span className="detail">{detailOf(m)}</span>
     </div>
@@ -352,9 +352,9 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
     <div className="dock">
       <div
         className="row rackhead"
-        style={{ height: 34, padding: '0 18px', justifyContent: 'space-between' }}
+        style={{ height: 'var(--space-6)', padding: '0 var(--space-4)', justifyContent: 'space-between' }}
       >
-        <div className="row" style={{ gap: 14 }}>
+        <div className="row" style={{ gap: 'var(--space-3)' }}>
           {/* Folding the rack away closes the editor with it: re-opening onto a knob
               somebody left open twenty minutes ago is not where they were. */}
           <RackToggle
@@ -376,7 +376,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
             {wired.length} / {LIMITS().MODS}
           </Mono>
         </div>
-        <div className="row" style={{ gap: 20 }}>
+        <div className="row" style={{ gap: 'var(--space-4)' }}>
           <span
             style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
           >
@@ -384,7 +384,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
           </span>
           <button
             className="row raise"
-            style={{ gap: 9, padding: '6px 12px' }}
+            style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
             onClick={onOpenMatrix}
           >
             <Ico.Link />

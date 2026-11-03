@@ -86,7 +86,7 @@ function LayerLevel({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
   return (
     <>
       <Hr />
-      <div className="row" style={{ padding: '22px 26px 24px', gap: 22, alignItems: 'center' }}>
+      <div className="row" style={{ padding: 'var(--space-5)', gap: 'var(--space-5)', alignItems: 'center' }}>
         <Param
           ctl={ctl}
           spec={spec}
@@ -126,7 +126,7 @@ function ChainStages({ ctl, warps, colourAt }: {
   const node = ctl.node;
   if (!warps.length) {
     return (
-      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)', paddingTop: 6 }}>
+      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)', paddingTop: 'var(--space-2)' }}>
         {colourAt !== null
           ? 'No warp loaded. The layer renders in its own coordinates.'
           : 'No warp loaded. The mix reaches the strip as it is.'}
@@ -239,11 +239,11 @@ function Chain({ ctl, host, top }: {
   const none = () => {};
 
   return (
-    <div style={{ padding: '20px 26px 28px', display: 'flex', flexDirection: 'column', gap: 18 }}>
+    <div style={{ padding: 'var(--space-5) var(--space-5) var(--space-6)', display: 'flex', flexDirection: 'column', gap: 'var(--space-4)' }}>
       {/* The chain takes the full width, so it sits against the inspector it drives with nothing
           between them. Its picture folds away underneath instead of standing in the middle,
           where it read as a third column of controls (Ruan, 2026-09-10). */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <Lab className="head">Chain</Lab>
           <Mono className="dim sm">
@@ -252,7 +252,7 @@ function Chain({ ctl, host, top }: {
         </div>
         <div
           className="well"
-          style={{ padding: 5, display: 'flex', flexDirection: 'column', gap: 3 }}
+          style={{ padding: 'var(--space-1)', display: 'flex', flexDirection: 'column', gap: 'var(--space-half)' }}
         >
           {top}
           {rows.map((r, index) =>
@@ -312,7 +312,7 @@ function Chain({ ctl, host, top }: {
        * (LIFE-824), so the stages only ever give way to the room, never to a knob.
        */}
       <Hr />
-      <div className="col" style={{ gap: 14 }}>
+      <div className="col" style={{ gap: 'var(--space-3)' }}>
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <RackToggle shut={stagesShut} onToggle={toggleStages}>
             Stages
@@ -350,9 +350,9 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
     <>
       <div
         className="row"
-        style={{ height: 58, padding: '0 26px', flexShrink: 0, justifyContent: 'space-between' }}
+        style={{ height: 'var(--row-tall)', padding: '0 var(--space-5)', flexShrink: 0, justifyContent: 'space-between' }}
       >
-        <div className="row" style={{ gap: 14, alignItems: 'baseline' }}>
+        <div className="row" style={{ gap: 'var(--space-3)', alignItems: 'baseline' }}>
           <span
             style={{
               font: 'var(--type-heading)',
@@ -363,9 +363,9 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
           </span>
           <span style={{ font: 'var(--type-note)', color: 'var(--text-3)' }}>{sub}</span>
         </div>
-        <div className="row" style={{ gap: 10 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           {crumb.map((s, i) => (
-            <span key={s} className="row" style={{ gap: 10 }}>
+            <span key={s} className="row" style={{ gap: 'var(--space-2)' }}>
               {i > 0 && <Ico.Arrow w={12} />}
               <Lab className={lit.includes(s) ? 'mid' : 'dim'}>{s}</Lab>
             </span>
@@ -378,7 +378,7 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
           coordinate, gates that cut it, the Colour row, and colour effects under it. It was
           "Space" while every row was geometry, and gates and colour effects (LIFE-819) left that
           name describing less than the rack holds (LIFE-850). */}
-      <div style={{ padding: '14px 26px 0', flexShrink: 0 }}>
+      <div style={{ padding: 'var(--space-4) var(--space-5) 0', flexShrink: 0 }}>
         <Tabs
           items={['source', 'fx'] as const}
           labels={{ fx: 'fx rack' }}
@@ -432,7 +432,7 @@ export function MasterPanel({ ctl, tab, onTab }: { ctl: Ctl; tab: Tab; onTab(tab
           that publishes it reads the mix, and one that does not keeps it in the patch and ignores
           it (LIFE-715). */}
       {!nodeById(GLOBAL_NODE) && (
-        <div style={{ padding: '14px 26px 0', flexShrink: 0 }}>
+        <div style={{ padding: 'var(--space-4) var(--space-5) 0', flexShrink: 0 }}>
           <Blurb>
             Not on this light yet — its firmware does not read the master stage (LIFE-715). What you
             set here is kept in the patch and saved with it.
@@ -441,11 +441,11 @@ export function MasterPanel({ ctl, tab, onTab }: { ctl: Ctl; tab: Tab; onTab(tab
       )}
 
       {tab === 'source' && (
-        <div className="col" style={{ padding: '22px 26px 24px', gap: 18 }}>
+        <div className="col" style={{ padding: 'var(--space-5)', gap: 'var(--space-4)' }}>
           {MASTER_KNOBS.map(key => {
             const spec = globalParam(key);
             return (
-              <div key={key} className="row" style={{ gap: 22, alignItems: 'center' }}>
+              <div key={key} className="row" style={{ gap: 'var(--space-5)', alignItems: 'center' }}>
                 <Param ctl={ctl} spec={spec} path={`G.${key}`} value={G[key]} />
                 {spec.desc && <Blurb>{spec.desc}</Blurb>}
               </div>
@@ -480,7 +480,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
     return (
       <div
         className="row rackrow"
-        style={{ height: 42, padding: '0 11px 0 10px', gap: 12, cursor: 'pointer' }}
+        style={{ height: 'var(--row)', padding: '0 var(--space-3)', gap: 'var(--space-3)', cursor: 'pointer' }}
         {...drag}
         onClick={onAdd}
       >
@@ -530,7 +530,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
 }
 
 /** A filled rack row: the warp and the palette rows share it. */
-const RACK_ROW = { height: 42, padding: '0 11px 0 10px', gap: 12, cursor: 'pointer', position: 'relative' } as const;
+const RACK_ROW = { height: 'var(--row)', padding: '0 var(--space-3)', gap: 'var(--space-3)', cursor: 'pointer', position: 'relative' } as const;
 const rackRowClass = (sel: boolean) => `row rackrow ${sel ? 'raise-hi' : 'flatcard'}`;
 
 /**
@@ -561,7 +561,7 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
         style={{
           width: 28,
           height: 14,
-          borderRadius: 2,
+          borderRadius: 'var(--radius)',
           flexShrink: 0,
           background: `linear-gradient(90deg, ${gradient})`,
           boxShadow: 'inset 0 0 0 1px var(--track)',
@@ -609,7 +609,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
     return (
       <div
         className="row rackrow"
-        style={{ height: 42, padding: '0 11px 0 10px', gap: 12, cursor: 'pointer' }}
+        style={{ height: 'var(--row)', padding: '0 var(--space-3)', gap: 'var(--space-3)', cursor: 'pointer' }}
         title="Give every layer one palette. Their own come back when you remove it"
         onClick={() => {
           const reached = ctl.addMasterPalette();

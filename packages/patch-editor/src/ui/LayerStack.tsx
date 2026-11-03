@@ -164,7 +164,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
     <div className="panel" style={{ width: 276, flexShrink: 0 }}>
       <div className="panelhead">
         <Lab className="head">Layers</Lab>
-        <div className="row" style={{ gap: 10 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <Mono className="dim sm">
             {ctl.patch.layers.length} / {LIMITS().SLOTS}
           </Mono>
@@ -188,7 +188,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
 
       <div
         className="scroll"
-        style={{ padding: 10, display: 'flex', flexDirection: 'column', gap: 6 }}
+        style={{ padding: 'var(--space-3)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
       >
         {ordered.map((L, i) => (
           <LayerRow
@@ -259,7 +259,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
 
       <div className="grow" />
       <Hr />
-      <div style={{ padding: 10, flexShrink: 0 }}>
+      <div style={{ padding: 'var(--space-3)', flexShrink: 0 }}>
         <MasterRow ctl={ctl} />
       </div>
     </div>
@@ -289,7 +289,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
       title="The whole mix: brightness, speed and a rack over every layer"
     >
       {on && <span className="selrule" />}
-      <div className="row" style={{ gap: 9 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <span style={{ width: 35, display: 'flex', justifyContent: 'flex-end' }}>
           <Ico.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
         </span>
@@ -310,7 +310,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
             style={{
               width: 22,
               height: 10,
-              borderRadius: 2,
+              borderRadius: 'var(--radius)',
               flexShrink: 0,
               background: `linear-gradient(90deg, ${gradientOf(ctl.masterPalette)})`,
               boxShadow: 'inset 0 0 0 1px var(--track)',
@@ -370,7 +370,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
       onClick={() => ctl.selectLayer(L.slot)}
     >
       {selected && <span className="selrule" />}
-      <div className="row" style={{ gap: 9 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <RowGrip />
         <span
           style={{
@@ -384,7 +384,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
         </span>
         <span className="name grow">{L.emitter.type}</span>
         {/* The actions show on hover or when this row is the selected one. */}
-        <div className="row rowacts" style={{ gap: 7 }}>
+        <div className="row rowacts">
           <button
             title={`Copy ${layerName(L.slot)} — paste it into any patch in this window`}
             onClick={e => {
@@ -414,7 +414,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             <Ico.X />
           </button>
         </div>
-        <div className="row" style={{ gap: 4 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <button
             className={`tog ${L.muted ? '' : 'well'}`}
             data-on={L.muted}

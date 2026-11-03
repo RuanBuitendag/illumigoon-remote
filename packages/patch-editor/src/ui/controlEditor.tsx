@@ -253,7 +253,7 @@ function TypeFields({ patch, control, next, d, set }: {
       )}
 
       {next.type === 'toggle' && (
-        <div className="col" style={{ gap: 8 }}>
+        <div className="col" style={{ gap: 'var(--space-2)' }}>
           <Switch on={d.invert} label="Invert" onChange={invert => set({ invert })} />
           <Blurb>On means {onMeans(patch, control, d.invert)}.</Blurb>
         </div>
@@ -278,7 +278,7 @@ function EditorButtons({ isNew, canSave, onRemove, onClose, onSave }: {
   isNew: boolean; canSave: boolean; onRemove(): void; onClose(): void; onSave(): void;
 }) {
   return (
-    <div className="row" style={{ justifyContent: 'space-between', paddingTop: 2 }}>
+    <div className="row" style={{ justifyContent: 'space-between', paddingTop: 'var(--space-half)' }}>
       {isNew ? (
         <span />
       ) : (
@@ -286,7 +286,7 @@ function EditorButtons({ isNew, canSave, onRemove, onClose, onSave }: {
           REMOVE
         </button>
       )}
-      <div className="row" style={{ gap: 6 }}>
+      <div className="row" style={{ gap: 'var(--space-1)' }}>
         <button className="pill" onClick={onClose}>
           CANCEL
         </button>
@@ -334,7 +334,7 @@ function NumberFields({ patch, path, spec, d, set }: {
   const hi = num(d.hi, spec.max);
   const base = readPath(patch, path) ?? spec.def;
   return (
-    <div className="col" style={{ gap: 10 }}>
+    <div className="col" style={{ gap: 'var(--space-2)' }}>
       <Lab className="dim">Range, in the parameter’s own units</Lab>
       <div className="rangebar well">
         <i
@@ -345,7 +345,7 @@ function NumberFields({ patch, path, spec, d, set }: {
         />
         <b style={{ left: at(base) }} title={`now ${base}`} />
       </div>
-      <div className="row" style={{ gap: 10 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <input
           className="popin grow"
           type="number"
@@ -368,7 +368,7 @@ function NumberFields({ patch, path, spec, d, set }: {
         as{' '}
         {roomDraws({ path, spec, d, base })}.
       </Blurb>
-      <div className="row" style={{ gap: 9 }}>
+      <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="dim">Show as</Lab>
         <Seg
           items={['value', 'percent'] as const}
@@ -435,7 +435,7 @@ function SectionField({ d, set, groups }: {
           <option value={'\0new'}>New section…</option>
         </select>
       ) : (
-        <div className="row" style={{ gap: 8 }}>
+        <div className="row" style={{ gap: 'var(--space-2)' }}>
           <input
             className="popin grow"
             value={d.newGroup}
@@ -461,10 +461,10 @@ function SectionField({ d, set, groups }: {
 /** A select's options: which are offered, and what each is called. */
 function OptionFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
   return (
-    <div className="col" style={{ gap: 6 }}>
+    <div className="col" style={{ gap: 'var(--space-1)' }}>
       <Lab className="dim">Options — offered, and what each is called</Lab>
       {d.offered.map((o, i) => (
-        <div key={o.choice} className="row" style={{ gap: 9 }}>
+        <div key={o.choice} className="row" style={{ gap: 'var(--space-2)' }}>
           <Switch
             on={o.on}
             onChange={on =>
@@ -495,7 +495,7 @@ function OptionFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
 /** How few and how many colours a palette control may offer. */
 function PaletteFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
   return (
-    <div className="row" style={{ gap: 12 }}>
+    <div className="row" style={{ gap: 'var(--space-3)' }}>
       <label className="popfield grow">
         <Lab className="dim">Fewest colours</Lab>
         <input

@@ -169,7 +169,7 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
 export const Switch = ({ on, onChange, label, title }: {
   on: boolean; onChange(v: boolean): void; label?: string; title?: string;
 }) => (
-  <button className="row" style={{ gap: 9 }} title={title} onClick={() => onChange(!on)}>
+  <button className="row" style={{ gap: 'var(--space-2)' }} title={title} onClick={() => onChange(!on)}>
     <span className={`sw ${on ? 'sw-on' : 'well'}`}><i /></span>
     {label && <Lab className={on ? 'mid' : ''}>{label}</Lab>}
   </button>
@@ -195,7 +195,7 @@ export const StructField = ({ node, field, value, onChange }: {
     return <Switch on={v === true} label={field.label} onChange={onChange} title={title} />;
   }
   return (
-    <div className="col" style={{ gap: 9 }}>
+    <div className="col" style={{ gap: 'var(--space-2)' }}>
       <Lab title={title}>{field.label}</Lab>
       <div className="seg well tight">
         {field.options!.map(o => (
@@ -273,7 +273,7 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
   const col = budgetColour(bytes);
   const title = budgetNote(bytes);
   return (
-    <div className="row" style={{ gap: 11 }} title={title}>
+    <div className="row" style={{ gap: 'var(--space-3)' }} title={title}>
       <Lab>Size</Lab>
       <div className="budget" style={{ width: w }}>
         <div className="groove well" style={{ width: w }} />
@@ -330,11 +330,11 @@ export function RackToggle({ shut, onToggle, children }: {
   shut: boolean; onToggle(): void; children: React.ReactNode;
 }) {
   return (
-    <button className="row" style={{ gap: 9 }} onClick={onToggle}
+    <button className="row" style={{ gap: 'var(--space-2)' }} onClick={onToggle}
             title={shut ? 'show this rack' : 'fold this rack away'}>
       {/* Down when open, right when shut — the arrow points at what it will reveal. */}
       <span style={{ display: 'flex', transform: shut ? 'rotate(-90deg)' : 'none',
-                     transition: 'transform 120ms ease' }}>
+                     transition: 'transform var(--duration-press) var(--ease-out)' }}>
         <Ico.Chev />
       </span>
       <Lab className="head">{children}</Lab>
