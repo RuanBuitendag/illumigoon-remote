@@ -47,7 +47,7 @@ export function useSaveActs({ say, save, file, setProblem, listing }: SaveContex
       const notes = save.notes.trim() || listing.mine.find(r => r.file === file)?.notes;
       await writePreset(file, toPreset(save.patch, save.name, notes));
       save.onSaved();
-      say(`saved to ${file}`);
+      say(`Saved ${save.name.trim()}`);
       await listing.list();
     } catch (e) {
       setProblem((e as Error).message);

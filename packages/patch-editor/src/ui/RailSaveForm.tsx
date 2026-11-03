@@ -9,14 +9,11 @@ import type { useRailVerdict } from './useRailVerdict';
 
 type Verdict = ReturnType<typeof useRailVerdict>['verdict'];
 
-/** What each publish actually does, for the button that offers it. */
+/** What each publish actually does, in the words under the button that offers it. */
 const PUBLISH_MEANS: Record<PublishKind, string> = {
-  preset:
-
-      'Save where the controls are as a preset of the published version — the patch itself does ' +
-      'not move',
-  version: 'Publish this as the next version of the same patch',
-  patch: 'Publish this as a patch of its own, related to nothing',
+  preset: 'shares where the controls are, on the look already published',
+  version: 'shares this as the next version of the published look',
+  patch: 'shares this on the patch server as a look of its own',
 };
 
 /** The offer, as a person reads it: what they get, not what it is called internally. */
@@ -24,6 +21,22 @@ const publishLabel = (kind: PublishKind, v: { identity?: { version: number } } |
   kind === 'preset' ? 'AS PRESET'
     : kind === 'version' ? `AS v${(v?.identity?.version ?? 0) + 1}`
     : v?.identity ? 'AS NEW PATCH' : 'PUBLISH';
+
+/** The publish buttons on show, each with its one line. */
+function publishLines(publishing: boolean, verdict: Verdict): string[] {
+  if (publishing || !verdict) return [];
+  if (verdict.unchanged) return ['RE-PUBLISH sends it again: the server already has it'];
+  return verdict.offered.map(kind => `${publishLabel(kind, verdict)} ${PUBLISH_MEANS[kind]}`);
+}
+
+/** One short line per action, so nobody has to guess what a button does. */
+function SaveMeans({ lines }: { lines: string[] }) {
+  return (
+    <div className="col" style={{ gap: 4 }}>
+      {lines.map(line => <Blurb key={line}>{line}</Blurb>)}
+    </div>
+  );
+}
 
 function PublishOffer({ save, publishing, verdict, onPublish }: {
   save: RailSave;
@@ -78,7 +91,6 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
 
 export function RailSaveForm({
   save,
-  file,
   clash,
   size,
   publishing,
@@ -91,7 +103,6 @@ export function RailSaveForm({
   onCopy,
 }: {
   save: RailSave;
-  file: string;
   clash: boolean;
   size: number;
   publishing: boolean;
@@ -103,6 +114,8 @@ export function RailSaveForm({
   onCapture(): void;
   onCopy(): void;
 }) {
+  const name = save.name.trim() || 'this look';
+  const saveMeans = clash ? `Puts this over ${name} in Mine` : `Keeps ${name} in Mine`;
   return (
     <div className="railsave">
       <div className="row" style={{ gap: 8 }}>
@@ -136,9 +149,7 @@ export function RailSaveForm({
           style={{ padding: '8px 12px' }}
           disabled={!save.name.trim()}
           onClick={() => onSave()}
-          title={
-            clash ? `${file} is already in Mine — this replaces it` : `Save to Mine as ${file}`
-          }
+          title={saveMeans}
         >
           {clash ? 'REPLACE' : 'SAVE'}
         </button>
@@ -151,6 +162,12 @@ export function RailSaveForm({
             first. It works it out and offers what is left (#58). */}
         <PublishOffer save={save} publishing={publishing} verdict={verdict} onPublish={onPublish} />
       </div>
+      <SaveMeans
+        lines={[
+          `${clash ? 'REPLACE puts this over' : 'SAVE keeps'} ${name} in Mine`,
+          ...publishLines(publishing, verdict),
+        ]}
+      />
       {/* WHY A VERSION IS NOT ON OFFER, said in the row rather than discovered by its
           absence. A surface whose controls mean something new is the one edit that looks
           harmless and is not: every position anybody stored against the old one still
@@ -192,6 +209,12 @@ export function RailSaveForm({
           COPY
         </button>
       </div>
+      <SaveMeans
+        lines={[
+          '+ PRESET keeps where the controls are now, under this look',
+          'COPY puts the look on the clipboard as text',
+        ]}
+      />
     </div>
   );
 }

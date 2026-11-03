@@ -11,14 +11,19 @@
  * difference would be worse than neither. A row's depth and polarity are set on the knob the
  * same address has on its Source tab, in the modulator's own editor, or in the matrix.
  *
- * Travel is RELATIVE, like the knob's: pressing does not jump the value, so a click meant for
- * the row it sits in cannot change a level by accident. A full sweep is the bar's own width.
+ * Travel is RELATIVE, like the knob's: a drag moves the value from where it was, and a full
+ * sweep is the bar's own width. A TAP that does not move sets the value where it landed, because
+ * on a phone a tap on the track is how a person asks for a level (LIFE-1934).
  */
 
 import { Fragment, useRef } from 'react';
 import type { ParamSpec } from '../domain/catalog';
 import { clamp, clamp01, fineOf } from './bits';
+import { doubleClick } from './touch';
 import { format, reachOf, toPos, toValue, useModDots, type KnobMod } from './Knob';
+
+/** Further than this, in pixels, and a press is a drag rather than a tap. */
+const TAP_SLOP = 4;
 
 export interface FaderProps {
   spec: ParamSpec;
@@ -44,7 +49,9 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
   const [lo, hi] = spec.soft ?? [spec.min, spec.max];
   const f = toPos(value, lo, hi, spec.curve);
 
-  const drag = useRef<{ x: number; from: number; span: number } | null>(null);
+  const drag = useRef<{ x: number; left: number; from: number; span: number; moved: boolean } | null>(
+    null,
+  );
   const dots = useModDots({ mods, value, lo, hi, curve: spec.curve }, placeOnBar);
 
   const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -53,26 +60,30 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
     e.preventDefault();
     e.stopPropagation();
     e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = {
-      x: e.clientX,
-      from: f,
-      span: e.currentTarget.getBoundingClientRect().width || 1,
-    };
+    const { left, width } = e.currentTarget.getBoundingClientRect();
+    drag.current = { x: e.clientX, left, from: f, span: width || 1, moved: false };
+  };
+
+  const setAt = (t: number) => {
+    const next = clamp(toValue(clamp01(t), lo, hi, spec.curve), spec.min, spec.max);
+    onChange(spec.step && spec.step >= 1 ? Math.round(next) : next);
   };
 
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const d = drag.current;
     if (!d) return;
+    if (!d.moved && Math.abs(e.clientX - d.x) < TAP_SLOP) return;
+    d.moved = true;
     // In POSITION, not value, for the reason the knob gives: a taper would otherwise crawl at
     // one end and leap at the other.
-    const t = d.from + ((e.clientX - d.x) / d.span) * fineOf(e);
-    const next = clamp(toValue(clamp01(t), lo, hi, spec.curve), spec.min, spec.max);
-    onChange(spec.step && spec.step >= 1 ? Math.round(next) : next);
+    setAt(d.from + ((e.clientX - d.x) / d.span) * fineOf(e));
   };
 
-  const endDrag = () => {
-    if (!drag.current) return;
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const d = drag.current;
+    if (!d) return;
     drag.current = null;
+    if (!d.moved && e.type === 'pointerup') setAt((e.clientX - d.left) / d.span);
     onCommit?.();
   };
 
@@ -91,7 +102,7 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
       ? `\nmodulated by ${mods.map(m => `M${m.src}`).join(', ')} — set depth on the Source tab's ` +
         `knob, the modulator or the matrix`
       : '') +
-    '\ndrag sideways · shift for fine · double-click to reset';
+    `\ntap to set · drag sideways · shift for fine · ${doubleClick()} to reset`;
 
   return (
     <div className="editor-fader" title={title}

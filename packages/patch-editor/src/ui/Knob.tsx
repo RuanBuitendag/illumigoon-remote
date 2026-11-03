@@ -19,6 +19,7 @@ import { useLatest } from './useLatest';
 import type { ParamSpec } from '../domain/catalog';
 import { clamp, clamp01, DRAG_SPAN, fineOf, depthAfterDrag } from './bits';
 import { onFrame } from './live';
+import { doubleClick } from './touch';
 
 const RI = 19.5;
 const CI = 2 * Math.PI * RI;
@@ -173,7 +174,7 @@ function KnobTitle({ spec, bound }: { spec: ParamSpec; bound: boolean }) {
       {`\n\n${spec.min} … ${spec.max}${spec.unit ? ` ${spec.unit}` : ''}`
        + `   default ${spec.def}   ${spec.overflow}`}
       {bound ? '\ndrag a ring to set its depth' : ''}
-      {'\ndouble-click to reset'}
+      {`\n${doubleClick()} to reset`}
     </title>
   );
 }

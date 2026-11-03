@@ -6,7 +6,7 @@ import { useLatest } from './ui/useLatest';
 import { AwaitingCatalog, EditorOverlays, EditorStage, SaveSheet } from './app/EditorStage';
 import { connectNotice } from './app/useConnection';
 import { useEditor, type OpenLight } from './app/useEditor';
-import { editedLook, type EditedLook } from './app/usePatchDraft';
+import { editedLook, lookOf, type EditedLook } from './app/usePatchDraft';
 import { useSection, type EditorSection } from './app/useSection';
 
 export type { EditedLook, EditorSection, OpenLight };
@@ -22,13 +22,15 @@ type AppProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
+  /** The light has said what it plays, and the editor shows it. */
+  onOpened(look: EditedLook): void;
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 };
 
 export default function App(props: AppProps) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
-  const { onSection, onName, onLeave, onClose } = props;
+  const { onSection, onName, onOpened, onLeave, onClose } = props;
   const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
@@ -37,17 +39,24 @@ export default function App(props: AppProps) {
   const named = useLatest(onName);
   useEffect(() => named.current(draft.patchName), [draft.patchName, named]);
 
+  // Once: the app's strips draw what the light plays, which is what the editor opened on.
+  const opened = useLatest(onOpened);
+  const current = useLatest(draft);
+  const isEditing = ready.at === 'editing';
+  useEffect(() => {
+    if (isEditing) opened.current(lookOf(current.current));
+  }, [isEditing, opened, current]);
+
   // Decided here and not by unmounting: what is still waiting goes out before the socket closes.
   const { commit } = writes;
   const left = useLatest(onLeave);
-  const leaving = useLatest(draft);
   useEffect(() => {
     if (isOpen) return;
     commit();
     disconnect();
-    const { current } = leaving;
-    left.current(editedLook(current), current.savedPatchRef.current === current.patchRef.current);
-  }, [isOpen, commit, disconnect, left, leaving]);
+    const leaving = current.current;
+    left.current(editedLook(leaving), leaving.savedPatchRef.current === leaving.patchRef.current);
+  }, [isOpen, commit, disconnect, left, current]);
 
   return (
     <div

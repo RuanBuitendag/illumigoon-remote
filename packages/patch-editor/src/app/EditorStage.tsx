@@ -28,6 +28,7 @@ import type { BindGesture } from './useBindGesture';
 import type { Dialogs } from './useDialogs';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
+import { forgetKeptDraft } from './useKeptDraft';
 import type { Rolls } from './useRolls';
 import { sectionOfSide, type EditorSection } from './useSection';
 
@@ -66,6 +67,7 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
             onNotes: setPatchNotes,
             onSaved: () => {
               savedPatchRef.current = patchRef.current;
+              forgetKeptDraft();
             },
           }}
           say={say}

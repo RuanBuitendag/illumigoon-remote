@@ -36,7 +36,6 @@ export function SavePanel({ save, say, saveNudge }: {
     <div className="panel">
       <RailSaveForm
         save={save}
-        file={file}
         clash={listing.mine.some(r => r.file === file)}
         size={size}
         publishing={server.publishing}

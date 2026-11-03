@@ -58,6 +58,8 @@ export function UndoNotice({ text, onUndo, onSave }: UndoNoticeProps) {
 type EditLayoutProps<Section extends string> = {
   backLabel: string;
   title: string;
+  // Which lights the edit plays on.
+  where?: string;
   sections: { value: Section; name: string }[];
   section: Section;
   onSection: (section: Section) => void;
@@ -68,7 +70,7 @@ type EditLayoutProps<Section extends string> = {
 
 // Edit fills the screen: the way back, what is being edited, the editor, and its sections for the thumb.
 export function EditLayout<Section extends string>(props: EditLayoutProps<Section>) {
-  const { backLabel, title, sections, section, onSection, onBack, onSave, children } = props;
+  const { backLabel, title, where, sections, section, onSection, onBack, onSave, children } = props;
   return (
     <div className="edit-layout">
       <header className="edit-header">
@@ -76,6 +78,7 @@ export function EditLayout<Section extends string>(props: EditLayoutProps<Sectio
         {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
       </header>
       <h1 className="edit-title">{title}</h1>
+      {where && <p className="edit-where">{where}</p>}
       <div className="edit-body">{children}</div>
       <nav className="edit-sections">
         <OptionRow label="Section" options={sections} value={section} onChange={onSection} />

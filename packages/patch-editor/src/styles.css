@@ -881,6 +881,11 @@
   .patch-editor .rackrow { min-height: 44px; }
   .patch-editor .rowgrip { min-width: 44px; min-height: 44px; margin: -6px -8px -6px -10px; }
   .patch-editor .ctlend { height: 16px; }
+  /* A fader is drawn 14 px tall but takes a thumb's 44 px, so a tap on its track lands. */
+  .patch-editor .editor-fader { height: 44px; margin: -15px 0; }
+  .patch-editor .editor-fader :is(.track, .fill) { top: 21px; }
+  .patch-editor .editor-fader .reach { top: 18px; }
+  .patch-editor .editor-fader .dot { top: 17px; }
   .patch-editor .blurb { min-width: 0; }
   .patch-editor .rackhead { height: auto !important; flex-wrap: wrap; gap: 4px 14px; padding-top: 6px !important; padding-bottom: 6px !important; }
   .patch-editor .rackhead > .row { flex-wrap: wrap; row-gap: 4px; }

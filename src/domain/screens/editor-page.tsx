@@ -5,11 +5,11 @@ import { APP_IDENTITY } from '../light-network/app-identity';
 import type { AnimationState } from '../light-network/protocol';
 import { finishEdit } from '../store/edit-follow';
 import { editorApi } from '../store/editor-host';
-import { setHeldByEditor } from '../store/fleet-store';
+import { noteState, setHeldByEditor, useFleet, type Light } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
 import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
-import { momentsOf, offerUndo } from '../store/undo';
+import { momentsOf, offerUndo, pauseUndo } from '../store/undo';
 import { useEditorDialogs } from './editor-dialogs';
 
 // The editor is large, so a phone that only sets looks never loads it.
@@ -36,6 +36,19 @@ function titleOf(lookName: string, lightName: string | undefined, isOneLight: bo
   return isOneLight ? `${lookName} on ${lightName}` : lookName;
 }
 
+// Edit plays on one light, and the others in scope take the look when the person leaves.
+function whereOf(lightName: string | undefined, room: Room | undefined, lights: Light[]) {
+  if (!lightName || !room) return undefined;
+  if (lights.length < 2) return `On ${lightName}`;
+  return `On ${lightName}, then all ${lights.length} ${room.name} lights when you leave`;
+}
+
+// What the editor opened on is what the light plays, so the strips in the app draw the same look.
+function noteOpened(address: string, lookName: string, look: AnimationState) {
+  const light = useFleet.getState().lights[address];
+  if (light) noteState(light, { isOn: true, lookName: lookName || undefined, animation: look });
+}
+
 export function EditorPage({ room }: { room: Room | undefined }) {
   const isOpen = useNavigation((navigation) => navigation.isPageOpen);
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
@@ -43,9 +56,10 @@ export function EditorPage({ room }: { room: Room | undefined }) {
   const [light] = useState(() => firstLight(room, scopeAddress));
   const [scope] = useState(scopeAddress);
   // Lights that are off sit an edit out, so nothing has to go back on them.
-  const [before] = useState(() =>
-    momentsOf(room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : []),
+  const [playing] = useState(() =>
+    room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : [],
   );
+  const [before] = useState(() => momentsOf(playing));
   const [isOneLight] = useState(() => room !== undefined && lightsInScope(room, scopeAddress).length === 1);
   const backLabel = useBackLabel(room);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
@@ -71,6 +85,8 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     if (!light || !look || !room) return;
     const unsaved = isSaved ? undefined : { name: lookName, animation: look };
     offerUndo({ text: 'Changes are on the light', moments: before, unsaved });
+    // Stays until the person saves, undoes or makes another change.
+    pauseUndo();
     finishEdit(light.address, lightsInScope(room, scope), lookName, look);
   };
 
@@ -79,6 +95,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     <EditLayout
       backLabel={backLabel}
       title={titleOf(lookName, light?.name, isOneLight)}
+      where={isOneLight ? undefined : whereOf(light?.name, room, playing)}
       sections={SECTIONS}
       section={section}
       onSection={setSection}
@@ -99,6 +116,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
             onSaveClosed={() => setSaving(false)}
             onSection={setSection}
             onName={setLookName}
+            onOpened={(look) => noteOpened(light.address, light.lookName ?? '', look)}
             onLeave={leave}
             onClose={closePage}
           />

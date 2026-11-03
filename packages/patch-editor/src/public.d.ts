@@ -25,6 +25,8 @@ export function PatchEditor(props: {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
+  /** The light has said what it plays, and the editor shows it. */
+  onOpened(look: EditedLook): void;
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 }): ReactNode;

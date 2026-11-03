@@ -23,6 +23,7 @@ import type { Ctl } from './ctl';
 import type { AudioFeed } from '../domain/scope';
 import { ModEditor } from './modEditor';
 import { deadReason } from './modulatorStatus';
+import { pointAt } from './touch';
 
 export const M = ({ children }: { children: ReactNode }) => (
   <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)' }}>{children}</span>
@@ -134,7 +135,7 @@ export const freeSlot = (patch: Patch): number | undefined => {
 
 const tileTitle = (m: Modulator, drives: number) =>
   `${m.label || m.name ? `${m.label || m.name} · ` : ''}${m.type}`
-  + (drives ? ` — drives ${drives}; hover to see which` : ' — drag onto a parameter to bind');
+  + (drives ? ` — drives ${drives}; ${pointAt()} to see which` : ' — drag onto a parameter to bind');
 
 function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: number }) {
   return (

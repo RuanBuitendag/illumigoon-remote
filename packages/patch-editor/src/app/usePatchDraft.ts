@@ -75,10 +75,14 @@ export type PatchDraft = ReturnType<typeof usePatchDraft>;
 
 export type EditedLook = { type: string; params: Record<string, unknown> };
 
-/** What this session leaves on the light, or null when it changed nothing. */
-export function editedLook({ hasEditedRef, patchRef, patchNameRef }: PatchDraft): EditedLook | null {
-  if (!hasEditedRef.current) return null;
+/** The look the draft holds, as the light is sent it. */
+export function lookOf({ patchRef, patchNameRef }: Pick<PatchDraft, 'patchRef' | 'patchNameRef'>): EditedLook {
   const params = serialise(patchRef.current) as Record<string, unknown>;
   const name = patchNameRef.current.trim();
   return { type: 'patch', params: name ? { ...params, name } : params };
+}
+
+/** What this session leaves on the light, or null when it changed nothing. */
+export function editedLook(draft: PatchDraft): EditedLook | null {
+  return draft.hasEditedRef.current ? lookOf(draft) : null;
 }

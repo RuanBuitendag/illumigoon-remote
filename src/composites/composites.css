@@ -7,10 +7,11 @@
 .screen-page { z-index: 3; overflow-y: auto; padding: var(--page-top) var(--gutter) var(--space-7); }
 .screen-page::before { content: ''; position: sticky; top: calc(-1 * var(--page-top)); z-index: 3; display: block; height: var(--page-top); margin: calc(-1 * var(--page-top)) var(--edge) 0; background: var(--background); }
 .screen-room[data-open='true'], .screen-page[data-open='true'] { transform: none; box-shadow: var(--push-shadow); }
-.edit-layout { position: fixed; inset: 0; z-index: 4; display: flex; flex-direction: column; padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
+.edit-layout { position: fixed; inset: 0; z-index: 4; display: flex; flex-direction: column; padding: var(--page-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
 .edit-header { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
 .edit-header .text-key { min-width: var(--row); justify-content: flex-end; }
 .edit-title { flex: none; overflow: hidden; padding: 0 var(--gutter); font: var(--type-heading); text-overflow: ellipsis; white-space: nowrap; }
+.edit-where { flex: none; padding: 0 var(--gutter) var(--space-2); color: var(--text-3); font: var(--type-note); }
 .edit-body { flex: 1; min-height: 0; }
 .edit-sections { flex: none; padding: 0 var(--gutter); border-top: 1px solid var(--track); }
 .edit-sections .option-row { flex-wrap: nowrap; justify-content: space-between; gap: var(--space-3); }

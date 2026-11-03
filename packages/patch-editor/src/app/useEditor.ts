@@ -10,6 +10,7 @@ import { useBindGesture, type Gesture } from './useBindGesture';
 import { useConnection } from './useConnection';
 import { useCtl } from './useCtl';
 import { useDialogs } from './useDialogs';
+import { useKeptDraft } from './useKeptDraft';
 import { useLongPress } from './useLongPress';
 import { useMasterPalette } from './useMasterPalette';
 import { useNavigation } from './useNavigation';
@@ -39,6 +40,7 @@ export function useEditor(light: OpenLight | undefined) {
   const gesture = useBindGesture({ ...draft, ...writes, dragRef, say });
   const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say });
   const dialogs = useDialogs();
+  useKeptDraft({ draft, ready, pushScene: writes.pushScene, leftPatch: nav.leftPatch, say });
 
   // Opens once. The name goes on the draft first, so the first write keeps what the light had.
   const { patchNameRef, setPatchName } = draft;

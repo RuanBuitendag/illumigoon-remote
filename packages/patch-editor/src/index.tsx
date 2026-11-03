@@ -19,6 +19,8 @@ type PatchEditorProps = {
   onSaveClosed(): void;
   onSection(section: EditorSection): void;
   onName(name: string): void;
+  /** The light has said what it plays, and the editor shows it. */
+  onOpened(look: EditedLook): void;
   /** Send a look from the library to lights the host picks. */
   /** The socket has closed. Carries the document on the light if this session changed it. */
   onLeave(look: EditedLook | null, isSaved: boolean): void;
