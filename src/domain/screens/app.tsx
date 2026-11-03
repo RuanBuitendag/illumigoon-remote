@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 import { startLibrary } from '../store/library-store';
 import { startLooks } from '../store/look-files';
 import { noteHouseState } from '../store/state-history';
@@ -44,6 +44,32 @@ function OpenPage({ rooms }: { rooms: Room[] }) {
   return <Page room={room} />;
 }
 
+const ADDRESS_WAIT_MS = 10000;
+
+const closeAll = () => {
+  closePage();
+  closeRoom();
+};
+
+// A room can vanish under an open screen when its lights change room. A room that an address opened
+// has not been seen yet, so it waits for its lights to answer before it closes.
+function useCloseVanishedRoom(roomId: string | null, room: Room | undefined) {
+  const seenRoomId = useRef<string | null>(null);
+  useEffect(() => {
+    if (room) {
+      seenRoomId.current = room.id;
+      return undefined;
+    }
+    if (!roomId) return undefined;
+    if (seenRoomId.current === roomId) {
+      closeAll();
+      return undefined;
+    }
+    const timer = window.setTimeout(closeAll, ADDRESS_WAIT_MS);
+    return () => window.clearTimeout(timer);
+  }, [roomId, room]);
+}
+
 export function App() {
   const rooms = useRooms();
   const roomId = useNavigation((navigation) => navigation.roomId);
@@ -64,13 +90,7 @@ export function App() {
     noteHouseState(rooms);
   }, [rooms]);
 
-  // A room can vanish under an open screen when its lights change room.
-  useEffect(() => {
-    if (roomId && !room) {
-      closePage();
-      closeRoom();
-    }
-  }, [roomId, room]);
+  useCloseVanishedRoom(roomId, room);
 
   // On a laptop the pane beside Home is never empty.
   useEffect(() => {

@@ -7,7 +7,8 @@ import { chromium } from 'playwright';
 import { createServer } from 'vite';
 import { freshLibrary, madeUpLibrary } from './made-up-library.mjs';
 
-const PORT = 5198;
+// STORY_PORT lets two story runs share the machine.
+const PORT = Number(process.env.STORY_PORT ?? 5198);
 const VIEWPORTS = {
   phone: { width: 375, height: 812 },
   smallPhone: { width: 320, height: 640 },
