@@ -679,3 +679,89 @@ checks it.
 Why: one component per job needs the editor to use the app's components. Logic that only the editor needs stays in
 the editor.
 Date: 2026-11-04
+
+### The app reads like Edit (LIFE-1935)
+
+**D51. The live mark is a bar**
+
+Chosen: `.status-mark` is Edit's live mark, a short flat bar: `--fill` when on, `--thumb-off` when off, dashed in
+`--text-4` when the light is silent.
+Why: Edit draws no circles. The app's round dot was the only round mark left on the room cards.
+Date: 2026-11-04
+
+**D52. A flat switch**
+
+Chosen: `PowerKey` is a flat track with a square thumb, both on `--radius`, a hairline edge in `--track`; on, the
+track fills with `--fill`. The hit area stays 44 px tall through `::after`.
+Why: Edit has no pills. The rounded pill switch was the loudest shape on Home and the room screen.
+Date: 2026-11-04
+
+**D53. Add keys are keys**
+
+Chosen: `+ Add a light` and `+ Add a schedule` use the key type: small capitals, `--tracking-label`, `--text-2`.
+Why: every other key in the app and Edit's `+ ADD LAYER` speak this way (voice BR-5). The two add keys were the only
+keys in sentence case.
+Date: 2026-11-04
+
+**D54. One title size**
+
+Chosen: page titles and room names use `--type-heading`, Edit's title. Fields and the main action key use
+`--type-body`. The tokens `--size-title`, `--size-page`, `--type-title`, `--type-page`, `--tracking-title` and
+`--weight-light`, and the Geist 300 font file, are removed. This replaces the `--tracking-title` part of D8: no role
+uses tighter tracking now.
+Why: Edit's largest text is `--type-heading`. The app's 36 px light and 28 px titles, and fields and keys as large as
+the title, made every page read louder than Edit.
+Date: 2026-11-04
+
+**D55. Control labels are small capitals**
+
+Chosen: `.control-label` is Edit's dial label: `--type-label`, `--tracking-label`, upper case, `--text-4`. The value
+beside it keeps its own case and tracking.
+Why: Edit names every dial this way. The app's labels were body text, so a slider row read like a sentence.
+Date: 2026-11-04
+
+**D56. One wording for a light's state**
+
+Chosen: a light that does not answer reads "Isn't answering" everywhere. A light in use elsewhere reads "In use",
+and says nothing when the room's lock note already says so.
+Why: the same state had three wordings ("ISN'T ANSWERING", "Isn't answering", "Not answering."), and "IN USE" under
+each light repeated the room's lock note (one fact in one place).
+Date: 2026-11-04
+
+**D57. A hairline under section heads**
+
+Chosen: `.heading-row` has a `--line` rule in `--track` under it.
+Why: Edit's panel heads sit over a hairline. The app's heads floated, so a section's start was hard to see.
+Date: 2026-11-04
+
+**D58. A note shared by every look is said once**
+
+Chosen: when every playable look carries the same "Plays on ..." note, Looks says it once at the top of the list and
+not under each look.
+Why: the same line under every look was duplicated information.
+Date: 2026-11-04
+
+**D59. The open room is Picked**
+
+Chosen: on the laptop the open room's name in the side list is marked with `Picked`, the one selected mark (D48).
+Why: it had its own text underline, a second selected mark.
+Date: 2026-11-04
+
+**D60. Text areas start bare**
+
+Chosen: `textarea` gets the same reset as `input`: no box, no border, inherited type.
+Why: Paste a look showed the browser's grey box with a full border, unlike every other field.
+Date: 2026-11-04
+
+**D61. Sheet heads line up with the body**
+
+Chosen: on the phone the sheet head is padded `--space-3` by `--space-5`, the body's side gutter.
+Why: the head's title sat 8 px left of the rows under it.
+Date: 2026-11-04
+
+**D62. One list of controls**
+
+Chosen: Transition lays its controls out in `ControlList`, as the room does; Recent puts its empty note in its own
+`PageSection`. `RoomSection` loses its unused title, and `.section-title` is removed.
+Why: two components did one job, so the same controls sat at different gaps on two pages.
+Date: 2026-11-04
