@@ -5,12 +5,12 @@ const HEARTBEAT_MS = 500;
 const UPDATE_SERVER = 'https://updates.test';
 
 export class FakeLight {
-  constructor({ id, name, room = '', isOn = true, brightness = 0.5, hasWifi = true, isMaster = false }) {
+  constructor({ id, name, room = '', isOn = true, brightness = 0.5, hasWifi = true, isMaster = false, animation }) {
     Object.assign(this, { id, name, room, isOn, brightness, hasWifi, isMaster });
     this.received = [];
     this.sockets = new Set();
     this.isDown = false;
-    this.animation = { type: 'aurora', params: { scale: 3, speed: 1 } };
+    this.animation = animation ?? { type: 'aurora', params: { scale: 3, speed: 1 } };
     this.uptime = 1000;
     this.timer = setInterval(() => this.beat(), HEARTBEAT_MS);
   }

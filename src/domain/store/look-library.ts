@@ -1,17 +1,14 @@
 import type { Shelf } from '@illumigoon/patch-editor/library';
 import type { AnimationState, ParameterValue } from '../light-network/protocol';
 import { groupedLooks, lookDescription, movesToMusic } from '../looks/look-catalog';
+import type { PatchLook } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
 import { withParameter, type Light } from './fleet-store';
 import type { LookFile } from './look-files';
 import {
   canPlay,
-  defaultParams,
-  flatLooks,
-  lightsWithLook,
   patchLights,
   previewOfAnimation,
-  previewOfManifest,
   previewOfPatch,
 } from './rooms';
 
@@ -45,6 +42,20 @@ const PRESET_PLACE = { both: 'PUBLISHED', local: 'ON THIS DEVICE', server: 'ON T
 // The size at which a light can no longer keep a look through a restart.
 const LIGHT_KEEPS_BYTES = 3800;
 
+const MOST_USED = 5;
+
+const catalogLook = (look: PatchLook, players: Light[]): LibraryLook => ({
+  id: look.id,
+  name: look.name,
+  description: lookDescription(look.id),
+  hasSound: movesToMusic(look.id),
+  preview: previewOfPatch(look),
+  animation: { type: 'patch', params: look.document },
+  lights: players,
+  file: null,
+  presets: [],
+});
+
 function patchGroups(lights: Light[]): LibraryGroup[] {
   const players = patchLights(lights);
   if (players.length === 0) return [];
@@ -52,33 +63,15 @@ function patchGroups(lights: Light[]): LibraryGroup[] {
     kind: 'catalog',
     title,
     note,
-    looks: looks.map((look) => ({
-      id: look.id,
-      name: look.name,
-      description: lookDescription(look.id),
-      hasSound: movesToMusic(look.id),
-      preview: previewOfPatch(look),
-      animation: { type: 'patch', params: look.document },
-      lights: players,
-      file: null,
-      presets: [],
-    })),
+    looks: looks.map((look) => catalogLook(look, players)),
   }));
 }
 
-function builtInGroup(lights: Light[]): LibraryGroup {
-  const looks = flatLooks(lights).map((manifest) => ({
-    id: manifest.id,
-    name: manifest.name,
-    description: '',
-    hasSound: false,
-    preview: previewOfManifest(manifest),
-    animation: { type: manifest.id, params: defaultParams(manifest) },
-    lights: lightsWithLook(lights, manifest.id),
-    file: null,
-    presets: [],
-  }));
-  return { kind: 'catalog', title: 'Simple looks', note: 'Every light has these', looks };
+// The looks on the page that were played most, by the count the household keeps.
+function mostUsedGroup(groups: LibraryGroup[], plays: Record<string, number>): LibraryGroup {
+  const played = groups.flatMap(({ looks }) => looks).filter(({ name }) => (plays[name] ?? 0) > 0);
+  const looks = played.sort((a, b) => (plays[b.name] ?? 0) - (plays[a.name] ?? 0)).slice(0, MOST_USED);
+  return { kind: 'catalog', title: 'Most used', note: '', looks };
 }
 
 const byFolder = (a: string | null, b: string | null) => (a ?? '').localeCompare(b ?? '');
@@ -144,22 +137,9 @@ function mineGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGr
   }));
 }
 
-function exampleGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGroup[] {
-  return foldersOf(files).map((folder) => ({
-    kind: 'example',
-    title: folder ? `Examples, ${folder}` : 'Examples',
-    note: 'Worked examples, read only',
-    looks: looksOfFiles(files.filter(({ group }) => group === folder), lights, shelf),
-  }));
-}
-
-export function libraryFor(lights: Light[], mine: LookFile[], examples: LookFile[], shelf: Shelf) {
-  const groups = [
-    ...mineGroups(mine, lights, shelf),
-    ...patchGroups(lights),
-    builtInGroup(lights),
-    ...exampleGroups(examples, lights, shelf),
-  ];
+export function libraryFor(lights: Light[], mine: LookFile[], shelf: Shelf, plays: Record<string, number>) {
+  const catalog = patchGroups(lights);
+  const groups = [mostUsedGroup(catalog, plays), ...catalog, ...mineGroups(mine, lights, shelf)];
   return groups.filter(({ title, looks }) => looks.length > 0 || title === 'Mine');
 }
 

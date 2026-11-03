@@ -33,6 +33,8 @@ type Household = {
   lightOrders: Record<string, string[]>;
   roomOrder: string[];
   recentLooks: Record<string, RecentLook[]>;
+  // How many times each look was played, by name, for Most used on Looks.
+  lookPlays: Record<string, number>;
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
   // Light software versions the notice on Home was told to leave for later.
@@ -49,6 +51,7 @@ export const useHousehold = create<Household>()(
       lightOrders: {} as Record<string, string[]>,
       roomOrder: [] as string[],
       recentLooks: {} as Record<string, RecentLook[]>,
+      lookPlays: {} as Record<string, number>,
       lightAddresses: [] as string[],
       skippedSoftware: [] as string[],
     }),
@@ -76,9 +79,12 @@ export function renameRoom(id: string, name: string) {
 const RECENT_LOOKS = 4;
 
 export function rememberRecentLook(roomId: string, look: RecentLook) {
-  useHousehold.setState(({ recentLooks }) => {
+  useHousehold.setState(({ recentLooks, lookPlays }) => {
     const others = (recentLooks[roomId] ?? []).filter(({ name }) => name !== look.name);
-    return { recentLooks: { ...recentLooks, [roomId]: [look, ...others].slice(0, RECENT_LOOKS) } };
+    return {
+      recentLooks: { ...recentLooks, [roomId]: [look, ...others].slice(0, RECENT_LOOKS) },
+      lookPlays: { ...lookPlays, [look.name]: (lookPlays[look.name] ?? 0) + 1 },
+    };
   });
 }
 

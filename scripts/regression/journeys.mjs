@@ -1,4 +1,5 @@
 // What a person does in the app, each against made-up lights. One journey is one thing that must keep working.
+import starfield from '../../src/domain/looks/patches/starfield.json' with { type: 'json' };
 import { FakeLight } from './fake-light.mjs';
 
 const LONGER_THAN_SILENCE_MS = 6500;
@@ -6,6 +7,9 @@ const NEW_LIGHT_MAC = '2805A5705A5C';
 
 const desk = () => new FakeLight({ id: 'AA0000000001', name: 'Desk', room: 'Bedroom', isOn: false });
 const lamp = () => new FakeLight({ id: 'AA0000000002', name: 'Lamp', room: 'Bedroom', isMaster: true });
+// A light that plays patches, which is what puts the catalog on the Looks page.
+const patchLamp = () =>
+  new FakeLight({ id: 'AA0000000002', name: 'Lamp', room: 'Bedroom', animation: { type: 'patch', params: starfield } });
 const fresh = () => new FakeLight({ id: '2805A5707FE4', name: 'Left', hasWifi: false });
 
 async function until(check, what, milliseconds = 8000) {
@@ -238,6 +242,20 @@ export const journeys = [
       await see(page, 'Lamp');
       await page.getByRole('button', { name: /looks/i }).first().click();
       await see(page, 'On Bedroom');
+    },
+  },
+  {
+    name: 'The Looks page shows only the kept looks, and a played look lands in Most used',
+    lights: { '10.0.0.2': patchLamp },
+    async run({ page }) {
+      await see(page, 'Lamp');
+      await page.getByRole('button', { name: /looks/i }).first().click();
+      await see(page, 'Candle');
+      for (const gone of ['Lava lamp', 'Black Hole', 'Simple looks', 'Examples', 'Most used']) {
+        if ((await page.getByText(gone, { exact: true }).count()) > 0) throw new Error(`${gone} is on the page`);
+      }
+      await page.getByText('Candle', { exact: true }).first().click();
+      await see(page, 'Most used');
     },
   },
   {

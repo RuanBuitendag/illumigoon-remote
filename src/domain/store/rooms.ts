@@ -1,14 +1,11 @@
 import type { Colour } from '../../design-system';
-import type { AnimationState, Manifest, Parameter } from '../light-network/protocol';
+import type { AnimationState, Parameter } from '../light-network/protocol';
 import { useMemo } from 'react';
 import { findPatchLook, latestDocumentOf, lookShape } from '../looks/look-catalog';
 import type { PatchLook } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
 import { lightIdOf, useFleet, type Light } from './fleet-store';
 import { useHousehold } from './household-store';
-
-// What the firmware shows by itself, or what only makes sense with a patch document.
-const HIDDEN_ANIMATIONS = new Set(['patch', 'identify', 'wifi_strength', 'progress_line']);
 
 export type Room = {
   id: string;
@@ -89,16 +86,6 @@ export const isAnyOn = (lights: Light[]) => lights.some((light) => light.isOn);
 export const highestBrightness = (lights: Light[]) =>
   lights.length === 0 ? 0 : Math.max(...lights.map((light) => light.brightness));
 
-export function flatLooks(lights: Light[]): Manifest[] {
-  const looks = new Map<string, Manifest>();
-  for (const light of lights) {
-    for (const manifest of light.manifests) {
-      if (!HIDDEN_ANIMATIONS.has(manifest.id)) looks.set(manifest.id, manifest);
-    }
-  }
-  return [...looks.values()];
-}
-
 const playsPatches = (light: Light) =>
   light.animation?.type === 'patch' || light.manifests.some((manifest) => manifest.id === 'patch');
 
@@ -111,13 +98,6 @@ export function lightsInScope({ writableLights }: Room, scopeAddress: string | n
   const scoped = writableLights.filter(({ address }) => address === scopeAddress);
   if (scoped.length > 0) return scoped;
   return scopeAddress === null && isMixedLook(writableLights) ? writableLights.slice(0, 1) : writableLights;
-}
-
-export const lightsWithLook = (lights: Light[], animationId: string) =>
-  lights.filter((light) => light.manifests.some((manifest) => manifest.id === animationId));
-
-export function defaultParams({ parameters }: Manifest) {
-  return Object.fromEntries(parameters.map((parameter) => [parameter.key, parameter.default]));
 }
 
 // A patch brings its controls in its document, and `default` is the current position of each one.
@@ -198,16 +178,6 @@ export function previewOfAnimation(animation: AnimationState | null): PreviewSou
   if (animation.type === 'patch') return { kind: 'patch', key, document: animation.params };
   return { kind: 'colours', key, colours: coloursOf(animation.params) };
 }
-
-export function previewOfManifest(manifest: Manifest): PreviewSource {
-  return previewOfFlat(manifest.id, defaultParams(manifest));
-}
-
-const previewOfFlat = (type: string, params: Record<string, unknown>): PreviewSource => ({
-  kind: 'colours',
-  key: JSON.stringify({ type, params }),
-  colours: coloursOf(params),
-});
 
 export const previewOfPatch = (look: PatchLook): PreviewSource => ({
   kind: 'patch',

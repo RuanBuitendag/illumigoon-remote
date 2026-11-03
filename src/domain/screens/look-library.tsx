@@ -19,6 +19,7 @@ import {
   removePreset,
   useLookActions,
 } from '../store/look-actions';
+import { useHousehold } from '../store/household-store';
 import { useLibrary } from '../store/library-store';
 import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
 import { playLook, startNewLook } from '../store/look-play';
@@ -124,7 +125,7 @@ function foundGroups(groups: LibraryGroup[], wanted: string) {
 
 export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () => void }) {
   const mine = useLookFiles((files) => files.mine);
-  const examples = useLookFiles((files) => files.examples);
+  const plays = useHousehold((household) => household.lookPlays);
   const shelf = useLookFiles((files) => files.shelf);
   const note = useLibraryNote();
   const shownLights = useShownLights(lights);
@@ -134,7 +135,7 @@ export function LookLibrary({ lights, onPaste }: { lights: Light[]; onPaste: () 
   const wanted = query.trim().toLowerCase();
   const deleteKey = useArmedDelete();
   useFreshLooks();
-  const groups = foundGroups(libraryFor(lights, mine, examples, shelf), wanted);
+  const groups = foundGroups(libraryFor(lights, mine, shelf, plays), wanted);
   const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
