@@ -34,7 +34,7 @@ import {
 } from '../store/look-library';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { closePage } from '../store/navigation-store';
-import { isAnyOn, isMixedLook, lookNameOf } from '../store/rooms';
+import { playingLookName, playsExactly } from '../store/rooms';
 import { LookStrip } from './look-strip';
 
 const TILE_BRIGHTNESS = 0.85;
@@ -163,7 +163,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
   const shelf = useLookFiles((files) => files.shelf);
   const note = useLibraryNote();
   const shownLights = useShownLights(lights);
-  const playingName = isMixedLook(shownLights) ? null : lookNameOf(shownLights[0]);
+  const playingName = playingLookName(shownLights);
   const wanted = query.trim().toLowerCase();
   const deleteKey = useArmedDelete();
   useFreshLooks();
@@ -175,7 +175,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
     if (!animation) return;
-    if (name === playingName && isAnyOn(shownLights)) closePage();
+    if (name === playingName && playsExactly(shownLights, animation)) closePage();
     else playLook(players, name, animation);
   };
 
