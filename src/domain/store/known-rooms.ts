@@ -28,14 +28,17 @@ const waitingRoom = (id: string, name: string): Room => ({
   isLocked: false,
 });
 
-// Notes when each light was last on a card, and says which known lights still wait for an answer.
+// Notes when each light was last on a card, and says which known lights of a room still wait for an
+// answer. A name counts only in its own room, because two rooms can each have a light called Left.
 function waitingCheck(rooms: Room[], isSettling: boolean) {
   const now = Date.now();
-  const present = rooms.flatMap(({ lights }) => lights.map(knownLightOf));
-  for (const { id } of present) lastSeen.set(id, now);
-  return ({ id, name }: KnownLight) => {
-    if (present.some((light) => light.id === id || light.name === name)) return false;
-    return isSettling || now - (lastSeen.get(id) ?? 0) < GRACE_MS;
+  for (const { lights } of rooms) for (const light of lights) lastSeen.set(lightIdOf(light), now);
+  return (roomId: string) => {
+    const present = rooms.find(({ id }) => id === roomId)?.lights.map(knownLightOf) ?? [];
+    return ({ id, name }: KnownLight) => {
+      if (present.some((light) => light.id === id || light.name === name)) return false;
+      return isSettling || now - (lastSeen.get(id) ?? 0) < GRACE_MS;
+    };
   };
 }
 
@@ -66,7 +69,7 @@ export function useRoomPlaces(rooms: Room[]): RoomPlace[] {
   const places = ids.flatMap((id) => {
     const room = rooms.find((existing) => existing.id === id);
     const knownLights = known.find((existing) => existing.id === id)?.lights ?? [];
-    const waitingLights = knownLights.filter(isWaiting);
+    const waitingLights = knownLights.filter(isWaiting(id));
     if (!room && waitingLights.length === 0) return [];
     return [{ room: room ?? waitingRoom(id, roomNames[id] ?? id), waitingLights }];
   });

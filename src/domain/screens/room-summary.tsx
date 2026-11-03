@@ -22,8 +22,8 @@ import { RecentLookRow } from './recent-looks';
 
 const CARD_LOOKS = 2;
 
-function lockedText({ onlineLights }: Room) {
-  const until = onlineLights[0]?.lockedUntil ?? 0;
+function lockedText({ lights }: Room) {
+  const until = lights.find(({ isLockedByOther }) => isLockedByOther)?.lockedUntil ?? 0;
   if (until <= Date.now()) return 'In use on another device';
   const time = new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
   return `In use on another device until ${time}`;
@@ -39,7 +39,14 @@ export function RoomLockNote({ room }: { room: Room }) {
   );
 }
 
+// A flat look takes its name from the light's manifests, which come after the look. A light held on
+// another device can keep its manifests back, so its look is named from the type alone.
+const hasReported = ({ animation, manifests, isLockedByOther }: Light) =>
+  Boolean(animation) && (animation?.type === 'patch' || manifests.length > 0 || isLockedByOther);
+
+// While lights still report, the card names no look, so it does not change name as each one answers.
 function lookLabel(lights: Light[]) {
+  if (!lights.every(hasReported)) return '';
   if (isMixedLook(lights)) return 'Mixed';
   return lookNameOf(lights[0]) ?? '';
 }

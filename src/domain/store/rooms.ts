@@ -32,6 +32,9 @@ export type RoomSettings = {
   roomOrder: string[];
 };
 
+// A held light that misses a heartbeat is still held, so its card keeps the lock note and its height.
+const isHeldElsewhere = ({ isLockedByOther }: Light) => isLockedByOther;
+
 function toRoom(id: string, lights: Light[], settings: RoomSettings): Room {
   const ordered = inOrder(lights, settings.lightOrders[id]);
   const onlineLights = ordered.filter((light) => light.isOnline);
@@ -42,7 +45,7 @@ function toRoom(id: string, lights: Light[], settings: RoomSettings): Room {
     lights: ordered,
     onlineLights,
     writableLights,
-    isLocked: onlineLights.length > 0 && writableLights.length === 0,
+    isLocked: writableLights.length === 0 && ordered.some(isHeldElsewhere),
   };
 }
 
