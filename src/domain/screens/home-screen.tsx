@@ -6,6 +6,7 @@ import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, useFleet } from '../store/fleet-store';
 import { setHousePower } from '../store/house-power';
 import { setRoomOrder, skipSoftware, useHousehold } from '../store/household-store';
+import { useRoomPlaces } from '../store/known-rooms';
 import { moveOldScenes } from '../store/library-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
@@ -14,10 +15,11 @@ import { RoomSummary } from './room-summary';
 import { SceneRow } from './scene-row';
 import { SEARCH_REFUSED_TEXT } from './search-screen';
 
-function HouseControls({ rooms }: { rooms: Room[] }) {
+// `placeCount` counts the rooms that have not answered yet too, so the section does not pop in.
+function HouseControls({ rooms, placeCount }: { rooms: Room[]; placeCount: number }) {
   const lights = rooms.flatMap((room) => room.writableLights);
   const shownLights = useShownLights(lights);
-  if (rooms.length < 2) return null;
+  if (placeCount < 2) return null;
   return (
     <HouseSection title="WHOLE HOUSE" action={<TextKey onClick={() => openPage('looks')}>LOOKS</TextKey>}>
       <ToggleRow
@@ -68,39 +70,38 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
   const [showsVersion, setShowsVersion] = useState(false);
   const isSilent = rooms.every((room) => room.onlineLights.length === 0);
   const isRefused = useFleet((fleet) => fleet.isSearchRefused);
+  const places = useRoomPlaces(rooms);
 
   useEffect(() => {
     void moveOldScenes(rooms);
   }, [rooms]);
 
   return (
-    <>
-      <HomeLayout
-        wordmark={showsVersion ? `VERSION ${APP_VERSION}` : 'ILLUMIGOON'}
-        onWordmark={() => setShowsVersion(!showsVersion)}
-      >
-        {isSilent ? (
-          <HouseNote
-            text={
-              isRefused
-                ? SEARCH_REFUSED_TEXT
-                : 'No lights are answering. Check the home Wi-Fi, and that Local Network is on for Illumigoon in Settings.'
-            }
-            actionLabel="SEARCH AGAIN"
-            onAction={searchAgain}
-          />
-        ) : (
-          <HouseControls rooms={rooms} />
-        )}
-        <SceneRow rooms={rooms} />
-        <RoomDragList ids={rooms.map(({ id }) => id)} onOrder={setRoomOrder}>
-          {rooms.map((room) => (
-            <RoomSummary key={room.id} room={room} />
-          ))}
-        </RoomDragList>
-        <HomeAdd onClick={() => openPage('add-light')}>+ Add a light</HomeAdd>
-      </HomeLayout>
-      <UpdateNotice rooms={rooms} />
-    </>
+    <HomeLayout
+      wordmark={showsVersion ? `VERSION ${APP_VERSION}` : 'ILLUMIGOON'}
+      onWordmark={() => setShowsVersion(!showsVersion)}
+      notice={<UpdateNotice rooms={rooms} />}
+    >
+      {isSilent ? (
+        <HouseNote
+          text={
+            isRefused
+              ? SEARCH_REFUSED_TEXT
+              : 'No lights are answering. Check the home Wi-Fi, and that Local Network is on for Illumigoon in Settings.'
+          }
+          actionLabel="SEARCH AGAIN"
+          onAction={searchAgain}
+        />
+      ) : (
+        <HouseControls rooms={rooms} placeCount={places.length} />
+      )}
+      <SceneRow rooms={rooms} />
+      <RoomDragList ids={places.map(({ room }) => room.id)} onOrder={setRoomOrder}>
+        {places.map(({ room, waitingLights }) => (
+          <RoomSummary key={room.id} room={room} waitingLights={waitingLights} />
+        ))}
+      </RoomDragList>
+      <HomeAdd onClick={() => openPage('add-light')}>+ Add a light</HomeAdd>
+    </HomeLayout>
   );
 }

@@ -16,6 +16,7 @@ export type PageKind =
   | 'lock'
   | 'take-back'
   | 'arrange'
+  | 'transition'
   | 'room-settings'
   | 'add-light'
   | 'editor'

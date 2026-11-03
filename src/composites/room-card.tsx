@@ -9,18 +9,22 @@ type RoomCardProps = {
   power: ReactNode;
   lightStates: { id: string; name: string; state: 'on' | 'off' | 'silent' }[];
   note: string | null;
+  // Keeps the height of the recent looks while they load.
+  hasLooks: boolean;
   // Shows on a laptop, where the open room stands beside its card.
   isOpen: boolean;
-  onOpen: () => void;
+  // A room that has not answered yet has nothing to open.
+  onOpen?: () => void;
   // A room someone else holds has no looks to change.
   onLooks?: () => void;
   children: ReactNode;
 };
 
 export function RoomCard(card: RoomCardProps) {
+  const lookName = card.lookName || 'No look';
   return (
-    <article className="room-card" data-open={card.isOpen}>
-      <Press className="room-open" onClick={card.onOpen}>
+    <article className="room-card" aria-label={card.name} data-open={card.isOpen} data-has-looks={card.hasLooks}>
+      <Press className="room-open" label={`Open ${card.name}`} disabled={!card.onOpen} onClick={card.onOpen ?? noop}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>
           <ChevronMark direction="right" />
@@ -35,7 +39,12 @@ export function RoomCard(card: RoomCardProps) {
         </span>
         {card.strip}
       </Press>
-      <Press className="room-look" onClick={card.onLooks ?? card.onOpen}>
+      <Press
+        className="room-look"
+        label={`${card.name} look: ${lookName}`}
+        disabled={!card.onOpen}
+        onClick={card.onLooks ?? card.onOpen ?? noop}
+      >
         <span className="room-look-name">{card.lookName}</span>
         {card.hasSound && <SoundMark />}
         {card.onLooks && (
@@ -51,6 +60,8 @@ export function RoomCard(card: RoomCardProps) {
     </article>
   );
 }
+
+const noop = () => undefined;
 
 export function QuietNote({ children }: { children: ReactNode }) {
   return <p className="note quiet-note">{children}</p>;

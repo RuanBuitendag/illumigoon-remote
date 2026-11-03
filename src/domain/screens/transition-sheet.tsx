@@ -1,7 +1,8 @@
-import { Overlay, SelectRow, SliderRow } from '../../composites';
+import { PageFrame, PageSection, SelectRow, SliderRow } from '../../composites';
 import { TextKey } from '../../design-system';
-import { setTransition, type Light } from '../store/fleet-store';
-import type { Room } from '../store/rooms';
+import { applyLook, setTransition, type Light } from '../store/fleet-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
+import { lookNameOf, type Room } from '../store/rooms';
 
 const MAX_TRANSITION_SECONDS = 10;
 
@@ -11,25 +12,27 @@ export const transitionLights = ({ writableLights }: Room) =>
 const styleOf = ({ transitionId, transitions }: Light) => transitionId ?? transitions[0]?.id ?? '';
 const secondsOf = ({ transitionMs }: Light) => (transitionMs ?? 0) / 1000;
 
+// The slider is squared, so the short lengths most people pick get most of its travel.
+const positionOf = (seconds: number) => Math.sqrt(seconds / MAX_TRANSITION_SECONDS);
+const secondsAt = (position: number) => Math.round(position * position * MAX_TRANSITION_SECONDS * 10) / 10;
+
 export function transitionNote(light: Light) {
   const style = light.transitions.find(({ id }) => id === styleOf(light));
   return `${style?.name ?? ''}, ${secondsOf(light).toFixed(1)} s`;
 }
 
-export function TransitionSheet({ lights, onClose }: { lights: Light[]; onClose: () => void }) {
-  const light = lights[0];
-  if (!light) return null;
+// Each light takes its own look again, so it shows the transition into it.
+function playTransition(lights: Light[]) {
+  for (const light of lights) {
+    if (light.isOn && light.animation) applyLook([light], lookNameOf(light) ?? '', light.animation);
+  }
+}
+
+function TransitionControls({ lights, light }: { lights: Light[]; light: Light }) {
   const id = styleOf(light);
   const seconds = secondsOf(light);
   return (
-    <Overlay
-      label="Transition"
-      actions={
-        <TextKey isQuiet onClick={onClose}>
-          CLOSE
-        </TextKey>
-      }
-    >
+    <PageSection>
       <SelectRow
         label="Style"
         options={light.transitions.map(({ id: value, name }) => ({ value, name }))}
@@ -39,12 +42,23 @@ export function TransitionSheet({ lights, onClose }: { lights: Light[]; onClose:
       <SliderRow
         label="Length"
         valueText={`${seconds.toFixed(1)} s`}
-        value={seconds}
+        value={positionOf(seconds)}
         min={0}
-        max={MAX_TRANSITION_SECONDS}
-        step={0.1}
-        onChange={(next) => setTransition(lights, id, next * 1000)}
+        max={1}
+        step={0.01}
+        onChange={(next) => setTransition(lights, id, secondsAt(next) * 1000)}
       />
-    </Overlay>
+      {lights.some(({ isOn }) => isOn) && <TextKey onClick={() => playTransition(lights)}>TRY IT</TextKey>}
+    </PageSection>
+  );
+}
+
+export function TransitionPage({ room }: { room: Room }) {
+  const lights = transitionLights(room);
+  const light = lights[0];
+  return (
+    <PageFrame title="Transition" backLabel={useBackLabel(room)} onBack={closePage}>
+      {light && <TransitionControls lights={lights} light={light} />}
+    </PageFrame>
   );
 }

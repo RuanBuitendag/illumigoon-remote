@@ -15,11 +15,9 @@ import {
   animationOf,
   applyScene,
   isSceneShowing,
-  lightCount,
   noteLastScene,
   refreshScene,
   roomOfScene,
-  sceneSummary,
   useLastScenes,
   WHOLE_HOUSE,
 } from '../store/scenes';
@@ -27,25 +25,15 @@ import { offerUndo } from '../store/undo';
 import { LookStrip } from './look-strip';
 import { SaveSceneSheet } from './save-scene-sheet';
 
-// The shelf stays short, and the Recent page shows every light.
-const SHELF_LINES = 3;
-
 function LightLine({ light }: { light: SceneLight }) {
   const source = previewOfAnimation(animationOf(light));
   const strip = <LookStrip source={source} shape="line" isOn={light.is_on} brightness={light.brightness} />;
   return <SceneLine name={light.name} strip={strip} />;
 }
 
-export function SceneLights({ lights, limit = lights.length }: { lights: SceneLight[]; limit?: number }) {
-  const hidden = lights.length - limit;
-  return (
-    <>
-      {lights.slice(0, limit).map((light) => (
-        <LightLine key={light.id} light={light} />
-      ))}
-      {hidden > 0 && <SceneLine name={`+${lightCount(hidden)}`} />}
-    </>
-  );
+// Every light has its line, so the strips say what a scene turns on and off.
+export function SceneLights({ lights }: { lights: SceneLight[] }) {
+  return lights.map((light) => <LightLine key={light.id} light={light} />);
 }
 
 function deleteScene(scene: SceneEntry) {
@@ -61,8 +49,9 @@ type SceneRowProps = {
 
 type SceneSheet = { renaming: SceneEntry | null };
 
+// The scene that shows is marked on its card, so only one that has changed is named here.
 function currentText(showing: SceneEntry | undefined, last: SceneEntry | undefined, isOn: boolean) {
-  if (showing) return showing.name;
+  if (showing) return '';
   return isOn && last ? `${last.name}, changed` : '';
 }
 
@@ -120,7 +109,6 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
           <SceneCard
             key={scene.file}
             name={scene.name}
-            summary={sceneSummary(scene, room ? [room] : rooms)}
             isCurrent={room ? scene === showing : undefined}
             isEditing={isEditing}
             onApply={() => applyScene(scene, rooms)}
@@ -130,7 +118,7 @@ export function SceneRow({ rooms, room }: SceneRowProps) {
             onRename={() => setSheet({ renaming: scene })}
             onDelete={() => deleteScene(scene)}
           >
-            <SceneLights lights={scene.lights} limit={SHELF_LINES} />
+            <SceneLights lights={scene.lights} />
           </SceneCard>
         ))}
       </SceneShelf>

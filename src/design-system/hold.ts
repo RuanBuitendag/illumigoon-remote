@@ -18,10 +18,12 @@ type PressEvents = {
 // The returned function ends the press early.
 export function watchPress(start: Pointer, { onHold, onDrag, onEnd }: PressEvents, holdMs = HOLD_MS) {
   let isHeld = false;
-  const timer = window.setTimeout(() => {
+  const hold = () => {
     isHeld = true;
     onHold();
-  }, holdMs);
+  };
+  // With no hold to wait for, the press holds at once, so a fast drag is not taken for a scroll.
+  const timer = holdMs > 0 ? window.setTimeout(hold, holdMs) : 0;
 
   const stop = (wasTap: boolean, wasLifted = false) => {
     window.clearTimeout(timer);
@@ -47,6 +49,7 @@ export function watchPress(start: Pointer, { onHold, onDrag, onEnd }: PressEvent
   window.addEventListener('pointermove', onMove);
   window.addEventListener('pointerup', onLift);
   window.addEventListener('pointercancel', onCancel);
+  if (holdMs === 0) hold();
   return () => stop(false);
 }
 

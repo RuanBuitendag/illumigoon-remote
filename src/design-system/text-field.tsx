@@ -19,6 +19,10 @@ export function TextField({ label, size, type = 'text', onChange, onLeave, ...in
       aria-label={label}
       onChange={(event) => onChange?.(event.target.value)}
       onBlur={(event) => onLeave?.(event.target.value)}
+      // Return keeps a field that saves when it is left, as a tap elsewhere does.
+      onKeyDown={(event) => {
+        if (onLeave && event.key === 'Enter') event.currentTarget.blur();
+      }}
     />
   );
 }

@@ -17,6 +17,7 @@ import { RoomScreen } from './room-screen';
 import { RoomSettingsPage } from './room-settings-page';
 import { SchedulesPage } from './schedules-page';
 import { SearchScreen } from './search-screen';
+import { TransitionPage } from './transition-sheet';
 import { UndoBar } from './undo-bar';
 
 const ROOM_PAGES = {
@@ -26,6 +27,7 @@ const ROOM_PAGES = {
   lock: LockPage,
   'take-back': TakeBackPage,
   arrange: ArrangePage,
+  transition: TransitionPage,
   'room-settings': RoomSettingsPage,
 } satisfies Record<Exclude<PageKind, 'add-light' | 'editor' | 'history' | 'looks'>, (props: { room: Room }) => ReactNode>;
 

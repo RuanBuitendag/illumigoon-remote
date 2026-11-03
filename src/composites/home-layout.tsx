@@ -5,18 +5,23 @@ import { HeadingRow } from './control-rows';
 type HomeLayoutProps = {
   wordmark: string;
   onWordmark: () => void;
+  // Stands below the list, not over it, so it never hides a room.
+  notice: ReactNode;
   children: ReactNode;
 };
 
-export function HomeLayout({ wordmark, onWordmark, children }: HomeLayoutProps) {
+export function HomeLayout({ wordmark, onWordmark, notice, children }: HomeLayoutProps) {
   return (
-    <div className="home-scroll">
-      <header className="home-header">
-        <Press className="wordmark" onClick={onWordmark}>
-          {wordmark}
-        </Press>
-      </header>
-      <div className="home-column">{children}</div>
+    <div className="home-screen">
+      <div className="home-scroll">
+        <header className="home-header">
+          <Press className="wordmark" onClick={onWordmark}>
+            {wordmark}
+          </Press>
+        </header>
+        <div className="home-column">{children}</div>
+      </div>
+      {notice}
     </div>
   );
 }

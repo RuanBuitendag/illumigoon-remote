@@ -37,11 +37,12 @@ const RECENT_LOOKS = 3;
 const PERCENT = 100;
 
 // The look's name stands under the lights. A light repeats it only when the lights differ.
+// Its switch and its dark strip already say that it is off.
 function lightNote(light: Light, hasOneLook: boolean) {
   if (!light.isOnline) return "ISN'T ANSWERING";
   if (light.isLockedByOther) return 'IN USE';
-  if (!light.isOn) return 'OFF';
-  return hasOneLook ? '' : (lookNameOf(light) ?? '');
+  if (!light.isOn || hasOneLook) return '';
+  return lookNameOf(light) ?? '';
 }
 
 function allLightsWord({ writableLights }: Room) {
@@ -170,8 +171,14 @@ function RoomMore({ room }: { room: Room }) {
   );
 }
 
+// Nothing is chosen until a light is tapped, so lights with different looks open as Mixed.
+function chosenLights(room: Room, scopeAddress: string | null) {
+  return scopeAddress === null ? room.writableLights : lightsInScope(room, scopeAddress);
+}
+
 export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
   const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
+  const chosen = chosenLights(room, scopeAddress);
   const shownLights = useShownLights(room.onlineLights);
   const { writableLights } = room;
   const isOn = isAnyOn(shownLights);
@@ -194,13 +201,13 @@ export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
         label={room.name}
         isOn={isOn}
         level={highestBrightness(shownLights)}
-        disabled={isReadOnly}
+        disabled={isReadOnly || !isOn}
         onLevel={(next) => setBrightness(writableLights, next)}
       />
       {room.isLocked && <RoomLockNote room={room} />}
       <SceneRow rooms={rooms} room={room} />
-      <LightCards room={room} chosen={lightsInScope(room, scopeAddress)} />
-      <LookPanel room={room} lights={lightsInScope(room, scopeAddress)} />
+      <LightCards room={room} chosen={chosen} />
+      <LookPanel room={room} lights={chosen} />
       <RoomMore room={room} />
     </RoomLayout>
   );

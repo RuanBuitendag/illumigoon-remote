@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from '../../composites';
-import { ActionKey, AddKey, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
+import { ActionKey, AddKey, ChevronMark, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
 import { removeSchedule, setScheduleEnabled, writeSchedule, type Light } from '../store/fleet-store';
 import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
 import { useLibrary } from '../store/library-store';
-import { closePage, useBackLabel } from '../store/navigation-store';
+import { closePage, openSettingsPage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import {
   changesOfScene,
@@ -194,8 +194,23 @@ function ScheduleItem({ room, schedule, onChange }: ScheduleItemProps) {
   );
 }
 
-const unableText = (names: string[]) =>
-  `${names.join(', ')} can't keep a schedule. ${names.length === 1 ? 'It needs' : 'They need'} newer light software.`;
+// The off timer on the room screen is a schedule too, so it stays away until the lights are updated.
+function unableText(names: string[]) {
+  const needs = names.length === 1 ? 'It needs' : 'They need';
+  return `${names.join(', ')} can't keep a schedule or an off timer. ${needs} newer light software.`;
+}
+
+function UnableNote({ room, names }: { room: Room; names: string[] }) {
+  return (
+    <PageSection>
+      <PageHint>{unableText(names)}</PageHint>
+      <TextKey onClick={() => openSettingsPage('software', room.id)}>
+        LIGHT SOFTWARE
+        <ChevronMark direction="right" />
+      </TextKey>
+    </PageSection>
+  );
+}
 
 export function SchedulesPage({ room }: { room: Room }) {
   const [form, setForm] = useState<{ changing: RoomSchedule | null } | null>(null);
@@ -222,7 +237,7 @@ export function SchedulesPage({ room }: { room: Room }) {
           ))}
         </PageSection>
       )}
-      {unable.length > 0 && <PageHint>{unableText(unable)}</PageHint>}
+      {unable.length > 0 && <UnableNote room={room} names={unable} />}
       {form && <ScheduleForm room={room} changing={form.changing} onDone={() => setForm(null)} />}
       {!form && able.length > 0 && hasScheduleSpace(able) && (
         <AddKey onClick={() => setForm({ changing: null })}>+ Add a schedule</AddKey>

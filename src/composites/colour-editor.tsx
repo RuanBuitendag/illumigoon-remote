@@ -6,7 +6,6 @@ import { NamingRow } from './naming-row';
 import { CurrentPalette, PaletteShelf, type ColourSet } from './palette-shelf';
 
 const MAX_COLOURS = 8;
-const MAX_UNDO_STEPS = 20;
 
 type ColourField = {
   key: string;
@@ -14,11 +13,17 @@ type ColourField = {
   isPalette: boolean;
   colours: string[];
   minimumColours: number;
+  // What to call the colours a look came with, while they match no palette.
+  ownName?: string;
 };
 
 type ColourEditorProps = {
   fields: ColourField[];
   sets: ColourSet[];
+  // Undo covers every control of the look, so its steps are kept outside.
+  canUndo: boolean;
+  onStep: (key: string, colours: string[]) => void;
+  onUndo: () => void;
   onChange: (key: string, colours: string[]) => void;
   onKeepSet: (name: string, colours: string[]) => void;
 };
@@ -100,17 +105,15 @@ function Slots({ field, selected, onSelect, onAdd }: SlotsProps) {
   );
 }
 
-function useColourEdits(start: ColourField, { fields, onChange }: ColourEditorProps) {
+function useColourEdits(start: ColourField, { fields, onStep, onChange }: ColourEditorProps) {
   const [picked, setPicked] = useState({ key: start.key, index: 0 });
   const [isOpen, setOpen] = useState(false);
-  const [undoSteps, setUndoSteps] = useState<{ key: string; colours: string[] }[]>([]);
   const hasDragged = useRef(false);
   const field = fields.find(({ key }) => key === picked.key) ?? start;
   const { key, colours } = field;
   const selected = Math.min(picked.index, colours.length - 1);
 
-  const remember = (step: { key: string; colours: string[] }) =>
-    setUndoSteps((steps) => [...steps.slice(1 - MAX_UNDO_STEPS), step]);
+  const remember = (step: { key: string; colours: string[] }) => onStep(step.key, step.colours);
 
   const change = (next: string[]) => {
     remember({ key, colours });
@@ -122,7 +125,6 @@ function useColourEdits(start: ColourField, { fields, onChange }: ColourEditorPr
     selected,
     current: colours[selected] ?? BLACK_HEX,
     isOpen,
-    canUndo: undoSteps.length > 0,
     // A tap on the open colour closes the picker.
     pick: (next: { key: string; index: number }) => {
       setOpen(!(isOpen && next.key === key && next.index === selected));
@@ -159,12 +161,6 @@ function useColourEdits(start: ColourField, { fields, onChange }: ColourEditorPr
       onChange(added.key, [...added.colours, last]);
       setPicked({ key: added.key, index: added.colours.length });
       setOpen(true);
-    },
-    undo: () => {
-      const previous = undoSteps.at(-1);
-      if (!previous) return;
-      setUndoSteps(undoSteps.slice(0, -1));
-      onChange(previous.key, previous.colours);
     },
   };
 }
@@ -255,9 +251,9 @@ function PaletteChoices({ field, sets, onApply, onKeep, onChangeColours }: Palet
 }
 
 function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: ColourField }) {
-  const { fields, sets, onKeepSet } = props;
+  const { fields, sets, canUndo, onUndo, onKeepSet } = props;
   const edits = useColourEdits(fields.find(({ isPalette }) => isPalette) ?? first, props);
-  const { isOpen, canUndo, applySet, closePicker, undo } = edits;
+  const { isOpen, applySet, closePicker } = edits;
   const [copied, setCopied] = useState<string | null>(null);
   // Closed, then the palettes to choose from, then the single colours of this one.
   const [opened, setOpened] = useState<{ key: string; step: 'palettes' | 'colours' } | null>(null);
@@ -280,6 +276,7 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
         <CurrentPalette
           label={label}
           colours={colours}
+          ownName={field.ownName}
           sets={sets}
           maxColours={MAX_COLOURS}
           isOpen={step !== null}
@@ -289,7 +286,10 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
           <PaletteChoices
             field={field}
             sets={sets}
-            onApply={(set) => applySet(field, set)}
+            onApply={(set) => {
+              applySet(field, set);
+              setOpened(null);
+            }}
             onKeep={(name) => onKeepSet(name, colours)}
             onChangeColours={() => goTo({ key, step: 'colours' })}
           />
@@ -314,7 +314,7 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
           <span className="control-label">
             {field.label}
             {field === first && (
-              <TextKey isQuiet disabled={!canUndo} onClick={undo}>
+              <TextKey isQuiet disabled={!canUndo} onClick={onUndo}>
                 UNDO
               </TextKey>
             )}

@@ -1,11 +1,10 @@
-import { useState } from 'react';
 import { MoreRow, PageFrame, PageSection } from '../../composites';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { closePage, openSettingsPage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { lightCount } from '../store/scenes';
 import { roomSchedules } from '../store/schedules';
-import { TransitionSheet, transitionLights, transitionNote } from './transition-sheet';
+import { transitionLights, transitionNote } from './transition-sheet';
 
 function lockSummary({ lights }: Room) {
   const light = lights[0];
@@ -32,16 +31,18 @@ function softwareNote({ lights }: Room, waiting: number) {
 export function RoomSettingsPage({ room }: { room: Room }) {
   const servers = useLatestVersions((latest) => latest.servers);
   const waiting = room.lights.filter((light) => newVersionOf(light, servers)).length;
-  const [isChoosing, setChoosing] = useState(false);
-  const fadingLights = transitionLights(room);
-  const fadingLight = fadingLights[0];
+  const fadingLight = transitionLights(room)[0];
   return (
     <PageFrame title="Room settings" backLabel={useBackLabel(room)} onBack={closePage}>
       <PageSection>
         <MoreRow label="Schedules" note={scheduleNote(room)} onOpen={() => openSettingsPage('schedules', room.id)} />
         <MoreRow label="Lock" note={lockSummary(room)} onOpen={() => openSettingsPage('lock', room.id)} />
         {fadingLight && (
-          <MoreRow label="Transition" note={transitionNote(fadingLight)} onOpen={() => setChoosing(true)} />
+          <MoreRow
+            label="Transition"
+            note={transitionNote(fadingLight)}
+            onOpen={() => openSettingsPage('transition', room.id)}
+          />
         )}
         <MoreRow
           label="Rename and arrange"
@@ -59,7 +60,6 @@ export function RoomSettingsPage({ room }: { room: Room }) {
           onOpen={() => openSettingsPage('light-setup', room.id)}
         />
       </PageSection>
-      {isChoosing && <TransitionSheet lights={fadingLights} onClose={() => setChoosing(false)} />}
     </PageFrame>
   );
 }

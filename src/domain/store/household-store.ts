@@ -25,6 +25,9 @@ export type SavedLook = { id: string; name: string; baseName: string; animation:
 
 export type RecentLook = { name: string; animation: AnimationState };
 
+// The rooms and lights Home showed last, so each keeps its place while the lights answer again.
+export type KnownRoom = { id: string; lights: { id: string; name: string }[] };
+
 type Household = {
   scenes: OldScene[];
   savedLooks: SavedLook[];
@@ -39,6 +42,7 @@ type Household = {
   lightAddresses: string[];
   // Light software versions the notice on Home was told to leave for later.
   skippedSoftware: string[];
+  knownRooms: KnownRoom[];
 };
 
 export const useHousehold = create<Household>()(
@@ -54,6 +58,7 @@ export const useHousehold = create<Household>()(
       lookPlays: {} as Record<string, number>,
       lightAddresses: [] as string[],
       skippedSoftware: [] as string[],
+      knownRooms: [] as KnownRoom[],
     }),
     { name: 'household' },
   ),
@@ -100,4 +105,8 @@ export function setRoomOrder(roomOrder: string[]) {
 
 export function setLightOrder(roomId: string, lightIds: string[]) {
   useHousehold.setState(({ lightOrders }) => ({ lightOrders: { ...lightOrders, [roomId]: lightIds } }));
+}
+
+export function rememberRooms(knownRooms: KnownRoom[]) {
+  useHousehold.setState({ knownRooms });
 }

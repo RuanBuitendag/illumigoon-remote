@@ -2,6 +2,7 @@ import { LockNote, RoomCard } from '../../composites';
 import { PowerKey } from '../../design-system';
 import { movesToMusic } from '../looks/look-catalog';
 import { setPower, type Light } from '../store/fleet-store';
+import { useHousehold } from '../store/household-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom, useNavigation } from '../store/navigation-store';
 import {
@@ -55,8 +56,18 @@ function timerText(room: Room) {
   return offTimersOf(lights).length > 0 ? offTimerNote(lights) : null;
 }
 
-export function RoomSummary({ room }: { room: Room }) {
+type LightStateLine = { id: string; name: string; state: ReturnType<typeof lightState> };
+
+const stateOfLight = (light: Light): LightStateLine => ({ id: light.address, name: light.name, state: lightState(light) });
+const stateOfWaiting = ({ id, name }: { id: string; name: string }): LightStateLine => ({ id, name, state: 'silent' });
+
+type RoomSummaryProps = { room: Room; waitingLights: { id: string; name: string }[] };
+
+// Lights that have not answered yet keep their place on the card, as lights that do not answer.
+export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
   const { writableLights } = room;
+  const hasLooks = useHousehold((household) => (household.recentLooks[room.id]?.length ?? 0) > 0);
+  const lightStates = [...room.lights.map(stateOfLight), ...waitingLights.map(stateOfWaiting)];
   const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
   const onlineLights = useShownLights(room.onlineLights);
   const first = onlineLights[0];
@@ -80,10 +91,11 @@ export function RoomSummary({ room }: { room: Room }) {
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
       lookName={lookLabel(onlineLights)}
       hasSound={Boolean(lookId && movesToMusic(lookId))}
-      lightStates={room.lights.map((light) => ({ id: light.address, name: light.name, state: lightState(light) }))}
+      lightStates={lightStates}
+      hasLooks={hasLooks}
       note={silentText(room) ?? timerText(room)}
       isOpen={isOpen}
-      onOpen={() => openRoom(room.id)}
+      onOpen={room.lights.length > 0 ? () => openRoom(room.id) : undefined}
       onLooks={writableLights.length > 0 ? () => openPage('looks', room.id) : undefined}
     >
       {room.isLocked ? (

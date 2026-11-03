@@ -3,7 +3,7 @@ import { Eyebrow, Picked, Press, TextKey } from '../design-system';
 import { HeadingRow } from './control-rows';
 import { QuietNote } from './room-card';
 
-export function SceneLine({ name, strip }: { name: string; strip?: ReactNode }) {
+export function SceneLine({ name, strip }: { name: string; strip: ReactNode }) {
   return (
     <span className="scene-line">
       <span className="scene-tag">{name}</span>
@@ -14,7 +14,6 @@ export function SceneLine({ name, strip }: { name: string; strip?: ReactNode }) 
 
 type SceneCardProps = {
   name: string;
-  summary: string;
   isCurrent?: boolean;
   isEditing: boolean;
   onApply: () => void;
@@ -27,7 +26,7 @@ type SceneCardProps = {
 };
 
 export function SceneCard(props: SceneCardProps) {
-  const { name, summary, isCurrent, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
+  const { name, isCurrent, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
   return (
     <div className="scene-card">
       <Press className="scene-apply" disabled={isEditing} onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
@@ -35,7 +34,6 @@ export function SceneCard(props: SceneCardProps) {
           <Picked isOn={isCurrent}>{name}</Picked>
         </span>
         {children}
-        <span className="scene-summary">{summary}</span>
       </Press>
       {isEditing && (
         <span className="scene-edit">
