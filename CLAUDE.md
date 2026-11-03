@@ -11,6 +11,12 @@ the page, by `packages/patch-editor/src/phone`, from the same `server/library.mj
 imports it. There is no separate editor to open: Edit is a page of the app, reached from EDIT on a room's look, the
 same on both sizes. Its parts move into the three layers below one at a time.
 
+## Standards
+
+The Linear document "Agent rules: project standards" (personal workspace, id `b6c36ef7-9279-4f4e-b193-1aa24da6af98`)
+sets the layout, design system, lint, tests and user stories for this repo, and wins over anything here. The design
+system audit, its decisions and its README are in `docs/design-system/`.
+
 ## Layers
 
 All source sits in three layers. Imports only point down. `src/main.tsx` is the only file outside them.
