@@ -77,6 +77,8 @@
   --radius-round: 50%;
   --radius-pill: 999px;
   --mark-line: 1.5px;
+  /* How far the selected line sits under its text. A row of tabs moves it down onto the tab rule. */
+  --mark-gap: 7px;
   --line: 1px;
   --line-strong: 2px;
   /* Stacking order. Each value counts inside its own stacking context: a sticky bar in a screen,
@@ -246,7 +248,10 @@ input::placeholder { color: var(--text-5); }
 .note { color: var(--text-3); font: var(--type-note); }
 .picked { position: relative; display: inline-block; }
 .picked[data-on='true'] { color: var(--text-1); }
-.picked[data-on='true']::after { content: ''; position: absolute; left: 0; right: 0; bottom: calc(-1 * var(--space-1)); height: var(--mark-line); background: var(--text-1); }
+.picked[data-on='true']::after { content: ''; position: absolute; left: 0; background: var(--text-1); }
+.picked[data-edge='under'][data-on='true']::after { right: 0; bottom: calc(-1 * var(--mark-gap)); height: var(--mark-line); }
+.picked[data-edge='side'] { position: absolute; left: 0; top: var(--space-2); bottom: var(--space-2); }
+.picked[data-edge='side'][data-on='true']::after { top: 0; bottom: 0; width: var(--line-strong); }
 
 /* Keys */
 

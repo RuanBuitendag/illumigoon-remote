@@ -1,6 +1,7 @@
 /** Shared primitives: the bloom filter every accent stroke uses, icons, small controls. */
 
 import type { ReactNode } from 'react';
+import { Picked } from '../../../../src/design-system';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
 import { useRowDrag } from './useRowDrag';
@@ -106,8 +107,8 @@ export function Seg<T extends string>({ items, value, onChange, tight, labels }:
   return (
     <div className={`seg well${tight ? ' tight' : ''}`}>
       {items.map(it => (
-        <button key={it} data-on={it === value} onClick={() => onChange(it)}>
-          {labels?.[it] ?? it}
+        <button key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
+          <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
         </button>
       ))}
     </div>
@@ -130,8 +131,8 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   return (
     <div className="tabs">
       {items.map(it => (
-        <button key={it} data-on={it === value} onClick={() => onChange(it)}>
-          {labels?.[it] ?? it}
+        <button key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
+          <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
         </button>
       ))}
       <span className="tabrule" />
@@ -173,9 +174,9 @@ export const StructField = ({ node, field, value, onChange }: {
       <Lab title={title}>{field.label}</Lab>
       <div className="seg well tight">
         {field.options!.map(o => (
-          <button key={o} data-on={o === v} onClick={() => onChange(o)}
+          <button key={o} aria-pressed={o === v} onClick={() => onChange(o)}
                   title={STRUCT_OPTION_BLURBS[`${node}.${field.key}.${o}`]}>
-            {o.replace(/_/g, ' ')}
+            <Picked isOn={o === v}>{o.replace(/_/g, ' ')}</Picked>
           </button>
         ))}
       </div>

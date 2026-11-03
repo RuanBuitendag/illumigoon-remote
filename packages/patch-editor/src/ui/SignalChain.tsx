@@ -1,6 +1,7 @@
 /** The centre column: the signal chain of a layer or of the mix. */
 
 import { useState, type DragEvent, type HTMLAttributes, type ReactNode } from 'react';
+import { Picked } from '../../../../src/design-system';
 import { LIMITS, nodeById, requireParam, globalParam, GLOBAL_NODE } from '../domain/catalog';
 import { makeWarp, pathOf, type Layer, type Warp } from '../domain/patch';
 import { gradientOf } from '../library/palettes';
@@ -500,7 +501,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       {...drag}
       onClick={onSelect}
     >
-      {sel && <span className="selrule" style={{ top: 7, bottom: 7 }} />}
+      <Picked isOn={sel} edge="side" />
       <RowGrip />
       <span onClick={e => e.stopPropagation()} {...expose}>
         <Switch
@@ -555,7 +556,7 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
       title={title}
       {...row}
     >
-      {sel && <span className="selrule" style={{ top: 7, bottom: 7 }} />}
+      <Picked isOn={sel} edge="side" />
       {lead}
       <span
         style={{

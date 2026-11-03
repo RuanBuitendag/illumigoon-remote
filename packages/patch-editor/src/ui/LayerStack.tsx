@@ -1,6 +1,7 @@
 /** The layer stack: every layer of the patch, and the master row above them. */
 
 import { useState } from 'react';
+import { Picked } from '../../../../src/design-system';
 import { LIMITS, requireParam, blendModes, globalParam } from '../domain/catalog';
 import { BLEND_BLURBS } from '../domain/presentation';
 import { makeLayer, pathOf, reachFrom, type Layer } from '../domain/patch';
@@ -288,7 +289,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
       onClick={ctl.selectMaster}
       title="The whole mix: brightness, speed and a rack over every layer"
     >
-      {on && <span className="selrule" />}
+      <Picked isOn={on} edge="side" />
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <span style={{ width: 35, display: 'flex', justifyContent: 'flex-end' }}>
           <Ico.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
@@ -369,7 +370,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
       }}
       onClick={() => ctl.selectLayer(L.slot)}
     >
-      {selected && <span className="selrule" />}
+      <Picked isOn={selected} edge="side" />
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <RowGrip />
         <span

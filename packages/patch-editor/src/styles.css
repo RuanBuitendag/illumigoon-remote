@@ -67,8 +67,6 @@
 .patch-editor .seg { display: flex; flex-wrap: wrap; gap: var(--space-half) var(--space-4); width: fit-content; background: none; }
 .patch-editor .seg > button { position: relative; padding: var(--space-2) 0; font: var(--type-note); color: var(--text-4); }
 .patch-editor .seg > button:hover { color: var(--text-2); }
-.patch-editor .seg > button[data-on='true'] { color: var(--text-1); }
-.patch-editor .seg > button[data-on='true']::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 1.5px; background: var(--text-1); }
 .patch-editor .seg.tight { gap: var(--space-half) var(--space-3); }
 .patch-editor .seg.tight > button { font-size: var(--size-small); }
 
@@ -165,7 +163,7 @@
  * A RULE DOWN THE LEFT, where the selection draws one in white — the two say related things
  * ("this layer is what you are looking at" / "this layer is what that slot touches") and
  * reading them in one glance means reading them in one place. Accent rather than white, and
- * inset rather than the `.selrule` element, so a row can carry both at once.
+ * inset rather than the side `Picked` mark, so a row can carry both at once.
  */
 .patch-editor .layerrow[data-lit='true'] { box-shadow: inset 2px 0 0 var(--modulation); background: var(--modulation-ghost); }
 
@@ -183,7 +181,6 @@
 .patch-editor .layerrow.raise-hi .rowacts { display: flex; }
 .patch-editor .rowgrip { width: var(--space-3); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; touch-action: none; }
 .patch-editor [data-lifted='true'] { opacity: var(--opacity-disabled); }
-.patch-editor .selrule { position: absolute; left: 0; top: 9px; bottom: 9px; width: 2px; background: var(--text-1); }
 
 .patch-editor .tog {
   width: 17px;
@@ -652,7 +649,8 @@
 .patch-editor .tabs { display: flex; align-items: flex-end; }
 .patch-editor .tabs > button { position: relative; padding: var(--space-2) 0 var(--space-3); margin-right: var(--space-4); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-4); }
 .patch-editor .tabs > button:hover { color: var(--text-3); }
-.patch-editor .tabs > button[data-on='true'] { color: var(--text-1); box-shadow: inset 0 -1.5px 0 var(--text-1); }
+/* The selected tab's line lands on the rule under the row. */
+.patch-editor .tabs { --mark-gap: var(--space-3); }
 .patch-editor .tabs > .tabrule { flex-grow: 1; height: 1px; background: var(--track); }
 
 /* A layer's blend, as a chip on its row. A native select, so the menu is the platform's and
