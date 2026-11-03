@@ -21,12 +21,14 @@
   --sans: 'Geist', -apple-system, system-ui, sans-serif;
   --mono: 'Geist Mono', ui-monospace, monospace;
   --push: cubic-bezier(0.32, 0.72, 0, 1);
-  --size-small: 10.5px;
-  --size-note: 13px;
-  --size-body: 15px;
-  --size-heading: 20px;
-  --size-title: 28px;
-  --size-page: 36px;
+  /* Sizes are rem, so they follow the reader's text size; 1rem is 16 px by default. The floor is
+     11 pt on iPhone, which is 11 CSS px: no size goes under --size-small (LIFE-1938). */
+  --size-small: 0.6875rem;
+  --size-note: 0.8125rem;
+  --size-body: 0.9375rem;
+  --size-heading: 1.25rem;
+  --size-title: 1.75rem;
+  --size-page: 2.25rem;
   --weight-light: 300;
   --weight-regular: 400;
   --weight-medium: 500;
