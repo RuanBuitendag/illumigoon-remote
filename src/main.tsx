@@ -1,14 +1,14 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App, startApp } from './domain';
+import { App, GalleryScreen, startApp, startErrorReports } from './domain';
 
-startApp();
+startErrorReports();
+
+// `?gallery` on the dev server shows every primitive in each state, for `npm run screenshots`.
+const isGallery = import.meta.env.DEV && new URLSearchParams(window.location.search).has('gallery');
+if (!isGallery) startApp();
 
 const root = document.getElementById('root');
 if (root) {
-  createRoot(root).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  );
+  createRoot(root).render(<StrictMode>{isGallery ? <GalleryScreen /> : <App />}</StrictMode>);
 }

@@ -1,0 +1,5 @@
+[
+  { "name": "app script", "path": "dist/assets/index-*.js", "limit": "165 kB" },
+  { "name": "all scripts", "path": "dist/assets/*.js", "limit": "280 kB" },
+  { "name": "styles", "path": "dist/assets/*.css", "limit": "64 kB" }
+]

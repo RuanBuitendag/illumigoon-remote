@@ -1,6 +1,7 @@
 import './composites.css';
 
 export { ColourEditor } from './colour-editor';
+export { Gallery } from './gallery';
 export {
   HeadingRow,
   SelectRow,
