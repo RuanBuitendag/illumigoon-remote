@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Icon, LinkKey, Press, SoundMark, StatusMark } from '../design-system';
+import { Icon, LinkKey, Picked, Press, SoundMark, StatusMark } from '../design-system';
 
 type RoomCardProps = {
   name: string;
@@ -12,7 +12,7 @@ type RoomCardProps = {
   note: string | null;
   // Keeps the height of the recent looks while they load.
   hasLooks: boolean;
-  // Shows on a laptop, where the open room stands beside its card.
+  // Marked with the one selected mark: on a laptop the open room stands beside its card.
   isOpen: boolean;
   // A room that has not answered yet has nothing to open.
   onOpen?: () => void;
@@ -27,7 +27,9 @@ export function RoomCard(card: RoomCardProps) {
     <article className="room-card" aria-label={card.name} data-open={card.isOpen} data-has-looks={card.hasLooks}>
       <Press className="room-open" label={`Open ${card.name}`} disabled={!card.onOpen} onClick={card.onOpen ?? noop}>
         <span className="room-heading">
-          <span className="room-name">{card.name}</span>
+          <span className="room-name">
+            <Picked isOn={card.isOpen}>{card.name}</Picked>
+          </span>
           <Icon.Fwd c="currentColor" />
         </span>
         <span className="room-lights">

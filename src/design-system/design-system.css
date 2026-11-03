@@ -25,11 +25,8 @@
   --size-note: 0.8125rem;
   --size-body: 0.9375rem;
   --size-heading: 1.25rem;
-  --size-title: 1.75rem;
-  --size-page: 2.25rem;
   /* Text fields on a touch screen: Safari zooms in on anything smaller. */
   --size-field: 1rem;
-  --weight-light: 300;
   --weight-regular: 400;
   --weight-medium: 500;
   --type-label: var(--weight-medium) var(--size-small)/1.3 var(--mono);
@@ -39,10 +36,7 @@
   --type-note: var(--weight-regular) var(--size-note)/1.4 var(--sans);
   --type-body: var(--weight-regular) var(--size-body)/1.35 var(--sans);
   --type-heading: var(--weight-regular) var(--size-heading)/1.3 var(--sans);
-  --type-title: var(--weight-light) var(--size-title)/1.2 var(--sans);
-  --type-page: var(--weight-light) var(--size-page)/1.15 var(--sans);
   --tracking-label: 0.14em;
-  --tracking-title: -0.015em;
   --space-1: 4px;
   --space-2: 8px;
   --space-3: 12px;
@@ -182,7 +176,7 @@ body {
 
 h1, h2, h3, p { margin: 0; font: inherit; }
 i { display: block; font-style: normal; }
-button, input { font: inherit; color: inherit; }
+button, input, textarea { font: inherit; color: inherit; }
 button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-touch-callout: none; transition: transform var(--duration-press) var(--ease-out); }
 button:disabled { cursor: default; opacity: var(--opacity-disabled); }
 button[data-held='true'] { transform: translateY(-2px) scale(1.015); }
@@ -196,8 +190,8 @@ button[data-held='true'] { transform: translateY(-2px) scale(1.015); }
   box-shadow: var(--lift-shadow);
   transition: none;
 }
-input { padding: 0; -webkit-user-select: text; user-select: text; border: 0; border-radius: 0; outline: 0; background: none; }
-input::placeholder { color: var(--text-5); }
+input, textarea { padding: 0; -webkit-user-select: text; user-select: text; border: 0; border-radius: 0; outline: 0; background: none; }
+input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 /* Focus. Every control reached by keyboard shows the same ring. The fader's real input is hidden
    inside its thumb, so the bar carries the ring for it. */
@@ -229,9 +223,11 @@ input::placeholder { color: var(--text-5); }
 .sound-mark i:nth-child(2) { height: 9px; }
 .sound-mark i:nth-child(3) { height: 6px; }
 
-.status-mark { flex: none; width: 9px; height: 9px; border-radius: var(--radius-round); box-shadow: inset 0 0 0 1.5px var(--text-4); }
-.status-mark[data-state='on'] { background: var(--fill); box-shadow: none; }
-.status-mark[data-state='silent'] { box-shadow: none; outline: var(--line) dashed var(--text-5); }
+/* Edit's live mark: a short flat bar, full ink when the light is on, the off grey when it is off, and
+   broken into dots when it does not answer. No circle (D51). */
+.status-mark { flex: none; width: var(--space-3); height: 3px; background: var(--thumb-off); }
+.status-mark[data-state='on'] { background: var(--fill); }
+.status-mark[data-state='silent'] { background: repeating-linear-gradient(90deg, var(--text-4) 0 var(--space-half), transparent var(--space-half) var(--space-1)); }
 
 /* Text */
 
@@ -250,17 +246,21 @@ input::placeholder { color: var(--text-5); }
 
 .text-key { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--row); color: var(--text-2); }
 .text-key[data-quiet='true'] { color: var(--text-4); }
-.action-key { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); color: var(--text-1); font: var(--type-heading); }
+/* A form's main action and its fields read at body size, as Edit's forms do, under the heading that names the page (D54). */
+.action-key { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); color: var(--text-1); font: var(--type-body); }
 .key-row { display: flex; align-items: center; gap: var(--space-5); }
 .link-key { position: relative; text-decoration: underline; text-underline-offset: 3px; }
-.add-key { min-height: var(--row); color: var(--text-3); white-space: nowrap; }
+/* A key that adds, in Edit's key type, as Edit writes + ADD LAYER (D53). */
+.add-key { min-height: var(--row); color: var(--text-2); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; white-space: nowrap; }
 .back-key { display: flex; align-items: center; gap: var(--space-3); min-height: var(--row); color: var(--text-3); }
 
-.power-key { position: relative; display: block; flex: none; width: 50px; height: 30px; padding: 0; border: 0; border-radius: var(--radius-pill); background: var(--wash-strong); box-shadow: inset 0 0 0 var(--line) var(--track); cursor: pointer; transition: background-color var(--duration-settle), box-shadow var(--duration-settle); }
-.power-key::after { content: ''; position: absolute; inset: -7px 0; }
+/* The switch, flat as Edit draws things (D52): a box with the small corner and a hairline edge, and a square
+   thumb. On, the box fills with ink. Its press area grows to --row each way. */
+.power-key { position: relative; display: block; flex: none; width: 44px; height: 24px; padding: 0; border: 0; border-radius: var(--radius); background: none; box-shadow: inset 0 0 0 var(--line) var(--track); cursor: pointer; transition: background-color var(--duration-settle), box-shadow var(--duration-settle); }
+.power-key::after { content: ''; position: absolute; inset: -10px 0; }
 .power-key[data-checked] { background: var(--fill); box-shadow: none; }
 .power-key[data-disabled] { opacity: var(--opacity-disabled); }
-.power-key-thumb { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: var(--radius-round); background: var(--text-3); transition: transform var(--duration-settle) var(--push), background-color var(--duration-settle); }
+.power-key-thumb { position: absolute; top: 4px; left: 4px; width: 16px; height: 16px; border-radius: var(--radius); background: var(--text-4); transition: transform var(--duration-settle) var(--push), background-color var(--duration-settle); }
 .power-key[data-checked] .power-key-thumb { background: var(--on-fill); transform: translateX(20px); }
 
 .option-row { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); }
@@ -309,7 +309,7 @@ input::placeholder { color: var(--text-5); }
 
 .text-field { width: 100%; min-width: 0; border-bottom: var(--line) solid var(--track); }
 .text-area { width: 100%; min-height: 200px; padding: var(--space-3) 0; border-bottom: var(--line) solid var(--track); font: var(--type-value); resize: vertical; }
-.text-field-large { height: var(--row); font: var(--type-heading); }
+.text-field-large { height: var(--row); font: var(--type-body); }
 .text-field-small { flex: 1; height: var(--row); font: var(--type-body); }
 
 /* Colour chips */

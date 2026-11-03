@@ -46,13 +46,12 @@ export function LookHeading({ name, onReset, onEdit, onLooks }: LookHeadingProps
   );
 }
 
-type RoomSectionProps = { title?: string; eyebrow?: string; action?: ReactNode; children: ReactNode };
+type RoomSectionProps = { eyebrow?: string; action?: ReactNode; children: ReactNode };
 
-export function RoomSection({ title, eyebrow, action, children }: RoomSectionProps) {
+export function RoomSection({ eyebrow, action, children }: RoomSectionProps) {
   return (
     <section className="room-section">
       {eyebrow && <HeadingRow heading={<Eyebrow>{eyebrow}</Eyebrow>}>{action}</HeadingRow>}
-      {title && <h2 className="section-title">{title}</h2>}
       {children}
     </section>
   );
