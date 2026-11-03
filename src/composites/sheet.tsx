@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { type ReactNode, useEffect } from 'react';
 import { Eyebrow } from '../design-system';
 
 type SheetProps = {
@@ -8,9 +8,25 @@ type SheetProps = {
   // Stays in view while the rest of the sheet scrolls.
   pinned?: ReactNode;
   children: ReactNode;
+  // What the quiet way out does: CANCEL or CLOSE. Escape does the same.
+  onClose: () => void;
 };
 
-export function Sheet({ label, title, actions, pinned, children }: SheetProps) {
+// Escape is the change of mind on a keyboard, the same as the sheet's own way out.
+function useEscape(onClose: () => void) {
+  useEffect(() => {
+    const close = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || event.defaultPrevented) return;
+      event.preventDefault();
+      onClose();
+    };
+    window.addEventListener('keydown', close);
+    return () => window.removeEventListener('keydown', close);
+  }, [onClose]);
+}
+
+export function Sheet({ label, title, actions, pinned, children, onClose }: SheetProps) {
+  useEscape(onClose);
   return (
     <section className="sheet" role="dialog" aria-label={label}>
       <div className="sheet-pinned">

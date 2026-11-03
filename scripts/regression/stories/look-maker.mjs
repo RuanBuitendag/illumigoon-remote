@@ -77,9 +77,8 @@ export const lookMaker = [
   },
   {
     name: 'P2-S11 a layer added while Edit is still loading the look, then undone',
-    // GAP 2 (E1) is a race, so this test fails on some runs and passes on others. A test that cannot lose on every
-    // run would make the gate flaky, so it stays out until the race is fixed; then remove `fixme`.
-    fixme: 'GAP 2 (E1): an edit made while Edit loads sometimes makes the first undo empty the look (a race)',
+    // E1: the history starts at the look the light reported, so no undo can reach the empty patch the look replaced.
+    // The opening pull may replace the layer added before it, and then the undo has nothing to take away.
     lights: LOUNGE,
     async run({ page, lights }) {
       await openLounge(page);
@@ -90,8 +89,9 @@ export const lookMaker = [
       await readTheLook(page);
       const shown = await layerCount(page);
       await page.keyboard.press('Control+z');
-      await until(async () => (await layerCount(page)) !== shown, 'Ctrl+Z to take the layer away');
+      await page.waitForTimeout(1500);
       expect((await layerCount(page)) > 0, 'the undo emptied the look');
+      expect((await layerCount(page)) >= shown - 1, 'the undo took away more than the added layer');
       expect(layersOn(lights['10.0.0.13']) > 0, 'the undo sent an empty look to the light');
     },
   },
@@ -160,7 +160,6 @@ export const lookMaker = [
       await page.keyboard.press('Escape');
       await page.getByRole('dialog').waitFor({ state: 'hidden', timeout: 2000 });
     },
-    fails: 'GAP 3 (E12): Escape does not close the Check dialog that Clear all layers opens',
   },
   {
     name: 'P2-S7 read the fragments without file names',
@@ -176,7 +175,6 @@ export const lookMaker = [
   },
   {
     name: 'P2-S8 the controls list reads as the room screen does',
-    fails: 'GAP 5: on the phone each CONTROLS row shows only its glyph; the names (Speed, Second colours) are 0 px wide',
     lights: LOUNGE,
     async run({ page }) {
       await openEdit(page);

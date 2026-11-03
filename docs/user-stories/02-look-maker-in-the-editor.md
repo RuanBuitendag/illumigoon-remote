@@ -70,7 +70,7 @@ Features: Fragments, Check dialog. Contexts: laptop keyboard on the phone layout
 1. `Fragments` opens YOUR FRAGMENTS; Escape closes it.
 2. `Clear all layers` opens its Check dialog; Escape closes it.
 
-**GAP 3 (E12):** Escape does not close the Check dialog.
+**GAP 3 (E12), fixed 4 Nov 2026:** Escape closes the Check dialog, as CANCEL does.
 
 - **Failures:** none.
 - **Wrong actions:** the panel was opened by mistake.

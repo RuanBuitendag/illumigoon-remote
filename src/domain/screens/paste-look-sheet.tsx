@@ -21,6 +21,7 @@ export function PasteLookSheet({ onClose }: { onClose: () => void }) {
   return (
     <Overlay
       label="Paste a look"
+      onClose={onClose}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={onClose}>

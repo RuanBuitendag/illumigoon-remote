@@ -16,6 +16,7 @@ function QuestionSheet({ text, suggestion, onAnswer }: Question) {
   return (
     <Overlay
       label={isNaming ? text : 'Check'}
+      onClose={() => onAnswer(null)}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={() => onAnswer(null)}>

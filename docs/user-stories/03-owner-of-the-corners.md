@@ -44,7 +44,7 @@ Features: scenes. Contexts: laptop keyboard. Should take: 1 key.
 
 1. `+ SAVE`, a name, then Escape: the sheet closes and no scene is saved.
 
-**GAP 6:** Escape does not close the Save scene sheet; only CANCEL does.
+**GAP 6, fixed 4 Nov 2026:** Escape closes the Save scene sheet, as CANCEL does.
 
 - **Failures:** none.
 - **Wrong actions:** the sheet opened by mistake.

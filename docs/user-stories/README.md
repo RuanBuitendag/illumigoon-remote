@@ -68,10 +68,10 @@ A worker runs `--only` for the area it touched. The full `npm test` runs once pe
 | -- | -- | -- | -- |
 | 1 | 10 | A tap on a second light chooses only that light; two lights cannot be chosen | P1-S7 |
 | 2 | E1 | An edit made while Edit is still loading sometimes makes the first UNDO go to an empty look (0 / 8) and send it to the light. It is a race, so its test is skipped, not a known fail | P2-S11 |
-| 3 | E12 | Escape does not close the Check dialog that Clear all layers opens | P2-S6 |
+| 3 | E12 | Fixed 4 Nov 2026: Escape closes the Check dialog that Clear all layers opens, as CANCEL does | P2-S6 |
 | 4 | E13 | The fragments panel shows file names, "1 mod · 2 row" and "48 h ago" | P2-S7 |
 | 5 | new | On the phone each CONTROLS row in Edit shows only its glyph; the names are 0 px wide | P2-S8 |
-| 6 | new | Escape does not close the Save scene sheet | P3-S4 |
+| 6 | new | Fixed 4 Nov 2026: Escape closes the Save scene sheet and every other app sheet, as CANCEL does | P3-S4 |
 
 ## Coverage
 
@@ -91,7 +91,7 @@ Status is the result of the last full run (3 Nov 2026): pass, or known fail with
 | P2-S3 put the saved Candle back | RESET on the room | `stories/look-maker.mjs` | pass |
 | P2-S4 remove a layer by mistake, get it back, redo | Edit layers, undo, Clear all layers | `stories/look-maker.mjs` | pass |
 | P2-S5 save a changed look under a new name | Edit SAVE, Mine | `stories/look-maker.mjs` | pass |
-| P2-S6 close a panel with Escape | Fragments, Check dialog | `stories/look-maker.mjs` | known fail, GAP 3 |
+| P2-S6 close a panel with Escape | Fragments, Check dialog | `stories/look-maker.mjs` | pass |
 | P2-S7 read the fragments without file names | Fragments | `stories/look-maker.mjs` | known fail, GAP 4 |
 | P2-S8 the controls list reads as the room does | Edit CONTROLS | `stories/look-maker.mjs` | known fail, GAP 5 |
 | P2-S9 start a new look and save what it shows | NEW LOOK, Edit SAVE | `stories/look-maker.mjs` | pass |
@@ -100,7 +100,7 @@ Status is the result of the last full run (3 Nov 2026): pass, or known fail with
 | P3-S1 rename the room and a light | Rename and arrange | `stories/corner-owner.mjs` | pass |
 | P3-S2 schedules on old software say what to do | Schedules, Light software | `stories/corner-owner.mjs` | pass |
 | P3-S3 save a scene and bring it back | scenes | `stories/corner-owner.mjs` | pass |
-| P3-S4 Escape closes the scene sheet | scenes | `stories/corner-owner.mjs` | known fail, GAP 6 |
+| P3-S4 Escape closes the scene sheet | scenes | `stories/corner-owner.mjs` | pass |
 | P3-S5 the software notice leaves the rooms usable | software notice, Light software | `stories/corner-owner.mjs` | pass |
 | P3-S6 a deleted look leaves the recent looks | Mine, MANAGE, recent looks | `stories/corner-owner.mjs` | pass |
 | P3-S7 set the transition, try it, keep it | Transition | `stories/corner-owner.mjs` | pass |

@@ -2,11 +2,11 @@ import type { ReactNode } from 'react';
 import { Eyebrow, Picked, Press } from '../design-system';
 import { Sheet } from './sheet';
 
-type OverlayProps = { label: string; actions: ReactNode; children: ReactNode };
+type OverlayProps = { label: string; actions: ReactNode; children: ReactNode; onClose: () => void };
 
-export function Overlay({ label, actions, children }: OverlayProps) {
+export function Overlay({ label, actions, children, onClose }: OverlayProps) {
   return (
-    <Sheet label={label} title={label} actions={actions}>
+    <Sheet label={label} title={label} actions={actions} onClose={onClose}>
       <div className="sheet-body">{children}</div>
     </Sheet>
   );

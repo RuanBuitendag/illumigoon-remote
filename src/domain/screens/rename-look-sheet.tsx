@@ -16,6 +16,7 @@ export function RenameLookSheet({ look, onClose }: { look: LookFile; onClose: ()
   return (
     <Overlay
       label="Rename"
+      onClose={onClose}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={onClose}>

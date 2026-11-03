@@ -34,6 +34,7 @@ export function WhichLightsSheet({ rooms, room, picked, onDone, onClose }: Which
   return (
     <Overlay
       label="Which lights"
+      onClose={onClose}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={onClose}>

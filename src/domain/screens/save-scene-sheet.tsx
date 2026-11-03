@@ -51,6 +51,7 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
   return (
     <Overlay
       label={renaming ? 'Rename scene' : 'Save scene'}
+      onClose={onClose}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={onClose}>

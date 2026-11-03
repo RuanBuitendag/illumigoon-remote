@@ -75,7 +75,6 @@ export const cornerOwner = [
   },
   {
     name: 'P3-S4 a change of mind closes the scene sheet with Escape',
-    fails: 'GAP 6: Escape does not close the Save scene sheet; only CANCEL does',
     lights: LOUNGE,
     async run({ page }) {
       await press(page, '+ SAVE');

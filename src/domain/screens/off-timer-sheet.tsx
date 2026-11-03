@@ -47,6 +47,7 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
   return (
     <Overlay
       label="Off timer"
+      onClose={onClose}
       actions={
         <KeyRow>
           <TextKey isQuiet onClick={onClose}>

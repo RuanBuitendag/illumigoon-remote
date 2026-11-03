@@ -47,8 +47,8 @@ Reach: 2 taps from Home (`Open Lounge`, `EDIT`).
   0 / 8, and send it to the light (E1, P2-S11). `useHistory` starts `rested` on the patch it first sees, which can be
   the empty one before the light's look arrives. It is a race: once the look has loaded, undo and redo work (P2-S2,
   P2-S4). A person on a slow light who undoes one step can lose the whole look on the light.
-- **U-004 GAP 3** Escape does not close the Check dialog that Clear all layers opens (E12, P2-S6). The Fragments
-  panel does close on Escape, so the two differ.
+- **OK** Escape closes the Check dialog that Clear all layers opens, as it closes the Fragments panel (U-004, GAP 3,
+  fixed 4 Nov 2026, E12, P2-S6).
 - **U-005 GAP 4** The Fragments panel shows file names, "1 mod · 2 row" and "48 h ago" (E13, P2-S7).
 - **U-006 GAP 5** On the phone each CONTROLS row shows only its glyph: `.ctllabel` is 0 px wide, so Speed, Breath,
   Colours and Second colours are not readable (`packages/patch-editor/src/ui/Surface.tsx`, P2-S8).
@@ -64,7 +64,7 @@ Reach: 2 taps from Home (`Open Lounge`, `EDIT`).
 Reach: save 2 taps and a name; apply 1 tap.
 
 - **OK** SAVE waits for a name; a scene brings the room back (P3-S3).
-- **U-009 GAP 6** Escape does not close the Save scene sheet; only CANCEL does (P3-S4).
+- **OK** Escape closes the Save scene sheet, as CANCEL does (U-009, GAP 6, fixed 4 Nov 2026, P3-S4).
 
 ## Room settings
 
