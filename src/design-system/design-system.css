@@ -318,7 +318,13 @@ input::placeholder { color: var(--text-5); }
 .colour-slot { position: relative; display: block; flex: 1 1 0; min-width: 0; height: var(--row); transition: flex-grow var(--duration-settle) var(--ease-out); }
 .colour-slot[aria-pressed='true'] { flex-grow: 2; }
 .colour-slot .picked { display: block; width: 100%; height: 100%; }
-.colour-slot-fill { display: block; width: 100%; height: 100%; border-radius: var(--radius); box-shadow: inset 0 0 0 var(--line) var(--track); }
+.colour-slot .swatch { width: 100%; height: 100%; }
+.swatch { display: block; flex-shrink: 0; border-radius: var(--radius); box-shadow: inset 0 0 0 var(--line) var(--track); }
+/* The system picker draws its own box inside the key, so the paint and the edge go on that box. */
+input.swatch { cursor: pointer; box-shadow: none; }
+input.swatch::-webkit-color-swatch-wrapper { padding: 0; }
+input.swatch::-webkit-color-swatch { border: var(--line) solid var(--track); border-radius: var(--radius); }
+input.swatch::-moz-color-swatch { border: var(--line) solid var(--track); border-radius: var(--radius); }
 .colour-pad.react-colorful { width: 100%; height: var(--pad-height); gap: var(--space-2); }
 .colour-pad .react-colorful__saturation { border-bottom: 0; border-radius: var(--radius); }
 .colour-pad .react-colorful__hue { height: var(--row); border-radius: var(--radius); }

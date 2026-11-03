@@ -445,7 +445,7 @@
   background: var(--wash);
   border-radius: var(--radius);
 }
-.patch-editor .editor-swatch { width: 22px; height: 22px; border-radius: var(--radius); flex-shrink: 0; padding: 0; cursor: pointer; box-shadow: inset 0 0 0 1px var(--track); }
+.patch-editor .swatch { width: 22px; height: 22px; }
 .patch-editor .hexin { font: var(--type-small); color: var(--text-3); width: 70px; }
 .patch-editor .hexin:focus { color: var(--text-1); }
 .patch-editor .gradstrip { height: 40px; border-radius: var(--radius); }
@@ -858,7 +858,7 @@
   .patch-editor .rowacts > button { min-width: var(--space-3); display: inline-flex; justify-content: center; }
   .patch-editor .modchip :is(.src, .drop) { padding-inline: var(--space-2); }
   .patch-editor :where(select, input:not([type='color'])) { min-height: var(--pointer-target); }
-  .patch-editor .editor-swatch { width: var(--pointer-target); height: var(--pointer-target); }
+  .patch-editor .swatch { width: var(--pointer-target); height: var(--pointer-target); }
 }
 
 /* ---------------------------------------------------------- phone
@@ -876,7 +876,7 @@
   /* A thumb and arm's length: every press target is 44 px, and no type is under 13 px. The last
      selector meets the font sizes the panels set inline. */
   .patch-editor button, .patch-editor select { min-width: var(--row); min-height: var(--row); }
-  .patch-editor .editor-swatch { width: var(--row); height: var(--row); }
+  .patch-editor .swatch { width: var(--row); height: var(--row); }
   .patch-editor :where(input:not([type='color'])) { min-height: var(--row); }
   .patch-editor .numdrag { display: inline-flex; align-items: center; min-width: var(--row); min-height: var(--row); }
   .patch-editor :is(

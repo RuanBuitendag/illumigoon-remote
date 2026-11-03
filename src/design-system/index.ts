@@ -13,7 +13,7 @@ export {
   warmthToColour,
 } from './colour';
 export type { Colour } from './colour';
-export { ColourFill, ColourSlot } from './colour-chips';
+export { ColourFill, ColourSlot, Swatch } from './colour-chips';
 export { ColourPad } from './colour-pad';
 export { STARTER_COLOUR_SETS } from './colour-sets';
 export { Dialog } from './dialog';

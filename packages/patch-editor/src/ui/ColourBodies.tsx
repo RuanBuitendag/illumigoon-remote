@@ -1,6 +1,7 @@
 /** The inspector bodies of a layer's colour and the master colour. */
 
 import type { ReactNode } from 'react';
+import { Swatch } from '../../../../src/design-system';
 import { LIMITS, requireNode, colourIndices } from '../domain/catalog';
 import { DEAL_BLURBS, INDEX_BLURBS } from '../domain/presentation';
 import { pathOf, type Layer } from '../domain/patch';
@@ -167,12 +168,11 @@ function PaletteStops({
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-half)' }}>
         {entries.map((c, i) => (
           <div className="swrow" key={i} {...expose?.(i)}>
-            <input
-              className="editor-swatch"
-              type="color"
-              value={`#${c}`}
+            <Swatch
+              colour={`#${c}`}
+              label={`Colour ${i + 1}`}
               disabled={locked}
-              onChange={e => setEntry(i, e.target.value.slice(1).toLowerCase())}
+              onPick={hex => setEntry(i, hex.slice(1).toLowerCase())}
             />
             <Mono className="dim sm">{i + 1}</Mono>
             <input
