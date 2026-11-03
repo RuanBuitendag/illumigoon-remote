@@ -30,7 +30,7 @@ const waitingRoom = (id: string, name: string): Room => ({
 
 // Notes when each light was last on a card, and says which known lights of a room still wait for an
 // answer. A name counts only in its own room, because two rooms can each have a light called Left.
-function waitingCheck(rooms: Room[], isSettling: boolean) {
+export function waitingCheck(rooms: Room[], isSettling: boolean) {
   const now = Date.now();
   for (const { lights } of rooms) for (const light of lights) lastSeen.set(lightIdOf(light), now);
   return (roomId: string) => {

@@ -15,6 +15,7 @@
     "lint": "node scripts/lint/all.mjs",
     "regression": "node scripts/regression/run.mjs",
     "setup-light": "node scripts/setup-light/setup-light.mjs",
+    "test:unit": "vitest run",
     "lint:types": "tsc --noEmit",
     "lint:code": "oxlint --deny-warnings src scripts electron",
     "lint:complexity": "biome lint --max-diagnostics=none",
@@ -55,11 +56,13 @@
     "dependency-cruiser": "^18.7.0",
     "electron": "44.3.0",
     "electron-builder": "26.15.3",
+    "happy-dom": "^21.0.4",
     "jscpd": "^4.3.0",
     "knip": "^6.44.0",
     "oxlint": "^1.90.0",
     "playwright": "^1.64.1",
     "typescript": "~6.0.2",
-    "vite": "^8.3.5"
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
   }
 }
