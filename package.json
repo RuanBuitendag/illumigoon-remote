@@ -39,7 +39,6 @@
     "@illumigoon/led-tape": "*",
     "@illumigoon/patch-editor": "*",
     "@mhaberler/capacitor-zeroconf-nsd": "5.1.0",
-    "@sentry/react": "^11.10.0",
     "electron-updater": "6.8.9",
     "react": "^19.3.1",
     "react-colorful": "^5.6.1",

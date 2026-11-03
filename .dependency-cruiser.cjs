@@ -16,7 +16,7 @@
 
 const LAYERS = '^src/(design-system|composites|domain)/';
 const LOOK_LIBRARIES = '^node_modules/(@base-ui|@fontsource)';
-const APP_LIBRARIES = '^node_modules/(zustand|@capacitor|@capgo|@mhaberler|@sentry)';
+const APP_LIBRARIES = '^node_modules/(zustand|@capacitor|@capgo|@mhaberler)';
 const EDITOR = '^(packages/patch-editor|node_modules/@illumigoon)/';
 
 const rule = (name, comment, from, to) => ({ name, comment, severity: 'error', from, to });

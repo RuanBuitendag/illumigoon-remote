@@ -43,6 +43,7 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 | `lint:editor` | the package gate | the same tools over `packages/patch-editor` |
 
 Fix the code when a check fails. Do not weaken a rule, and do not add an exception for one file.
+`packages/patch-editor/src/engine/generated` is a generated WebAssembly build, so the checks skip it.
 
 Outside the lint gate:
 
@@ -54,12 +55,8 @@ Outside the lint gate:
 
 A new primitive or composite state goes on the gallery page, `src/composites/gallery.tsx`, in the same change.
 
-Errors in the installed app go to Sentry (`src/domain/error-reports.ts`) when `.env.production` holds `VITE_SENTRY_DSN`.
-With no key, and on the dev server, nothing is sent.
-
 ## Exception: accessibility
 
 This app is for one household, so WCAG conformance and the `AC` rows of the design-system checklist are out of scope
 (Ruan, 3 Nov 2026: "i dont care about accessibility though this is only for a household app"). The tap-target size and
 the text contrast in the tokens stay, because they are about use on a phone in poor light, not about conformance.
-`packages/patch-editor/src/engine/generated` is a generated WebAssembly build, so the checks skip it.
