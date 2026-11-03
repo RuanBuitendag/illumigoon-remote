@@ -546,7 +546,7 @@
 
 /* -------------------------------------------------------------- toasts */
 
-.patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: 300; padding: 11px 18px; border-radius: 2px; font: var(--type-note); background: var(--text-1); color: var(--background); box-shadow: var(--float-shadow); }
+.patch-editor .toast { position: fixed; left: 50%; bottom: 140px; transform: translateX(-50%); z-index: 300; padding: 11px 18px; border-radius: 2px; font: var(--type-note); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); }
 .patch-editor .toast .toastact { margin-left: 14px; padding: 0; border: 0; background: none; color: inherit; font: var(--type-label); letter-spacing: var(--tracking-label); cursor: pointer; }
 
 /* -------------------------------------------------------------- scroll */
@@ -902,7 +902,8 @@
   .patch-editor .body .vr { display: none; }
   .patch-editor .body .panel { border-right: 0; border-bottom: 1px solid var(--track); }
   .patch-editor .body .scroll, .patch-editor .centre { overflow: visible; max-height: none; }
-  .patch-editor .body .grow { display: none; }
+  /* The empty spacers that push a panel's foot down. A column that grows to hold names stays. */
+  .patch-editor .body .grow:empty { display: none; }
   .patch-editor .tabs { flex-wrap: wrap; }
 
   /* A sheet is the whole screen, and each row of a table wraps onto its own lines. */
@@ -934,4 +935,4 @@
 .patch-editor :focus-visible,
 .patch-editor textarea.well:focus-visible { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
 /* The toast is ink on paper turned round, so its ring is the paper colour. */
-.patch-editor .toast :focus-visible { outline-color: var(--background); }
+.patch-editor .toast :focus-visible { outline-color: var(--on-fill); }

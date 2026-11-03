@@ -258,7 +258,7 @@ export const pathName = (path: string) =>
  * that does not.
  */
 export const budgetColour = (bytes: number) =>
-  bytes <= BUDGET.NVS ? 'var(--text-1)' : bytes <= BUDGET.MESH ? 'var(--warn)' : 'var(--bad)';
+  bytes <= BUDGET.NVS ? 'var(--good)' : bytes <= BUDGET.MESH ? 'var(--warn)' : 'var(--bad)';
 
 export const budgetNote = (bytes: number) =>
   bytes <= BUDGET.NVS

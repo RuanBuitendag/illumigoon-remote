@@ -103,6 +103,12 @@
   --modulation-ghost: rgba(var(--ink-rgb), 0.1);
   --warn: var(--text-2);
   --bad: #c85f4e;
+  /* Status roles (CO-3). Only danger has a hue. Good news and information show in the ink ramp,
+     by their words and place, since the owner rejects orange and amber and wants neutral states. */
+  --good: var(--text-1);
+  --info: var(--text-3);
+  /* Text and marks on an ink fill: the toast, a power key that is on (CO-5). */
+  --on-fill: var(--background);
 }
 
 @media (prefers-color-scheme: light) {
@@ -235,10 +241,14 @@ input::placeholder { color: var(--text-5); }
 .power-key[data-checked] { background: var(--fill); box-shadow: none; }
 .power-key[data-disabled] { opacity: var(--opacity-disabled); }
 .power-key-thumb { position: absolute; top: 4px; left: 4px; width: 22px; height: 22px; border-radius: var(--radius-round); background: var(--text-3); transition: transform var(--duration-settle) var(--push), background-color var(--duration-settle); }
-.power-key[data-checked] .power-key-thumb { background: var(--background); transform: translateX(20px); }
+.power-key[data-checked] .power-key-thumb { background: var(--on-fill); transform: translateX(20px); }
 
 .option-row { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); }
 .option { height: var(--row); color: var(--text-4); }
+
+/* A thumb needs --row each way (LIFE-1953). A short word key keeps its look, and its hit area grows around it. */
+.text-key, .option { position: relative; }
+.text-key::after, .option::after, .colour-slot::after { content: ''; position: absolute; top: 50%; left: 50%; width: max(100%, var(--row)); height: max(100%, var(--row)); translate: -50% -50%; }
 
 /* Fader */
 

@@ -16,6 +16,14 @@ orange or amber fill.
 Why: `design-system.css` sets `--warn: var(--text-2)` in both themes, and the owner rejects orange and amber accents.
 Date: 2026-11-03
 
+**CO-3 and CO-5. The other status roles and the on-colour**
+
+Chosen: `--good: var(--text-1)` and `--info: var(--text-3)`, from the ink ramp. `--on-fill: var(--background)` is the
+colour for text and marks on an ink fill.
+Why: the editor's memory budget already shows a good state in `--text-1` (`bits.tsx`), the toast and the power key put
+the paper colour on ink, and the owner wants neutral states with no orange or amber.
+Date: 2026-11-04
+
 ## Where systems disagree: options side by side, unranked
 
 Each table lists what exists, not what to pick. "Verified" says how strong the evidence is for the facts in that row. Rows the owner's existing rules already settle are noted in the owner table above.
