@@ -1,7 +1,7 @@
 {
   "fragment": "layer",
   "name": "Comet",
-  "notes": "A spawner on a periodic trigger, scrolled by a translate warp. The warp chain comes with it — a fragment is the whole layer, not just the emitter.\n\nLayer 0 of `showcase/02-comet.json`.",
+  "notes": "A bright spark that runs along the strip, again and again.",
   "layers": {
     "0": {
       "emitter": {

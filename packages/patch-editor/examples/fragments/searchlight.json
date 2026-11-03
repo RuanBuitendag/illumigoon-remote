@@ -1,7 +1,7 @@
 {
   "fragment": "layer",
   "name": "Searchlight",
-  "notes": "An ERASE layer: it removes light rather than adding it, so it needs something lit underneath to be visible at all. Drop it on top of a bright patch.\n\nLayer 1 of `showcase/06-searchlight.json`.",
+  "notes": "A dark beam that sweeps over the layers under it. Put it on top of a bright look.",
   "layers": {
     "0": {
       "emitter": {

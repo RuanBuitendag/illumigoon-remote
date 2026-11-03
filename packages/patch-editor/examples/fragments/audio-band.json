@@ -1,7 +1,7 @@
 {
   "fragment": "layer",
   "name": "Audio Band",
-  "notes": "A noise field fed by an audio band. The simplest audio-reactive layer in the corpus.\n\nLayer 0 of `03-audio-band.json`.",
+  "notes": "A soft field of colour that moves with the music.",
   "layers": {
     "0": {
       "emitter": {

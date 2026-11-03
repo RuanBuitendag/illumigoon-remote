@@ -82,7 +82,8 @@ Features: Fragments. Contexts: phone. Should take: nothing to decode.
 
 1. `Fragments` shows saved pieces by name, without `.json` and without engine counts.
 
-**GAP 4 (E13):** the panel shows file names, "1 mod · 2 row" and "48 h ago".
+**GAP 4 (E13), fixed 4 Nov 2026:** the panel once showed file names, "1 mod · 2 row" and "48 h ago". Each row
+now shows the name a person gave, their sentence of what it is, and one key.
 
 - **Failures:** none.
 - **Wrong actions:** none.

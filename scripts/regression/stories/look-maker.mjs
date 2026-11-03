@@ -163,7 +163,6 @@ export const lookMaker = [
   },
   {
     name: 'P2-S7 read the fragments without file names',
-    fails: 'GAP 4 (E13): the fragments panel shows file names, "1 mod · 2 row" and "48 h ago"',
     lights: LOUNGE,
     async run({ page }) {
       await openEdit(page);

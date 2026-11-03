@@ -1,7 +1,7 @@
 {
   "fragment": "layer",
   "name": "Bass Bar",
-  "notes": "Audio-reactive: a bass band stretches the line while an LFO moves it. Brings its own `audio_band`, so the patch it lands in starts asking the DSP task for frames.\n\nLayer 0 of `ports/08-sine-bass.json`.",
+  "notes": "A line that swings and stretches with the bass.",
   "layers": {
     "0": {
       "emitter": {

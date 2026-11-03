@@ -69,7 +69,7 @@ A worker runs `--only` for the area it touched. The full `npm test` runs once pe
 | 1 | 10 | Fixed 4 Nov 2026: after one light is chosen, a tap on another light adds it, so two lights share a look | P1-S7 |
 | 2 | E1 | Fixed 4 Nov 2026: the history starts at the look the light reported, so the first UNDO never goes to an empty look | P2-S11 |
 | 3 | E12 | Fixed 4 Nov 2026: Escape closes the Check dialog that Clear all layers opens, as CANCEL does | P2-S6 |
-| 4 | E13 | The fragments panel shows file names, "1 mod · 2 row" and "48 h ago" | P2-S7 |
+| 4 | E13 | Fixed 4 Nov 2026: the fragments panel shows each name and its sentence, with no file names, counts or ages | P2-S7 |
 | 5 | new | Fixed 4 Nov 2026: on the phone each CONTROLS row in Edit shows its name | P2-S8 |
 | 7 | new | Fixed 4 Nov 2026: an app sheet takes the focus, keeps Tab inside, and gives the focus back on close | K-2 |
 | 6 | new | Fixed 4 Nov 2026: Escape closes the Save scene sheet and every other app sheet, as CANCEL does | P3-S4 |
@@ -93,7 +93,7 @@ Status is the result of the last full run (4 Nov 2026): pass, or known fail with
 | P2-S4 remove a layer by mistake, get it back, redo | Edit layers, undo, Clear all layers | `stories/look-maker.mjs` | pass |
 | P2-S5 save a changed look under a new name | Edit SAVE, Mine | `stories/look-maker.mjs` | pass |
 | P2-S6 close a panel with Escape | Fragments, Check dialog | `stories/look-maker.mjs` | pass |
-| P2-S7 read the fragments without file names | Fragments | `stories/look-maker.mjs` | known fail, GAP 4 |
+| P2-S7 read the fragments without file names | Fragments | `stories/look-maker.mjs` | pass |
 | P2-S8 the controls list reads as the room does | Edit CONTROLS | `stories/look-maker.mjs` | pass |
 | P2-S9 start a new look and save what it shows | NEW LOOK, Edit SAVE | `stories/look-maker.mjs` | pass |
 | P2-S10 the laptop shows it all on one screen | Edit on the laptop | `stories/look-maker.mjs` | pass |

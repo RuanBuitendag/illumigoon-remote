@@ -1,7 +1,7 @@
 {
   "fragment": "layer",
   "name": "Fireflies",
-  "notes": "Particles that do not move, breathing through the palette. The LFO drives the palette rather than the emitter.\n\nLayer 0 of `showcase/16-fireflies.json`.",
+  "notes": "Points of light that stay put and breathe through the colours.",
   "layers": {
     "0": {
       "emitter": {
