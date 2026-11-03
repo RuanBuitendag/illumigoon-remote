@@ -7,8 +7,9 @@
 //   - The two CSS files stay with their layer.
 //   - The editor's style sheet takes every colour from the tokens.
 //   - Type comes only from the tokens, in composites, the design system and the editor.
-//   - Spacing, row heights and corners come only from the tokens in composites.
-//   - Layers, opacity, motion and line widths come only from the tokens in composites and the design system.
+//   - Spacing, row heights and corners come only from the tokens in composites and the editor.
+//   - Layers, opacity, motion and line widths come only from the tokens in composites, the design system and
+//     the editor, in its style sheet and in the inline styles of its components.
 //   - Every media query width in the app and the editor is the --wide token.
 
 import fs from 'node:fs';
@@ -68,6 +69,21 @@ const MEDIA_WIDTH = /\((min|max)-width:\s*(\d+)px\)/g;
 const INLINE_TYPE = /\b(font|fontSize|fontWeight|letterSpacing|lineHeight)\s*:\s*['"]?\.?\d[^,}\n]*/g;
 const TOKENS_END = /^\* \{/m;
 
+// The editor's inline styles, `style={{ ... }}`, checked for the same properties in their camelCase spelling.
+const INLINE_STYLE_START = /\bstyle=\{\{/g;
+const INLINE_GEOMETRY = [
+  {
+    rule: 'raw-spacing',
+    pattern:
+      /(?<![\w.])((?:padding|margin)(?:Top|Right|Bottom|Left|Inline|Block)?(?:Start|End)?|gap|rowGap|columnGap|minHeight|border\w*Radius)\s*:\s*([^,}\n]+)/g,
+    ones: false,
+  },
+  { rule: 'raw-line', pattern: /(?<![\w.])(border(?:Top|Right|Bottom|Left)?(?:Width)?|outline(?:Width)?)\s*:\s*([^,}\n]+)/g, ones: false },
+  { rule: 'raw-layer', pattern: /(?<![\w.])(zIndex|opacity)\s*:\s*([^,}\n]+)/g, ones: true },
+  { rule: 'raw-motion', pattern: /(?<![\w.])((?:transition|animation)(?:Duration|Delay|TimingFunction)?)\s*:\s*([^,}\n]+)/g, ones: false },
+];
+const INLINE_NUMBER = /(?<![\w.$#-])\d*\.?\d+(?![\w.%])/g;
+
 const problems = [];
 
 const report = (file, line, rule, text) => problems.push({ file, line, rule, text });
@@ -120,6 +136,41 @@ function checkMediaWidths(file) {
   }
 }
 
+// The text of each `style={{ ... }}` object, found by counting braces so a nested expression stays inside.
+function inlineStyles(text) {
+  return [...text.matchAll(INLINE_STYLE_START)].map((match) => {
+    let depth = 0;
+    let end = match.index + match[0].length - 2;
+    do {
+      if (text[end] === '{') depth += 1;
+      if (text[end] === '}') depth -= 1;
+      end += 1;
+    } while (depth > 0 && end < text.length);
+    return { at: match.index, body: text.slice(match.index, end) };
+  });
+}
+
+// A value is raw when it writes a length, a time or a number of its own, outside a `var(--token)`.
+function isRawInline(value, ones) {
+  const bare = value.replace(/var\(--[\w-]+\)/g, '');
+  if (LITERAL.test(bare) || RAW_MOTION.test(bare)) return true;
+  return [...bare.matchAll(INLINE_NUMBER)].some(([number]) => Number(number) !== 0 && !(ones && Number(number) === 1));
+}
+
+function checkInlineGeometry(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  for (const { at, body } of inlineStyles(text)) {
+    for (const { rule, pattern, ones } of INLINE_GEOMETRY) {
+      for (const match of body.matchAll(pattern)) {
+        const [, property, value] = match;
+        if (isRawInline(value, ones)) {
+          report(file, lineOf(text, at + match.index), rule, `${property}: ${value.trim()}: use a token from design-system.css`);
+        }
+      }
+    }
+  }
+}
+
 function checkInlineType(file) {
   runChecks(file, [['raw-type', INLINE_TYPE, 'use a type token from design-system.css']]);
 }
@@ -151,8 +202,13 @@ for (const file of walk(SOURCE)) {
 
 runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);
 checkTokens(EDITOR_STYLES, TYPE_PROPERTY, 'raw-type');
+checkTokens(EDITOR_STYLES, SPACE_PROPERTY, 'raw-spacing');
+checkGeometry(EDITOR_STYLES);
 for (const file of walk(EDITOR_SOURCE)) {
-  if (file.endsWith('.tsx')) checkInlineType(file);
+  if (file.endsWith('.tsx')) {
+    checkInlineType(file);
+    checkInlineGeometry(file);
+  }
   if (/\.(css|tsx?)$/.test(file) && !file.includes('/generated/')) checkMediaWidths(file);
 }
 
