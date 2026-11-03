@@ -66,7 +66,7 @@ A worker runs `--only` for the area it touched. The full `npm test` runs once pe
 
 | GAP | Finding | What is wrong | Story |
 | -- | -- | -- | -- |
-| 1 | 10 | A tap on a second light chooses only that light; two lights cannot be chosen | P1-S7 |
+| 1 | 10 | Fixed 4 Nov 2026: after one light is chosen, a tap on another light adds it, so two lights share a look | P1-S7 |
 | 2 | E1 | An edit made while Edit is still loading sometimes makes the first UNDO go to an empty look (0 / 8) and send it to the light. It is a race, so its test is skipped, not a known fail | P2-S11 |
 | 3 | E12 | Fixed 4 Nov 2026: Escape closes the Check dialog that Clear all layers opens, as CANCEL does | P2-S6 |
 | 4 | E13 | The fragments panel shows file names, "1 mod · 2 row" and "48 h ago" | P2-S7 |
@@ -85,7 +85,7 @@ Status is the result of the last full run (3 Nov 2026): pass, or known fail with
 | P1-S4 search for a warm look | Looks search | `stories/evening-user.mjs` | pass |
 | P1-S5 change one light, then the whole room | light choice, Looks page | `stories/evening-user.mjs` | pass |
 | P1-S6 a saved look keeps its name after a reload | look controls, SAVE AS NEW, Mine | `stories/evening-user.mjs` | pass |
-| P1-S7 give the two front lights one look | light choice | `stories/evening-user.mjs` | known fail, GAP 1 |
+| P1-S7 give the two front lights one look | light choice | `stories/evening-user.mjs` | pass |
 | P2-S1 add a layer and take it to the room | Edit layers, leave warning | `stories/look-maker.mjs` | pass |
 | P2-S2 undo and redo in Edit | Edit undo | `stories/look-maker.mjs` | pass |
 | P2-S3 put the saved Candle back | RESET on the room | `stories/look-maker.mjs` | pass |

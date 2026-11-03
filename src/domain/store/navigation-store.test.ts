@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { addressOf, closePage, closeRoom, openAddress, openPage, openRoom, useNavigation } from './navigation-store';
+import { addressOf, chooseLight, chooseLights, closePage, closeRoom, openAddress, openPage, openRoom, useNavigation } from './navigation-store';
 
 const reset = () => {
   closePage();
@@ -42,5 +42,33 @@ describe('screen addresses', () => {
     expect(useNavigation.getState().isPageOpen).toBe(false);
     openAddress('#nonsense');
     expect(useNavigation.getState().page === 'editor').toBe(false);
+  });
+});
+
+describe('light choice', () => {
+  const room = [{ address: 'front-left' }, { address: 'front-right' }, { address: 'back' }];
+  const chosen = () => useNavigation.getState().chosenAddresses;
+  afterEach(() => chooseLights([]));
+
+  it('chooses a light alone when the whole room is chosen', () => {
+    chooseLight('front-left', room);
+    expect(chosen()).toEqual(['front-left']);
+    chooseLights(room.map(({ address }) => address));
+    chooseLight('back', room);
+    expect(chosen()).toEqual(['back']);
+  });
+
+  it('adds a second light, and takes a chosen light out', () => {
+    chooseLight('front-left', room);
+    chooseLight('front-right', room);
+    expect(chosen()).toEqual(['front-left', 'front-right']);
+    chooseLight('front-left', room);
+    expect(chosen()).toEqual(['front-right']);
+  });
+
+  it('chooses the whole room again when the last light is taken out', () => {
+    chooseLight('front-left', room);
+    chooseLight('front-left', room);
+    expect(chosen()).toEqual([]);
   });
 });

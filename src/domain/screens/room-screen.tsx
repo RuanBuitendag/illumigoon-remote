@@ -13,9 +13,8 @@ import { PowerKey, TextKey } from '../../design-system';
 import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
 import { playLook } from '../store/look-play';
 import { useShownLights } from '../store/look-preview';
-import { closeRoom, openPage, setScope, useNavigation } from '../store/navigation-store';
+import { chooseLight, chooseLights, closeRoom, openPage, useNavigation } from '../store/navigation-store';
 import {
-  ALL_LIGHTS,
   editedLook,
   highestBrightness,
   isAnyOn,
@@ -57,7 +56,7 @@ function ChooseAllKey({ room, chosen }: { room: Room; chosen: Light[] }) {
   const isAll = chosen.length === writableLights.length;
   const word = allLightsWord(room);
   return (
-    <TextKey onClick={() => setScope(isAll ? first.address : ALL_LIGHTS)}>
+    <TextKey onClick={() => chooseLights(isAll ? [first.address] : [])}>
       {isAll ? `${word} CHOSEN` : `CHOOSE ${word}`}
     </TextKey>
   );
@@ -97,7 +96,7 @@ function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
                 />
               )
             }
-            onChoose={() => setScope(light.address)}
+            onChoose={() => chooseLight(light.address, room.writableLights)}
             onHold={() => flashLights([light])}
           />
         );
@@ -178,8 +177,8 @@ function RoomMore({ room }: { room: Room }) {
 }
 
 export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
-  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  const chosen = lightsInScope(room, scopeAddress);
+  const chosenAddresses = useNavigation((navigation) => navigation.chosenAddresses);
+  const chosen = lightsInScope(room, chosenAddresses);
   const shownLights = useShownLights(room.onlineLights);
   const { writableLights } = room;
   const isOn = isAnyOn(shownLights);

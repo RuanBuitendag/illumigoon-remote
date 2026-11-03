@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { PageFrame, WhichLine } from '../../composites';
 import type { Light } from '../store/fleet-store';
 import type { LookFile } from '../store/look-files';
-import { closePage, setScope, useBackLabel, useNavigation } from '../store/navigation-store';
-import { ALL_LIGHTS, lightsInScope, patchLights, type Room } from '../store/rooms';
+import { chooseLights, closePage, useBackLabel, useNavigation } from '../store/navigation-store';
+import { lightsInScope, patchLights, type Room } from '../store/rooms';
 import { LookLibrary } from './look-library';
 import { PasteLookSheet } from './paste-look-sheet';
 import { RenameLookSheet } from './rename-look-sheet';
@@ -26,19 +26,17 @@ function whichLine(lights: Light[], rooms: Room[]) {
   return `On ${lights.length} lights`;
 }
 
-// A choice the open room can hold goes back to it: the whole room, or one of its lights.
+// A choice the open room can hold goes back to it: the whole room, or some of its lights.
 function keepInRoom(room: Room, lights: Light[]) {
   if (!lights.every(({ roomId }) => roomId === room.id)) return;
-  const [only] = lights;
-  if (isExactly(lights, room.writableLights)) setScope(ALL_LIGHTS);
-  else if (only && lights.length === 1) setScope(only.address);
+  chooseLights(isExactly(lights, room.writableLights) ? [] : lights.map(({ address }) => address));
 }
 
 type Sheet = { kind: 'which' } | { kind: 'paste' } | { kind: 'rename'; look: LookFile };
 
 // With no room this page is for the whole house. Which lights lasts as long as the page is open.
 export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room[] }) {
-  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
+  const chosenAddresses = useNavigation((navigation) => navigation.chosenAddresses);
   const isRoomOpen = useNavigation(({ roomId, isRoomOpen: isOpen }) => isOpen && roomId === room?.id);
   const backLabel = useBackLabel(room);
   const [sheet, setSheet] = useState<Sheet | null>(null);
@@ -46,7 +44,7 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
   const [isEditing, setEditing] = useState(false);
   const [query, setQuery] = useState('');
   const writable = rooms.flatMap(({ writableLights }) => writableLights);
-  const opened = room ? lightsInScope(room, scopeAddress) : writable;
+  const opened = room ? lightsInScope(room, chosenAddresses) : writable;
   const lights = picked ? writable.filter(({ address }) => picked.includes(address)) : opened;
 
   const pick = (addresses: string[]) => {

@@ -1,6 +1,6 @@
 import type { AnimationState } from '../light-network/protocol';
 import { NEW_LOOK } from '../looks/looks';
-import { openPage, setScope } from './navigation-store';
+import { chooseLights, openPage } from './navigation-store';
 
 const NEW_LOOK_NAME = 'New look';
 import { applyLook, noteLook, noteState, setPower, type Light } from './fleet-store';
@@ -26,7 +26,7 @@ export function startNewLook(lights: Light[]) {
   const [first] = editable;
   if (!first) return false;
   playLook(editable, NEW_LOOK_NAME, NEW_LOOK);
-  setScope(editable.length === 1 ? first.address : null);
+  chooseLights(editable.length === 1 ? [first.address] : []);
   openPage('editor', first.roomId);
   return true;
 }

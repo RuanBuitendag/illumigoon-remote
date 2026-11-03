@@ -26,7 +26,7 @@ export type PageKind =
 type Navigation = {
   roomId: string | null;
   isRoomOpen: boolean;
-  scopeAddress: string | null;
+  chosenAddresses: string[];
   page: PageKind | null;
   parentPage: PageKind | null;
   isPageOpen: boolean;
@@ -37,7 +37,7 @@ type Navigation = {
 export const useNavigation = create<Navigation>(() => ({
   roomId: null,
   isRoomOpen: false,
-  scopeAddress: null,
+  chosenAddresses: [],
   page: null,
   parentPage: null,
   isPageOpen: false,
@@ -46,12 +46,24 @@ export const useNavigation = create<Navigation>(() => ({
 }));
 
 export function openRoom(roomId: string) {
-  useNavigation.setState({ roomId, isRoomOpen: true, scopeAddress: null, parentPage: null, isPageOpen: false });
+  useNavigation.setState({ roomId, isRoomOpen: true, chosenAddresses: [], parentPage: null, isPageOpen: false });
 }
 
 export const closeRoom = () => useNavigation.setState({ isRoomOpen: false, parentPage: null, isPageOpen: false });
 
-export const setScope = (scopeAddress: string | null) => useNavigation.setState({ scopeAddress });
+// No address chosen means the whole room.
+export const chooseLights = (chosenAddresses: string[]) => useNavigation.setState({ chosenAddresses });
+
+// With the whole room chosen, a tap on a light chooses it alone. After that a tap adds a light or takes it
+// out, so two lights can share a look (P1-S7). Taking out the last light chooses the whole room again.
+export function chooseLight(address: string, roomLights: { address: string }[]) {
+  useNavigation.setState(({ chosenAddresses }) => {
+    const isWholeRoom = roomLights.every((light) => chosenAddresses.includes(light.address));
+    if (chosenAddresses.length === 0 || isWholeRoom) return { chosenAddresses: [address] };
+    const isChosen = chosenAddresses.includes(address);
+    return { chosenAddresses: isChosen ? chosenAddresses.filter((each) => each !== address) : [...chosenAddresses, address] };
+  });
+}
 
 export function openPage(page: PageKind, pageRoomId: string | null = null) {
   useNavigation.setState(({ pageVisit }) => ({

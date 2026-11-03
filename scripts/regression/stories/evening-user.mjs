@@ -128,7 +128,6 @@ export const eveningUser = [
   },
   {
     name: 'P1-S7 give the two front lights one look',
-    fails: 'GAP 1 (finding 10): a tap on a second light chooses only that light, so two cannot be chosen',
     lights: LOUNGE,
     async run({ page, lights }) {
       await openLounge(page);

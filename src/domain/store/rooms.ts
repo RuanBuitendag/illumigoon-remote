@@ -95,11 +95,9 @@ const playsPatches = (light: Light) =>
 
 export const patchLights = (lights: Light[]) => lights.filter(playsPatches);
 
-export const ALL_LIGHTS = 'all';
-
 // With nothing chosen, every light that can be changed is in scope, so lights with different looks read as Mixed.
-export function lightsInScope({ writableLights }: Room, scopeAddress: string | null) {
-  const scoped = writableLights.filter(({ address }) => address === scopeAddress);
+export function lightsInScope({ writableLights }: Room, chosenAddresses: string[]) {
+  const scoped = writableLights.filter(({ address }) => chosenAddresses.includes(address));
   return scoped.length > 0 ? scoped : writableLights;
 }
 

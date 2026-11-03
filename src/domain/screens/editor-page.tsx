@@ -23,10 +23,10 @@ const SECTIONS: { value: EditorSection; name: string }[] = [
   { value: 'roll', name: 'ROLL' },
 ];
 
-function firstLight(room: Room | undefined, scopeAddress: string | null) {
+function firstLight(room: Room | undefined, chosenAddresses: string[]) {
   if (!room) return undefined;
   // A look written to a light that is off can replace the one it has saved.
-  const light = lightsInScope(room, scopeAddress).find(({ isOnline, isOn }) => isOnline && isOn);
+  const light = lightsInScope(room, chosenAddresses).find(({ isOnline, isOn }) => isOnline && isOn);
   if (!light) return undefined;
   const { address, name } = light;
   return { url: `ws://${address}/ws`, address, name, lookName: lookNameOf(light) ?? undefined };
@@ -49,7 +49,7 @@ function noteOpened(address: string, lookName: string, look: AnimationState) {
   if (light) noteState(light, { isOn: true, lookName: lookName || undefined, animation: look });
 }
 
-type EditScope = { light: EditorLight; room: Room; scope: string | null; before: ReturnType<typeof momentsOf> };
+type EditScope = { light: EditorLight; room: Room; scope: string[]; before: ReturnType<typeof momentsOf> };
 
 // The others in scope take the look, and UNDO stays until the person saves, undoes or changes more.
 function leaveEdit({ light, room, scope, before }: EditScope, { name, look, isSaved }: { name: string; look: AnimationState; isSaved: boolean }) {
@@ -66,21 +66,21 @@ async function askToLeave(isUnsaved: boolean, lookName: string, dialogs: ReturnT
 }
 
 // Lights that are off sit an edit out, so nothing has to go back on them.
-const litLights = (room: Room | undefined, scopeAddress: string | null) =>
-  room ? lightsInScope(room, scopeAddress).filter(({ isOnline, isOn }) => isOnline && isOn) : [];
+const litLights = (room: Room | undefined, chosenAddresses: string[]) =>
+  room ? lightsInScope(room, chosenAddresses).filter(({ isOnline, isOn }) => isOnline && isOn) : [];
 
-const isOneLightIn = (room: Room | undefined, scopeAddress: string | null) =>
-  room !== undefined && lightsInScope(room, scopeAddress).length === 1;
+const isOneLightIn = (room: Room | undefined, chosenAddresses: string[]) =>
+  room !== undefined && lightsInScope(room, chosenAddresses).length === 1;
 
 // Chosen once: the editor stays on this light whatever the fleet does while it is open.
-function editStart(room: Room | undefined, scopeAddress: string | null) {
-  const playing = litLights(room, scopeAddress);
+function editStart(room: Room | undefined, chosenAddresses: string[]) {
+  const playing = litLights(room, chosenAddresses);
   return {
-    light: firstLight(room, scopeAddress),
-    scope: scopeAddress,
+    light: firstLight(room, chosenAddresses),
+    scope: chosenAddresses,
     playing,
     before: momentsOf(playing),
-    isOneLight: isOneLightIn(room, scopeAddress),
+    isOneLight: isOneLightIn(room, chosenAddresses),
   };
 }
 
@@ -163,8 +163,8 @@ function EditFrame({ lookName, lightName, isOneLight, room, playing, sheet, chil
 
 export function EditorPage({ room }: { room: Room | undefined }) {
   const isOpen = useNavigation((navigation) => navigation.isPageOpen);
-  const scopeAddress = useNavigation((navigation) => navigation.scopeAddress);
-  const [{ light, scope, playing, before, isOneLight }] = useState(() => editStart(room, scopeAddress));
+  const chosenAddresses = useNavigation((navigation) => navigation.chosenAddresses);
+  const [{ light, scope, playing, before, isOneLight }] = useState(() => editStart(room, chosenAddresses));
   const backLabel = useBackLabel(room);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
   const [section, setSection] = useState<EditorSection>('layers');

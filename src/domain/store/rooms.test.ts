@@ -156,16 +156,16 @@ describe('lightsInScope', () => {
   if (!room) throw new Error('no room');
 
   it('is every light that can be changed when nothing is chosen', () => {
-    expect(lightsInScope(room, null).map(({ name }) => name)).toEqual(['Back', 'Front']);
+    expect(lightsInScope(room, []).map(({ name }) => name)).toEqual(['Back', 'Front']);
   });
 
   it('is the one chosen light', () => {
-    expect(lightsInScope(room, '10.0.0.1').map(({ name }) => name)).toEqual(['Front']);
+    expect(lightsInScope(room, ['10.0.0.1']).map(({ name }) => name)).toEqual(['Front']);
   });
 
   it('falls back to every light that can be changed when the chosen light is held or gone', () => {
-    expect(lightsInScope(room, '10.0.0.3').map(({ name }) => name)).toEqual(['Back', 'Front']);
-    expect(lightsInScope(room, '10.9.9.9').map(({ name }) => name)).toEqual(['Back', 'Front']);
+    expect(lightsInScope(room, ['10.0.0.3']).map(({ name }) => name)).toEqual(['Back', 'Front']);
+    expect(lightsInScope(room, ['10.9.9.9']).map(({ name }) => name)).toEqual(['Back', 'Front']);
   });
 });
 

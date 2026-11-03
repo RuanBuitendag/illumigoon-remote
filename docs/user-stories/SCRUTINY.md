@@ -21,8 +21,8 @@ Reach: open a room 1 tap; play a look 2 taps (`Lounge look: Candle`, then a look
 
 Reach: power 1 tap from Home; one light's look 3 taps.
 
-- **C-001 GAP 1** Two lights cannot be chosen together: a tap on a second light chooses only that light
-  (finding 10, P1-S7).
+- **C-001 OK** Two lights can be chosen together: after one light is chosen, a tap on another adds it
+  (finding 10, P1-S7, fixed 4 Nov 2026).
 - **OK** The level cannot move while the room is off (P1-S2); CHOOSE ALL brings the whole room back (P1-S5).
 
 ## Looks page

@@ -83,7 +83,7 @@ Features: light choice. Contexts: phone. Should take: 2 taps to choose, 1 to pla
 1. A tap on Front Left, then `Choose Front Right`: both front lights are chosen.
 2. Starfield plays on the two front lights.
 
-**GAP 1 (finding 10):** the second tap chooses only Front Right, so two lights cannot be chosen.
+**GAP 1 (finding 10), fixed 4 Nov 2026:** with one light chosen, a tap on another light adds it. A tap on a chosen light takes it out, and taking out the last light chooses the whole room again.
 
 - **Failures:** none.
 - **Wrong actions:** none.
