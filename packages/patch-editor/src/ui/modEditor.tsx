@@ -15,6 +15,7 @@ import {
   structDefaultsFor,
   type Modulator,
   type MatrixRow,
+  type Patch,
 } from '../domain/patch'
 import {
   Hr, Lab, Mono, Blurb, Seg, Ico, Switch, StructField, depthAfterDrag, fineOf, type DragRange,
@@ -45,8 +46,6 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
 }) {
   const spec = requireNode(m.type);
   const dead = deadReason(m);
-  const others = ctl.patch.modulators.filter(x => x.slot !== m.slot);
-
   return (
     <>
       <Hr />
@@ -55,138 +54,15 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
         style={{ padding: '16px 18px 20px', display: 'flex', gap: 26, alignItems: 'flex-start' }}
       >
         <div className="col" style={{ gap: 12, width: 300, flexShrink: 0 }}>
-          <div className="row" style={{ gap: 11, justifyContent: 'space-between' }}>
-            <div className="row" style={{ gap: 11 }}>
-              <Mono className="accent">{slotNumber(m.slot)}</Mono>
-              {/* The rack it is sitting in, said out loud — the same editor opens under both. */}
-              <Lab className="head">{m.type === 'macro' ? 'Macro' : 'Modulator'}</Lab>
-            </div>
-            <div className="row" style={{ gap: 14 }}>
-              <span {...exposeProps(ctl.patch, `M${m.slot}.bypass`)}>
-                <Switch
-                  on={!m.bypass}
-                  label={m.bypass ? 'bypassed' : 'active'}
-                  title="Bypass this modulator — every wire it drives, at once. Applies live."
-                  onChange={v =>
-                    ctl.setStructural(`M${m.slot}.bypass`, !v, d => {
-                      d.modulators.find(x => x.slot === m.slot)!.bypass = !v
-                    })
-                  }
-                />
-              </span>
-              <button
-                title="Remove this modulator and every row it drives"
-                onClick={() => {
-                  ctl.structural(d => {
-                    // Before the slot goes: a control may name it by its name, which only
-                    // resolves while the slot is still there to carry it.
-                    dropControls(d, c => modulatorOfTarget(d, c.target) === m.slot)
-                    d.modulators = d.modulators.filter(x => x.slot !== m.slot)
-                    d.matrix = d.matrix.filter(r => r.src !== m.slot)
-                    // A spawner trigger fed by this slot has nothing to fire it now.
-                    for (const L of d.layers)
-                      if (L.emitter.trigger?.src === m.slot) delete L.emitter.trigger
-                    for (const x of d.modulators)
-                      if (x.source === m.slot) {
-                        delete x.source
-                        delete x.sourceOut
-                      }
-                  })
-                  onClose()
-                }}
-              >
-                <Ico.X />
-              </button>
-            </div>
-          </div>
+          <ModHead ctl={ctl} m={m} onClose={onClose} />
 
-          {/*
-            NO TYPE SELECTOR ON A MACRO, and no `macro` on anybody else's.
+          {m.type !== 'macro' && <ModTypePicker ctl={ctl} m={m} spec={spec} />}
 
-            A macro is chosen by which `+` you press, not by a picker — the two racks draw
-            disjoint halves of one list, so a type change here is a slot silently jumping
-            racks under a person who was editing it. Offering the swap in only one direction
-            would be worse: a one-way door out of the macro rack.
-          */}
-          {m.type !== 'macro' && (
-            <Seg
-              items={nodesOfKind('modulator')
-                .map(x => x.id)
-                .filter(id => id !== 'macro')}
-              value={m.type}
-              tight
-              onChange={type =>
-                ctl.structural(d => {
-                  const x = d.modulators.find(y => y.slot === m.slot)!
-                  x.type = type
-                  x.params = defaultsFor(type)
-                  x.struct = structDefaultsFor(type)
-                  delete x.source
-                  delete x.sourceOut
-                })
-              }
-            />
-          )}
-
-          {/* A node's blurb answers "what is this thing" — worth its two lines next to a
-              type picker you are choosing from, and not next to a macro, which is the one
-              node you did not pick and whose name you just typed. */}
-          {m.type !== 'macro' && <Blurb>{spec.blurb}</Blurb>}
-
-          {dead && (
-            <div className="row" style={{ gap: 8 }}>
-              <span className="livedot" data-warn="true" />
-              <span className="warnline">{dead}</span>
-            </div>
-          )}
+          {dead && <DeadLine dead={dead} />}
 
           {extra}
 
-          {/* What the band hears, under its own knobs: Threshold on the raw level, Squelch on the
-              level after gain. Only here, where those two knobs are being turned. */}
-          {m.type === 'audio_band' && audio && (
-            <BandScope
-              feed={audio}
-              slot={m.slot}
-              threshold={
-                m.params.threshold ?? spec.params.find(p => p.key === 'threshold')?.def ?? 0
-              }
-              squelch={m.params.squelch ?? spec.params.find(p => p.key === 'squelch')?.def ?? 0}
-            />
-          )}
-
-          {/* One wire, three consumers: a threshold reads a value, an envelope and an lfo read
-              an edge. */}
-          {spec.takesSource && (
-            <SourceWire
-              ctl={ctl}
-              m={m}
-              others={others}
-              wire="a"
-              label={WIRE_LABELS[m.type]?.[0] ?? (spec.takesSourceB ? 'A' : 'Source')}
-            />
-          )}
-          {/*
-            THE SECOND OPERAND. `takesSourceB` has been parsed out of the catalog and written
-            by `serialiseModulator` all along, and nothing ever drew it -- so a math node
-            could be created here and only ever half-wired, which `detailOf` reports as
-            `2 mul ?` and `deadReason` refuses outright. Half of the node's expression was
-            unreachable from the tool that exists to build it.
-
-            It is also the answer to scaling one modulator by another: `mul` with an LFO on
-            one side and a macro on the other is a row whose depth the macro sets, which a
-            row cannot express on its own -- `depth` is a field on a MatrixRow, not an
-            address, so nothing can drive it. LIFE-757.
-          */}
-          {spec.takesSourceB && (
-            <SourceWire
-              ctl={ctl}
-              m={m}
-              others={others}
-              wire="b"
-              label={WIRE_LABELS[m.type]?.[1] ?? 'B'}
-            />
-          )}
+          <ModWires ctl={ctl} m={m} spec={spec} audio={audio} />
         </div>
 
         {/*
@@ -199,6 +75,173 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
 
         <Destinations ctl={ctl} slot={m.slot} />
       </div>
+    </>
+  )
+}
+
+/** The slot number, which rack it is in, its bypass and its delete. */
+function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void }) {
+  return (
+    <div className="row" style={{ gap: 11, justifyContent: 'space-between' }}>
+      <div className="row" style={{ gap: 11 }}>
+        <Mono className="accent">{slotNumber(m.slot)}</Mono>
+        {/* The rack it is sitting in, said out loud — the same editor opens under both. */}
+        <Lab className="head">{m.type === 'macro' ? 'Macro' : 'Modulator'}</Lab>
+      </div>
+      <div className="row" style={{ gap: 14 }}>
+        <span {...exposeProps(ctl.patch, `M${m.slot}.bypass`)}>
+          <Switch
+            on={!m.bypass}
+            label={m.bypass ? 'bypassed' : 'active'}
+            title="Bypass this modulator — every wire it drives, at once. Applies live."
+            onChange={v =>
+              ctl.setStructural(`M${m.slot}.bypass`, !v, d => {
+                d.modulators.find(x => x.slot === m.slot)!.bypass = !v
+              })
+            }
+          />
+        </span>
+        <button
+          title="Remove this modulator and every row it drives"
+          onClick={() => {
+            ctl.structural(d => removeModulator(d, m.slot))
+            onClose()
+          }}
+        >
+          <Ico.X />
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/** Takes the slot out, and every row, control, trigger and wire that named it. */
+function removeModulator(d: Patch, slot: number) {
+  // Before the slot goes: a control may name it by its name, which only
+  // resolves while the slot is still there to carry it.
+  dropControls(d, c => modulatorOfTarget(d, c.target) === slot)
+  d.modulators = d.modulators.filter(x => x.slot !== slot)
+  d.matrix = d.matrix.filter(r => r.src !== slot)
+  // A spawner trigger fed by this slot has nothing to fire it now.
+  for (const L of d.layers)
+    if (L.emitter.trigger?.src === slot) delete L.emitter.trigger
+  for (const x of d.modulators)
+    if (x.source === slot) {
+      delete x.source
+      delete x.sourceOut
+    }
+}
+
+function ModTypePicker({ ctl, m, spec }: {
+  ctl: Ctl; m: Modulator; spec: ReturnType<typeof requireNode>;
+}) {
+  return (
+    <>
+      {/*
+        NO TYPE SELECTOR ON A MACRO, and no `macro` on anybody else's.
+
+        A macro is chosen by which `+` you press, not by a picker — the two racks draw
+        disjoint halves of one list, so a type change here is a slot silently jumping
+        racks under a person who was editing it. Offering the swap in only one direction
+        would be worse: a one-way door out of the macro rack.
+      */}
+        <Seg
+          items={nodesOfKind('modulator')
+            .map(x => x.id)
+            .filter(id => id !== 'macro')}
+          value={m.type}
+          tight
+          onChange={type =>
+            ctl.structural(d => {
+              const x = d.modulators.find(y => y.slot === m.slot)!
+              x.type = type
+              x.params = defaultsFor(type)
+              x.struct = structDefaultsFor(type)
+              delete x.source
+              delete x.sourceOut
+            })
+          }
+        />
+
+      {/* A node's blurb answers "what is this thing" — worth its two lines next to a
+          type picker you are choosing from, and not next to a macro, which is the one
+          node you did not pick and whose name you just typed. */}
+      <Blurb>{spec.blurb}</Blurb>
+    </>
+  )
+}
+
+function DeadLine({ dead }: { dead: string }) {
+  return (
+    <div className="row" style={{ gap: 8 }}>
+        <span className="livedot" data-warn="true" />
+        <span className="warnline">{dead}</span>
+      </div>
+  )
+}
+
+/** A parameter's value on the slot, or the node's default for it. */
+const paramOf = (m: Modulator, spec: ReturnType<typeof requireNode>, key: string) =>
+  m.params[key] ?? spec.params.find(p => p.key === key)?.def ?? 0
+
+/** What an operand wire is called on this node: its own name, or A and B, or Source. */
+function wireLabel(m: Modulator, spec: ReturnType<typeof requireNode>, i: 0 | 1) {
+  const named = WIRE_LABELS[m.type]?.[i]
+  if (named !== undefined) return named
+  if (i === 1) return 'B'
+  return spec.takesSourceB ? 'A' : 'Source'
+}
+
+/** What the slot listens to: the band's scope, and the wires into its operands. */
+function ModWires({ ctl, m, spec, audio }: {
+  ctl: Ctl; m: Modulator; spec: ReturnType<typeof requireNode>; audio?: AudioFeed;
+}) {
+  const others = ctl.patch.modulators.filter(x => x.slot !== m.slot);
+  return (
+    <>
+      {/* What the band hears, under its own knobs: Threshold on the raw level, Squelch on the
+          level after gain. Only here, where those two knobs are being turned. */}
+      {m.type === 'audio_band' && audio && (
+        <BandScope
+          feed={audio}
+          slot={m.slot}
+          threshold={paramOf(m, spec, 'threshold')}
+          squelch={paramOf(m, spec, 'squelch')}
+        />
+      )}
+
+      {/* One wire, three consumers: a threshold reads a value, an envelope and an lfo read
+          an edge. */}
+      {spec.takesSource && (
+        <SourceWire
+          ctl={ctl}
+          m={m}
+          others={others}
+          wire="a"
+          label={wireLabel(m, spec, 0)}
+        />
+      )}
+      {/*
+        THE SECOND OPERAND. `takesSourceB` has been parsed out of the catalog and written
+        by `serialiseModulator` all along, and nothing ever drew it -- so a math node
+        could be created here and only ever half-wired, which `detailOf` reports as
+        `2 mul ?` and `deadReason` refuses outright. Half of the node's expression was
+        unreachable from the tool that exists to build it.
+
+        It is also the answer to scaling one modulator by another: `mul` with an LFO on
+        one side and a macro on the other is a row whose depth the macro sets, which a
+        row cannot express on its own -- `depth` is a field on a MatrixRow, not an
+        address, so nothing can drive it. LIFE-757.
+      */}
+      {spec.takesSourceB && (
+        <SourceWire
+          ctl={ctl}
+          m={m}
+          others={others}
+          wire="b"
+          label={wireLabel(m, spec, 1)}
+        />
+      )}
     </>
   )
 }
@@ -374,23 +417,27 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
           </div>
         ))}
 
-        {reach.feeds.map(i => {
-          const to = ctl.patch.modulators.find(x => x.slot === i);
-          // BOTH LETTERS WHEN IT IS ON BOTH. One slot wired into both operands is a
-          // degenerate node -- `sub` and `abs_diff` are then a constant nought -- and
-          // naming only one side would hide exactly the mistake worth seeing.
-          const side = [to?.source === slot && 'A', to?.sourceB === slot && 'B']
-            .filter(Boolean).join('+');
-          return (
-            <div key={`f${i}`} className="destrow" data-wire="true"
-                 title={`Operand ${side} of ${to?.label || to?.name || to?.type} in slot ${i}`
-                        + ' — unwire it on that node'}>
-              <span className="dst">M{i} · {to?.label || to?.name || to?.type}</span>
-              <Lab className="dim">in {side}</Lab>
-            </div>
-          );
-        })}
+        {reach.feeds.map(i => (
+          <FeedRow key={`f${i}`} to={ctl.patch.modulators.find(x => x.slot === i)} at={i}
+                   slot={slot} />
+        ))}
       </div>
+    </div>
+  );
+}
+
+/** A node this slot feeds through one of its operand wires. */
+function FeedRow({ to, at, slot }: { to: Modulator | undefined; at: number; slot: number }) {
+  // BOTH LETTERS WHEN IT IS ON BOTH. One slot wired into both operands is a
+  // degenerate node -- `sub` and `abs_diff` are then a constant nought -- and
+  // naming only one side would hide exactly the mistake worth seeing.
+  const side = to ? [to.source === slot && 'A', to.sourceB === slot && 'B'].filter(Boolean).join('+') : '';
+  const name = to ? to.label || to.name || to.type : undefined;
+  return (
+    <div className="destrow" data-wire="true"
+         title={`Operand ${side} of ${name} in slot ${at} — unwire it on that node`}>
+      <span className="dst">M{at} · {name}</span>
+      <Lab className="dim">in {side}</Lab>
     </div>
   );
 }

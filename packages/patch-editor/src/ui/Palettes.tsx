@@ -348,6 +348,19 @@ function PaletteCount({ e }: { e: PaletteEntry }) {
   );
 }
 
+/** Why the palette could not be read, or where it came from. */
+function PaletteNotes({ e }: { e: PaletteEntry }) {
+  return (
+    <div className="col grow libnotes" style={{ gap: 7, paddingLeft: 20, paddingRight: 14 }}>
+      {e.error
+        ? <span className="warnline">{e.error}</span>
+        : <span className="libnote" title={(e.sources ?? [e.file ?? '']).join('\n')}>
+            {e.sources ? e.sources.join(', ') : e.file}
+          </span>}
+    </div>
+  );
+}
+
 function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
   e: PaletteEntry;
   odd: boolean;
@@ -370,13 +383,7 @@ function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
     <PaletteName e={e} on={on} where={where} />
     <PaletteCount e={e} />
 
-    <div className="col grow libnotes" style={{ gap: 7, paddingLeft: 20, paddingRight: 14 }}>
-      {e.error
-        ? <span className="warnline">{e.error}</span>
-        : <span className="libnote" title={(e.sources ?? [e.file ?? '']).join('\n')}>
-            {e.sources ? e.sources.join(', ') : e.file}
-          </span>}
-    </div>
+    <PaletteNotes e={e} />
 
     <div className="row libacts" style={{ width: 128, justifyContent: 'flex-end', gap: 12 }}>
       <button className="pill" disabled={!!e.error || !e.entries.length}

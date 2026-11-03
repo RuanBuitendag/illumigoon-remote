@@ -512,11 +512,19 @@ function sameModulator(
   // knob value are identical in every other field, so pasting a layer back matched `colour`
   // to whichever macro happened to sit in a free slot and permuted the rack. LIFE-739.
   if ((held.name ?? '') !== (incoming.name ?? '')) return false;
-  if (wireSlot(held.source) !== feeder) return false;
-  if (wireSlot(held.sourceB) !== feederB) return false;
-  if ((held.sourceOut ?? 0) !== (incoming.sourceOut ?? 0)) return false;
-  if ((held.sourceOutB ?? 0) !== (incoming.sourceOutB ?? 0)) return false;
+  if (!sameWiring(held, incoming, feeder, feederB)) return false;
   return sameValues(held.params, incoming.params) && sameValues(held.struct, incoming.struct);
+}
+
+/** Both wires land on the same slots and read the same outputs. */
+function sameWiring(
+  held: Modulator, incoming: Modulator,
+  feeder: number | undefined, feederB: number | undefined,
+): boolean {
+  return wireSlot(held.source) === feeder
+    && wireSlot(held.sourceB) === feederB
+    && (held.sourceOut ?? 0) === (incoming.sourceOut ?? 0)
+    && (held.sourceOutB ?? 0) === (incoming.sourceOutB ?? 0);
 }
 
 /** Key-order-independent, because two objects built by different paths agree on neither. */

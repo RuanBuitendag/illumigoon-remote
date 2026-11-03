@@ -16,6 +16,7 @@
 
 import { Blurb, Hr, Ico, Lab, Mono } from './bits';
 import { Fader } from './Fader';
+import type { ReactNode } from 'react';
 import type { ParamSpec } from '../domain/catalog';
 import type { Patch } from '../domain/patch';
 import {
@@ -33,6 +34,112 @@ const LABEL: Record<Part, string> = {
   palettes: 'Palettes',
   modulation: 'Modulation',
   macros: 'Macros',
+}
+
+const rollTitle = (entry: History['entries'][number] | undefined, at: number) => {
+  if (!entry) return 'Nothing rolled yet';
+  return entry.seed === null ? 'Before rolling' : `Roll ${at}`;
+}
+
+function StepButton({ can, title, Icon, onClick }: {
+  can: boolean; title: string; Icon: (p: { c?: string }) => ReactNode; onClick(): void;
+}) {
+  return (
+    <button
+      className={`iconbtn ${can ? 'raise' : 'well'}`}
+      style={{ width: 34, height: 34 }}
+      disabled={!can}
+      title={title}
+      onClick={onClick}
+    >
+      <Icon c={can ? 'var(--text-3)' : 'var(--text-5)'} />
+    </button>
+  )
+}
+
+/** What the roll is, the roll and step buttons, and the strip of past rolls. */
+function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
+  RandomiseProps, 'history' | 'opts' | 'onRoll' | 'onStep'
+> & { everything: boolean }) {
+  const entry = history.entries[history.at];
+  const back = history.at > 0;
+  const fwd = history.at >= 0 && history.at < history.entries.length - 1;
+
+  // A window of thumbnails that always holds the current one.
+  const start = Math.max(
+    0,
+    Math.min(history.at - Math.floor(THUMBS / 2), history.entries.length - THUMBS),
+  )
+  const shown = history.entries.slice(start, start + THUMBS);
+  return (
+    <div className="col" style={{ padding: '14px 16px', gap: 12 }}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <Lab className="head">{rollTitle(entry, history.at)}</Lab>
+        {entry && entry.seed !== null && (
+          <Mono className="dim sm">seed {seedLabel(entry.seed)}</Mono>
+        )}
+      </div>
+
+      <div className="row" style={{ gap: 6 }}>
+        <button
+          className="pill row"
+          data-primary="true"
+          disabled={everything}
+          style={{
+            flexGrow: 1,
+            height: 34,
+            justifyContent: 'center',
+            gap: 9,
+            opacity: everything ? 0.4 : 1,
+          }}
+          title={
+            everything
+              ? 'Every part is locked, so there is nothing to roll'
+              : 'Roll a new patch — it replaces this one, on the light as well'
+          }
+          onClick={() => onRoll({ ...opts, only: undefined })}
+        >
+          <Ico.Dice c="var(--background)" />
+          {opts.keep.length ? 'ROLL UNLOCKED' : 'ROLL'}
+        </button>
+        <StepButton can={back} title="The roll before this one" Icon={Ico.Back}
+                    onClick={() => onStep(history.at - 1)} />
+        <StepButton can={fwd} title="The roll after this one" Icon={Ico.Fwd}
+                    onClick={() => onStep(history.at + 1)} />
+      </div>
+
+      {shown.length > 0 && (
+        <RollStrip history={history} start={start} shown={shown} onStep={onStep} />
+      )}
+    </div>
+  )
+}
+
+function RandomiseFoot({ connected, deviceName, onSave }: Pick<
+  RandomiseProps, 'connected' | 'deviceName' | 'onSave'
+>) {
+  return (
+    <div
+      className="row"
+      style={{ padding: '10px 12px 12px 16px', justifyContent: 'space-between', flexShrink: 0 }}
+    >
+      <div className="row" style={{ gap: 8, minWidth: 0 }}>
+        <span className="livedot" data-on={String(connected)} />
+        <span className="stripnote">
+          {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
+        </span>
+      </div>
+      <button
+        className="row raise"
+        style={{ gap: 9, padding: '6px 12px' }}
+        onClick={onSave}
+        title="Save this patch to the library"
+      >
+        <Ico.Folder />
+        <Lab className="mid">Save to library</Lab>
+      </button>
+    </div>
+  )
 }
 
 /** A 0..1 amount, in the shape `Fader` draws. Nothing on the light reads these. */
@@ -88,7 +195,6 @@ export interface RandomiseProps {
 export function Randomise({
   patch, history, opts, onOpts, habits, connected, deviceName, onRoll, onStep, onSave,
 }: RandomiseProps) {
-  const entry = history.entries[history.at];
   const counts = partCounts(patch);
   const locked = (part: Part) => opts.keep.includes(part);
   const toggle = (part: Part) =>
@@ -97,78 +203,11 @@ export function Randomise({
       keep: locked(part) ? opts.keep.filter(x => x !== part) : [...opts.keep, part],
     })
   const everything = PARTS.every(locked);
-  const back = history.at > 0;
-  const fwd = history.at >= 0 && history.at < history.entries.length - 1;
-
-  // A window of thumbnails that always holds the current one.
-  const start = Math.max(
-    0,
-    Math.min(history.at - Math.floor(THUMBS / 2), history.entries.length - THUMBS),
-  )
-  const shown = history.entries.slice(start, start + THUMBS);
 
   return (
     <div className="col scroll" style={{ flexGrow: 1 }}>
-      <div className="col" style={{ padding: '14px 16px', gap: 12 }}>
-        <div className="row" style={{ justifyContent: 'space-between' }}>
-          <Lab className="head">
-            {!entry
-              ? 'Nothing rolled yet'
-              : entry.seed === null
-                ? 'Before rolling'
-                : `Roll ${history.at}`}
-          </Lab>
-          {entry && entry.seed !== null && (
-            <Mono className="dim sm">seed {seedLabel(entry.seed)}</Mono>
-          )}
-        </div>
-
-        <div className="row" style={{ gap: 6 }}>
-          <button
-            className="pill row"
-            data-primary="true"
-            disabled={everything}
-            style={{
-              flexGrow: 1,
-              height: 34,
-              justifyContent: 'center',
-              gap: 9,
-              opacity: everything ? 0.4 : 1,
-            }}
-            title={
-              everything
-                ? 'Every part is locked, so there is nothing to roll'
-                : 'Roll a new patch — it replaces this one, on the light as well'
-            }
-            onClick={() => onRoll({ ...opts, only: undefined })}
-          >
-            <Ico.Dice c="var(--background)" />
-            {opts.keep.length ? 'ROLL UNLOCKED' : 'ROLL'}
-          </button>
-          <button
-            className={`iconbtn ${back ? 'raise' : 'well'}`}
-            style={{ width: 34, height: 34 }}
-            disabled={!back}
-            title="The roll before this one"
-            onClick={() => onStep(history.at - 1)}
-          >
-            <Ico.Back c={back ? 'var(--text-3)' : 'var(--text-5)'} />
-          </button>
-          <button
-            className={`iconbtn ${fwd ? 'raise' : 'well'}`}
-            style={{ width: 34, height: 34 }}
-            disabled={!fwd}
-            title="The roll after this one"
-            onClick={() => onStep(history.at + 1)}
-          >
-            <Ico.Fwd c={fwd ? 'var(--text-3)' : 'var(--text-5)'} />
-          </button>
-        </div>
-
-        {shown.length > 0 && (
-          <RollStrip history={history} start={start} shown={shown} onStep={onStep} />
-        )}
-      </div>
+      <RollHead history={history} opts={opts} everything={everything} onRoll={onRoll}
+                onStep={onStep} />
       <Hr />
 
       <div className="col" style={{ padding: '14px 16px 16px', gap: 16 }}>
@@ -217,26 +256,7 @@ export function Randomise({
 
       <div className="grow" />
       <Hr />
-      <div
-        className="row"
-        style={{ padding: '10px 12px 12px 16px', justifyContent: 'space-between', flexShrink: 0 }}
-      >
-        <div className="row" style={{ gap: 8, minWidth: 0 }}>
-          <span className="livedot" data-on={String(connected)} />
-          <span className="stripnote">
-            {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
-          </span>
-        </div>
-        <button
-          className="row raise"
-          style={{ gap: 9, padding: '6px 12px' }}
-          onClick={onSave}
-          title="Save this patch to the library"
-        >
-          <Ico.Folder />
-          <Lab className="mid">Save to library</Lab>
-        </button>
-      </div>
+      <RandomiseFoot connected={connected} deviceName={deviceName} onSave={onSave} />
     </div>
   )
 }

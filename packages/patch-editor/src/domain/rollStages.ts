@@ -213,6 +213,14 @@ function rollModulator(b: Build, slot: number, pool: NodeSpec[]): Modulator {
 }
 
 function wireSource(b: Build, m: Modulator, below: Modulator[]) {
+  wireByType(b, m, below);
+  if (m.source === undefined && NEEDS_SOURCE.has(m.type)) {
+    const src = pick(b.r, below);
+    if (src) m.source = src.slot;
+  }
+}
+
+function wireByType(b: Build, m: Modulator, below: Modulator[]) {
   const { r, p } = b;
   if (m.type === 'envelope' || m.type === 'lfo') {
     // An envelope fires on an edge; an LFO takes one to restart its cycle, sometimes.
@@ -223,10 +231,6 @@ function wireSource(b: Build, m: Modulator, below: Modulator[]) {
     // A path wire: this threshold reads a live parameter rather than a source.
     const path = pick(r, destinations(p).filter(x => x.startsWith('L')));
     if (path) m.source = path;
-  }
-  if (m.source === undefined && NEEDS_SOURCE.has(m.type)) {
-    const src = pick(r, below);
-    if (src) m.source = src.slot;
   }
 }
 
@@ -293,17 +297,24 @@ function wireTrigger(b: Build, L: Layer) {
   const { r, p, madeMods, madeLayers } = b;
   if (!nodeById(L.emitter.type)?.takesTrigger) { delete L.emitter.trigger; return; }
   const sources = edgeSources(p);
-  if (L.emitter.trigger && sources.some(m => m.slot === L.emitter.trigger!.src)) return;
+  if (hasLiveTrigger(L, sources)) return;
   if (!madeLayers.has(L.slot) && !madeMods.size) return;
   const src = pick(r, sources);
   if (src && (needsTrigger(L) || chance(r, 0.7))) {
     L.emitter.trigger = { src: src.slot, out: 0 };
     return;
   }
-  if (!madeLayers.has(L.slot)) return;
+  if (madeLayers.has(L.slot)) dropTrigger(b, L);
+}
+
+const hasLiveTrigger = (L: Layer, sources: Modulator[]) =>
+  !!L.emitter.trigger && sources.some(m => m.slot === L.emitter.trigger!.src);
+
+/** A made layer with nothing to fire it runs on its own instead. */
+function dropTrigger(b: Build, L: Layer) {
   delete L.emitter.trigger;
   if (L.emitter.type === 'particles' && needsTrigger(L))
-    L.emitter.params.rate = sig(between(r, 4, 30));
+    L.emitter.params.rate = sig(between(b.r, 4, 30));
   else if (needsTrigger(L)) rollEmitter(b, L, 'perlin');
 }
 

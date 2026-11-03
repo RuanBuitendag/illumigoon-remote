@@ -122,16 +122,11 @@ const slotNamed = (patch: Patch, name: string) =>
  */
 /** A switch, or null for a row's bypass, a modulator's output and a bare name: not controls. */
 function resolveSwitch(patch: Patch, a: Address): Resolved | null {
-  const layer = (slot: number) => patch.layers.find(l => l.slot === slot);
   switch (a.kind) {
     case 'layerFlag':
-      if (!layer(a.slot) || a.flag === 'order') return null;
-      return { kind: a.flag === 'blend' ? 'blend' : 'flag', address: a };
-    case 'stageBypass': {
-      const L = layer(a.slot);
-      if (!L) return null;
-      return a.stage === 'colour' || L.warps[warpOf(a.stage)] ? { kind: 'flag', address: a } : null;
-    }
+      return resolveLayerFlag(patch, a);
+    case 'stageBypass':
+      return resolveStageBypass(patch, a);
     case 'modBypass':
       return patch.modulators.some(m => m.slot === a.slot) ? { kind: 'flag', address: a } : null;
     case 'globalBypass':
@@ -139,6 +134,17 @@ function resolveSwitch(patch: Patch, a: Address): Resolved | null {
     default:
       return null;
   }
+}
+
+function resolveLayerFlag(patch: Patch, a: AddressOf<'layerFlag'>): Resolved | null {
+  if (!patch.layers.some(l => l.slot === a.slot) || a.flag === 'order') return null;
+  return { kind: a.flag === 'blend' ? 'blend' : 'flag', address: a };
+}
+
+function resolveStageBypass(patch: Patch, a: AddressOf<'stageBypass'>): Resolved | null {
+  const L = patch.layers.find(l => l.slot === a.slot);
+  if (!L) return null;
+  return a.stage === 'colour' || L.warps[warpOf(a.stage)] ? { kind: 'flag', address: a } : null;
 }
 
 /** A palette's stops. Undefined when @p a is some other parameter. */
@@ -201,11 +207,7 @@ export function resolveTarget(patch: Patch, target: string): Resolved | null {
  * The node an address's key would be a setting of. `surface::nodeAt`: emitters, warps, modulators.
  */
 function nodeAt(patch: Patch, a: Address, mod: number): string | null {
-  if (a.kind === 'layerParam') {
-    const L = patch.layers.find(l => l.slot === a.slot);
-    if (!L || (a.stage !== 'emitter' && warpOf(a.stage) < 0)) return null;
-    return nodeIdForStage(L, a.stage);
-  }
+  if (a.kind === 'layerParam') return layerNodeAt(patch, a);
   if (a.kind === 'modParam' || a.kind === 'named') {
     return patch.modulators.find(m => m.slot === mod)?.type ?? null;
   }
@@ -215,24 +217,28 @@ function nodeAt(patch: Patch, a: Address, mod: number): string | null {
   return null;
 }
 
-/** Can a control of this type drive what its target turned out to be? `surface::compatible`. */
-function compatible(type: string, r: Resolved): boolean {
-  switch (type) {
-    case 'slider':
-    case 'stepper':
-      return r.kind === 'float';
-    case 'toggle':
-      return r.kind === 'flag' || (r.kind === 'setting' && r.field!.kind === 'toggle');
-    case 'select':
-      return r.kind === 'blend' || (r.kind === 'setting' && r.field!.kind === 'select');
-    case 'color_picker':
-      return r.kind === 'entry';
-    case 'palette':
-      return r.kind === 'entries';
-    default:
-      return false;
-  }
+function layerNodeAt(patch: Patch, a: AddressOf<'layerParam'>): string | null {
+  const L = patch.layers.find(l => l.slot === a.slot);
+  if (!L || (a.stage !== 'emitter' && warpOf(a.stage) < 0)) return null;
+  return nodeIdForStage(L, a.stage);
 }
+
+const isSetting = (r: Resolved, kind: 'toggle' | 'select') =>
+  r.kind === 'setting' && r.field!.kind === kind;
+
+/** What each control type can drive. `surface::compatible`. */
+const COMPATIBLE: Record<string, (r: Resolved) => boolean> = {
+  slider: r => r.kind === 'float',
+  stepper: r => r.kind === 'float',
+  toggle: r => r.kind === 'flag' || isSetting(r, 'toggle'),
+  select: r => r.kind === 'blend' || isSetting(r, 'select'),
+  color_picker: r => r.kind === 'entry',
+  palette: r => r.kind === 'entries',
+};
+
+/** Can a control of this type drive what its target turned out to be? */
+const compatible = (type: string, r: Resolved): boolean =>
+  Object.hasOwn(COMPATIBLE, type) && COMPATIBLE[type]!(r);
 
 /**
  * A key the phone can write: word characters, not led by a digit, never an index spelling.
@@ -307,34 +313,53 @@ const hexToRgb = (hex: string): Rgb => {
   return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 };
 
-/** A switch's state. The read half of `applyStructural`. */
-function readFlag(patch: Patch, a: Address): boolean {
+/**
+ * Where a switch's state is held: the object and the field on it. Null when the draft has no
+ * such node. `readFlag` and `writeFlag` share it, so the two halves cannot disagree.
+ */
+type FlagHolder = { on: Record<string, unknown>; key: string } | null;
+
+const bypassOf = (on: object | undefined): FlagHolder =>
+  on ? { on: on as Record<string, unknown>, key: 'bypass' } : null;
+
+function flagHolder(patch: Patch, a: Address): FlagHolder {
   switch (a.kind) {
     case 'layerFlag': {
       const L = patch.layers.find(l => l.slot === a.slot);
-      return a.flag === 'mute' ? !!L?.muted : !!L?.solo;
+      return L ? { on: L as unknown as Record<string, unknown>, key: a.flag === 'mute' ? 'muted' : 'solo' } : null;
     }
-    case 'stageBypass': {
-      const L = patch.layers.find(l => l.slot === a.slot);
-      return a.stage === 'colour' ? !!L?.colour.bypass : !!L?.warps[warpOf(a.stage)]?.bypass;
-    }
-    case 'modBypass':    return !!patch.modulators.find(m => m.slot === a.slot)?.bypass;
-    case 'globalBypass': return !!patch.global?.warps[warpOf(a.stage)]?.bypass;
-    default:             return false;
+    case 'stageBypass':  return stageBypassHolder(patch, a);
+    case 'modBypass':    return bypassOf(patch.modulators.find(m => m.slot === a.slot));
+    case 'globalBypass': return bypassOf(patch.global?.warps[warpOf(a.stage)]);
+    default:             return null;
   }
+}
+
+function stageBypassHolder(patch: Patch, a: AddressOf<'stageBypass'>): FlagHolder {
+  const L = patch.layers.find(l => l.slot === a.slot);
+  if (!L) return null;
+  return bypassOf(a.stage === 'colour' ? L.colour : L.warps[warpOf(a.stage)]);
+}
+
+/** A switch's state. The read half of `applyStructural`. */
+function readFlag(patch: Patch, a: Address): boolean {
+  const h = flagHolder(patch, a);
+  return !!h && !!h.on[h.key];
 }
 
 /** The settings of the node an address names, when the draft has that node. */
 function structAt(patch: Patch, a: Resolved['address']): Struct | undefined {
-  if (a.kind === 'layerParam') {
-    const L = patch.layers.find(l => l.slot === a.slot);
-    return a.stage === 'emitter' ? L?.emitter.struct : L?.warps[warpOf(a.stage)]?.struct;
-  }
+  if (a.kind === 'layerParam') return layerStructAt(patch, a);
   if (a.kind === 'modParam' || a.kind === 'named') {
     const slot = a.kind === 'named' ? slotNamed(patch, a.name) : a.slot;
     return patch.modulators.find(m => m.slot === slot)?.struct;
   }
   return a.kind === 'globalParam' ? patch.global?.warps[warpOf(a.stage)]?.struct : undefined;
+}
+
+function layerStructAt(patch: Patch, a: AddressOf<'layerParam'>): Struct | undefined {
+  const L = patch.layers.find(l => l.slot === a.slot);
+  return a.stage === 'emitter' ? L?.emitter.struct : L?.warps[warpOf(a.stage)]?.struct;
 }
 
 /** A setting's value on the draft, or its default. */
@@ -356,62 +381,48 @@ export function positionOf(patch: Patch, c: Control): Position | undefined {
   const r = resolveTarget(patch, c.target);
   if (!r || !compatible(c.type, r)) return undefined;
   switch (r.kind) {
-    case 'float': {
-      // The BASE, as `saveParams` writes it: a parameter at its default is absent from the draft.
-      const base = readPath(patch, r.path!) ?? r.spec!.def;
-      const x = fromTarget(mappingOf(c, r.spec!), base);
-      return c.type === 'stepper' ? Math.round(x) : rounded(x);
-    }
+    case 'float':
+      return floatPosition(patch, c, r);
     case 'flag':
       return readFlag(patch, r.address) !== !!c.invert;
-    case 'setting': {
-      const v = readSetting(patch, r);
-      return c.type === 'toggle' ? (v === true) !== !!c.invert : optionOf(c, v);
-    }
+    case 'setting':
+      return settingPosition(patch, c, r);
     case 'blend': {
       const a = r.address as Extract<Address, { kind: 'layerFlag' }>;
       return optionOf(c, patch.layers.find(l => l.slot === a.slot)?.blend);
     }
     case 'entries':
-    case 'entry': {
-      const a = r.address as Extract<Address, { kind: 'layerParam' }>;
-      const entries = patch.layers.find(l => l.slot === a.slot)?.colour.palette.entries ?? [];
-      if (r.kind === 'entries') return entries.map(hexToRgb);
-      const entry = entries[r.entry!];
-      return entry === undefined ? undefined : hexToRgb(entry);
-    }
+    case 'entry':
+      return palettePosition(patch, r);
   }
+}
+
+function settingPosition(patch: Patch, c: Control, r: Resolved): Position {
+  const v = readSetting(patch, r);
+  return c.type === 'toggle' ? (v === true) !== !!c.invert : optionOf(c, v);
+}
+
+/** The BASE, as `saveParams` writes it: a parameter at its default is absent from the draft. */
+function floatPosition(patch: Patch, c: Control, r: Resolved): Position {
+  const base = readPath(patch, r.path!) ?? r.spec!.def;
+  const x = fromTarget(mappingOf(c, r.spec!), base);
+  return c.type === 'stepper' ? Math.round(x) : rounded(x);
+}
+
+function palettePosition(patch: Patch, r: Resolved): Position | undefined {
+  const a = r.address as Extract<Address, { kind: 'layerParam' }>;
+  const entries = patch.layers.find(l => l.slot === a.slot)?.colour.palette.entries ?? [];
+  if (r.kind === 'entries') return entries.map(hexToRgb);
+  const entry = entries[r.entry!];
+  return entry === undefined ? undefined : hexToRgb(entry);
 }
 
 // ------------------------------------------------------------------ masking
 
 /** A switch's state, written. The mirror of `readFlag`. */
 function writeFlag(patch: Patch, a: Address, v: boolean): void {
-  switch (a.kind) {
-    case 'layerFlag': {
-      const L = patch.layers.find(l => l.slot === a.slot);
-      if (!L) return;
-      if (a.flag === 'mute') L.muted = v; else L.solo = v;
-      return;
-    }
-    case 'stageBypass': {
-      const L = patch.layers.find(l => l.slot === a.slot);
-      if (!L) return;
-      if (a.stage === 'colour') L.colour.bypass = v;
-      else { const w = L.warps[warpOf(a.stage)]; if (w) w.bypass = v; }
-      return;
-    }
-    case 'modBypass': {
-      const m = patch.modulators.find(m => m.slot === a.slot);
-      if (m) m.bypass = v;
-      return;
-    }
-    case 'globalBypass': {
-      const w = patch.global?.warps[warpOf(a.stage)];
-      if (w) w.bypass = v;
-      return;
-    }
-  }
+  const h = flagHolder(patch, a);
+  if (h) h.on[h.key] = v;
 }
 
 /** A setting's value, written. The mirror of `readSetting`, field for field. */
@@ -530,20 +541,25 @@ export function serialiseSurface(patch: Patch): any[] {
   return out;
 }
 
-/** A document
-  's `surface`, read back. Malformed entries are skipped; `default` is ' +
-  'the graph's, so it is not kept. */
+/**
+ * A document's `surface`, read back. Malformed entries are skipped; `default` is the graph's, so
+ * it is not kept.
+ */
 function readOptionalFields(c: Control, x: Record<string, unknown>) {
   if (typeof x.group === 'string' && x.group) c.group = x.group;
   for (const k of ['min', 'max', 'step', 'lo', 'hi', 'curve'] as const) {
     if (typeof x[k] === 'number' && Number.isFinite(x[k])) c[k] = x[k] as number;
   }
   if (typeof x.unit === 'string' && x.unit) c.unit = x.unit;
+  readLists(c, x);
+  if (x.invert === true) c.invert = true;
+}
+
+function readLists(c: Control, x: Record<string, unknown>) {
   for (const k of ['options', 'choices'] as const) {
     if (Array.isArray(x[k]) && (x[k] as unknown[]).every(s => typeof s === 'string'))
       c[k] = [...(x[k] as string[])];
   }
-  if (x.invert === true) c.invert = true;
 }
 
 function readControl(o: unknown): Control | null {
@@ -661,15 +677,19 @@ const words = (s: string) => s.replace(/_/g, ' ').replace(/^./, ch => ch.toUpper
 function flagLabel(patch: Patch, a: Address): string {
   if (a.kind === 'layerFlag')
     return `L${a.slot} ${patch.layers.find(l => l.slot === a.slot)?.emitter.type ?? ''}`.trim();
-  if (a.kind === 'stageBypass') {
-    const L = patch.layers.find(l => l.slot === a.slot);
-    return a.stage === 'colour' ? 'Colour' : words(L?.warps[warpOf(a.stage)]?.type ?? a.stage);
-  }
-  if (a.kind === 'modBypass') {
-    const m = patch.modulators.find(x => x.slot === a.slot);
-    return m?.label || m?.name || words(m?.type ?? 'modulator');
-  }
+  if (a.kind === 'stageBypass') return stageLabel(patch, a);
+  if (a.kind === 'modBypass') return modulatorLabel(patch, a.slot);
   return 'Effect';
+}
+
+function stageLabel(patch: Patch, a: AddressOf<'stageBypass'>): string {
+  const L = patch.layers.find(l => l.slot === a.slot);
+  return a.stage === 'colour' ? 'Colour' : words(L?.warps[warpOf(a.stage)]?.type ?? a.stage);
+}
+
+function modulatorLabel(patch: Patch, slot: number): string {
+  const m = patch.modulators.find(x => x.slot === slot);
+  return m?.label || m?.name || words(m?.type ?? 'modulator');
 }
 
 function floatLabel(patch: Patch, a: Address, spec: ParamSpec): string {

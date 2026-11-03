@@ -299,6 +299,22 @@ export function askTransitions(url, { timeoutMs = 8_000, source = 'tool-discover
 }
 
 /**
+ * A failed visit keeps the last one: the UI ages a light into silence by `at`. A visit that
+ * did not ask for the arrival keeps the one already heard.
+ */
+function keepVisit(cur, r) {
+  if (r.beat)
+    cur.probe = {
+      ...r.beat,
+      own_transition: r.beat.own_transition ?? cur.probe?.own_transition ?? null,
+    };
+  if (r.animation !== undefined) {
+    cur.animation = r.animation;
+    cur.stateHash = r.beat?.state_hash ?? null;
+  }
+}
+
+/**
  * Browse, probe, and answer.
  *
  * @param port      0 for whatever is free — the installed app, which must not fight a
@@ -359,19 +375,10 @@ export async function start({
       noPull.add(name);
       log(`[discover] ${name} dropped the socket answering light_state_req — not asking it again`);
     }
-    // A failed visit keeps the last one: the UI ages a light into silence by `at`. A visit that
-    // did not ask for the arrival keeps the one already heard.
-    if (r.beat)
-      cur.probe = {
-        ...r.beat,
-        own_transition: r.beat.own_transition ?? cur.probe?.own_transition ?? null,
-      };
-    if (r.animation !== undefined) {
-      cur.animation = r.animation;
-      cur.stateHash = r.beat?.state_hash ?? null;
-    }
+    keepVisit(cur, r);
     if (r.beat) learnTransitions(name, url);
   }
+
 
   function learnTransitions(name, url) {
     if (transitions || Date.now() - transitionsAskedAt <= TRANSITIONS_RETRY_MS) return;

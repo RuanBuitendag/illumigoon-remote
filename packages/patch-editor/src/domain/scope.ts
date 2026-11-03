@@ -85,26 +85,33 @@ export class BandHistory {
     if (p && typeof p === 'object') this.heardAt = now;
     const b = p?.bands;
     if (!b || !Array.isArray(b.frames)) return;
-    if (typeof b.rate === 'number' && b.rate > 0) this.rate = b.rate;
-    const seq = typeof b.seq === 'number' ? b.seq : (this.next ?? 0);
-
-    if (this.next !== null) {
-      // Far behind what came before: the light restarted and its count did too.
-      if (seq + this.cap < this.next) this.clear();
-      else if (seq > this.next) this.hole(Math.min(seq - this.next, this.cap));
-    }
-
+    if (isRate(b.rate)) this.rate = b.rate;
+    const seq = this.seqOf(b.seq);
+    this.catchUp(seq);
     for (const frame of b.frames) this.takeFrame(frame);
     this.next = seq + b.frames.length;
     this.lastAt = now;
   }
 
+  /** The frame count a payload starts at; one with none carries on from the last. */
+  private seqOf(seq: unknown): number {
+    return typeof seq === 'number' ? seq : (this.next ?? 0);
+  }
+
+  /** Lines @p seq up with what came before: a gap becomes a hole, a restart starts again. */
+  private catchUp(seq: number) {
+    if (this.next === null) return;
+    // Far behind what came before: the light restarted and its count did too.
+    if (seq + this.cap < this.next) this.clear();
+    else if (seq > this.next) this.hole(Math.min(seq - this.next, this.cap));
+  }
+
   private takeFrame(frame: unknown) {
     const seen = new Set<number>();
     for (const tap of Array.isArray(frame) ? frame : []) {
-      if (!Array.isArray(tap) || tap.length < 4) continue;
-      const [slot = NaN, raw = 0, norm = 0, out = 0] = tap.map(Number);
-      if (!Number.isInteger(slot) || slot < 0) continue;
+      const read = readTap(tap);
+      if (!read) continue;
+      const [slot, raw, norm, out] = read;
       this.push(slot, raw / FULL, norm / FULL, out / FULL);
       seen.add(slot);
     }
@@ -123,6 +130,16 @@ export class BandHistory {
     this.lastAt = null;
     this.heardAt = null;
   }
+}
+
+const isRate = (rate: unknown): rate is number => typeof rate === 'number' && rate > 0;
+
+/** One tap of a frame as `[slot, raw, norm, out]`, or null when it is malformed. */
+function readTap(tap: unknown): [number, number, number, number] | null {
+  if (!Array.isArray(tap) || tap.length < 4) return null;
+  const [slot = NaN, raw = 0, norm = 0, out = 0] = tap.map(Number);
+  if (!Number.isInteger(slot) || slot < 0) return null;
+  return [slot, raw, norm, out];
 }
 
 /**

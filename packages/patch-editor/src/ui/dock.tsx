@@ -1,6 +1,6 @@
 /** The modulator bar along the bottom, and the matrix as a list. */
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, type PointerEvent, type ReactNode } from 'react';
 import { useLatest } from './useLatest';
 import {
   LIMITS,
@@ -194,6 +194,42 @@ function MacroDial({ ctl, m }: { ctl: Ctl; m: Modulator }) {
   );
 }
 
+const tileClass = (open: boolean, bypass: boolean | undefined) =>
+  `modslot ${open ? 'raise-hi' : 'raise'}${bypass ? ' bypassed' : ''}`;
+
+/** Fed by the traced slot through a wire; never the traced slot itself. */
+const isFed = (m: Modulator, trace: number | null) =>
+  trace !== null && m.slot !== trace && (m.source === trace || m.sourceB === trace);
+
+/** The tile is the handle a slot is dragged by. */
+function tileDrag(ctl: Ctl, slot: number, dragging: boolean) {
+  return {
+    onPointerDown(e: PointerEvent<HTMLDivElement>) {
+      e.preventDefault();
+      e.currentTarget.setPointerCapture(e.pointerId);
+      ctl.beginDrag({ kind: 'mod', slot }, e.clientX, e.clientY);
+    },
+    onPointerMove(e: PointerEvent<HTMLDivElement>) {
+      if (dragging) ctl.dragMove(e.clientX, e.clientY);
+    },
+    onPointerUp(e: PointerEvent<HTMLDivElement>) {
+      if (dragging) { e.currentTarget.releasePointerCapture(e.pointerId); ctl.dragEnd(); }
+    },
+    onPointerCancel() { if (dragging) ctl.dragEnd(); },
+  };
+}
+
+/** A macro carries its dial; anything else reports the value it computes. */
+function TileBody({ ctl, m, played }: { ctl: Ctl; m: Modulator; played: boolean }) {
+  if (played) return <MacroDial ctl={ctl} m={m} />;
+  return (
+    <div className="col" style={{ gap: 8 }}>
+      <LiveMeter mod={m} />
+      <span className="detail">{detailOf(m)}</span>
+    </div>
+  );
+}
+
 /**
  * One slot in a rack — the drag handle, the readout, and the click that opens it.
  *
@@ -236,8 +272,7 @@ export function SlotTile({ ctl, m, open, onOpen }: {
    * the racks have always been worst at showing: `SourceWire` names the slot NUMBER, so
    * reading a chain of three means holding two numbers in your head (LIFE-757).
    */
-  const fed = !traced && ctl.trace !== null
-              && (m.source === ctl.trace || m.sourceB === ctl.trace);
+  const fed = isFed(m, ctl.trace);
 
   /*
    * HOVER, NOT CLICK, and cleared on the way out.
@@ -258,7 +293,7 @@ export function SlotTile({ ctl, m, open, onOpen }: {
 
   return (
     <div
-      className={`modslot ${open ? 'raise-hi' : 'raise'}${m.bypass ? ' bypassed' : ''}`}
+      className={tileClass(open, m.bypass)}
       data-played={played || undefined}
       data-dead={dead ? true : undefined}
       data-dragging={dragging || undefined}
@@ -267,25 +302,11 @@ export function SlotTile({ ctl, m, open, onOpen }: {
       title={dead ?? tileTitle(m, reach.total)}
       onPointerEnter={() => ctl.setTrace(m.slot)}
       onPointerLeave={() => ctl.setTrace(null)}
-      onPointerDown={e => {
-        e.preventDefault();
-        e.currentTarget.setPointerCapture(e.pointerId);
-        ctl.beginDrag({ kind: 'mod', slot: m.slot }, e.clientX, e.clientY);
-      }}
-      onPointerMove={e => { if (dragging) ctl.dragMove(e.clientX, e.clientY); }}
-      onPointerUp={e => {
-        if (dragging) { e.currentTarget.releasePointerCapture(e.pointerId); ctl.dragEnd(); }
-      }}
-      onPointerCancel={() => { if (dragging) ctl.dragEnd(); }}
+      {...tileDrag(ctl, m.slot, dragging)}
       onClick={onOpen}
     >
       <TileHead m={m} dead={!!dead} drives={reach.total} />
-      {played ? <MacroDial ctl={ctl} m={m} /> : (
-        <div className="col" style={{ gap: 8 }}>
-          <LiveMeter mod={m} />
-          <span className="detail">{detailOf(m)}</span>
-        </div>
-      )}
+      <TileBody ctl={ctl} m={m} played={played} />
     </div>
   );
 }

@@ -268,6 +268,37 @@ function Part({ id, section, children }: {
   return <div className="sectionpart" data-section={id} data-open={section === id}>{children}</div>;
 }
 
+/** The sheets the editor opens over itself: the matrix, the fragments and the palettes. */
+function EditorSheets({ ctl, nav, dialogs, master, onRecallMaster }: {
+  ctl: Ctl;
+  nav: Navigation;
+  dialogs: Dialogs;
+  master: MasterColour | null;
+  onRecallMaster(entries: string[]): Reached;
+}) {
+  return (
+    <>
+    {dialogs.showMatrix && (
+      <MatrixSheet ctl={ctl} onClose={() => dialogs.setShowMatrix(false)} />
+    )}
+
+    {dialogs.showFragments && (
+      <FragmentSheet ctl={ctl} onClose={() => dialogs.setShowFragments(false)} />
+    )}
+
+    {dialogs.showPalettes && (
+      <PaletteSheets
+        ctl={ctl}
+        nav={nav}
+        master={master}
+        onRecallMaster={onRecallMaster}
+        onClose={() => dialogs.setShowPalettes(false)}
+      />
+    )}
+    </>
+  );
+}
+
 export function EditorStage({
   ctl, nav, rolled, dialogs, patch, master, audio, onRecallMaster,
   section, info, hb, label, history, onLeave, onSave,
@@ -364,23 +395,8 @@ export function EditorStage({
           />
         </Part>
 
-        {dialogs.showMatrix && (
-          <MatrixSheet ctl={ctl} onClose={() => dialogs.setShowMatrix(false)} />
-        )}
-
-        {dialogs.showFragments && (
-          <FragmentSheet ctl={ctl} onClose={() => dialogs.setShowFragments(false)} />
-        )}
-
-        {dialogs.showPalettes && (
-          <PaletteSheets
-            ctl={ctl}
-            nav={nav}
-            master={master}
-            onRecallMaster={onRecallMaster}
-            onClose={() => dialogs.setShowPalettes(false)}
-          />
-        )}
+        <EditorSheets ctl={ctl} nav={nav} dialogs={dialogs} master={master}
+                      onRecallMaster={onRecallMaster} />
       </Boundary>
       </div>
     </>

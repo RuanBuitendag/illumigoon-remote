@@ -89,6 +89,67 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
   );
 }
 
+/** Why a version or a preset is not on offer, said rather than left to its absence. */
+function PublishNotes({ publishing, verdict }: { publishing: boolean; verdict: Verdict }) {
+  return (
+    <>
+      {/* WHY A VERSION IS NOT ON OFFER, said in the row rather than discovered by its
+          absence. A surface whose controls mean something new is the one edit that looks
+          harmless and is not: every position anybody stored against the old one still
+          applies, and still lands somewhere else. */}
+      {!publishing && verdict?.breaks.length ? (
+        <Mono className="dim sm">{whyNoVersion(verdict.breaks)}</Mono>
+      ) : null}
+      {/* A stamp with nothing behind it. Said out loud rather than left to be inferred from
+          a missing AS PRESET, because the reason a preset is not on offer here is different
+          from every other reason it might not be. */}
+      {!publishing && verdict?.referenceMissing ? (
+        <Mono className="dim sm">
+          published as v{verdict.identity?.version}, but there is no local copy of what was sent — a
+          preset needs one, so this can only be a version or a new patch
+        </Mono>
+      ) : null}
+    </>
+  );
+}
+
+function PresetCopyRow({ canCapture, presetCount, onCapture, onCopy }: {
+  canCapture: boolean;
+  presetCount: number;
+  onCapture(): void;
+  onCopy(): void;
+}) {
+  return (
+    <>
+      {/* Saving WHERE THE KNOBS ARE, as distinct from saving the patch. A patch is the
+          instrument; a preset is a set of positions on it, and many belong to one patch. */}
+      <div className="row" style={{ gap: 8 }}>
+        <button
+          className="pill sm"
+          style={{ padding: '5px 10px' }}
+          disabled={!canCapture}
+          onClick={() => onCapture()}
+          title="Save where the controls are now as a preset of this patch"
+        >
+          + PRESET
+        </button>
+        <Mono className="dim sm">
+          {presetCount === 1 ? '1 preset' : `${presetCount || 'No'} presets`}
+        </Mono>
+        <span className="grow" />
+        <button
+          className="pill sm"
+          style={{ padding: '5px 10px' }}
+          onClick={() => onCopy()}
+          title="Copy the patch on the light as JSON"
+        >
+          COPY
+        </button>
+      </div>
+    </>
+  );
+}
+
 export function RailSaveForm({
   save,
   clash,
@@ -168,47 +229,9 @@ export function RailSaveForm({
           ...publishLines(publishing, verdict),
         ]}
       />
-      {/* WHY A VERSION IS NOT ON OFFER, said in the row rather than discovered by its
-          absence. A surface whose controls mean something new is the one edit that looks
-          harmless and is not: every position anybody stored against the old one still
-          applies, and still lands somewhere else. */}
-      {!publishing && verdict?.breaks.length ? (
-        <Mono className="dim sm">{whyNoVersion(verdict.breaks)}</Mono>
-      ) : null}
-      {/* A stamp with nothing behind it. Said out loud rather than left to be inferred from
-          a missing AS PRESET, because the reason a preset is not on offer here is different
-          from every other reason it might not be. */}
-      {!publishing && verdict?.referenceMissing ? (
-        <Mono className="dim sm">
-          published as v{verdict.identity?.version}, but there is no local copy of what was sent — a
-          preset needs one, so this can only be a version or a new patch
-        </Mono>
-      ) : null}
-      {/* Saving WHERE THE KNOBS ARE, as distinct from saving the patch. A patch is the
-          instrument; a preset is a set of positions on it, and many belong to one patch. */}
-      <div className="row" style={{ gap: 8 }}>
-        <button
-          className="pill sm"
-          style={{ padding: '5px 10px' }}
-          disabled={!save.name.trim()}
-          onClick={() => onCapture()}
-          title="Save where the controls are now as a preset of this patch"
-        >
-          + PRESET
-        </button>
-        <Mono className="dim sm">
-          {presetCount === 1 ? '1 preset' : `${presetCount || 'No'} presets`}
-        </Mono>
-        <span className="grow" />
-        <button
-          className="pill sm"
-          style={{ padding: '5px 10px' }}
-          onClick={() => onCopy()}
-          title="Copy the patch on the light as JSON"
-        >
-          COPY
-        </button>
-      </div>
+      <PublishNotes publishing={publishing} verdict={verdict} />
+      <PresetCopyRow canCapture={!!save.name.trim()} presetCount={presetCount}
+                     onCapture={onCapture} onCopy={onCopy} />
       <SaveMeans
         lines={[
           '+ PRESET keeps where the controls are now, under this look',

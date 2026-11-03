@@ -26,6 +26,19 @@ const hex = (h: number) => (h >>> 0).toString(16).padStart(8, '0');
 
 const TAPE: LedShape = { padding: 20, spread: 5, chip: 3.4, glow: 1.25 };
 
+/** What stands in for the strip while the engine is not running. */
+function StripEmpty({ status }: { status: ReturnType<typeof previewStatus> }) {
+  return (
+    <div className="stripcells stripempty">
+      {status.at === 'loading' && 'starting the engine…'}
+      {/* "then reload", because a module built mid-session arrives by hot update as a
+          fresh copy of `preview.ts`, and the open socket is still feeding the old one. */}
+      {status.at === 'missing' && 'engine not built — npm run engine:build, then reload'}
+      {status.at === 'failed' && `the engine would not start: ${status.why}`}
+    </div>
+  );
+}
+
 export function Strip({ deviceCatalogHash, meter, head }: {
   deviceCatalogHash?: number;
   /** Beside what the strip says about itself, for what must be seen while editing. */
@@ -75,13 +88,7 @@ export function Strip({ deviceCatalogHash, meter, head }: {
         {running ? (
             <canvas ref={cells} className="stripcells" />
         ) : (
-          <div className="stripcells stripempty">
-            {status.at === 'loading' && 'starting the engine…'}
-            {/* "then reload", because a module built mid-session arrives by hot update as a
-                fresh copy of `preview.ts`, and the open socket is still feeding the old one. */}
-            {status.at === 'missing' && 'engine not built — npm run engine:build, then reload'}
-            {status.at === 'failed' && `the engine would not start: ${status.why}`}
-          </div>
+          <StripEmpty status={status} />
         )}
       </div>
     </div>

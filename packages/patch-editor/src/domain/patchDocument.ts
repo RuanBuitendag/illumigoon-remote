@@ -112,9 +112,16 @@ export function serialiseModulator(m: Modulator, omitDefaults = true): any {
   if (m.label && m.label !== m.name) o.label = m.label;
   packStruct(m.type, m.struct, o, omitDefaults);
   if (m.bypass) o.bypass = true;
-  // Which nodes take a wire comes from the CATALOG, not from a name list here. A hardcoded
-  // `threshold || envelope` is how `math` silently lost both its operands on the way to the
-  // device -- the node was in the factory and the catalog, and only this line disagreed.
+  packWires(m, o);
+  return o;
+}
+
+/**
+ * Which nodes take a wire comes from the CATALOG, not from a name list here. A hardcoded
+ * `threshold || envelope` is how `math` silently lost both its operands on the way to the
+ * device -- the node was in the factory and the catalog, and only this line disagreed.
+ */
+function packWires(m: Modulator, o: any) {
   const spec = nodeById(m.type);
   if (spec?.takesSource && m.source !== undefined) {
     o.source = m.source;
@@ -124,7 +131,6 @@ export function serialiseModulator(m: Modulator, omitDefaults = true): any {
     o.sourceB = m.sourceB;
     if (m.sourceOutB) o.sourceOutB = m.sourceOutB;
   }
-  return o;
 }
 
 /**
@@ -211,15 +217,20 @@ function readEmitterInto(L: Layer, type: string, v: any) {
 }
 
 function readColourInto(L: Layer, v: any) {
-  L.colour.index = ['u', 'density', 'position'].includes(v?.colour?.index) ? v.colour.index : 'u';
-  L.colour.bypass = !!v?.colour?.bypass;
-  L.colour.wrap = !!v?.colour?.wrap;
+  const c = v?.colour ?? {};
+  L.colour.index = ['u', 'density', 'position'].includes(c.index) ? c.index : 'u';
+  L.colour.bypass = !!c.bypass;
+  L.colour.wrap = !!c.wrap;
   // Absent stays absent -- see `Layer.colour.at`. `makeLayer` starts a layer Colour-first,
   // which is right for a new one and wrong for a document that predates the field.
-  L.colour.at = Number.isInteger(v?.colour?.at) && v.colour.at >= 0 ? v.colour.at : undefined;
-  Object.assign(L.colour.params, pickNumbers(v?.colour?.params));
-  Object.assign(L.colour.palette.params, pickNumbers(v?.colour?.palette?.params));
-  const entries = v?.colour?.palette?.entries;
+  L.colour.at = Number.isInteger(c.at) && c.at >= 0 ? c.at : undefined;
+  Object.assign(L.colour.params, pickNumbers(c.params));
+  readPaletteInto(L, c.palette ?? {});
+}
+
+function readPaletteInto(L: Layer, p: any) {
+  Object.assign(L.colour.palette.params, pickNumbers(p.params));
+  const entries = p.entries;
   if (Array.isArray(entries) && entries.length) {
     L.colour.palette.entries = entries
       .filter(e => typeof e === 'string')
@@ -229,15 +240,16 @@ function readColourInto(L: Layer, v: any) {
 }
 
 function readLayer(slot: number, v: any): Layer {
-  const type = v?.emitter?.type ?? 'line';
-  const L = makeLayer(slot, type, v?.order ?? slot);
+  const d = v ?? {};
+  const type = d.emitter?.type ?? 'line';
+  const L = makeLayer(slot, type, d.order ?? slot);
   readEmitterInto(L, type, v);
   readColourInto(L, v);
-  L.warps = readWarps(v?.warps);
-  L.opacity = num(v?.opacity, 1);
-  L.blend = typeof v?.blend === 'string' ? v.blend : 'add';
-  L.muted = !!v?.muted;
-  L.solo = !!v?.solo;
+  L.warps = readWarps(d.warps);
+  L.opacity = num(d.opacity, 1);
+  L.blend = typeof d.blend === 'string' ? d.blend : 'add';
+  L.muted = !!d.muted;
+  L.solo = !!d.solo;
   return L;
 }
 
@@ -250,8 +262,15 @@ function readModulator(slot: number, v: any): Modulator {
   m.bypass = !!v?.bypass;
   if (typeof v?.name === 'string' && v.name) m.name = v.name;
   if (typeof v?.label === 'string' && v.label) m.label = v.label;
-  // A wire is a slot number or a path string, and both are load-bearing: dropping the
-  // string form would quietly turn "read L0's position" into "read nothing".
+  readWiresInto(m, v);
+  return m;
+}
+
+/**
+ * A wire is a slot number or a path string, and both are load-bearing: dropping the
+ * string form would quietly turn "read L0's position" into "read nothing".
+ */
+function readWiresInto(m: Modulator, v: any) {
   if (isWire(v?.source)) {
     m.source = v.source;
     m.sourceOut = v.sourceOut ?? 0;
@@ -260,7 +279,6 @@ function readModulator(slot: number, v: any): Modulator {
     m.sourceB = v.sourceB;
     m.sourceOutB = v.sourceOutB ?? 0;
   }
-  return m;
 }
 
 const validSlot = (slot: number, count: number) =>
@@ -277,46 +295,56 @@ const validSlot = (slot: number, count: number) =>
 function readRows(doc: any, modulators: Modulator[]): MatrixRow[] {
   const slotOfName = new Map(modulators.filter(m => m.name).map(m => [m.name!, m.slot]));
   const slotOf = (src: unknown) => (typeof src === 'string' ? slotOfName.get(src) : undefined);
-  const rows: MatrixRow[] = [];
-  for (const r of (Array.isArray(doc.matrix) ? doc.matrix : []).slice(0, LIMITS().MATRIX)) {
-    if (typeof r?.dst !== 'string') continue;
-    const src = typeof r?.src === 'number' ? r.src : slotOf(r?.src);
-    if (src === undefined) continue;
-    rows.push({
-      id: newRowId(),
-      src,
-      out: r.out ?? 0,
-      dst: r.dst,
-      depth: num(r.depth, 0),
-      bipolar: r.bipolar !== false,
-      op: r.op === 'multiply' ? 'multiply' : 'add',
-      bypass: !!r.bypass,
-    });
-  }
-  return rows;
+  const list: any[] = Array.isArray(doc.matrix) ? doc.matrix : [];
+  return list.slice(0, LIMITS().MATRIX).flatMap(r => readRow(r, slotOf) ?? []);
+}
+
+function readRow(r: any, slotOf: (src: unknown) => number | undefined): MatrixRow | null {
+  if (typeof r?.dst !== 'string') return null;
+  const src = typeof r.src === 'number' ? r.src : slotOf(r.src);
+  if (src === undefined) return null;
+  return {
+    id: newRowId(),
+    src,
+    out: r.out ?? 0,
+    dst: r.dst,
+    depth: num(r.depth, 0),
+    bipolar: r.bipolar !== false,
+    op: r.op === 'multiply' ? 'multiply' : 'add',
+    bypass: !!r.bypass,
+  };
+}
+
+/** Each entry of a slot-keyed object whose key is a slot in range and whose value is wanted. */
+function readSlots<T>(
+  map: any,
+  count: number,
+  isWanted: (v: any) => boolean,
+  read: (slot: number, v: any) => T,
+): T[] {
+  return Object.entries<any>(map ?? {})
+    .filter(([k, v]) => validSlot(Number(k), count) && isWanted(v))
+    .map(([k, v]) => read(Number(k), v));
+}
+
+function readGlobalInto(patch: Patch, g: any) {
+  if (!g || typeof g !== 'object') return;
+  patch.global.opacity = num(g.opacity, 1);
+  patch.global.speed = num(g.speed, 1);
+  patch.global.warps = readWarps(g.warps);
 }
 
 export function deserialise(doc: any): Patch {
   const patch = emptyPatch();
   if (!doc || typeof doc !== 'object') return patch;
 
-  for (const [k, v] of Object.entries<any>(doc.layers ?? {})) {
-    if (validSlot(Number(k), LIMITS().SLOTS)) patch.layers.push(readLayer(Number(k), v));
-  }
-  for (const [k, v] of Object.entries<any>(doc.modulators ?? {})) {
-    if (validSlot(Number(k), LIMITS().MODS) && nodeById(v?.type))
-      patch.modulators.push(readModulator(Number(k), v));
-  }
+  patch.layers = readSlots(doc.layers, LIMITS().SLOTS, () => true, readLayer);
+  patch.modulators = readSlots(doc.modulators, LIMITS().MODS, v => !!nodeById(v?.type), readModulator);
   patch.matrix = readRows(doc, patch.modulators);
 
   patch.layers.sort((a, b) => a.slot - b.slot);
   patch.modulators.sort((a, b) => a.slot - b.slot);
-  const g = doc.global;
-  if (g && typeof g === 'object') {
-    patch.global.opacity = num(g.opacity, 1);
-    patch.global.speed = num(g.speed, 1);
-    patch.global.warps = readWarps(g.warps);
-  }
+  readGlobalInto(patch, doc.global);
   patch.surface = readSurface(doc.surface);
   patch.identity = readIdentity(doc);
 

@@ -87,6 +87,17 @@ export { LibraryError };
  * since `..` in a filename is far more often a typo than an attack. Neither may be a write
  * to somewhere else on the disk.
  */
+/** Throws the reason a split library path is not one a file may have. */
+function checkParts(parts) {
+  if (!parts.length) throw bad('no filename');
+  if (parts.includes('..')) throw bad('`..` is not a filename');
+  if (parts.includes('.')) throw bad('`.` is not a filename');
+  if (parts.some((p) => p.startsWith('.'))) throw bad('hidden names are not part of the library');
+  if (parts.length > 2) throw bad('groups are one level deep — `group/name.json`');
+  if (!parts[parts.length - 1].toLowerCase().endsWith('.json'))
+    throw bad('a library file ends in .json');
+}
+
 export function resolveIn(root, rel) {
   if (typeof rel !== 'string' || !rel.trim()) throw bad('no filename');
   if (rel.includes('\0')) throw bad('filename contains a null byte');
@@ -96,13 +107,7 @@ export function resolveIn(root, rel) {
     throw bad('filename must be relative to the library');
 
   const parts = clean.split('/').filter((p) => p !== '');
-  if (!parts.length) throw bad('no filename');
-  if (parts.includes('..')) throw bad('`..` is not a filename');
-  if (parts.includes('.')) throw bad('`.` is not a filename');
-  if (parts.some((p) => p.startsWith('.'))) throw bad('hidden names are not part of the library');
-  if (parts.length > 2) throw bad('groups are one level deep — `group/name.json`');
-  if (!parts[parts.length - 1].toLowerCase().endsWith('.json'))
-    throw bad('a library file ends in .json');
+  checkParts(parts);
 
   const full = resolve(root, parts.join('/'));
   if (full !== root && !full.startsWith(root + sep)) throw bad('that path leaves the library');
@@ -120,20 +125,15 @@ export function resolveIn(root, rel) {
  * than refusing it — the refusal is one message now, the junk is a patch that fails to parse
  * on some evening months from now.
  */
+const isObjectOrAbsent = (v) => v === undefined || (typeof v === 'object' && !Array.isArray(v));
+
 export function validateDoc(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return 'not a JSON object';
   if (!['layers', 'modulators', 'matrix'].some((k) => k in raw)) {
     return 'no layers, modulators or matrix — is this a patch document?';
   }
-  if (raw.layers !== undefined && (typeof raw.layers !== 'object' || Array.isArray(raw.layers))) {
-    return '`layers` is not an object';
-  }
-  if (
-    raw.modulators !== undefined &&
-    (typeof raw.modulators !== 'object' || Array.isArray(raw.modulators))
-  ) {
-    return '`modulators` is not an object';
-  }
+  if (!isObjectOrAbsent(raw.layers)) return '`layers` is not an object';
+  if (!isObjectOrAbsent(raw.modulators)) return '`modulators` is not an object';
   if (raw.matrix !== undefined && !Array.isArray(raw.matrix)) return '`matrix` is not an array';
   return null;
 }
@@ -574,17 +574,26 @@ function fragmentEntryFor(root, rel, { readOnly = false } = {}) {
   }
 
   const problem = validateFragment(doc);
-  const layer = Object.values(doc?.layers ?? {})[0];
   return {
     ...base,
     ...blank,
     name: typeof doc.name === 'string' && doc.name.trim() ? doc.name : basename(rel, '.json'),
-    notes: typeof doc.notes === 'string' ? doc.notes : '',
-    created: typeof doc.created === 'string' ? doc.created : null,
+    notes: textOr(doc.notes, ''),
+    created: textOr(doc.created, null),
+    ...fragmentCounts(doc),
+    ...(problem ? { error: problem } : {}),
+  };
+}
+
+const textOr = (v, fallback) => (typeof v === 'string' ? v : fallback);
+
+/** What a fragment holds, for its row: modulators, rows and the first layer's emitter. */
+function fragmentCounts(doc) {
+  const layer = Object.values(doc?.layers ?? {})[0];
+  return {
     mods: Object.keys(doc?.modulators ?? {}).length,
     rows: Array.isArray(doc?.matrix) ? doc.matrix.length : 0,
-    emitter: typeof layer?.emitter?.type === 'string' ? layer.emitter.type : '',
-    ...(problem ? { error: problem } : {}),
+    emitter: textOr(layer?.emitter?.type, ''),
   };
 }
 
@@ -727,7 +736,7 @@ function presetEntryFor(root, rel, { readOnly = false } = {}) {
     values: problem ? {} : doc.values,
     // The id the server gave it, or absent. Absent means "not published yet", which is a thing
     // the rail says out loud rather than something a person has to infer from silence.
-    publishedAs: typeof doc.publishedAs === 'string' ? doc.publishedAs : null,
+    publishedAs: textOr(doc.publishedAs, null),
     authoredAgainst: Number.isInteger(doc.authoredAgainst) ? doc.authoredAgainst : null,
     ...(problem ? { error: problem } : {}),
   };
@@ -844,16 +853,20 @@ const bump = (table, key) => {
 };
 
 function countDocument(counts, doc) {
-  for (const L of Object.values(doc?.layers ?? {})) {
-    bump(counts.emitter, L?.emitter?.type);
-    bump(counts.blend, L?.blend ?? 'add');
-    for (const w of Array.isArray(L?.warps) ? L.warps : []) bump(counts.warp, w?.type);
-  }
-  for (const m of Object.values(doc?.modulators ?? {})) {
-    if (m?.type === 'macro') continue;
-    bump(counts.modulator, m?.type);
-    if (m?.type === 'lfo') bump(counts.wave, m.wave ?? 'sine');
-  }
+  for (const L of Object.values(doc?.layers ?? {})) countLayer(counts, L);
+  for (const m of Object.values(doc?.modulators ?? {})) countModulator(counts, m);
+}
+
+function countLayer(counts, L) {
+  bump(counts.emitter, L?.emitter?.type);
+  bump(counts.blend, L?.blend ?? 'add');
+  for (const w of Array.isArray(L?.warps) ? L.warps : []) bump(counts.warp, w?.type);
+}
+
+function countModulator(counts, m) {
+  if (m?.type === 'macro') return;
+  bump(counts.modulator, m?.type);
+  if (m?.type === 'lfo') bump(counts.wave, m.wave ?? 'sine');
 }
 
 

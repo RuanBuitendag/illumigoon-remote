@@ -284,36 +284,8 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
         <Hr />
 
         <div className="scroll" style={{ padding: '6px 6px 0' }}>
-          {busy && rows.length === 0 && starters.length === 0 && (
-            <div className="libempty">Reading the folder…</div>
-          )}
-
-          {error && <div className="libempty">{error}</div>}
-
-          {/*
-           * An empty user folder is the NORMAL first run, and the starters are the whole
-           * reason the sheet is worth opening then. So this is a heading with one line under
-           * it, in the same shape as a group heading — not a centred block. As a block it
-           * pushed the eight shipped fragments below the fold, and a sheet whose first and
-           * largest statement is "nothing here" reads as empty even when it is not.
-           */}
-          {!busy && !error && rows.length === 0 && (
-            <ShelfNotice label="YOUR FRAGMENTS" colour="var(--text-5)">
-              None yet — select a layer, name it above and press SAVE. Or pull one of the starters
-              below and edit it.
-            </ShelfNotice>
-          )}
-
-          {/*
-           * The shipped set, when it did not arrive. Same shape as the block above, because
-           * the reason is the same one: a heading with a line under it says WHICH half is
-           * missing, where a bare empty shelf says only that something is wrong.
-           */}
-          {!busy && starterError && (
-            <ShelfNotice label={STARTERS_LABEL} colour="var(--warn)">
-              {starterError}
-            </ShelfNotice>
-          )}
+          <FragmentNotices busy={busy} isEmpty={rows.length === 0} hasStarters={starters.length > 0}
+                           error={error} starterError={starterError} />
 
           {sections.map(({ key, label, group, list }) => (
             <div key={key} className="col" style={{ gap: 2 }}>
@@ -338,6 +310,92 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   );
 }
 
+/** What the shelf says when a half of it is missing or still being read. */
+function FragmentNotices({ busy, isEmpty, hasStarters, error, starterError }: {
+  busy: boolean; isEmpty: boolean; hasStarters: boolean; error: string | null | undefined;
+  starterError: string | null | undefined;
+}) {
+  return (
+    <>
+    {busy && isEmpty && !hasStarters && (
+      <div className="libempty">Reading the folder…</div>
+    )}
+
+    {error && <div className="libempty">{error}</div>}
+
+    {/*
+     * An empty user folder is the NORMAL first run, and the starters are the whole
+     * reason the sheet is worth opening then. So this is a heading with one line under
+     * it, in the same shape as a group heading — not a centred block. As a block it
+     * pushed the eight shipped fragments below the fold, and a sheet whose first and
+     * largest statement is "nothing here" reads as empty even when it is not.
+     */}
+    {!busy && !error && isEmpty && (
+      <ShelfNotice label="YOUR FRAGMENTS" colour="var(--text-5)">
+        None yet — select a layer, name it above and press SAVE. Or pull one of the starters
+        below and edit it.
+      </ShelfNotice>
+    )}
+
+    {/*
+     * The shipped set, when it did not arrive. Same shape as the block above, because
+     * the reason is the same one: a heading with a line under it says WHICH half is
+     * missing, where a bare empty shelf says only that something is wrong.
+     */}
+    {!busy && starterError && (
+      <ShelfNotice label={STARTERS_LABEL} colour="var(--warn)">
+        {starterError}
+      </ShelfNotice>
+    )}
+    </>
+  );
+}
+
+function FragmentName({ e }: { e: FragmentEntry }) {
+  return (
+    <div className="col" style={{ width: 210, gap: 7 }}>
+      <span
+        className="libname"
+        title={e.name}
+        style={{
+          font: 'var(--type-note)',
+          color: e.error ? 'var(--text-4)' : 'var(--text-1)',
+        }}
+      >
+        {e.name}
+      </span>
+      <Mono className="dim sm libfile" title={e.file}>
+        {e.emitter ? `${e.emitter} · ${e.file}` : e.file}
+      </Mono>
+    </div>
+  );
+}
+
+function FragmentActions({ e, why, onPull, onDrop }: {
+  e: FragmentEntry; why: string | null; onPull(e: FragmentEntry): void; onDrop(e: FragmentEntry): void;
+}) {
+  return (
+    <div className="row libacts" style={{ width: 122, justifyContent: 'flex-end', gap: 12 }}>
+      <button
+        className="pill"
+        disabled={!!e.error || !!why}
+        title={why ?? 'Add this layer to the patch, leaving the rest running'}
+        onClick={() => onPull(e)}
+      >
+        PULL
+      </button>
+      {e.readOnly ? (
+        // Not a disabled delete: a starter has no delete.
+        <Mono className="dim sm">shipped</Mono>
+      ) : (
+        <button title="Delete from the folder" onClick={() => onDrop(e)}>
+          <Ico.X c="var(--text-4)" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 function FragmentRow({ ctl, e, odd, onPull, onDrop }: {
   ctl: Ctl;
   e: FragmentEntry;
@@ -354,21 +412,7 @@ function FragmentRow({ ctl, e, odd, onPull, onDrop }: {
       data-odd={odd || undefined}
       onDoubleClick={() => !e.error && !why && onPull(e)}
     >
-      <div className="col" style={{ width: 210, gap: 7 }}>
-        <span
-          className="libname"
-          title={e.name}
-          style={{
-            font: 'var(--type-note)',
-            color: e.error ? 'var(--text-4)' : 'var(--text-1)',
-          }}
-        >
-          {e.name}
-        </span>
-        <Mono className="dim sm libfile" title={e.file}>
-          {e.emitter ? `${e.emitter} · ${e.file}` : e.file}
-        </Mono>
-      </div>
+      <FragmentName e={e} />
 
       <div className="col grow libnotes" style={{ gap: 7, paddingRight: 14 }}>
         <span className="libnote" title={e.error ?? e.notes}>
@@ -389,24 +433,7 @@ function FragmentRow({ ctl, e, odd, onPull, onDrop }: {
         </Mono>
       </div>
 
-      <div className="row libacts" style={{ width: 122, justifyContent: 'flex-end', gap: 12 }}>
-        <button
-          className="pill"
-          disabled={!!e.error || !!why}
-          title={why ?? 'Add this layer to the patch, leaving the rest running'}
-          onClick={() => onPull(e)}
-        >
-          PULL
-        </button>
-        {e.readOnly ? (
-          // Not a disabled delete: a starter has no delete.
-          <Mono className="dim sm">shipped</Mono>
-        ) : (
-          <button title="Delete from the folder" onClick={() => onDrop(e)}>
-            <Ico.X c="var(--text-4)" />
-          </button>
-        )}
-      </div>
+      <FragmentActions e={e} why={why} onPull={onPull} onDrop={onDrop} />
     </div>
   );
 }

@@ -52,6 +52,57 @@ function NodeKnobs({ ctl, title, bottom, slot, node, values }: {
   )
 }
 
+/** The palette header's count, store and add buttons. */
+function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
+  count: number; full: boolean; locked: boolean; onBrowse?(): void; onAdd(): void;
+}) {
+  const warns = full && !locked
+  return (
+    <div className="row" style={{ gap: 10 }}>
+      {/* `dim` is dropped rather than overridden, so there is no question of which
+          colour rule wins. */}
+      <Mono
+        className={warns ? 'sm warn' : 'dim sm'}
+        title={
+          warns
+            ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
+            : undefined
+        }
+      >
+        {count}
+      </Mono>
+      {/* Save and recall live in the sheet: this header has room for one more
+          control, and the store is a list of forty-five. */}
+      {!locked && onBrowse && (
+        <button
+          className="iconbtn"
+          title="Palette store — save this one, or recall another"
+          onClick={onBrowse}
+        >
+          <Ico.Folder />
+        </button>
+      )}
+      {/* Disabled at PALETTE_NEW, not at PALETTE. A palette that arrived longer than
+          the house rule keeps every stop it came with -- it simply cannot grow. */}
+      {!locked && (
+        <button
+          className="iconbtn"
+          disabled={full}
+          style={{ opacity: full ? 0.3 : 1 }}
+          title={
+            full
+              ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
+              : 'Add a stop'
+          }
+          onClick={onAdd}
+        >
+          <Ico.Plus />
+        </button>
+      )}
+    </div>
+  )
+}
+
 /**
  * A palette's stops: the count, the store, add, the strip and the list.
  *
@@ -103,48 +154,8 @@ function PaletteStops({
     >
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="head">Palette</Lab>
-        <div className="row" style={{ gap: 10 }}>
-          {/* `dim` is dropped rather than overridden, so there is no question of which
-              colour rule wins. */}
-          <Mono
-            className={full && !locked ? 'sm warn' : 'dim sm'}
-            title={
-              full && !locked
-                ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
-                : undefined
-            }
-          >
-            {entries.length}
-          </Mono>
-          {/* Save and recall live in the sheet: this header has room for one more
-              control, and the store is a list of forty-five. */}
-          {!locked && onBrowse && (
-            <button
-              className="iconbtn"
-              title="Palette store — save this one, or recall another"
-              onClick={onBrowse}
-            >
-              <Ico.Folder />
-            </button>
-          )}
-          {/* Disabled at PALETTE_NEW, not at PALETTE. A palette that arrived longer than
-              the house rule keeps every stop it came with -- it simply cannot grow. */}
-          {!locked && (
-            <button
-              className="iconbtn"
-              disabled={full}
-              style={{ opacity: full ? 0.3 : 1 }}
-              title={
-                full
-                  ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
-                  : 'Add a stop'
-              }
-              onClick={() => onChange([...entries, 'ffffff'])}
-            >
-              <Ico.Plus />
-            </button>
-          )}
-        </div>
+        <StopsHeadControls count={entries.length} full={full} locked={locked} onBrowse={onBrowse}
+                           onAdd={() => onChange([...entries, 'ffffff'])} />
       </div>
 
       {note}

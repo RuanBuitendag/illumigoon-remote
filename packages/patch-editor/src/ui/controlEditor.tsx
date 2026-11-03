@@ -36,30 +36,41 @@ interface Draft {
 
 function draftOf(patch: Patch, c: Control): Draft {
   const r = resolveTarget(patch, c.target);
-  const spec = r?.spec;
-  const percent = c.lo !== undefined || c.hi !== undefined;
-  const table = choicesFor(patch, c.target);
   return {
     label: c.label,
     group: c.group ?? '',
     newGroup: null,
-    percent,
-    lo: String(percent ? c.lo ?? spec?.min ?? 0 : c.min ?? spec?.min ?? 0),
-    hi: String(percent ? c.hi ?? spec?.max ?? 1 : c.max ?? spec?.max ?? 1),
-    unit: percent ? '' : c.unit ?? '',
+    ...rangeDraft(c, r?.spec),
     curve: String(c.curve ?? 1),
     whole: c.type === 'stepper',
     invert: !!c.invert,
-    offered: table.map(choice => {
-      const i = (c.choices ?? []).indexOf(choice);
-      return {
-        choice,
-        label: i >= 0 ? (c.options?.[i] ?? words(choice)) : words(choice),
-        on: i >= 0,
-      };
-    }),
+    offered: choicesFor(patch, c.target).map(choice => offeredOf(c, choice)),
     fewest: String(c.min ?? 1),
     most: String(c.max ?? LIMITS().PALETTE_NEW),
+  };
+}
+
+type RangeDraft = Pick<Draft, 'percent' | 'lo' | 'hi' | 'unit'>;
+
+/** A control with `lo` or `hi` shows a percentage; one without shows its own numbers. */
+function rangeDraft(c: Control, spec: { min: number; max: number } | undefined): RangeDraft {
+  const min = spec?.min ?? 0;
+  const max = spec?.max ?? 1;
+  return c.lo !== undefined || c.hi !== undefined ? percentDraft(c, min, max) : valueDraft(c, min, max);
+}
+
+const percentDraft = (c: Control, min: number, max: number): RangeDraft =>
+  ({ percent: true, lo: String(c.lo ?? min), hi: String(c.hi ?? max), unit: '' });
+
+const valueDraft = (c: Control, min: number, max: number): RangeDraft =>
+  ({ percent: false, lo: String(c.min ?? min), hi: String(c.max ?? max), unit: c.unit ?? '' });
+
+function offeredOf(c: Control, choice: string): Draft['offered'][number] {
+  const i = (c.choices ?? []).indexOf(choice);
+  return {
+    choice,
+    label: i >= 0 ? (c.options?.[i] ?? words(choice)) : words(choice),
+    on: i >= 0,
   };
 }
 
@@ -120,10 +131,29 @@ function controlOf(patch: Patch, original: Control, d: Draft, isNew: boolean): C
 function onMeans(patch: Patch, c: Control, invert: boolean): string {
   const r = resolveTarget(patch, c.target);
   if (r?.kind === 'setting') return `${r.field!.label} is ${invert ? 'off' : 'on'}`;
-  if (c.target.endsWith('.mute')) return invert ? 'the layer is heard' : 'the layer is muted';
-  if (c.target.endsWith('.solo')) return invert ? 'the layer is not soloed' : 'the layer is soloed';
-  if (c.target.endsWith('.bypass')) return invert ? 'the effect is on' : 'the effect is bypassed';
-  return invert ? `${c.target} is off` : `${c.target} is on`;
+  const known = SWITCH_MEANS.find(([end]) => c.target.endsWith(end));
+  const [, on, off] = known ?? ['', `${c.target} is on`, `${c.target} is off`];
+  return invert ? off : on;
+}
+
+/** A switch's address ending, and what On and Off mean for it. */
+const SWITCH_MEANS: [string, string, string][] = [
+  ['.mute', 'the layer is muted', 'the layer is heard'],
+  ['.solo', 'the layer is soloed', 'the layer is not soloed'],
+  ['.bypass', 'the effect is bypassed', 'the effect is on'],
+];
+
+/** Why the control cannot be saved as drafted, or null. */
+function problemOf(patch: Patch, control: Control, next: Control, d: Draft): string | null {
+  // Judged against the controls AHEAD of this one, as the light judges it, with this one in place.
+  const others = (patch.surface ?? []).filter(c => c.key !== control.key);
+  const dropped = whyDropped(patch, next, keptControls(patch, others));
+  if (dropped) return dropped;
+  const isFloat = resolveTarget(patch, control.target)?.kind === 'float';
+  return isFloat && !d.percent && !(num(d.hi, 0) > num(d.lo, 0))
+    ? 'Value shows the parameter’s own numbers, low to high. To run it backwards, show it as ' +
+      'Percent.'
+    : null;
 }
 
 export function ControlEditor({ ctl, at, control, isNew, onClose }: {
@@ -137,17 +167,8 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
   const [d, setD] = useState<Draft>(() => draftOf(patch, control));
   const set = (p: Partial<Draft>) => setD(x => ({ ...x, ...p }));
 
-  const r = resolveTarget(patch, control.target);
   const next = controlOf(patch, control, d, isNew);
-  // Judged against the controls AHEAD of this one, as the light judges it, with this one in place.
-  const others = (patch.surface ?? []).filter(c => c.key !== control.key);
-  const problem =
-    whyDropped(patch, next, keptControls(patch, others)) ??
-    (r?.kind === 'float' && !d.percent && !(num(d.hi, 0) > num(d.lo, 0))
-      ?
-        'Value shows the parameter’s own numbers, low to high. To run it backwards, show it as ' +
-        'Percent.'
-      : null);
+  const problem = problemOf(patch, control, next, d);
   const groups = groupsOf(patch);
 
   const save = () => {
@@ -203,30 +224,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
 
         <SectionField d={d} set={set} groups={groups} />
 
-        {r?.kind === 'float' && <NowLine patch={patch} path={r.path!} spec={r.spec!} />}
-
-        {r?.kind === 'float' && (
-          <NumberFields patch={patch} path={r.path!} spec={r.spec!} d={d} set={set} />
-        )}
-
-        {next.type === 'toggle' && (
-          <div className="col" style={{ gap: 8 }}>
-            <Switch on={d.invert} label="Invert" onChange={invert => set({ invert })} />
-            <Blurb>On means {onMeans(patch, control, d.invert)}.</Blurb>
-          </div>
-        )}
-
-        {next.type === 'select' && (
-          <OptionFields d={d} set={set} />
-        )}
-
-        {next.type === 'palette' && (
-          <PaletteFields d={d} set={set} />
-        )}
-
-        {next.type === 'color_picker' && (
-          <Blurb>A single colour: the room’s colour picker, on this stop.</Blurb>
-        )}
+        <TypeFields patch={patch} control={control} next={next} d={d} set={set} />
 
         {problem && (
           <span className="warnline">
@@ -234,29 +232,72 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
           </span>
         )}
 
-        <div className="row" style={{ justifyContent: 'space-between', paddingTop: 2 }}>
-          {isNew ? (
-            <span />
-          ) : (
-            <button className="pill" onClick={remove}>
-              REMOVE
-            </button>
-          )}
-          <div className="row" style={{ gap: 6 }}>
-            <button className="pill" onClick={onClose}>
-              CANCEL
-            </button>
-            <button className="pill" data-primary="true" disabled={!!problem} onClick={save}>
-              {isNew ? 'EXPOSE' : 'SAVE'}
-            </button>
-          </div>
-        </div>
+        <EditorButtons isNew={isNew} canSave={!problem} onRemove={remove} onClose={onClose}
+                       onSave={save} />
       </div>
     </>
   );
 }
 
-/** A number control's range, shown on the parameter's own range, and how it reads on the phone. */
+/** What the control's kind lets a person set. */
+function TypeFields({ patch, control, next, d, set }: {
+  patch: Patch; control: Control; next: Control; d: Draft; set(p: Partial<Draft>): void;
+}) {
+  const r = resolveTarget(patch, control.target);
+  return (
+    <>
+      {r?.kind === 'float' && <NowLine patch={patch} path={r.path!} spec={r.spec!} />}
+
+      {r?.kind === 'float' && (
+        <NumberFields patch={patch} path={r.path!} spec={r.spec!} d={d} set={set} />
+      )}
+
+      {next.type === 'toggle' && (
+        <div className="col" style={{ gap: 8 }}>
+          <Switch on={d.invert} label="Invert" onChange={invert => set({ invert })} />
+          <Blurb>On means {onMeans(patch, control, d.invert)}.</Blurb>
+        </div>
+      )}
+
+      {next.type === 'select' && (
+        <OptionFields d={d} set={set} />
+      )}
+
+      {next.type === 'palette' && (
+        <PaletteFields d={d} set={set} />
+      )}
+
+      {next.type === 'color_picker' && (
+        <Blurb>A single colour: the room’s colour picker, on this stop.</Blurb>
+      )}
+    </>
+  );
+}
+
+function EditorButtons({ isNew, canSave, onRemove, onClose, onSave }: {
+  isNew: boolean; canSave: boolean; onRemove(): void; onClose(): void; onSave(): void;
+}) {
+  return (
+    <div className="row" style={{ justifyContent: 'space-between', paddingTop: 2 }}>
+      {isNew ? (
+        <span />
+      ) : (
+        <button className="pill" onClick={onRemove}>
+          REMOVE
+        </button>
+      )}
+      <div className="row" style={{ gap: 6 }}>
+        <button className="pill" onClick={onClose}>
+          CANCEL
+        </button>
+        <button className="pill" data-primary="true" disabled={!canSave} onClick={onSave}>
+          {isNew ? 'EXPOSE' : 'SAVE'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /** Where the setting is now, read again on every change so turning it shows here (LIFE-1934). */
 function NowLine({ patch, path, spec }: { patch: Patch; path: string; spec: ParamSpec }) {
   const value = readPath(patch, path) ?? spec.def;
@@ -268,6 +309,21 @@ function NowLine({ patch, path, spec }: { patch: Patch; path: string; spec: Para
   );
 }
 
+/** What the room shows for the setting where it is now, under the drafted range. */
+function roomDraws({ path, spec, d, base }: {
+  path: string; spec: { min: number; max: number; def: number; unit?: string }; d: Draft; base: number;
+}): string {
+  const lo = num(d.lo, spec.min);
+  const hi = num(d.hi, spec.max);
+  if (!d.percent) return String(+Math.min(Math.max(base, lo), hi).toFixed(2));
+  const m = mappingOf(
+    { key: '', label: '', type: 'slider', target: path, min: 0, max: 100, lo, hi, curve: num(d.curve, 1) },
+    spec,
+  );
+  return `${+(m.max === m.min ? 0 : fromTarget(m, base)).toFixed(2)} %`;
+}
+
+/** A number control's range, shown on the parameter's own range, and how it reads on the phone. */
 function NumberFields({ patch, path, spec, d, set }: {
   patch: Patch; path: string; spec: { min: number; max: number; def: number; unit?: string };
   d: Draft; set(p: Partial<Draft>): void;
@@ -277,22 +333,6 @@ function NumberFields({ patch, path, spec, d, set }: {
   const lo = num(d.lo, spec.min);
   const hi = num(d.hi, spec.max);
   const base = readPath(patch, path) ?? spec.def;
-  const m = mappingOf(
-    d.percent
-      ? {
-          key: '',
-          label: '',
-          type: 'slider',
-          target: path,
-          min: 0,
-          max: 100,
-          lo,
-          hi,
-          curve: num(d.curve, 1),
-        }
-      : { key: '', label: '', type: 'slider', target: path, min: lo, max: hi },
-    spec,
-  );
   return (
     <div className="col" style={{ gap: 10 }}>
       <Lab className="dim">Range, in the parameter’s own units</Lab>
@@ -326,16 +366,7 @@ function NumberFields({ patch, path, spec, d, set }: {
         The whole parameter runs {spec.min} to {spec.max}
         {spec.unit ? ` ${spec.unit}` : ''}; it sits at {+base.toFixed(4)} now, which the room draws
         as{' '}
-        {
-          +(
-            d.percent
-              ? m.max === m.min
-                ? 0
-                : fromTarget(m, base)
-              : Math.min(Math.max(base, lo), hi)
-          ).toFixed(2)
-        }
-        {d.percent ? ' %' : ''}.
+        {roomDraws({ path, spec, d, base })}.
       </Blurb>
       <div className="row" style={{ gap: 9 }}>
         <Lab className="dim">Show as</Lab>

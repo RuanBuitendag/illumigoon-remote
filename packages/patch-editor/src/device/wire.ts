@@ -95,6 +95,24 @@ export interface WireEvents {
  * only evidence when the DEVICE produced it, and only when it produced the 1006 the bug
  * produces. See `Wire.close` and the `onclose` below.
  */
+/** The six catalog answers, which are folded together rather than handled one by one. */
+const CATALOG_RESPONSES = new Set([
+  'light_emitters_res', 'light_warps_res', 'light_colours_res',
+  'light_modulators_res', 'light_blends_res', 'light_limits_res',
+]);
+
+/** A frame as JSON with a string `type`, or null for anything else. */
+function parseFrame(raw: unknown): { type: string; source?: unknown; payload?: any } | null {
+  if (typeof raw !== 'string') return null;
+  let msg: any;
+  try {
+    msg = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  return typeof msg?.type === 'string' ? msg : null;
+}
+
 export class Wire {
   private ws: WebSocket | null = null;
   private seq = 1;
@@ -426,15 +444,9 @@ export class Wire {
   // ------------------------------------------------------------- receiving
 
   private receive(raw: any) {
-    if (typeof raw !== 'string') return;
-    let msg: any;
-    try {
-      msg = JSON.parse(raw);
-    } catch {
-      return;
-    }
-    const type = msg?.type;
-    if (typeof type !== 'string') return;
+    const msg = parseFrame(raw);
+    if (!msg) return;
+    const type: string = msg.type;
 
     // LIVENESS FIRST, and for any heartbeat regardless of whose it is. The deadline asks
     // whether THIS SOCKET is carrying traffic, and a Master bridging for a light behind it
@@ -463,7 +475,14 @@ export class Wire {
     this.emit('log', 'rx', type, raw.length);
     const p = msg.payload ?? {};
     this.emit('message', type, p);
+    this.dispatch(type, p);
+  }
 
+  private dispatch(type: string, p: any) {
+    if (CATALOG_RESPONSES.has(type)) {
+      this.receiveCatalogPart(type, p);
+      return;
+    }
     switch (type) {
       case 'heartbeat_ws':
         // Liveness and attribution were handled above, and deliberately apart: folding them
@@ -484,14 +503,6 @@ export class Wire {
         // the older top-level one -- is the caller's to read, because the caller is what
         // knows the difference between a patch, a flat animation and nothing published yet.
         this.questions.deliver(Wire.STATE, p);
-        break;
-      case 'light_emitters_res':
-      case 'light_warps_res':
-      case 'light_colours_res':
-      case 'light_modulators_res':
-      case 'light_blends_res':
-      case 'light_limits_res':
-        this.receiveCatalogPart(type, p);
         break;
     }
   }

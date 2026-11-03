@@ -183,6 +183,35 @@ async function storePresets(server, presets, { familyId, version }) {
  * the report would be a lie. What comes back instead is the identity, plus a count of the
  * presets that did not make it, so the editor can say so.
  */
+/**
+ * The document, stored on the server, or undefined once the refusal has been sent.
+ */
+async function storeDocument(server, body, res) {
+  let stored;
+  try {
+    stored = await postJson(server, '/api/patches', body);
+  } catch (e) {
+    send(res, 504, { error: unreachable(server, e) });
+    return undefined;
+  }
+  if (stored.status >= 400 || !stored.body?.familyId) {
+    send(res, stored.status >= 400 ? stored.status : 502, {
+      error: stored.body?.error ?? `the server answered ${stored.status}`,
+      bytes: stored.body?.bytes,
+    });
+    return undefined;
+  }
+  return stored;
+}
+
+/**
+ * Aborted, refused, or unresolvable. Named rather than generic, because "the server is
+ * asleep" and "you are offline" want different things from the person reading it.
+ */
+const unreachable = (server, e) => e?.name === 'AbortError'
+  ? `no answer in ${PUBLISH_TIMEOUT_MS / 1000}s — the server may be waking up; try again`
+  : `could not reach ${server} — ${e?.message ?? e}`;
+
 async function publish(req, res) {
   const body = await publishRequest(req, res);
   if (body === undefined) return;
@@ -194,26 +223,8 @@ async function publish(req, res) {
   }
 
   const server = patchServer();
-  let stored;
-  try {
-    stored = await postJson(server, '/api/patches', { document, name, notes });
-  } catch (e) {
-    // Aborted, refused, or unresolvable. Named rather than generic, because "the server is
-    // asleep" and "you are offline" want different things from the person reading it.
-    const why = e?.name === 'AbortError'
-      ? `no answer in ${PUBLISH_TIMEOUT_MS / 1000}s — the server may be waking up; try again`
-      : `could not reach ${server} — ${e?.message ?? e}`;
-    send(res, 504, { error: why });
-    return;
-  }
-
-  if (stored.status >= 400 || !stored.body?.familyId) {
-    send(res, stored.status >= 400 ? stored.status : 502, {
-      error: stored.body?.error ?? `the server answered ${stored.status}`,
-      bytes: stored.body?.bytes,
-    });
-    return;
-  }
+  const stored = await storeDocument(server, { document, name, notes }, res);
+  if (!stored) return;
 
   const { familyId, version } = stored.body;
   const { refused, presetIds } = await storePresets(server, presets, { familyId, version });

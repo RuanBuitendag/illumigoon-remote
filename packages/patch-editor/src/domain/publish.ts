@@ -221,7 +221,11 @@ export function classify(open: unknown, published: unknown): Verdict {
   if (!identity || identity.familyId !== claimed.familyId) {
     return { ...bare, offered: ['version', 'patch'], identity: claimed, referenceMissing: true };
   }
+  return compared(open, published, identity);
+}
 
+/** The verdict for a document whose published reference is at hand and is its own family. */
+function compared(open: unknown, published: unknown, identity: NonNullable<Verdict['identity']>): Verdict {
   const before = deserialise(published);
   const after = deserialise(open);
 

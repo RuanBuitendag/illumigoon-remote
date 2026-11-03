@@ -93,6 +93,10 @@ function checkRow(doc: any, row: any, { problems, notes }: Verdict) {
   if (!m) { problems.push(`row dst not a path: ${row?.dst}`); return; }
   const table = m[1] === 'L' ? doc.layers : doc.modulators;
   if (!table?.[m[2] ?? '']) problems.push(`row dst ${row.dst} names nothing in the document`);
+  checkRowSource(doc, row, { problems, notes });
+}
+
+function checkRowSource(doc: any, row: any, { problems, notes }: Verdict) {
   const srcMod = modOf(doc, row.src);
   if (!srcMod) problems.push(`row src ${row.src} names no modulator`);
   if (UNIPOLAR.has(srcMod?.type) && row.bipolar === false) {
@@ -115,15 +119,22 @@ function checkSurface(doc: any, rows: any[], problems: string[]) {
   if (new Set(keys).size !== keys.length) problems.push('two user controls share a key');
   const targets = surface.map(c => c?.target);
   if (new Set(targets).size !== targets.length) problems.push('two user controls share a target');
-  for (const want of ['speed', 'colour']) {
-    const slot = namedMacros(doc).find(([, m]) => m.name === want)?.[0];
-    if (slot === undefined) { problems.push(`no ${want} macro`); continue; }
-    if (!rows.some(r => r.src === want || String(r.src) === slot)) {
-      problems.push(`${want} macro drives nothing — no matrix row reads it`);
-    }
-    if (!surface.some(c => c?.target === `M${slot}.knob` || c?.target === `${want}.knob`)) {
-      problems.push(`${want} macro is not on the user surface`);
-    }
+  for (const want of ['speed', 'colour']) checkMacroControl({ doc, rows, surface }, want, problems);
+}
+
+/** The macro named @p want exists, drives something and is on the user surface. */
+function checkMacroControl(
+  { doc, rows, surface }: { doc: any; rows: any[]; surface: any[] },
+  want: string,
+  problems: string[],
+) {
+  const slot = namedMacros(doc).find(([, m]) => m.name === want)?.[0];
+  if (slot === undefined) { problems.push(`no ${want} macro`); return; }
+  if (!rows.some(r => r.src === want || String(r.src) === slot)) {
+    problems.push(`${want} macro drives nothing — no matrix row reads it`);
+  }
+  if (!surface.some(c => c?.target === `M${slot}.knob` || c?.target === `${want}.knob`)) {
+    problems.push(`${want} macro is not on the user surface`);
   }
 }
 
@@ -170,15 +181,21 @@ function checkCrossModulation(doc: any, rows: any[], problems: string[]) {
  * at 2.0 drive every entry to its pure hue at full brightness and leave only the HUE to the
  * entry. Dimming is `layer.opacity`'s job.
  */
-function checkPalette(slot: string, L: any, { problems, notes }: Verdict) {
-  const p = L?.colour?.palette?.params ?? {};
+function checkPalette(slot: string, L: any, verdict: Verdict) {
+  const palette = L?.colour?.palette ?? {};
+  const p = palette.params ?? {};
   if (p.saturation !== 2.0 || p.value !== 2.0) {
-    problems.push(`L${slot} palette is not at saturation 2.0 / value 2.0 ` +
-                  `(got ${p.saturation ?? 1} / ${p.value ?? 1})`);
+    verdict.problems.push(`L${slot} palette is not at saturation 2.0 / value 2.0 ` +
+                          `(got ${p.saturation ?? 1} / ${p.value ?? 1})`);
   }
-  // Saturation 2.0 rescues a dark hue and cannot rescue a grey one. v == 0 is exempt --
-  // black is "off", which particle age envelopes need.
-  const entries: string[] = L?.colour?.palette?.entries ?? [];
+  checkEntries(slot, palette.entries ?? [], verdict.notes);
+}
+
+/**
+ * Saturation 2.0 rescues a dark hue and cannot rescue a grey one. v == 0 is exempt --
+ * black is "off", which particle age envelopes need.
+ */
+function checkEntries(slot: string, entries: string[], notes: string[]) {
   for (const e of entries) {
     const { s, v } = hsvOf(e);
     if (v > 0.02 && s < 0.4)
@@ -205,12 +222,15 @@ export function galleryRules(doc: any): Verdict {
   checkWarps(doc, rows, problems);
   checkCrossModulation(doc, rows, problems);
   for (const [slot, L] of Object.entries<any>(doc?.layers ?? {})) checkPalette(slot, L, verdict);
+  checkDrivenPalettes(doc, rows, notes);
+  return verdict;
+}
+
+function checkDrivenPalettes(doc: any, rows: any[], notes: string[]) {
   for (const t of [...rows.map(r => r?.dst),
                    ...Object.values<any>(doc?.macros ?? {}).flatMap(m => m?.targets ?? [])]) {
     if (/\.palette\.(value|saturation)$/.test(t ?? '')) {
       notes.push(`${t} is driven, but the gallery pins it at 2.0 — dim with layer.opacity instead`);
     }
   }
-
-  return verdict;
 }

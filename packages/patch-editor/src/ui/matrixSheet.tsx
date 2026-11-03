@@ -171,42 +171,26 @@ function MatrixRoute({
 const modulatorLabel = (mod: Patch['modulators'][number] | undefined) =>
   mod ? (mod.label || mod.name || mod.type) : '—';
 
-function MatrixLine({ ctl, r, i, drop, note }: {
+/** Where the row takes its setting, low to high, or a dash when that cannot be known. */
+function reachText(ctl: Ctl, r: MatrixRow, srcBipolar: boolean): string {
+  const resolved = specForPath(ctl.patch, r.dst);
+  const base = ctl.baseOf(r.dst);
+  if (!resolved || base === undefined) return '—';
+  const reach = reachOf({ ...r, base, srcBipolar }, resolved.spec);
+  return `${reach.lo.toFixed(2)} – ${reach.hi.toFixed(2)}`;
+}
+
+type RowEdit = (change: (row: MatrixRow) => void) => (d: Patch) => void;
+
+/** The row's swing and how it acts on the setting. */
+function MatrixToggles({ ctl, r, srcBipolar, edit }: {
   ctl: Ctl;
   r: MatrixRow;
-  i: number;
-  drop: string | undefined;
-  note: string | undefined;
+  srcBipolar: boolean;
+  edit: RowEdit;
 }) {
-  const mod = ctl.patch.modulators.find(x => x.slot === r.src);
-  const resolved = specForPath(ctl.patch, r.dst);
-  // A dangling row is kept by the device and re-binds when its target returns,
-  // so it is marked but never struck through — that would read as lost.
-  const warn = drop ?? note;
-  const srcBipolar = srcBipolarOf(ctl.patch, r.src);
-  const base = ctl.baseOf(r.dst);
-  const reach = resolved && base !== undefined
-    ? reachOf({ ...r, base, srcBipolar }, resolved.spec)
-    : null;
-  /** Change this row in the draft, found by its id because the index can move under a drag. */
-  const edit = (change: (row: MatrixRow) => void) => (d: Patch) => {
-    const row = d.matrix.find(y => y.id === r.id);
-    if (row) change(row);
-  };
-
   return (
-    <div
-      className="mrow"
-      data-odd={i % 2 === 1 || undefined}
-      data-dropped={drop ? true : undefined}
-    >
-      <MatrixRoute r={r} label={modulatorLabel(mod)} warn={warn} />
-      <div style={{ width: 74, textAlign: 'right' }}>
-        <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
-      </div>
-      <div style={{ width: 120, textAlign: 'right' }}>
-        <Mono>{reach ? `${reach.lo.toFixed(2)} – ${reach.hi.toFixed(2)}` : '—'}</Mono>
-      </div>
+    <>
       <MatrixToggle
         width={54}
         disabled={!srcBipolar}
@@ -238,6 +222,43 @@ function MatrixLine({ ctl, r, i, drop, note }: {
       >
         {r.op === 'multiply' ? 'scales' : 'adds'}
       </MatrixToggle>
+    </>
+  );
+}
+
+function MatrixLine({ ctl, r, i, drop, note }: {
+  ctl: Ctl;
+  r: MatrixRow;
+  i: number;
+  drop: string | undefined;
+  note: string | undefined;
+}) {
+  const mod = ctl.patch.modulators.find(x => x.slot === r.src);
+  const resolved = specForPath(ctl.patch, r.dst);
+  // A dangling row is kept by the device and re-binds when its target returns,
+  // so it is marked but never struck through — that would read as lost.
+  const warn = drop ?? note;
+  const srcBipolar = srcBipolarOf(ctl.patch, r.src);
+  /** Change this row in the draft, found by its id because the index can move under a drag. */
+  const edit = (change: (row: MatrixRow) => void) => (d: Patch) => {
+    const row = d.matrix.find(y => y.id === r.id);
+    if (row) change(row);
+  };
+
+  return (
+    <div
+      className="mrow"
+      data-odd={i % 2 === 1 || undefined}
+      data-dropped={drop ? true : undefined}
+    >
+      <MatrixRoute r={r} label={modulatorLabel(mod)} warn={warn} />
+      <div style={{ width: 74, textAlign: 'right' }}>
+        <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
+      </div>
+      <div style={{ width: 120, textAlign: 'right' }}>
+        <Mono>{reachText(ctl, r, srcBipolar)}</Mono>
+      </div>
+      <MatrixToggles ctl={ctl} r={r} srcBipolar={srcBipolar} edit={edit} />
       <div style={{ width: 58, textAlign: 'right' }}>
         <Lab className="dim">{resolved ? OVERFLOW_WORDS[resolved.spec.overflow] : '—'}</Lab>
       </div>

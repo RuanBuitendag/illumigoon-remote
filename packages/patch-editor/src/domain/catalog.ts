@@ -205,6 +205,17 @@ function parseNode(raw: any): NodeSpec {
  * catalogue::limits. It is a node like any other once it is here.
  */
 export function parseCatalog(raw: any): Catalog {
+  const L = raw.limits ?? {};
+  return {
+    hash: raw.catalogHash ?? 0,
+    nodes: nodesOf(raw),
+    blends: raw.blends ?? [],
+    indices: raw.indices ?? [],
+    limits: limitsOf(L),
+  };
+}
+
+function nodesOf(raw: any): Map<string, NodeSpec> {
   const nodes = new Map<string, NodeSpec>();
   for (const key of ['emitters', 'warps', 'colours', 'modulators']) {
     for (const n of raw[key] ?? []) nodes.set(n.id, parseNode(n));
@@ -231,33 +242,30 @@ export function parseCatalog(raw: any): Catalog {
     const mix = parseNode(raw.limits.global);
     nodes.set(mix.id, mix);
   }
-  const L = raw.limits ?? {};
+  return nodes;
+}
+
+function limitsOf(L: any): Catalog['limits'] {
   return {
-    hash: raw.catalogHash ?? 0,
-    nodes,
-    blends: raw.blends ?? [],
-    indices: raw.indices ?? [],
-    limits: {
-      SLOTS: L.slots, MODS: L.modulators, MATRIX: L.matrix,
-      WARPS: L.warps, PALETTE: L.palette,
-      // Sixteen on a light from before surfaces were published, which is what `SurfaceDoc::CAP`
-      // has been since the first build that could hold one -- and a light older than that drops
-      // the `surface` key whatever the editor thinks the cap is.
-      SURFACE: L.surface ?? 16,
-      // A HOUSE RULE, NOT A CAPABILITY -- which is why it is separate from PALETTE rather
-      // than a smaller value written over it.
-      //
-      // Eight stops is as many as a palette here is allowed to GROW to. The device still
-      // takes PALETTE of them, and `fromDoc` still loads that many, because the alternative
-      // is opening somebody's twelve-stop patch and silently handing back eight. A rule
-      // about what to author must not eat what is already authored.
-      //
-      // The number is small on purpose: a palette is reconstructed CONTINUOUSLY, so stops
-      // buy hue precision rather than hue range, and past a handful the strip cannot show
-      // the difference while every one of them costs document bytes against the device's
-      // single NVS slot.
-      PALETTE_NEW: 8,
-    },
+    SLOTS: L.slots, MODS: L.modulators, MATRIX: L.matrix,
+    WARPS: L.warps, PALETTE: L.palette,
+    // Sixteen on a light from before surfaces were published, which is what `SurfaceDoc::CAP`
+    // has been since the first build that could hold one -- and a light older than that drops
+    // the `surface` key whatever the editor thinks the cap is.
+    SURFACE: L.surface ?? 16,
+    // A HOUSE RULE, NOT A CAPABILITY -- which is why it is separate from PALETTE rather
+    // than a smaller value written over it.
+    //
+    // Eight stops is as many as a palette here is allowed to GROW to. The device still
+    // takes PALETTE of them, and `fromDoc` still loads that many, because the alternative
+    // is opening somebody's twelve-stop patch and silently handing back eight. A rule
+    // about what to author must not eat what is already authored.
+    //
+    // The number is small on purpose: a palette is reconstructed CONTINUOUSLY, so stops
+    // buy hue precision rather than hue range, and past a handful the strip cannot show
+    // the difference while every one of them costs document bytes against the device's
+    // single NVS slot.
+    PALETTE_NEW: 8,
   };
 }
 

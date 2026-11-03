@@ -180,67 +180,64 @@ function warpCoverage(w: Warp, pos: number, footprint = 0): number {
  * `check:warp` cannot catch that case — it only knows the nodes the firmware compiled —
  * so a new warp arrives here silently and the preview under-reports until this is taught it.
  */
+type Param = ReturnType<typeof readParams>;
+type WarpMap = (p: Param, pos: number, footprint: number, w: Warp) => Warped;
+
+/** Each known warp, by node id. */
+const WARP_MAPS: Record<string, WarpMap> = {
+  translate: (p, pos, footprint, w) => {
+    // `wrap` is structural, not a parameter, and defaults TRUE — the catalog publishes
+    // that default precisely because "the first option" is the wrong guess for it.
+    const wrap = w.struct.wrap !== false;
+    let q = pos - p('offset', 0);
+    if (wrap) q -= Math.floor(q);
+    return { pos: q, footprint };
+  },
+  ripple: (p, pos, footprint) => {
+    const amp = p('amp', 0.05);
+    const freq = p('freq', 3);
+    const w = 2 * Math.PI * (freq * pos + p('phase', 0));
+    // The footprint is the DERIVATIVE, not the input — a ripple compresses space where
+    // the sine falls and stretches it where it rises, so a sample covers a different
+    // amount of the shape at every point.
+    const d = 1 + amp * 2 * Math.PI * freq * Math.cos(w);
+    return { pos: pos + amp * Math.sin(w), footprint: footprint * Math.abs(d) };
+  },
+  pinch: (p, pos, footprint) => {
+    const centre = p('centre', 0.5);
+    const k = Math.pow(2, p('amount', 0) * 2);
+    const d = pos - centre;
+    const a = Math.abs(d);
+    // The fixed point, and where d^(k-1) blows up.
+    if (a < 1e-6) return { pos: centre, footprint };
+    const m = Math.pow(a, k);
+    return { pos: centre + Math.sign(d) * m, footprint: (footprint * k * m) / a };
+  },
+  // ADDED, in strip units — never a multiple of the footprint, or the blur would change with
+  // the strip it lands on. It moves nothing; a wider question is the whole effect (LIFE-848).
+  blur: (p, pos, footprint) => ({ pos, footprint: footprint + Math.max(0, p('radius', 0.05)) }),
+  // A fade reads TIME, not space: it samples from exactly where it sits. Written out rather
+  // than left to the default, so it reads as known rather than as a node this build has not met.
+  fade: (_p, pos, footprint) => ({ pos, footprint }),
+  // Source 0 at the centre and source 1 at both ends, so a shape drawn once appears
+  // twice. The footprint doubles with it.
+  mirror: (p, pos, footprint) => ({ pos: Math.abs(pos - p('centre', 0.5)) * 2, footprint: footprint * 2 }),
+  tile: (p, pos, footprint) => {
+    const n = Math.max(1, p('count', 2));
+    const x = pos * n;
+    return { pos: x - Math.floor(x), footprint: footprint * n };
+  },
+  scale: (p, pos, footprint) => {
+    const zoom = p('zoom', 1);
+    const z = Math.abs(zoom) < 1e-4 ? 1e-4 : zoom;
+    const centre = p('centre', 0.5);
+    return { pos: (pos - centre) / z + centre, footprint: footprint / Math.abs(z) };
+  },
+};
+
 function warpToSource(w: Warp, pos: number, footprint: number): Warped {
-  const p = readParams(w);
-
-  switch (w.type) {
-    case 'translate': {
-      // `wrap` is structural, not a parameter, and defaults TRUE — the catalog publishes
-      // that default precisely because "the first option" is the wrong guess for it.
-      const wrap = w.struct.wrap !== false;
-      let q = pos - p('offset', 0);
-      if (wrap) q -= Math.floor(q);
-      return { pos: q, footprint };
-    }
-    case 'ripple': {
-      const amp = p('amp', 0.05);
-      const freq = p('freq', 3);
-      const w = 2 * Math.PI * (freq * pos + p('phase', 0));
-      // The footprint is the DERIVATIVE, not the input — a ripple compresses space where
-      // the sine falls and stretches it where it rises, so a sample covers a different
-      // amount of the shape at every point.
-      const d = 1 + amp * 2 * Math.PI * freq * Math.cos(w);
-      return { pos: pos + amp * Math.sin(w), footprint: footprint * Math.abs(d) };
-    }
-    case 'pinch': {
-      const centre = p('centre', 0.5);
-      const k = Math.pow(2, p('amount', 0) * 2);
-      const d = pos - centre;
-      const a = Math.abs(d);
-      // The fixed point, and where d^(k-1) blows up.
-      if (a < 1e-6) return { pos: centre, footprint };
-      const m = Math.pow(a, k);
-      return { pos: centre + Math.sign(d) * m, footprint: (footprint * k * m) / a };
-    }
-    case 'blur':
-      // ADDED, in strip units — never a multiple of the footprint, or the blur would change with
-      // the strip it lands on. It moves nothing; a wider question is the whole effect (LIFE-848).
-      return { pos, footprint: footprint + Math.max(0, p('radius', 0.05)) };
-    case 'fade':
-      // A fade reads TIME, not space: it samples from exactly where it sits. Written out rather
-      // than
-      // left to the default, so it reads as known rather than as a node this build has not met.
-      return { pos, footprint };
-
-    case 'mirror':
-      // Source 0 at the centre and source 1 at both ends, so a shape drawn once appears
-      // twice. The footprint doubles with it.
-      return { pos: Math.abs(pos - p('centre', 0.5)) * 2, footprint: footprint * 2 };
-
-    case 'tile': {
-      const n = Math.max(1, p('count', 2));
-      const x = pos * n;
-      return { pos: x - Math.floor(x), footprint: footprint * n };
-    }
-    case 'scale': {
-      const zoom = p('zoom', 1);
-      const z = Math.abs(zoom) < 1e-4 ? 1e-4 : zoom;
-      const centre = p('centre', 0.5);
-      return { pos: (pos - centre) / z + centre, footprint: footprint / Math.abs(z) };
-    }
-    default:
-      return { pos, footprint };
-  }
+  const map = Object.hasOwn(WARP_MAPS, w.type) ? WARP_MAPS[w.type] : undefined;
+  return map ? map(readParams(w), pos, footprint, w) : { pos, footprint };
 }
 
 /**

@@ -167,20 +167,35 @@ export const AUTHORED_LABEL = 'As authored';
  */
 const isAuthored = (preset: ServerPreset) => preset.name === AUTHORED_LABEL;
 
-const rowOf = (preset: ServerPreset, local: FolderPreset | undefined): PresetRow => ({
-  key: local?.file ?? preset.id,
-  // The FOLDER'S name wins when there is one. Renaming a preset locally is a thing a person
-  // does to their own copy, and having the rail relabel it from the server on the next refresh
-  // would look like the rename had failed.
-  name: local?.name ?? preset.name,
-  where: local ? 'both' : 'server',
-  authored: isAuthored(preset),
-  values: local?.values ?? preset.values,
-  authoredAgainst: preset.authoredAgainst,
-  file: local?.file ?? null,
-  publishedAs: preset.id,
-  author: preset.author,
-  error: local?.error,
+const rowOf = (preset: ServerPreset, local: FolderPreset | undefined): PresetRow => {
+  const row: PresetRow = {
+    key: preset.id,
+    name: preset.name,
+    where: 'server',
+    authored: isAuthored(preset),
+    values: preset.values,
+    authoredAgainst: preset.authoredAgainst,
+    file: null,
+    publishedAs: preset.id,
+    author: preset.author,
+    error: undefined,
+  };
+  return local ? withFolder(row, local) : row;
+};
+
+/**
+ * The FOLDER'S name wins when there is one. Renaming a preset locally is a thing a person
+ * does to their own copy, and having the rail relabel it from the server on the next refresh
+ * would look like the rename had failed.
+ */
+const withFolder = (row: PresetRow, local: FolderPreset): PresetRow => ({
+  ...row,
+  key: local.file ?? row.key,
+  name: local.name ?? row.name,
+  where: 'both',
+  values: local.values ?? row.values,
+  file: local.file ?? null,
+  error: local.error,
 });
 
 const localRow = (local: FolderPreset): PresetRow => ({

@@ -441,6 +441,12 @@ export function inRange(a: Address): boolean {
     case 'layerFlag':                      return a.slot < L.SLOTS;
     case 'modParam': case 'modBypass':
     case 'modOutput':                      return a.slot < L.MODS;
+    default:                               return otherInRange(a, L);
+  }
+}
+
+function otherInRange(a: Address, L: ReturnType<typeof LIMITS>): boolean {
+  switch (a.kind) {
     case 'rowBypass':                      return a.row < L.MATRIX;
     case 'globalParam': case 'globalBypass': return warpIndex(a.stage) < L.WARPS;
     default:                               return true;
@@ -786,17 +792,22 @@ export function triggerWarning(patch: Patch, L: Layer): string | null {
   if (!nodeById(L.emitter.type)?.takesTrigger) return null;
 
   const t = L.emitter.trigger;
-  if (t) {
-    const src = patch.modulators.find(m => m.slot === t.src);
-    // `rewire()` keeps the stored index and re-binds the moment the slot fills again, so
-    // this is dormant in exactly the sense `danglingRows` means it — not lost.
-    if (!src) return `slot ${t.src} is empty — dormant until something is there`;
-    if (!nodeById(src.type)?.trigger)
-      return `slot ${t.src} holds ${src.type} — it has no edge to give`;
-    if (src.bypass) return `slot ${t.src} is bypassed`;
-    return null;
-  }
+  return t ? wiredWarning(patch, t.src) : unwiredWarning(L);
+}
 
+/** What is wrong with the slot a trigger is wired to, or null when it fires. */
+function wiredWarning(patch: Patch, slot: number): string | null {
+  const src = patch.modulators.find(m => m.slot === slot);
+  // `rewire()` keeps the stored index and re-binds the moment the slot fills again, so
+  // this is dormant in exactly the sense `danglingRows` means it — not lost.
+  if (!src) return `slot ${slot} is empty — dormant until something is there`;
+  if (!nodeById(src.type)?.trigger)
+    return `slot ${slot} holds ${src.type} — it has no edge to give`;
+  if (src.bypass) return `slot ${slot} is bypassed`;
+  return null;
+}
+
+function unwiredWarning(L: Layer): string | null {
   switch (L.emitter.type) {
     case 'spawner':   return 'no trigger — nothing ever spawns';
     // A rate is the other way in. With one running, no trigger is a choice rather than a gap.

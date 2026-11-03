@@ -81,14 +81,19 @@ function lfoAt(m: Modulator, t: number): number {
   // Phase runs 0–1 per cycle; each wave shape maps it to 0–1 the way the C++ does.
   const x = (t * rate + phase) % 1;
   const u = x < 0 ? x + 1 : x;
+  return shapeAt(wave, u, duty, t * Math.max(1e-4, rate));
+}
+
+/** @p u is the phase 0–1, and @p at the time in cycles, for the shapes that are not periodic. */
+function shapeAt(wave: string, u: number, duty: number, at: number): number {
   switch (wave) {
     case 'triangle': return u < duty ? u / Math.max(1e-4, duty)
                                      : 1 - (u - duty) / Math.max(1e-4, 1 - duty);
     case 'ramp_up': return u;
     case 'ramp_down': return 1 - u;
     case 'square': return u < duty ? 1 : 0;
-    case 'sample_hold': return pseudoRandom(Math.floor(t * Math.max(1e-4, rate)));
-    case 'perlin': return smoothNoise(t * Math.max(1e-4, rate));
+    case 'sample_hold': return pseudoRandom(Math.floor(at));
+    case 'perlin': return smoothNoise(at);
     default: return (Math.sin(2 * Math.PI * u) + 1) / 2;
   }
 }
