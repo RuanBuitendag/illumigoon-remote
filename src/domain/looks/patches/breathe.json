@@ -1,0 +1,95 @@
+{
+  "name": "Breathe",
+  "notes": "A slow rise and fall of light, with the palette along the strip.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 0.5
+        },
+        "palette": {
+          "entries": [
+            "00c8ff",
+            "8040ff"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.12
+      },
+      "wave": "sine"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.layer.opacity",
+      "depth": -0.85
+    }
+  ],
+  "surface": [
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 1,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 200,
+          "b": 255
+        },
+        {
+          "r": 128,
+          "g": 64,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.rate",
+      "lo": 0.03,
+      "hi": 0.5,
+      "default": 19.1489
+    },
+    {
+      "key": "spread",
+      "label": "Spread",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.colour.paletteSpan",
+      "lo": 0,
+      "hi": 1.5,
+      "default": 33.3333
+    }
+  ]
+}

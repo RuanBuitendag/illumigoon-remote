@@ -251,6 +251,7 @@ export const journeys = [
       await see(page, 'Lamp');
       await page.getByRole('button', { name: /looks/i }).first().click();
       await see(page, 'Candle');
+      await see(page, 'Solid colour');
       for (const gone of ['Lava lamp', 'Black Hole', 'Simple looks', 'Examples', 'Most used']) {
         if ((await page.getByText(gone, { exact: true }).count()) > 0) throw new Error(`${gone} is on the page`);
       }

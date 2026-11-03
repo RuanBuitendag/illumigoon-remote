@@ -1,0 +1,62 @@
+{
+  "name": "Solid colour",
+  "notes": "One colour over the whole strip. Span 0 puts every LED on the first palette entry.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 0
+        },
+        "palette": {
+          "entries": [
+            "ff2a6d"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    }
+  },
+  "modulators": {},
+  "matrix": [],
+  "surface": [
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 1,
+      "max": 1,
+      "default": [
+        {
+          "r": 255,
+          "g": 42,
+          "b": 109
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "pastel",
+      "label": "Pastel",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.palette.saturation",
+      "lo": 1,
+      "hi": 0.25,
+      "default": 0
+    }
+  ]
+}

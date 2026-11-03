@@ -1,0 +1,89 @@
+{
+  "name": "Gradient",
+  "notes": "The palette laid along the strip and held still.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 0.67,
+          "paletteOffset": 0
+        },
+        "palette": {
+          "entries": [
+            "ff1f6b",
+            "a020ff",
+            "1f6bff"
+          ],
+          "params": {}
+        },
+        "wrap": true
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    }
+  },
+  "modulators": {},
+  "matrix": [],
+  "surface": [
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 31,
+          "b": 107
+        },
+        {
+          "r": 160,
+          "g": 32,
+          "b": 255
+        },
+        {
+          "r": 31,
+          "g": 107,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "spread",
+      "label": "Spread",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.colour.paletteSpan",
+      "lo": 0.15,
+      "hi": 2,
+      "default": 28.1081
+    },
+    {
+      "key": "shift",
+      "label": "Shift",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.colour.paletteOffset",
+      "lo": 0,
+      "hi": 1,
+      "default": 0
+    }
+  ]
+}

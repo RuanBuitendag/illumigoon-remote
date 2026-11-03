@@ -3,6 +3,11 @@ import { PATCH_LOOKS, type PatchLook } from './looks';
 export type LookGroup = { title: string; note: string; ids: string[] };
 
 export const LOOK_GROUPS: LookGroup[] = [
+  {
+    title: 'Basics',
+    note: '',
+    ids: ['solid-colour', 'warm-white', 'gradient', 'colour-fade', 'rainbow', 'breathe'],
+  },
   { title: 'Fire and warmth', note: 'Good for evenings', ids: ['candle', 'dark-embers', 'perlin-flame-2'] },
   { title: 'Water and sky', note: 'Slow and calm', ids: ['beach-sunset', 'starfield', 'downpour'] },
   { title: 'Colour and motion', note: '', ids: ['wavering-orbs', 'searchlight'] },
@@ -24,6 +29,12 @@ export const LOOK_GROUPS: LookGroup[] = [
 ];
 
 const DESCRIPTIONS: Record<string, string> = {
+  'solid-colour': 'One colour over the whole strip.',
+  'warm-white': 'Plain light, from candle warm to daylight.',
+  gradient: 'Your colours laid along the strip, held still.',
+  'colour-fade': 'The whole strip moves slowly through your colours.',
+  rainbow: 'Your colours flow along the strip.',
+  breathe: 'Light that slowly rises and falls.',
   candle: 'A single flame that breathes and flickers.',
   'dark-embers': 'Embers in a nearly dark room.',
   'perlin-flame-2': 'A taller, brighter flame.',

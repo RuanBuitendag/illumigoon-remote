@@ -1,0 +1,135 @@
+{
+  "name": "Rainbow",
+  "notes": "The palette flows along the strip. Bands sets how many times it repeats.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 1
+        },
+        "palette": {
+          "entries": [
+            "ff0000",
+            "ff8000",
+            "ffff00",
+            "00ff00",
+            "0080ff",
+            "8000ff"
+          ],
+          "params": {}
+        },
+        "wrap": true
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0.06
+      },
+      "wave": "ramp_up"
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.colour.paletteOffset",
+      "depth": 1
+    }
+  ],
+  "surface": [
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 128,
+          "b": 0
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 255,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 128,
+          "b": 255
+        },
+        {
+          "r": 128,
+          "g": 0,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.rate",
+      "lo": 0.01,
+      "hi": 0.4,
+      "default": 12.8205
+    },
+    {
+      "key": "bands",
+      "label": "Bands",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.colour.paletteSpan",
+      "lo": 0.3,
+      "hi": 4,
+      "default": 18.9189
+    },
+    {
+      "key": "direction",
+      "label": "Direction",
+      "type": "select",
+      "options": [
+        "Forward",
+        "Back"
+      ],
+      "choices": [
+        "ramp_up",
+        "ramp_down"
+      ],
+      "default": 0,
+      "target": "M0.wave"
+    }
+  ]
+}

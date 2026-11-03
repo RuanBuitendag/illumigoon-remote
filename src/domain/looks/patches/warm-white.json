@@ -1,0 +1,50 @@
+{
+  "name": "Warm white",
+  "notes": "Plain light from candle warm to daylight. Span 0 and the offset picks one point on the palette.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "block",
+        "params": {
+          "level": 1
+        }
+      },
+      "colour": {
+        "index": "position",
+        "params": {
+          "paletteSpan": 0,
+          "paletteOffset": 0.4
+        },
+        "palette": {
+          "entries": [
+            "ff7a1e",
+            "ffb56b",
+            "ffe4c4",
+            "fff6ec"
+          ],
+          "params": {}
+        }
+      },
+      "opacity": 1,
+      "blend": "over",
+      "order": 0
+    }
+  },
+  "modulators": {},
+  "matrix": [],
+  "surface": [
+    {
+      "key": "warmth",
+      "label": "Warmth",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.colour.paletteOffset",
+      "lo": 0.75,
+      "hi": 0,
+      "default": 46.6667
+    }
+  ]
+}
