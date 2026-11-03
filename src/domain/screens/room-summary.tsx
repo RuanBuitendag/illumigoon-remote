@@ -1,6 +1,6 @@
 import { LockNote, RoomCard } from '../../composites';
 import { PowerKey } from '../../design-system';
-import { movesToMusic } from '../looks/look-catalog';
+import { listensToMusic } from '../looks/looks';
 import { setPower, type Light } from '../store/fleet-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom, useNavigation } from '../store/navigation-store';
@@ -9,7 +9,6 @@ import {
   isAnyOn,
   isMixedLook,
   lightState,
-  lookIdOf,
   lookNameOf,
   previewOfAnimation,
   type Room,
@@ -63,7 +62,6 @@ export function RoomSummary({ room }: { room: Room }) {
   const source = previewOfAnimation(first?.animation ?? null);
   const isOn = isAnyOn(onlineLights);
   const level = highestBrightness(onlineLights);
-  const lookId = lookIdOf(first?.animation ?? null);
   return (
     <RoomCard
       name={room.name}
@@ -79,7 +77,7 @@ export function RoomSummary({ room }: { room: Room }) {
       }
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
       lookName={lookLabel(onlineLights)}
-      hasSound={Boolean(lookId && movesToMusic(lookId))}
+      hasSound={listensToMusic(first?.animation ?? null)}
       lightStates={room.lights.map((light) => ({ id: light.address, name: light.name, state: lightState(light) }))}
       note={silentText(room) ?? timerText(room)}
       isOpen={isOpen}

@@ -1,6 +1,7 @@
 import type { Shelf } from '@illumigoon/patch-editor/library';
 import type { AnimationState, ParameterValue } from '../light-network/protocol';
-import { groupedLooks, lookDescription, movesToMusic } from '../looks/look-catalog';
+import { groupedLooks, lookDescription } from '../looks/look-catalog';
+import { listensToMusic } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
 import { withParameter, type Light } from './fleet-store';
 import type { LookFile } from './look-files';
@@ -36,7 +37,7 @@ export type LibraryPreset = {
   animation: AnimationState;
 };
 
-export type LibraryGroup = { kind: 'mine' | 'catalog' | 'example'; title: string; note: string; looks: LibraryLook[] };
+export type LibraryGroup = { kind: 'mine' | 'catalog'; title: string; note: string; looks: LibraryLook[] };
 
 type PresetRow = NonNullable<ReturnType<Shelf['under']['get']>>[number];
 
@@ -52,17 +53,20 @@ function patchGroups(lights: Light[]): LibraryGroup[] {
     kind: 'catalog',
     title,
     note,
-    looks: looks.map((look) => ({
-      id: look.id,
-      name: look.name,
-      description: lookDescription(look.id),
-      hasSound: movesToMusic(look.id),
-      preview: previewOfPatch(look),
-      animation: { type: 'patch', params: look.document },
-      lights: players,
-      file: null,
-      presets: [],
-    })),
+    looks: looks.map((look) => {
+      const animation = { type: 'patch', params: look.document };
+      return {
+        id: look.id,
+        name: look.name,
+        description: lookDescription(look.id),
+        hasSound: listensToMusic(animation),
+        preview: previewOfPatch(look),
+        animation,
+        lights: players,
+        file: null,
+        presets: [],
+      };
+    }),
   }));
 }
 
@@ -107,10 +111,10 @@ function libraryPreset(preset: PresetRow, name: string, animation: AnimationStat
 }
 
 function fileLook(look: LookFile, lights: Light[], shelf: Shelf): LibraryLook {
-  const { animation, file, isExample, name } = look;
-  const presets = isExample || !animation ? [] : (shelf.under.get(file) ?? []);
+  const { animation, file, name } = look;
+  const presets = animation ? (shelf.under.get(file) ?? []) : [];
   return {
-    id: `${isExample ? 'example' : 'mine'}:${file}`,
+    id: `mine:${file}`,
     name,
     description: fileDescription(look),
     hasSound: look.hasSound,
@@ -144,22 +148,8 @@ function mineGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGr
   }));
 }
 
-function exampleGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGroup[] {
-  return foldersOf(files).map((folder) => ({
-    kind: 'example',
-    title: folder ? `Examples, ${folder}` : 'Examples',
-    note: 'Worked examples, read only',
-    looks: looksOfFiles(files.filter(({ group }) => group === folder), lights, shelf),
-  }));
-}
-
-export function libraryFor(lights: Light[], mine: LookFile[], examples: LookFile[], shelf: Shelf) {
-  const groups = [
-    ...mineGroups(mine, lights, shelf),
-    ...patchGroups(lights),
-    builtInGroup(lights),
-    ...exampleGroups(examples, lights, shelf),
-  ];
+export function libraryFor(lights: Light[], mine: LookFile[], shelf: Shelf) {
+  const groups = [...mineGroups(mine, lights, shelf), ...patchGroups(lights), builtInGroup(lights)];
   return groups.filter(({ title, looks }) => looks.length > 0 || title === 'Mine');
 }
 

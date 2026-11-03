@@ -1,6 +1,7 @@
 import { RecentLookItem, RecentLooks } from '../../composites';
 import type { Light } from '../store/fleet-store';
 import { useHousehold } from '../store/household-store';
+import { listensToMusic } from '../looks/looks';
 import { playLook } from '../store/look-play';
 import { endPreview, previewLook, useShownLights } from '../store/look-preview';
 import { canPlay, isAnyOn, isMixedLook, lookNameOf, previewOfAnimation, type Room } from '../store/rooms';
@@ -24,6 +25,7 @@ export function RecentLookRow({ room, lights, limit }: RecentLookRowProps) {
         <RecentLookItem
           key={name}
           name={name}
+          hasSound={listensToMusic(animation)}
           strip={<LookStrip source={previewOfAnimation(animation)} shape="tile" />}
           onPick={() => playLook(players, name, animation)}
           onHold={() => previewLook(players, name, animation)}

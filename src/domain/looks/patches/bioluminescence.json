@@ -1,0 +1,210 @@
+{
+  "name": "Bioluminescence",
+  "created": "2026-11-02T20:30:00.000Z",
+  "notes": "A steady rain of short sparks, multiplied by a slow noise field whose palette is black below the middle. Sparks show only where the wave stands. A dim copy of the same field adds the water around them.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "particles",
+        "colouring": "age",
+        "params": {
+          "origin": 0.5,
+          "spread": 1,
+          "count": 0,
+          "rate": 45,
+          "speed": 0,
+          "speedVary": 0,
+          "acceleration": 0,
+          "drag": 0,
+          "size": 0.007,
+          "sizeVary": 0.5,
+          "softness": 0.9,
+          "lifetime": 0.7,
+          "lifeVary": 0.5,
+          "fade": 0,
+          "maxAlive": 60
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "003060",
+            "00a0ff",
+            "40ffe0",
+            "ffffff",
+            "40ffe0",
+            "003060",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 2.4,
+          "evolve": 0.1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "000000",
+            "ffffff",
+            "ffffff"
+          ],
+          "params": {}
+        }
+      },
+      "blend": "multiply",
+      "opacity": 1,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 2.4,
+          "evolve": 0.1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "000000",
+            "000000",
+            "002850",
+            "0050a0"
+          ],
+          "params": {}
+        }
+      },
+      "blend": "add",
+      "opacity": 0.5,
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.06
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L1.emitter.offset",
+      "depth": 1.2,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L2.emitter.offset",
+      "depth": 1.2,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "amount",
+      "label": "Amount",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "L0.emitter.rate",
+      "lo": 10,
+      "hi": 80,
+      "default": 50
+    },
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.noiseRate",
+      "lo": 0.02,
+      "hi": 0.2,
+      "default": 22.2222
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 48,
+          "b": 96
+        },
+        {
+          "r": 0,
+          "g": 160,
+          "b": 255
+        },
+        {
+          "r": 64,
+          "g": 255,
+          "b": 224
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        {
+          "r": 64,
+          "g": 255,
+          "b": 224
+        },
+        {
+          "r": 0,
+          "g": 48,
+          "b": 96
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        }
+      ],
+      "target": "L0.palette.entries"
+    }
+  ]
+}

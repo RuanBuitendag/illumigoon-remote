@@ -16,6 +16,15 @@ export const PATCH_LOOKS = Object.entries(patchFiles)
   .map(toLook)
   .sort((a, b) => a.name.localeCompare(b.name));
 
+// The modulators that hear the microphone. The patch says so itself, so no list of looks can go stale.
+const LISTENING_MODULATORS = new Set(['audio_band', 'tempo', 'beat']);
+
+export function listensToMusic(animation: AnimationState | null) {
+  if (animation?.type !== 'patch') return false;
+  const modulators = Object.values((animation.params.modulators ?? {}) as Record<string, { type?: string }>);
+  return modulators.some(({ type }) => LISTENING_MODULATORS.has(type ?? ''));
+}
+
 // A patch starts at the positions it was authored with, because nothing reads `default`. A moved
 // control therefore goes in beside the document, both to a light and to the preview engine.
 export function withPositions(animation: AnimationState): AnimationState {

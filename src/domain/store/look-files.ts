@@ -5,7 +5,7 @@ import { useHousehold, type SavedLook } from './household-store';
 import { attempt, library, unusedFile, useLibrary } from './library-store';
 
 // Looks kept as files in the library that every shell answers at `/api`. Mine is the folder a person
-// saves to. Examples are the worked ones that ship with the firmware, and they are read only.
+// saves to.
 //
 // A preset file is a patch document, so a patch look is its file. A look that is not a patch rides in
 // `flatLook` beside three empty parts, which makes it a valid file for every reader of the folder.
@@ -16,7 +16,6 @@ export type LookFile = {
   notes: string;
   group: string | null;
   modified: number;
-  isExample: boolean;
   familyId: string | null;
   version: number | null;
   wire: number;
@@ -28,7 +27,6 @@ export type LookFile = {
 
 type LookFiles = {
   mine: LookFile[];
-  examples: LookFile[];
   // What the patch server and the preset folder hold, sorted under the looks of Mine.
   shelf: Shelf;
   server: ServerLibrary;
@@ -37,7 +35,6 @@ type LookFiles = {
 
 export const useLookFiles = create<LookFiles>(() => ({
   mine: [],
-  examples: [],
   shelf: { under: new Map(), elsewhere: [] },
   server: { reached: false, patches: [], presets: [] },
   listProblem: null,
@@ -49,7 +46,7 @@ const reasonOf = (error: unknown) => (error instanceof Error ? error.message : S
 
 type Reading = { doc: Preset | null; error: string | null };
 
-function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, error }: Reading) {
+function lookOf(shared: Shared, entry: LibraryEntry, { doc, error }: Reading) {
   const params = doc && shared.documentOf(doc);
   const flatLook = (doc?.flatLook ?? null) as AnimationState | null;
   return {
@@ -58,7 +55,6 @@ function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, 
     notes: entry.notes,
     group: entry.group,
     modified: entry.modified,
-    isExample,
     familyId: entry.familyId ?? null,
     version: entry.version ?? null,
     wire: entry.wire,
@@ -70,22 +66,22 @@ function lookOf(shared: Shared, entry: LibraryEntry, isExample: boolean, { doc, 
 }
 
 // A file that cannot be read is still listed, with the reason, so it can be seen and deleted.
-async function readLook(shared: Shared, entry: LibraryEntry, isExample: boolean) {
-  if (entry.error) return lookOf(shared, entry, isExample, { doc: null, error: entry.error });
+async function readLook(shared: Shared, entry: LibraryEntry) {
+  if (entry.error) return lookOf(shared, entry, { doc: null, error: entry.error });
   try {
-    return lookOf(shared, entry, isExample, { doc: await shared.readPreset(entry.file, isExample), error: null });
+    return lookOf(shared, entry, { doc: await shared.readPreset(entry.file), error: null });
   } catch (error) {
-    return lookOf(shared, entry, isExample, { doc: null, error: reasonOf(error) });
+    return lookOf(shared, entry, { doc: null, error: reasonOf(error) });
   }
 }
 
 // Each document once, and again when the file changes on disk.
-function readChanged(shared: Shared, entries: LibraryEntry[], known: LookFile[], isExample: boolean) {
+function readChanged(shared: Shared, entries: LibraryEntry[], known: LookFile[]) {
   const byFile = new Map(known.map((look) => [look.file, look]));
   return Promise.all(
     entries.map((entry) => {
       const before = byFile.get(entry.file);
-      return before?.modified === entry.modified ? before : readLook(shared, entry, isExample);
+      return before?.modified === entry.modified ? before : readLook(shared, entry);
     }),
   );
 }
@@ -95,18 +91,14 @@ const folderOf = ({ file, name, familyId, version }: LookFile) => ({ file, name,
 async function readLooks() {
   try {
     const shared = await library();
-    const [{ patches }, { patches: examples }, { presets }] = await Promise.all([
+    const [{ patches }, { presets }] = await Promise.all([
       shared.listLibrary(),
-      shared.listExamples(),
       shared.listPresets(),
     ]);
     const known = useLookFiles.getState();
-    const [mine, shownExamples] = await Promise.all([
-      readChanged(shared, patches, known.mine, false),
-      readChanged(shared, examples, known.examples, true),
-    ]);
+    const mine = await readChanged(shared, patches, known.mine);
     const shelf = shared.shelfOf(mine.map(folderOf), presets, useLookFiles.getState().server);
-    useLookFiles.setState({ mine, examples: shownExamples, shelf, listProblem: null });
+    useLookFiles.setState({ mine, shelf, listProblem: null });
   } catch (error) {
     useLookFiles.setState({ listProblem: `The looks did not load: ${reasonOf(error)}` });
   }

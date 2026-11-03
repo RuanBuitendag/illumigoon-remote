@@ -147,10 +147,10 @@ input::placeholder { color: var(--text-5); }
 .chevron-up { transform: rotate(90deg); }
 .chevron-down { transform: rotate(-90deg); }
 
-.sound-mark { flex: none; display: inline-flex; align-items: flex-end; gap: 1.5px; height: 9px; color: var(--text-4); }
-.sound-mark i { width: 2px; height: 4px; background: currentColor; }
-.sound-mark i:nth-child(2) { height: 9px; }
-.sound-mark i:nth-child(3) { height: 6px; }
+.sound-mark { flex: none; display: inline-flex; align-items: flex-end; gap: 2px; height: 12px; color: var(--text-2); }
+.sound-mark i { width: 3px; height: 5px; background: currentColor; }
+.sound-mark i:nth-child(2) { height: 12px; }
+.sound-mark i:nth-child(3) { height: 8px; }
 
 .status-mark { flex: none; width: 9px; height: 9px; border-radius: 50%; box-shadow: inset 0 0 0 1.5px var(--text-4); }
 .status-mark[data-state='on'] { background: var(--fill); box-shadow: none; }

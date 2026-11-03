@@ -1,0 +1,397 @@
+{
+  "name": "Storm Front",
+  "created": "2026-11-02T20:30:00.000Z",
+  "notes": "Crawling Lightning over a sky. A second, faster die fires short flashes on a coarse noise field that fills the strip, and the flicker sample_hold makes them stutter. The bolts run on their own die, so a bolt sometimes lands inside a flash.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 2.2,
+          "evolve": 0.4
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "100040",
+            "4020d0",
+            "b0a0ff"
+          ],
+          "params": {}
+        }
+      },
+      "blend": "add",
+      "opacity": 0,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 13,
+          "evolve": 0.9
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "000000",
+            "1030ff",
+            "ffffff",
+            "1030ff",
+            "000000",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0.5,
+            "to": 0.5,
+            "soft": 0.04
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 0,
+      "order": 1
+    },
+    "2": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 27,
+          "evolve": 1.7
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "000000",
+            "6030ff",
+            "ffffff",
+            "6030ff",
+            "000000",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0.5,
+            "to": 0.5,
+            "soft": 0.04
+          }
+        }
+      ],
+      "blend": "screen",
+      "opacity": 0,
+      "order": 2
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 1.1
+      }
+    },
+    "1": {
+      "type": "threshold",
+      "params": {
+        "level": 0.45,
+        "hysteresis": 0.5
+      },
+      "source": 0
+    },
+    "2": {
+      "type": "envelope",
+      "params": {
+        "attack": 0.9,
+        "decay": 2.2
+      },
+      "shape": "expo_in",
+      "source": 1
+    },
+    "3": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 0
+      },
+      "source": 1,
+      "sourceOut": 0
+    },
+    "4": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 11
+      }
+    },
+    "5": {
+      "type": "envelope",
+      "params": {
+        "attack": 0.03,
+        "decay": 2.4
+      },
+      "source": 1
+    },
+    "6": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 19
+      }
+    },
+    "7": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 2.3
+      }
+    },
+    "8": {
+      "type": "threshold",
+      "params": {
+        "level": 0.55,
+        "hysteresis": 0.4
+      },
+      "source": 7
+    },
+    "9": {
+      "type": "envelope",
+      "params": {
+        "attack": 0.02,
+        "decay": 1.4
+      },
+      "source": 8
+    }
+  },
+  "matrix": [
+    {
+      "src": 9,
+      "dst": "L0.layer.opacity",
+      "depth": 0.9
+    },
+    {
+      "src": 6,
+      "dst": "L0.layer.opacity",
+      "depth": -0.5,
+      "op": "multiply"
+    },
+    {
+      "src": 5,
+      "dst": "L1.layer.opacity",
+      "depth": 1
+    },
+    {
+      "src": 6,
+      "dst": "L1.layer.opacity",
+      "depth": -0.35,
+      "op": "multiply"
+    },
+    {
+      "src": 5,
+      "dst": "L2.layer.opacity",
+      "depth": 0.8
+    },
+    {
+      "src": 6,
+      "dst": "L2.layer.opacity",
+      "depth": -0.6,
+      "op": "multiply"
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp0.from",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L1.warp0.to",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L2.warp0.from",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": 3,
+      "dst": "L2.warp0.to",
+      "depth": 0.35,
+      "bipolar": true
+    },
+    {
+      "src": 2,
+      "dst": "L1.warp0.from",
+      "depth": -0.85
+    },
+    {
+      "src": 2,
+      "dst": "L1.warp0.to",
+      "depth": 0.85
+    },
+    {
+      "src": 2,
+      "dst": "L2.warp0.from",
+      "depth": -0.6
+    },
+    {
+      "src": 2,
+      "dst": "L2.warp0.to",
+      "depth": 0.6
+    },
+    {
+      "src": 4,
+      "dst": "L1.emitter.offset",
+      "depth": 0.05,
+      "bipolar": true
+    },
+    {
+      "src": 4,
+      "dst": "L2.emitter.offset",
+      "depth": 0.04,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "strikes",
+      "label": "Strikes",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.rate",
+      "lo": 0.3,
+      "hi": 3,
+      "default": 29.6296
+    },
+    {
+      "key": "flashes",
+      "label": "Flashes",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M7.rate",
+      "lo": 0.5,
+      "hi": 5,
+      "default": 40
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 16,
+          "g": 48,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        {
+          "r": 16,
+          "g": 48,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        }
+      ],
+      "target": "L1.palette.entries"
+    },
+    {
+      "key": "sky",
+      "label": "Sky colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 16,
+          "g": 0,
+          "b": 64
+        },
+        {
+          "r": 64,
+          "g": 32,
+          "b": 208
+        },
+        {
+          "r": 176,
+          "g": 160,
+          "b": 255
+        }
+      ],
+      "target": "L0.palette.entries"
+    }
+  ]
+}

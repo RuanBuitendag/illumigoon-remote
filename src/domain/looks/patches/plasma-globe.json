@@ -1,0 +1,208 @@
+{
+  "name": "Plasma Globe",
+  "created": "2026-11-02T20:30:00.000Z",
+  "notes": "Thin noise contours mirrored around the centre and shown through a window. A noise LFO moves the window edge, so the arcs reach out and snap back. A short dense line is the hot core.",
+  "layers": {
+    "0": {
+      "emitter": {
+        "type": "perlin",
+        "params": {
+          "time": 0,
+          "offset": 0,
+          "scale": 9,
+          "evolve": 1.1
+        }
+      },
+      "colour": {
+        "index": "u",
+        "params": {},
+        "palette": {
+          "entries": [
+            "000000",
+            "000000",
+            "c010ff",
+            "ff80f0",
+            "c010ff",
+            "000000",
+            "000000",
+            "000000"
+          ],
+          "params": {}
+        }
+      },
+      "warps": [
+        {
+          "type": "window",
+          "params": {
+            "from": 0,
+            "to": 0.5,
+            "soft": 0.2
+          }
+        },
+        {
+          "type": "mirror",
+          "params": {
+            "centre": 0.5
+          }
+        }
+      ],
+      "blend": "add",
+      "opacity": 1,
+      "order": 0
+    },
+    "1": {
+      "emitter": {
+        "type": "line",
+        "params": {
+          "centre": 0.5,
+          "length": 0.05,
+          "softness": 0.1
+        }
+      },
+      "colour": {
+        "index": "density",
+        "params": {},
+        "palette": {
+          "entries": [
+            "ffffff",
+            "ffc0ff",
+            "ff40e0"
+          ],
+          "params": {}
+        }
+      },
+      "blend": "add",
+      "opacity": 1,
+      "order": 1
+    }
+  },
+  "modulators": {
+    "0": {
+      "type": "lfo",
+      "params": {
+        "rate": 0,
+        "noise": 1,
+        "noiseRate": 0.35
+      }
+    },
+    "1": {
+      "type": "lfo",
+      "wave": "sample_hold",
+      "params": {
+        "rate": 7
+      }
+    }
+  },
+  "matrix": [
+    {
+      "src": 0,
+      "dst": "L0.warp0.to",
+      "depth": 0.45,
+      "bipolar": true
+    },
+    {
+      "src": 1,
+      "dst": "L0.emitter.offset",
+      "depth": 0.03,
+      "bipolar": true
+    },
+    {
+      "src": 0,
+      "dst": "L1.emitter.length",
+      "depth": 0.03,
+      "bipolar": true
+    }
+  ],
+  "surface": [
+    {
+      "key": "speed",
+      "label": "Speed",
+      "type": "slider",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%",
+      "target": "M0.noiseRate",
+      "lo": 0.1,
+      "hi": 1,
+      "default": 27.7778
+    },
+    {
+      "key": "colours",
+      "label": "Colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 192,
+          "g": 16,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 128,
+          "b": 240
+        },
+        {
+          "r": 192,
+          "g": 16,
+          "b": 255
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        },
+        {
+          "r": 0,
+          "g": 0,
+          "b": 0
+        }
+      ],
+      "target": "L0.palette.entries"
+    },
+    {
+      "key": "colours_2",
+      "label": "Second colours",
+      "group": "Colour",
+      "type": "palette",
+      "min": 2,
+      "max": 8,
+      "default": [
+        {
+          "r": 255,
+          "g": 255,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 192,
+          "b": 255
+        },
+        {
+          "r": 255,
+          "g": 64,
+          "b": 224
+        }
+      ],
+      "target": "L1.palette.entries"
+    }
+  ]
+}
