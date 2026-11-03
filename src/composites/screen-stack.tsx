@@ -1,5 +1,5 @@
 import { useSyncExternalStore, type ReactNode } from 'react';
-import { BackKey, OptionRow, TextKey } from '../design-system';
+import { BackKey, OptionRow, TextKey, WIDE } from '../design-system';
 
 type ScreenStackProps = {
   home: ReactNode;
@@ -11,8 +11,6 @@ type ScreenStackProps = {
   // A page that takes the whole window on a laptop.
   isPageWide: boolean;
 };
-
-const WIDE = '(min-width: 900px)';
 
 function listenToWidth(onChange: () => void) {
   const query = window.matchMedia(WIDE);

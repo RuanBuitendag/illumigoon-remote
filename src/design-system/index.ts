@@ -19,6 +19,7 @@ export { STARTER_COLOUR_SETS } from './colour-sets';
 export { useDragOrder } from './drag-order';
 export { Fader } from './fader';
 export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
+export { WIDE } from './layout';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';

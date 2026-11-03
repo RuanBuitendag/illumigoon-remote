@@ -8,6 +8,8 @@
 //   - The editor's style sheet takes every colour from the tokens.
 //   - Type comes only from the tokens, in composites, the design system and the editor.
 //   - Spacing, row heights and corners come only from the tokens in composites.
+//   - Layers, opacity, motion and line widths come only from the tokens in composites and the design system.
+//   - Every media query width in the app and the editor is the --wide token.
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -57,6 +59,12 @@ const BARE_WEIGHT = /(?<![\w.-])[1-9]00\b/;
 const TYPE_PROPERTY = /(?:^|[;{\s])(font|font-size|font-weight|line-height|letter-spacing)\s*:\s*([^;}]+)/g;
 const SPACE_PROPERTY =
   /(?:^|[;{\s])(gap|row-gap|column-gap|margin(?:-\w+)?|padding(?:-\w+)?|min-height|border-radius)\s*:\s*([^;}]+)/g;
+const BORDER_PROPERTY = /(?:^|[;{\s])(border(?:-top|-right|-bottom|-left)?(?:-width)?|outline(?:-width)?)\s*:\s*([^;}]+)/g;
+const LAYER_PROPERTY = /(?:^|[;{\s])(z-index|opacity)\s*:\s*([^;}]+)/g;
+const MOTION_PROPERTY = /(?:^|[;{\s])((?:transition|animation)(?:-duration|-delay|-timing-function)?)\s*:\s*([^;}]+)/g;
+const RAW_NUMBER = /^(?!0$|1$)\d*\.?\d+$/;
+const RAW_MOTION = /(?<![\w.-])(?!0m?s\b)\d*\.?\d+m?s\b|cubic-bezier\(/;
+const MEDIA_WIDTH = /\((min|max)-width:\s*(\d+)px\)/g;
 const INLINE_TYPE = /\b(font|fontSize|fontWeight|letterSpacing|lineHeight)\s*:\s*['"]?\.?\d[^,}\n]*/g;
 const TOKENS_END = /^\* \{/m;
 
@@ -83,6 +91,35 @@ function checkTokens(file, pattern, rule, from = 0) {
   }
 }
 
+// Reports a declaration whose value `isRaw` says the tokens should hold.
+function checkValues(file, pattern, rule, isRaw, from = 0) {
+  const text = fs.readFileSync(file, 'utf8');
+  for (const match of text.slice(from).matchAll(pattern)) {
+    const [, property, value] = match;
+    if (isRaw(value.trim())) {
+      report(file, lineOf(text, from + match.index), rule, `${property}: ${value.trim()}: use a token from design-system.css`);
+    }
+  }
+}
+
+function checkGeometry(file, from = 0) {
+  checkValues(file, BORDER_PROPERTY, 'raw-line', (value) => LITERAL.test(value), from);
+  checkValues(file, LAYER_PROPERTY, 'raw-layer', (value) => RAW_NUMBER.test(value), from);
+  checkValues(file, MOTION_PROPERTY, 'raw-motion', (value) => RAW_MOTION.test(value), from);
+}
+
+// A media query cannot read a custom property, so each width must be --wide, or one pixel under it.
+const WIDE = Number(/--wide:\s*(\d+)px/.exec(fs.readFileSync(`${SOURCE}/design-system/design-system.css`, 'utf8'))[1]);
+function checkMediaWidths(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  for (const match of text.matchAll(MEDIA_WIDTH)) {
+    const [query, side, width] = match;
+    if (Number(width) !== (side === 'min' ? WIDE : WIDE - 1)) {
+      report(file, lineOf(text, match.index), 'raw-width', `${query}: the laptop width is --wide, ${WIDE}px`);
+    }
+  }
+}
+
 function checkInlineType(file) {
   runChecks(file, [['raw-type', INLINE_TYPE, 'use a type token from design-system.css']]);
 }
@@ -93,9 +130,12 @@ function checkCss(file, layer) {
     runChecks(file, [CSS_RAW_COLOUR]);
     checkTokens(file, TYPE_PROPERTY, 'raw-type');
     checkTokens(file, SPACE_PROPERTY, 'raw-spacing');
+    checkGeometry(file);
   }
   if (layer === 'design-system') {
-    checkTokens(file, TYPE_PROPERTY, 'raw-type', fs.readFileSync(file, 'utf8').search(TOKENS_END));
+    const tokensEnd = fs.readFileSync(file, 'utf8').search(TOKENS_END);
+    checkTokens(file, TYPE_PROPERTY, 'raw-type', tokensEnd);
+    checkGeometry(file, tokensEnd);
   }
 }
 
@@ -106,12 +146,14 @@ for (const file of walk(SOURCE)) {
   else if (!layer) report(file, 1, 'outside-the-layers', `move it into ${LAYERS.join(', ')}`);
   else if (file.endsWith('.css')) checkCss(file, layer);
   else if (/\.tsx?$/.test(file)) runChecks(file, CODE_CHECKS[layer]);
+  if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);
 }
 
 runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);
 checkTokens(EDITOR_STYLES, TYPE_PROPERTY, 'raw-type');
 for (const file of walk(EDITOR_SOURCE)) {
   if (file.endsWith('.tsx')) checkInlineType(file);
+  if (/\.(css|tsx?)$/.test(file) && !file.includes('/generated/')) checkMediaWidths(file);
 }
 
 for (const layer of ['design-system', 'composites']) {
