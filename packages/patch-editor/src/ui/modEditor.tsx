@@ -1,6 +1,7 @@
 /** The sheet that edits one modulator. */
 
 import { WIRE_LABELS } from '../domain/presentation';
+import { Icon } from '../../../../src/design-system';
 import { useRef, type ReactNode } from 'react';
 import {
   requireNode,
@@ -18,7 +19,7 @@ import {
   type Patch,
 } from '../domain/patch'
 import {
-  Hr, Lab, Mono, Blurb, Seg, Ico, Switch, StructField, depthAfterDrag, fineOf, type DragRange,
+  Hr, Lab, Mono, Blurb, Seg, Switch, StructField, depthAfterDrag, fineOf, type DragRange,
   layerName,
   pathName,
   slotNumber,
@@ -107,7 +108,7 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
             onClose()
           }}
         >
-          <Ico.X />
+          <Icon.X />
         </button>
       </div>
     </div>
@@ -397,7 +398,7 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
                       onClick={() => { if (slotSwings) ctl.togglePolarity(r.id); }}>
                 {r.bipolar && slotSwings ? '±' : '+'}
               </button>
-              <button title="Unbind" onClick={() => ctl.removeRow(r.id)}><Ico.X /></button>
+              <button title="Unbind" onClick={() => ctl.removeRow(r.id)}><Icon.X /></button>
             </div>
           );
         })}

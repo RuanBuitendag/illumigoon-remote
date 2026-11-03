@@ -15,7 +15,8 @@ import {
   type MatrixRow,
 } from '../domain/patch'
 import {
-  Hr, Lab, Mono, Ico, Switch, pathName, slotNumber, } from './bits';
+  Hr, Lab, Mono, Switch, pathName, slotNumber, } from './bits';
+import { Icon } from '../../../../src/design-system';
 import { EditorSheet } from './Sheet';
 import type { Ctl } from './ctl';
 import { M } from './dock';
@@ -33,7 +34,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 
   return (
     <EditorSheet
-      icon={<Ico.Link />}
+      icon={<Icon.Link />}
       title="MODULATION MATRIX"
       onClose={onClose}
       detail={
@@ -156,7 +157,7 @@ function MatrixRoute({
         <span style={{ font: 'var(--type-note)', color: 'var(--text-1)' }}>{label}</span>
       </div>
       <div className="row" style={{ width: 26 }}>
-        <Ico.Arrow />
+        <Icon.Arrow />
       </div>
       <div className="col" style={{ width: 236, gap: 'var(--space-2)' }}>
         <span className="dst" style={{ color: 'var(--text-1)' }}>
@@ -285,7 +286,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
           })
         }
       >
-        <Ico.X />
+        <Icon.X />
       </button>
     </div>
   )

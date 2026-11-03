@@ -20,6 +20,7 @@
  */
 
 import { useState, type CSSProperties, type DragEvent } from 'react';
+import { Icon } from '../../../../src/design-system';
 import { LIMITS } from '../domain/catalog';
 import { specForPath, type Patch } from '../domain/patch';
 import {
@@ -31,7 +32,7 @@ import {
   whyDropped,
 } from '../domain/surface';
 import { type Control } from '../domain/control';
-import { Blurb, Hr, Ico, Lab, Mono, RowGrip, pathName, slotNumber } from './bits';
+import { Blurb, Hr, Lab, Mono, RowGrip, pathName, slotNumber } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 
 // ---------------------------------------------------------------- exposing
@@ -276,7 +277,7 @@ function SectionHead({
           title={`Delete the ${name} section — its controls become ungrouped`}
           onClick={() => onDelete(name)}
         >
-          <Ico.X />
+          <Icon.X />
         </button>
       )}
     </div>
@@ -340,7 +341,7 @@ function AddSection({ taken, onAdd }: { taken: readonly string[]; onAdd(name: st
         style={{ justifyContent: 'center' }}
         onClick={() => setNaming('')}
       >
-        <Ico.Plus c="var(--text-5)" />
+        <Icon.Plus c="var(--text-5)" />
         <Lab className="dim">Section</Lab>
       </button>
     );
@@ -517,7 +518,7 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
 
         {kept.length < cap && (
           <button className="ghostrow well" style={{ justifyContent: 'center' }} onClick={onAdd}>
-            <Ico.Plus c="var(--text-5)" />
+            <Icon.Plus c="var(--text-5)" />
             <Lab className="dim">Control</Lab>
           </button>
         )}

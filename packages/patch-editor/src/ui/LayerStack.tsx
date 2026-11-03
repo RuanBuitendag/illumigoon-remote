@@ -1,7 +1,7 @@
 /** The layer stack: every layer of the patch, and the master row above them. */
 
 import { useState } from 'react';
-import { Picked } from '../../../../src/design-system';
+import { Icon, Picked } from '../../../../src/design-system';
 import { LIMITS, requireParam, blendModes, globalParam } from '../domain/catalog';
 import { BLEND_BLURBS } from '../domain/presentation';
 import { makeLayer, pathOf, reachFrom, type Layer } from '../domain/patch';
@@ -11,7 +11,7 @@ import {
 } from '../domain/layerops';
 import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Ico, RowGrip, layerName, layerNumber } from './bits';
+import { Hr, Lab, Mono, RowGrip, layerName, layerNumber } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
@@ -181,7 +181,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
               })
             }
           >
-            <Ico.Plus c={freeSlot === undefined ? 'var(--text-5)' : 'var(--text-4)'} />
+            <Icon.Plus c={freeSlot === undefined ? 'var(--text-5)' : 'var(--text-4)'} />
           </button>
         </div>
       </div>
@@ -219,7 +219,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
               })
             }
           >
-            <Ico.Plus c="var(--text-5)" />
+            <Icon.Plus c="var(--text-5)" />
             <Lab className="dim">Add layer</Lab>
           </div>
         )}
@@ -232,7 +232,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
             onClick={acts.paste}
             title={`A copy of ${layerName(ctl.clip.from)}, with the modulators that drove it`}
           >
-            <Ico.Copy />
+            <Icon.Copy />
             <Lab className="dim">Paste {ctl.clip.label}</Lab>
           </div>
         )}
@@ -242,7 +242,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
           onClick={onFragments}
           title="Save this layer as a fragment, or pull one into the patch"
         >
-          <Ico.Copy />
+          <Icon.Copy />
           <Lab className="dim">Fragments</Lab>
         </div>
 
@@ -292,7 +292,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
       <Picked isOn={on} edge="side" />
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <span style={{ width: 35, display: 'flex', justifyContent: 'flex-end' }}>
-          <Ico.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
+          <Icon.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
         </span>
         <span
           className="name grow"
@@ -393,7 +393,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
               acts.copy(L.slot);
             }}
           >
-            <Ico.Copy />
+            <Icon.Copy />
           </button>
           <button
             title={`Duplicate ${layerName(L.slot)} — the copy is driven by the same modulators`}
@@ -402,7 +402,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
               acts.duplicate(L.slot);
             }}
           >
-            <Ico.Dup />
+            <Icon.Dup />
           </button>
           <button
             title={`Remove ${layerName(L.slot)}, its rows and any modulator left driving nothing — paste ` +
@@ -412,7 +412,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
               acts.remove(L.slot);
             }}
           >
-            <Ico.X />
+            <Icon.X />
           </button>
         </div>
         <div className="row" style={{ gap: 'var(--space-2)' }}>

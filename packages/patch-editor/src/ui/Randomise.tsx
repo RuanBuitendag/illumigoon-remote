@@ -14,7 +14,8 @@
  * the white primary pill; the current history entry is outlined in white like any selection.
  */
 
-import { Blurb, Hr, Ico, Lab, Mono } from './bits';
+import { Blurb, Hr, Lab, Mono } from './bits';
+import { Icon } from '../../../../src/design-system';
 import { Fader } from './Fader';
 import type { ReactNode } from 'react';
 import type { ParamSpec } from '../domain/catalog';
@@ -99,12 +100,12 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
           }
           onClick={() => onRoll({ ...opts, only: undefined })}
         >
-          <Ico.Dice c="var(--background)" />
+          <Icon.Dice c="var(--background)" />
           {opts.keep.length ? 'ROLL UNLOCKED' : 'ROLL'}
         </button>
-        <StepButton can={back} title="The roll before this one" Icon={Ico.Back}
+        <StepButton can={back} title="The roll before this one" Icon={Icon.Back}
                     onClick={() => onStep(history.at - 1)} />
-        <StepButton can={fwd} title="The roll after this one" Icon={Ico.Fwd}
+        <StepButton can={fwd} title="The roll after this one" Icon={Icon.Fwd}
                     onClick={() => onStep(history.at + 1)} />
       </div>
 
@@ -132,7 +133,7 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
         onClick={onSave}
         title="Save this patch to the library"
       >
-        <Ico.Folder />
+        <Icon.Folder />
         <Lab className="mid">Save to library</Lab>
       </button>
     </div>
@@ -357,7 +358,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
         }
         onClick={onToggle}
       >
-        {on ? <Ico.Lock c="var(--text-1)" /> : <Ico.Unlock />}
+        {on ? <Icon.Lock c="var(--text-1)" /> : <Icon.Unlock />}
       </button>
       <span
         style={{
@@ -378,7 +379,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
         title={`Roll only ${LABEL[part].toLowerCase()}, keeping everything else`}
         onClick={onRollOnly}
       >
-        <Ico.Dice s={12} c="var(--text-4)" />
+        <Icon.Dice s={12} c="var(--text-4)" />
       </button>
     </div>
   );

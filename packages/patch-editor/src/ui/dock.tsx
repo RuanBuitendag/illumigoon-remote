@@ -1,6 +1,7 @@
 /** The modulator bar along the bottom, and the matrix as a list. */
 
 import { useEffect, useRef, type PointerEvent, type ReactNode } from 'react';
+import { Icon } from '../../../../src/design-system';
 import { useLatest } from './useLatest';
 import {
   LIMITS,
@@ -14,7 +15,7 @@ import {
   type Patch,
   } from '../domain/patch'
 import {
-  Lab, Mono, Ico, ModIcon, RackToggle, slotNumber,
+  Lab, Mono, ModIcon, RackToggle, slotNumber,
   } from './bits';
 import { onFrame, sample } from './live';
 import { useCollapsed } from './collapsed';
@@ -159,7 +160,7 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
       {/* An arrow rather than a bare number: `5` beside a slot number and a TRG badge is a
           third integer with nothing saying which way it points. */}
       {drives > 0 && <span className="reach">→{drives}</span>}
-      <Ico.Grip />
+      <Icon.Grip />
     </div>
   )
 }
@@ -324,7 +325,7 @@ export function AddSlot({ slot, what, onAdd, played }: {
   return (
     <div className="emptyslot well" data-played={played || undefined}
          title={`Add a ${what}`} onClick={() => onAdd(slot)}>
-      <Ico.Plus c="var(--text-5)" />
+      <Icon.Plus c="var(--text-5)" />
     </div>
   );
 }
@@ -387,7 +388,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
             style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
             onClick={onOpenMatrix}
           >
-            <Ico.Link />
+            <Icon.Link />
             <Lab className="mid">Matrix</Lab>
             <Mono className="dim sm">
               {ctl.patch.matrix.length} / {LIMITS().MATRIX}

@@ -226,10 +226,7 @@ input::placeholder { color: var(--text-5); }
 
 /* Marks */
 
-.mark { flex: none; display: block; }
-.chevron-right { transform: rotate(180deg); }
-.chevron-up { transform: rotate(90deg); }
-.chevron-down { transform: rotate(-90deg); }
+.icon { flex: none; }
 
 .sound-mark { flex: none; display: inline-flex; align-items: flex-end; gap: 1.5px; height: 9px; color: var(--text-4); }
 .sound-mark i { width: 2px; height: 4px; background: currentColor; }

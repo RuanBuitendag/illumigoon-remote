@@ -1,4 +1,4 @@
-import { ChevronMark, ColourFill, Eyebrow, gradientOf, hexToColour, Picked, Press } from '../design-system';
+import { ColourFill, Eyebrow, gradientOf, hexToColour, Icon, Picked, Press } from '../design-system';
 
 export type ColourSet = { id: string; name: string; family: string; colours: string[] };
 
@@ -34,7 +34,7 @@ export function CurrentPalette({ label, colours, ownName, sets, maxColours, isOp
       <ColourFill className="palette-bar" paint={paintOf(colours)} />
       <span className="palette-current-name">
         {name}
-        <ChevronMark direction={isOpen ? 'up' : 'down'} />
+        <Icon.Chev c="currentColor" isUp={isOpen} />
       </span>
     </Press>
   );

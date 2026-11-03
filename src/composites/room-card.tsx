@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ChevronMark, LinkKey, LockMark, Press, SoundMark, StatusMark } from '../design-system';
+import { Icon, LinkKey, Press, SoundMark, StatusMark } from '../design-system';
 
 type RoomCardProps = {
   name: string;
@@ -28,7 +28,7 @@ export function RoomCard(card: RoomCardProps) {
       <Press className="room-open" label={`Open ${card.name}`} disabled={!card.onOpen} onClick={card.onOpen ?? noop}>
         <span className="room-heading">
           <span className="room-name">{card.name}</span>
-          <ChevronMark direction="right" />
+          <Icon.Fwd c="currentColor" />
         </span>
         <span className="room-lights">
           {card.lightStates.map(({ id, name, state }) => (
@@ -51,7 +51,7 @@ export function RoomCard(card: RoomCardProps) {
         {card.onLooks && (
           <span className="key-text room-look-key">
             LOOKS
-            <ChevronMark direction="right" />
+            <Icon.Fwd c="currentColor" />
           </span>
         )}
       </Press>
@@ -73,7 +73,7 @@ type LockNoteProps = { text: string; actionLabel: string; onAction: () => void }
 export function LockNote({ text, actionLabel, onAction }: LockNoteProps) {
   return (
     <p className="note lock-note">
-      <LockMark />
+      <Icon.Lock c="currentColor" />
       <span>
         {text} · <LinkKey onClick={onAction}>{actionLabel}</LinkKey>
       </span>

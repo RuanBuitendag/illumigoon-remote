@@ -1,7 +1,7 @@
 import { Switch } from '@base-ui/react/switch';
 import { useRef, type ReactNode } from 'react';
 import { useHold } from './hold';
-import { ChevronMark } from './marks';
+import { Icon } from './icons';
 import { Picked } from './text';
 
 type PressProps = {
@@ -57,7 +57,7 @@ export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'i
   return (
     <button type="button" className="action-key" disabled={disabled} onClick={onClick}>
       {children}
-      <ChevronMark direction="right" />
+      <Icon.Fwd c="currentColor" />
     </button>
   );
 }
@@ -110,7 +110,7 @@ export function AddKey({ children, onClick }: WordKeyProps) {
 export function BackKey({ label, onClick }: { label: string; onClick: () => void }) {
   return (
     <button type="button" className="back-key" onClick={onClick}>
-      <ChevronMark direction="left" />
+      <Icon.Back c="currentColor" />
       {label}
     </button>
   );

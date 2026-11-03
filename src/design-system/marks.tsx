@@ -8,40 +8,6 @@ export function SoundMark() {
   );
 }
 
-export function LockMark() {
-  return (
-    <svg className="mark" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true">
-      <rect x="1" y="6" width="10" height="7" fill="currentColor" />
-      <path d="M3 6V4a3 3 0 0 1 6 0v2" fill="none" stroke="currentColor" strokeWidth="1.4" />
-    </svg>
-  );
-}
-
-export function ChevronMark({ direction }: { direction: 'left' | 'right' | 'up' | 'down' }) {
-  return (
-    <svg className={`mark chevron-${direction}`} width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
-      <path d="M8 2 2 8l6 6" fill="none" stroke="currentColor" strokeWidth="1.5" />
-    </svg>
-  );
-}
-
-export function GripMark() {
-  return (
-    <svg className="mark" width="10" height="16" viewBox="0 0 10 16" aria-hidden="true">
-      <path d="M2 2h2v2H2zM6 2h2v2H6zM2 7h2v2H2zM6 7h2v2H6zM2 12h2v2H2zM6 12h2v2H6z" fill="currentColor" />
-    </svg>
-  );
-}
-
 export function StatusMark({ state }: { state: 'on' | 'off' | 'silent' }) {
   return <i className="status-mark" data-state={state} />;
-}
-
-// The way out of a sheet.
-export function CrossMark() {
-  return (
-    <svg className="mark" width="9" height="9" viewBox="0 0 9 9" aria-hidden="true">
-      <path d="M1 1l7 7M8 1l-7 7" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-    </svg>
-  );
 }

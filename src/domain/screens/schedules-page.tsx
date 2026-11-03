@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { DayPicker, InfoRow, PageFrame, PageHint, PageSection, SelectRow } from '../../composites';
-import { ActionKey, AddKey, ChevronMark, Eyebrow, PowerKey, TextField, TextKey } from '../../design-system';
+import { ActionKey, AddKey, Eyebrow, Icon, PowerKey, TextField, TextKey } from '../../design-system';
 import { removeSchedule, setScheduleEnabled, writeSchedule, type Light } from '../store/fleet-store';
 import type { ScheduleChange, ScheduleEntry } from '../light-network/protocol';
 import { useLibrary } from '../store/library-store';
@@ -269,7 +269,7 @@ function UnableNote({ room, names }: { room: Room; names: string[] }) {
       <PageHint>{unableText(names)}</PageHint>
       <TextKey onClick={() => openSettingsPage('software', room.id)}>
         LIGHT SOFTWARE
-        <ChevronMark direction="right" />
+        <Icon.Fwd c="currentColor" />
       </TextKey>
     </PageSection>
   );

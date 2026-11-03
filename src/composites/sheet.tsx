@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { CrossMark, Dialog, Eyebrow, Press } from '../design-system';
+import { Dialog, Eyebrow, Icon, Press } from '../design-system';
 
 type SheetProps = {
   // Names the sheet in its head, and to a screen reader.
@@ -29,7 +29,7 @@ export function Sheet({ label, icon, detail, actions, isWide, children, onClose 
           {detail}
           {actions ?? (
             <Press className="sheet-close" label="Close" onClick={onClose}>
-              <CrossMark />
+              <Icon.X c="currentColor" />
             </Press>
           )}
         </div>

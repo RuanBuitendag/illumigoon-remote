@@ -1,13 +1,13 @@
 /** The inspector bodies of a layer's colour and the master colour. */
 
 import type { ReactNode } from 'react';
-import { Swatch } from '../../../../src/design-system';
+import { Icon, Swatch } from '../../../../src/design-system';
 import { LIMITS, requireNode, colourIndices } from '../domain/catalog';
 import { DEAL_BLURBS, INDEX_BLURBS } from '../domain/presentation';
 import { pathOf, type Layer } from '../domain/patch';
 import { DEAL_COUNTS, DEAL_MODES } from '../domain/masterColour';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Seg, Ico, Switch, Blurb } from './bits';
+import { Hr, Lab, Mono, Seg, Switch, Blurb } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { exposeProps } from './Surface';
 import { Param } from './Param';
@@ -80,7 +80,7 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
           title="Palette store — save this one, or recall another"
           onClick={onBrowse}
         >
-          <Ico.Folder />
+          <Icon.Folder />
         </button>
       )}
       {/* Disabled at PALETTE_NEW, not at PALETTE. A palette that arrived longer than
@@ -97,7 +97,7 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
           }
           onClick={onAdd}
         >
-          <Ico.Plus />
+          <Icon.Plus />
         </button>
       )}
     </div>
@@ -198,7 +198,7 @@ function PaletteStops({
                 style={{ opacity: entries.length <= 1 ? 'var(--opacity-behind)' : 1 }}
                 onClick={() => onChange(entries.filter((_, j) => j !== i))}
               >
-                <Ico.X />
+                <Icon.X />
               </button>
             )}
           </div>
@@ -242,7 +242,7 @@ export function MasterColourBody({
               title="Reshuffle — every layer draws again"
               onClick={() => reshuffle(ctl)}
             >
-              <Ico.Dice />
+              <Icon.Dice />
             </button>
           )}
         </div>

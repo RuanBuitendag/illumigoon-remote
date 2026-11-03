@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { BLACK_HEX, ChevronMark, ColourFill, ColourSlot, KeyRow, Press, TextKey } from '../design-system';
+import { BLACK_HEX, ColourFill, ColourSlot, Icon, KeyRow, Press, TextKey } from '../design-system';
 import { ColourPicker } from './colour-picker';
 import { HeadingRow } from './control-rows';
 import { NamingRow } from './naming-row';
@@ -61,10 +61,10 @@ function SlotKeys({ count, canArrange, canRemove, selected, copied, onCopy, onPa
       {canArrange && (
         <>
           <TextKey disabled={selected === 0} onClick={() => onMove(-1)}>
-            <ChevronMark direction="left" />
+            <Icon.Back c="currentColor" />
           </TextKey>
           <TextKey disabled={selected === count - 1} onClick={() => onMove(1)}>
-            <ChevronMark direction="right" />
+            <Icon.Fwd c="currentColor" />
           </TextKey>
           <TextKey disabled={!canRemove} onClick={onRemove}>
             REMOVE
@@ -230,7 +230,7 @@ function PaletteChoices({ field, sets, onApply, onKeep, onChangeColours }: Palet
           heading={
             <TextKey onClick={onChangeColours}>
               CHANGE COLOURS
-              <ChevronMark direction="right" />
+              <Icon.Fwd c="currentColor" />
             </TextKey>
           }
         >
@@ -297,7 +297,7 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
         {step === 'colours' && (
           <>
             <TextKey onClick={() => goTo({ key, step: 'palettes' })}>
-              <ChevronMark direction="left" />
+              <Icon.Back c="currentColor" />
               OTHER PALETTES
             </TextKey>
             {details(field)}

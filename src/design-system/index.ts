@@ -24,6 +24,7 @@ export { WIDE } from './layout';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
-export { ChevronMark, CrossMark, GripMark, LockMark, SoundMark, StatusMark } from './marks';
+export { Icon, IconFrame } from './icons';
+export { SoundMark, StatusMark } from './marks';
 export { Eyebrow, Picked, ValueText } from './text';
 export { TextArea, TextField } from './text-field';

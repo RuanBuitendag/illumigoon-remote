@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, GripMark, LockMark, Picked, Press, TextField } from '../design-system';
+import { BackKey, Icon, Picked, Press, TextField } from '../design-system';
 
 type PageFrameProps = {
   title: string;
@@ -68,7 +68,7 @@ export function DayPicker({ days, onToggle }: DayPickerProps) {
 export function LockStatus({ children }: { children: ReactNode }) {
   return (
     <p className="page-status">
-      <LockMark />
+      <Icon.Lock c="currentColor" />
       {children}
     </p>
   );
@@ -96,7 +96,7 @@ export function ArrangeRow({ name, maxLength, hasGrip, onRename, action }: Arran
     <div className="arrange-row">
       {hasGrip && (
         <span className="arrange-grip">
-          <GripMark />
+          <Icon.Grip />
         </span>
       )}
       <TextField size="small" label={`Name of ${name}`} maxLength={maxLength} defaultValue={name} onLeave={onRename} />

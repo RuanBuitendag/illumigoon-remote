@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { BackKey, ChevronMark, Eyebrow, KeyRow, Picked, Press, TextKey } from '../design-system';
+import { BackKey, Eyebrow, Icon, KeyRow, Picked, Press, TextKey } from '../design-system';
 import { HeadingRow } from './control-rows';
 
 type RoomLayoutProps = {
@@ -39,7 +39,7 @@ export function LookHeading({ name, onReset, onEdit, onLooks }: LookHeadingProps
         {onEdit && <TextKey onClick={onEdit}>EDIT</TextKey>}
         <TextKey onClick={onLooks}>
           LOOKS
-          <ChevronMark direction="right" />
+          <Icon.Fwd c="currentColor" />
         </TextKey>
       </KeyRow>
     </div>
@@ -96,7 +96,7 @@ export function MoreRow({ label, note, onOpen }: MoreRowProps) {
         <span className="more-label">{label}</span>
         {note && <span className="note">{note}</span>}
       </span>
-      <ChevronMark direction="right" />
+      <Icon.Fwd c="currentColor" />
     </Press>
   );
 }

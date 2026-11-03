@@ -1,6 +1,7 @@
 /** The sheet that edits one control of the user surface. */
 
 import { useState } from 'react';
+import { Icon } from '../../../../src/design-system';
 import { LIMITS, type ParamSpec } from '../domain/catalog';
 import { readPath, type Patch } from '../domain/patch';
 import {
@@ -14,7 +15,7 @@ import {
   whyDropped,
 } from '../domain/surface';
 import { type Control } from '../domain/control';
-import { Blurb, Ico, Lab, Mono, Seg, Switch } from './bits';
+import { Blurb, Lab, Mono, Seg, Switch } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { format } from './Knob';
 import { words, num, arrange, Catch, placed } from './Surface';
@@ -450,7 +451,7 @@ function SectionField({ d, set, groups }: {
             title="Pick an existing section"
             onClick={() => set({ newGroup: null })}
           >
-            <Ico.X />
+            <Icon.X />
           </button>
         </div>
       )}

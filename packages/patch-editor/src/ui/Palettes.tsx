@@ -17,13 +17,14 @@
 import {
   attempt, confirmDelete, confirmReplace, SaveBar, SaveField, EditorSheet, ShelfHeading,
 } from './Sheet';
+import { Icon } from '../../../../src/design-system';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { LIMITS } from '../domain/catalog';
 import {
   deletePalette, gradientOf, listPalettes, paletteFileNameFor, paletteId,
   toPaletteDoc, writePalette, type PaletteEntry,
 } from '../library/palettes';
-import { Hr, Lab, Mono, Ico, Blurb } from './bits';
+import { Hr, Lab, Mono, Blurb } from './bits';
 import type { Ctl } from './ctl';
 
 interface Section {
@@ -207,7 +208,7 @@ export function PaletteSheet({ ctl, where, entries, wrap, onRecall, onClose }: {
 
   return (
     <EditorSheet
-      icon={<Ico.Folder />}
+      icon={<Icon.Folder />}
       title="PALETTES"
       onClose={onClose}
       detail={
@@ -389,9 +390,9 @@ function PaletteRow({ e, odd, here, where, onRecall, onCopy, onDrop }: {
     <div className="row libacts" style={{ width: 128, justifyContent: 'flex-end', gap: 'var(--space-3)' }}>
       <button className="pill" disabled={!!e.error || !e.entries.length}
               onClick={() => onRecall(e.entries, e.name)}>RECALL</button>
-      <button title="Copy the entries as JSON" onClick={() => onCopy(e)}><Ico.Copy /></button>
+      <button title="Copy the entries as JSON" onClick={() => onCopy(e)}><Icon.Copy /></button>
       {e.file
-        ? <button title="Delete from the disk" onClick={() => onDrop(e)}><Ico.X /></button>
+        ? <button title="Delete from the disk" onClick={() => onDrop(e)}><Icon.X /></button>
         // Not a disabled delete: a derived or shipped palette has no file to delete.
         : <span style={{ width: 9 }} title={e.sources && 'lifted from a patch — save it to keep it'} />}
     </div>

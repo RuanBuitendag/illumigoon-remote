@@ -1,11 +1,11 @@
 /** The centre column: the signal chain of a layer or of the mix. */
 
 import { useState, type DragEvent, type HTMLAttributes, type ReactNode } from 'react';
-import { Picked } from '../../../../src/design-system';
+import { Icon, Picked } from '../../../../src/design-system';
 import { LIMITS, nodeById, requireParam, globalParam, GLOBAL_NODE } from '../domain/catalog';
 import { makeWarp, pathOf, type Layer, type Warp } from '../domain/patch';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Tabs, Ico, Switch, Blurb, RackToggle, RowGrip, layerName } from './bits';
+import { Hr, Lab, Mono, Tabs, Switch, Blurb, RackToggle, RowGrip, layerName } from './bits';
 import { Stages } from './Stages';
 import { useCollapsed } from './collapsed';
 import { unlessReached, type Ctl, type Tab } from './ctl';
@@ -367,7 +367,7 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
         <div className="row" style={{ gap: 'var(--space-2)' }}>
           {crumb.map((s, i) => (
             <span key={s} className="row" style={{ gap: 'var(--space-2)' }}>
-              {i > 0 && <Ico.Arrow w={12} />}
+              {i > 0 && <Icon.Arrow w={12} />}
               <Lab className={lit.includes(s) ? 'mid' : 'dim'}>{s}</Lab>
             </span>
           ))}
@@ -490,7 +490,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
         <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
           —
         </span>
-        <Ico.Plus c="var(--text-5)" />
+        <Icon.Plus c="var(--text-5)" />
       </div>
     );
   }
@@ -524,7 +524,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
           onRemove();
         }}
       >
-        <Ico.X />
+        <Icon.X />
       </button>
     </div>
   );
@@ -623,7 +623,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
         <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
           —
         </span>
-        <Ico.Plus c="var(--text-5)" />
+        <Icon.Plus c="var(--text-5)" />
       </div>
     );
   }
@@ -649,7 +649,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
             reshuffle(ctl);
           }}
         >
-          <Ico.Dice />
+          <Icon.Dice />
         </button>
       )}
       <button
@@ -660,7 +660,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
           ctl.say(`every layer has its own palette back${unlessReached(reached)}`);
         }}
       >
-        <Ico.X />
+        <Icon.X />
       </button>
     </ColourRow>
   );

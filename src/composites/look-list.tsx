@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { ChevronMark, Eyebrow, Press, SoundMark, TextField } from '../design-system';
+import { Eyebrow, Icon, Press, SoundMark, TextField } from '../design-system';
 import { HeadingRow } from './control-rows';
 
 type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void };
@@ -128,7 +128,7 @@ export function WhichLine({ text, onClick }: { text: string; onClick: () => void
   return (
     <Press className="which-line" onClick={onClick}>
       {text}
-      <ChevronMark direction="right" />
+      <Icon.Fwd c="currentColor" />
     </Press>
   );
 }

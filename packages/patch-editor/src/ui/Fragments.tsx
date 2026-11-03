@@ -22,6 +22,7 @@
 import {
   attempt, confirmDelete, confirmReplace, SaveBar, SaveField, EditorSheet, ShelfHeading, ShelfNotice,
 } from './Sheet';
+import { Icon } from '../../../../src/design-system';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   captureLayer, fromFragment, insertFragment, toFragment, whyNotFit, whyNotFitCounts,
@@ -30,7 +31,7 @@ import {
 import {
   deleteFragment, fragmentFileNameFor, listFragments, listStarters, readFragment, writeFragment,
 } from '../library/fragment-store';
-import { Hr, Lab, Mono, Ico, layerName } from './bits';
+import { Hr, Lab, Mono, layerName } from './bits';
 import type { Layer } from '../domain/patch';
 import type { Ctl } from './ctl';
 
@@ -249,7 +250,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 
   return (
     <EditorSheet
-      icon={<Ico.Copy />}
+      icon={<Icon.Copy />}
       title="LAYER FRAGMENTS"
       onClose={onClose}
       detail={
@@ -390,7 +391,7 @@ function FragmentActions({ e, why, onPull, onDrop }: {
         <Mono className="dim sm">shipped</Mono>
       ) : (
         <button title="Delete from the folder" onClick={() => onDrop(e)}>
-          <Ico.X c="var(--text-4)" />
+          <Icon.X c="var(--text-4)" />
         </button>
       )}
     </div>
