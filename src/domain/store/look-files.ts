@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import type { LibraryEntry, Preset, ServerLibrary, Shelf } from '@illumigoon/patch-editor/library';
 import type { AnimationState } from '../light-network/protocol';
+import { PATCH_LOOKS } from '../looks/looks';
 import { useHousehold, type SavedLook } from './household-store';
 import { attempt, library, unusedFile, useLibrary } from './library-store';
 
@@ -92,6 +93,18 @@ function readChanged(shared: Shared, entries: LibraryEntry[], known: LookFile[],
 
 const folderOf = ({ file, name, familyId, version }: LookFile) => ({ file, name, familyId, version });
 
+// A look that leaves Mine leaves Recent too. A shipped look of the same name stays.
+function forgetGoneLooks(before: LookFile[], after: LookFile[]) {
+  const kept = new Set([...after.map(({ name }) => name), ...PATCH_LOOKS.map(({ name }) => name)]);
+  const gone = new Set(before.map(({ name }) => name).filter((name) => !kept.has(name)));
+  if (gone.size === 0) return;
+  useHousehold.setState(({ recentLooks }) => ({
+    recentLooks: Object.fromEntries(
+      Object.entries(recentLooks).map(([roomId, looks]) => [roomId, looks.filter(({ name }) => !gone.has(name))]),
+    ),
+  }));
+}
+
 async function readLooks() {
   try {
     const shared = await library();
@@ -107,6 +120,7 @@ async function readLooks() {
     ]);
     const shelf = shared.shelfOf(mine.map(folderOf), presets, useLookFiles.getState().server);
     useLookFiles.setState({ mine, examples: shownExamples, shelf, listProblem: null });
+    forgetGoneLooks(known.mine, mine);
   } catch (error) {
     useLookFiles.setState({ listProblem: `The looks did not load: ${reasonOf(error)}` });
   }

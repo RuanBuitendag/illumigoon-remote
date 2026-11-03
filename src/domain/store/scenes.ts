@@ -3,7 +3,7 @@ import type { AnimationState } from '../light-network/protocol';
 import { applyState, lightIdOf, type Light } from './fleet-store';
 import type { Scene, SceneLight } from './library-store';
 import { cancelWaiting } from './light-timing';
-import { canPlay, lookNameOf, type Room } from './rooms';
+import { canPlay, isSameAnimation, lookNameOf, type Room } from './rooms';
 import { momentsOf, offerUndo, showNotice } from './undo';
 
 export const WHOLE_HOUSE = 'house';
@@ -66,13 +66,12 @@ export function applyScene(scene: Scene, rooms: Room[]) {
 
 const LEVEL_MARGIN = 0.01;
 
-const isSameLook = (animation: AnimationState | null, saved: AnimationState) =>
-  animation?.type === saved.type && JSON.stringify(animation.params) === JSON.stringify(saved.params);
-
+// A light reports a look in its own key order and can leave the name out, so neither counts.
 function showsSaved(light: Light, saved: SceneLight) {
   if (light.isOn !== saved.is_on) return false;
   if (!saved.is_on) return true;
-  return Math.abs(light.brightness - saved.brightness) < LEVEL_MARGIN && isSameLook(light.animation, animationOf(saved));
+  const isSameLevel = Math.abs(light.brightness - saved.brightness) < LEVEL_MARGIN;
+  return isSameLevel && isSameAnimation(light.animation, animationOf(saved));
 }
 
 // A light that isn't answering can't say what it shows, so it doesn't count against a scene.

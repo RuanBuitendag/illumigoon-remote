@@ -2,10 +2,11 @@ import type { Colour } from '../../design-system';
 import type { AnimationState, Parameter } from '../light-network/protocol';
 import { useMemo } from 'react';
 import { findPatchLook, latestDocumentOf, lookShape } from '../looks/look-catalog';
-import type { PatchLook } from '../looks/looks';
+import { PATCH_LOOKS, type PatchLook } from '../looks/looks';
 import type { PreviewSource } from '../looks/recordings';
 import { lightIdOf, useFleet, type Light } from './fleet-store';
 import { useHousehold } from './household-store';
+import { useLookFiles, type LookFile } from './look-files';
 
 export type Room = {
   id: string;
@@ -101,12 +102,15 @@ export function lightsInScope({ writableLights }: Room, scopeAddress: string | n
 }
 
 // A patch brings its controls in its document, and `default` is the current position of each one.
+// A light can hold an older copy of a shipped look, which takes the controls of the new copy. An own
+// look keeps its own controls, even when it has the shape of a shipped look.
 // A flat look is described by its manifest, and the light reports the values apart from it.
 export function currentControls(light: Light | undefined): Parameter[] {
   const animation = light?.animation;
   if (!animation) return [];
   if (animation.type === 'patch') {
-    const { surface } = latestDocumentOf(animation.params) ?? animation.params;
+    const latest = baseLookOf(light)?.isShipped ? latestDocumentOf(animation.params) : undefined;
+    const { surface } = latest ?? animation.params;
     return (surface as Parameter[] | undefined) ?? [];
   }
   const manifest = light.manifests.find(({ id }) => id === animation.type);
@@ -129,34 +133,127 @@ export function lookIdOf(animation: AnimationState | null) {
 
 export const OWN_LOOK = 'Custom look';
 
+const LABELS = new Set(['name', 'notes', 'created']);
+
+const sortedKeys = (_key: string, value: unknown) =>
+  value && typeof value === 'object' && !Array.isArray(value)
+    ? Object.fromEntries(Object.entries(value).sort(([a], [b]) => (a < b ? -1 : 1)))
+    : value;
+
+// A light can report the keys of a document in another order, and a name is only a label, so
+// neither makes two copies of a look differ.
+const documentKey = (document: Record<string, unknown>) =>
+  JSON.stringify(Object.fromEntries(Object.entries(document).filter(([key]) => !LABELS.has(key))), sortedKeys);
+
+const animationKey = (animation: AnimationState | null) =>
+  animation?.type === 'patch' ? `patch:${documentKey(animation.params)}` : JSON.stringify(animation, sortedKeys);
+
+export const isSameAnimation = (first: AnimationState | null, second: AnimationState | null) =>
+  animationKey(first) === animationKey(second);
+
+const shippedByKey = new Map(PATCH_LOOKS.map((look) => [animationKey({ type: 'patch', params: look.document }), look]));
+
+let ownLooks: { mine: LookFile[]; byKey: Map<string, string[]> } | null = null;
+
+// The looks of Mine by what they play, worked out again only when Mine changes.
+function ownNamesByKey() {
+  const { mine } = useLookFiles.getState();
+  if (ownLooks?.mine === mine) return ownLooks.byKey;
+  const byKey = new Map<string, string[]>();
+  for (const { name, animation } of mine) {
+    if (!animation) continue;
+    const key = animationKey(animation);
+    byKey.set(key, [...(byKey.get(key) ?? []), name]);
+  }
+  ownLooks = { mine, byKey };
+  return byKey;
+}
+
+// The saved looks that are exactly this one: a person's own copies first, then the shipped look.
+function namesOfSame(animation: AnimationState) {
+  const key = animationKey(animation);
+  const shipped = shippedByKey.get(key);
+  return [...(ownNamesByKey().get(key) ?? []), ...(shipped ? [shipped.name] : [])];
+}
+
+// The editor sends a patch with its name, and the light keeps it.
+function documentName({ type, params }: AnimationState) {
+  const { name } = params;
+  return type === 'patch' && typeof name === 'string' && name.trim() ? name.trim() : undefined;
+}
+
+// A flat look with no manifest has only its type, such as `tempo_aurora`.
+function typeName(type: string) {
+  const words = type.replace(/[-_]+/g, ' ').trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+const patchName = (animation: AnimationState) =>
+  documentName(animation) ?? findPatchLook(animation.params)?.name ?? OWN_LOOK;
+
+// The name a look was given on this phone wins while the light still plays it. Without one, or after
+// a reload, a saved look that is the same document names it, then the name inside the document.
 export function lookNameOf(light: Light | undefined) {
   const animation = light?.animation;
   if (!animation) return null;
-  if (light.appliedLook?.shape === lookShape(animation)) return light.appliedLook.name;
-  if (animation.type === 'patch') return findPatchLook(animation.params)?.name ?? OWN_LOOK;
-  return light.manifests.find(({ id }) => id === animation.type)?.name ?? animation.type;
+  const same = namesOfSame(animation);
+  const applied = light.appliedLook?.shape === lookShape(animation) ? light.appliedLook.name : undefined;
+  if (applied && (same.length === 0 || same.includes(applied))) return applied;
+  if (same[0]) return same[0];
+  if (animation.type === 'patch') return patchName(animation);
+  return light.manifests.find(({ id }) => id === animation.type)?.name ?? typeName(animation.type);
 }
+
+// The look the lights play, by name, so lights that differ only in their positions still have one.
+// Lights that are off count only when none is on.
+export function playingLookName(lights: Light[]) {
+  const showing = lights.filter(({ animation }) => animation);
+  const on = showing.filter(({ isOn }) => isOn);
+  const names = new Set((on.length > 0 ? on : showing).map((light) => lookNameOf(light)));
+  const [only] = names;
+  return names.size === 1 ? (only ?? null) : null;
+}
+
+// Every light that is on shows this look as saved, so playing it again would change nothing.
+export const playsExactly = (lights: Light[], animation: AnimationState) =>
+  lights.some(({ isOn }) => isOn) && lights.every((light) => !light.isOn || isSameAnimation(light.animation, animation));
 
 // A patch's name is a label, and a light can report the document without it, so it never makes lights differ.
-function signatureOf(animation: Light['animation']) {
-  if (animation?.type !== 'patch') return JSON.stringify(animation);
-  const { name: _name, ...params } = animation.params;
-  return JSON.stringify({ ...animation, params });
-}
-
 export function isMixedLook(lights: Light[]) {
-  const signatures = new Set(lights.map(({ animation }) => signatureOf(animation)));
+  const signatures = new Set(lights.map(({ animation }) => animationKey(animation)));
   return signatures.size > 1;
 }
 
-const positionsOf = (document: Record<string, unknown>) => JSON.stringify(document.surface);
+type BaseLook = { name: string; document: Record<string, unknown>; isShipped: boolean };
 
-// The shipped look that a light has moved the controls of, so its first positions can come back.
+function lookNamed(name: string): BaseLook | undefined {
+  const own = useLookFiles.getState().mine.find((file) => file.name === name && file.animation?.type === 'patch');
+  if (own?.animation) return { name, document: own.animation.params, isShipped: false };
+  const shipped = PATCH_LOOKS.find((look) => look.name === name);
+  return shipped && { name, document: shipped.document, isShipped: true };
+}
+
+// The saved look a light's patch came from, one of Mine or a shipped one, by the name it goes by.
+function baseLookOf(light: Light | undefined) {
+  if (light?.animation?.type !== 'patch') return undefined;
+  const name = lookNameOf(light);
+  return name ? lookNamed(name) : undefined;
+}
+
+// The saved look that a light has changed in any part, so its saved state can come back.
 export function editedLook(light: Light | undefined) {
-  const animation = light?.animation;
-  if (animation?.type !== 'patch') return undefined;
-  const look = findPatchLook(animation.params);
-  return look && positionsOf(look.document) !== positionsOf(animation.params) ? look : undefined;
+  const base = baseLookOf(light);
+  const params = light?.animation?.params;
+  return base && params && documentKey(base.document) !== documentKey(params) ? base : undefined;
+}
+
+const surfaceOf = (document: Record<string, unknown>) => (document.surface as Parameter[] | undefined) ?? [];
+
+// The name of a look's own colours while a control still holds them, so they are not called Custom.
+export function lookColoursName(light: Light | undefined, { key, default: position }: Parameter) {
+  const base = baseLookOf(light);
+  const saved = base && surfaceOf(base.document).find((control) => control.key === key);
+  return saved && JSON.stringify(saved.default) === JSON.stringify(position) ? base.name : undefined;
 }
 
 const isColour = (value: unknown): value is Colour =>

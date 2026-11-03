@@ -1,9 +1,11 @@
 import { create } from 'zustand';
 import type { PaletteEntry, Scene, SceneEntry, SceneLight } from '@illumigoon/patch-editor/library';
 import { editorApi } from './editor-host';
-import { lightIdOf } from './fleet-store';
+import { lightIdOf, type Light } from './fleet-store';
 import { useHousehold, type OldScene } from './household-store';
-import type { Room } from './rooms';
+
+// A room as far as moving old scenes goes. Named here, because the rooms read the looks in this library.
+type Room = { id: string; lights: Light[] };
 
 export type { PaletteEntry, Scene, SceneEntry, SceneLight };
 

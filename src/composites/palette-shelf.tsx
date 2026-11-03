@@ -18,6 +18,7 @@ const paintOf = (colours: string[]) => (colours.length > 1 ? gradientOf(colours.
 type CurrentPaletteProps = {
   label: string;
   colours: string[];
+  ownName?: string;
   sets: ColourSet[];
   maxColours: number;
   isOpen: boolean;
@@ -25,9 +26,9 @@ type CurrentPaletteProps = {
 };
 
 // The palette in use, and the way in to everything else about colour.
-export function CurrentPalette({ label, colours, sets, maxColours, isOpen, onClick }: CurrentPaletteProps) {
+export function CurrentPalette({ label, colours, ownName, sets, maxColours, isOpen, onClick }: CurrentPaletteProps) {
   const match = sets.find((set) => isSameColours(set.colours.slice(0, maxColours), colours));
-  const name = match?.name ?? 'Custom';
+  const name = match?.name ?? ownName ?? 'Custom';
   return (
     <Press className="palette-current" label={`${label}: ${name}`} onClick={onClick}>
       <ColourFill className="palette-bar" paint={paintOf(colours)} />
