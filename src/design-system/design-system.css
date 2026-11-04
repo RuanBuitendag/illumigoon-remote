@@ -12,7 +12,7 @@
   --slot: transparent;
   --push-shadow: -20px 0 40px rgba(0, 0, 0, 0.5);
   --lift-shadow: 0 8px 28px rgba(0, 0, 0, 0.6);
-  --thumb-off: #55565a;
+  --thumb-off: #6a6b6f;
   --led-off: #26272a;
   --fill: rgb(var(--ink-rgb));
   --sans: 'Geist', -apple-system, system-ui, sans-serif;
@@ -145,7 +145,7 @@
   --modulation-dim: var(--text-4);
   --modulation-ghost: rgba(var(--ink-rgb), 0.1);
   --warn: var(--text-2);
-  --bad: #c85f4e;
+  --bad: #d4685a;
   /* Status roles (CO-3). Only danger has a hue. Good news and information show in the ink ramp,
      by their words and place, since the owner rejects orange and amber and wants neutral states. */
   --good: var(--text-1);
@@ -161,14 +161,14 @@
     --background: #f2f1ed;
     --text-1: #161618;
     --text-2: #2c2c30;
-    --text-3: #5c5c61;
-    --text-4: #6a6a6f;
-    --text-5: #88888c;
+    --text-3: #4a4a4f;
+    --text-4: #5e5e63;
+    --text-5: #7a7a7e;
     --track: rgba(0, 0, 0, 0.12);
     --slot: #131315;
     --push-shadow: -20px 0 40px rgba(0, 0, 0, 0.08);
     --lift-shadow: 0 8px 28px rgba(0, 0, 0, 0.14);
-    --thumb-off: #b4b4b8;
+    --thumb-off: #7a7a7e;
     --led-off: #2a2a2d;
     --fill: #161618;
     --wash: rgba(0, 0, 0, 0.04);
@@ -178,7 +178,7 @@
     --well: #131315;
     --modulation-ghost: rgba(0, 0, 0, 0.08);
     --warn: var(--text-2);
-    --bad: #a8412f;
+    --bad: #a23d2c;
   }
 }
 
@@ -191,6 +191,7 @@
     --text-5: #979894;
     --track: rgba(255, 255, 255, 0.45);
     --thumb-off: #8a8b8f;
+    --bad: #ec8574;
     --wash: rgba(255, 255, 255, 0.1);
     --wash-strong: rgba(255, 255, 255, 0.18);
     --scrim: rgba(9, 9, 10, 0.9);
@@ -204,6 +205,7 @@
     --text-5: #5c5c61;
     --track: rgba(0, 0, 0, 0.5);
     --thumb-off: #6a6a6f;
+    --bad: #8f3324;
     --wash: rgba(0, 0, 0, 0.08);
     --wash-strong: rgba(0, 0, 0, 0.16);
     --scrim: rgba(242, 241, 237, 0.9);

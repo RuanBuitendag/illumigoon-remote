@@ -354,6 +354,99 @@ for (const file of walk(SOURCE)) {
   if (/\.tsx?$/.test(file) && !file.endsWith('.test.ts') && !GENERATED.test(file)) checkVoice(file);
 }
 
+// TL-11: the WCAG contrast of every token pair the app draws, worked out from the tokens in each theme: dark,
+// light, and both with more contrast. Words need 4.5:1 (1.4.3). Marks that carry meaning (an icon, a meter, the
+// focus ring, a switch) need 3:1 (1.4.11). Hairlines (--track) are left out on purpose: they divide, and no control
+// is known by its hairline alone, so they stay faint (voice.md, Flat). Forced colours are the system's own.
+const TOKEN_FILE = `${SOURCE}/design-system/design-system.css`;
+const THEMES = {
+  dark: [],
+  light: ['prefers-color-scheme: light'],
+  'dark with more contrast': ['prefers-contrast: more'],
+  'light with more contrast': ['prefers-color-scheme: light', 'prefers-contrast: more'],
+};
+// What words and marks sit on: the page, a raised wash and a stronger wash. Edit's --well holds colours, not words.
+const GROUNDS = ['--background', '--wash', '--wash-strong'];
+const WORDS = ['--text-1', '--text-2', '--text-3', '--text-4', '--info', '--warn', '--good', '--bad', '--modulation-soft'];
+const MARKS = ['--text-5', '--focus', '--fill', '--thumb-off', '--modulation-dim'];
+const TEXT_CONTRAST = 4.5;
+const MARK_CONTRAST = 3;
+const CONTRAST_PAIRS = [
+  ...GROUNDS.flatMap((back) => WORDS.map((front) => ({ front, back, least: TEXT_CONTRAST }))),
+  ...GROUNDS.flatMap((back) => MARKS.map((front) => ({ front, back, least: MARK_CONTRAST }))),
+  // The toast, and a power key that is on: words and marks on the ink fill.
+  { front: '--on-fill', back: '--fill', least: TEXT_CONTRAST },
+];
+
+// Each `:root` block of the tokens, with the media conditions it sits under.
+function tokenBlocks() {
+  const tokens = fs.readFileSync(TOKEN_FILE, 'utf8').split(TOKENS_END)[0];
+  return [...tokens.matchAll(/(?:@media\s*([^{]*)\{\s*)?:root\s*\{([^}]*)\}/g)].map(([, media = '', body]) => ({
+    conditions: [...media.matchAll(/\(([^)]+)\)/g)].map(([, condition]) => condition.trim()),
+    body: body.replace(/\/\*[\s\S]*?\*\//g, ''),
+  }));
+}
+
+function tokensOf(blocks, theme) {
+  const tokens = new Map();
+  for (const { conditions, body } of blocks) {
+    if (!conditions.every((condition) => theme.includes(condition))) continue;
+    for (const [, name, value] of body.matchAll(/(--[\w-]+)\s*:\s*([^;]+);/g)) tokens.set(name, value.trim());
+  }
+  return tokens;
+}
+
+function resolveToken(tokens, value, depth = 0) {
+  const next = value.replace(/var\((--[\w-]+)\)/g, (_, name) => tokens.get(name) ?? `missing ${name}`);
+  return next === value || depth > 8 ? next : resolveToken(tokens, next, depth + 1);
+}
+
+// [red, green, blue, alpha], or null when the value is not a colour this check can read.
+function colourOf(value) {
+  if (value === 'transparent') return [0, 0, 0, 0];
+  const hex = /^#([0-9a-f]{6})$/i.exec(value)?.[1];
+  if (hex) return [0, 2, 4].map((at) => Number.parseInt(hex.slice(at, at + 2), 16)).concat(1);
+  const parts = /^rgba?\(([^)]+)\)$/.exec(value)?.[1].split(',').map(Number);
+  if (!parts || parts.length < 3 || parts.some(Number.isNaN)) return null;
+  return [parts[0], parts[1], parts[2], parts[3] ?? 1];
+}
+
+// A colour with alpha, laid over an opaque one.
+const laidOver = ([r, g, b, a], [r0, g0, b0]) => [r * a + r0 * (1 - a), g * a + g0 * (1 - a), b * a + b0 * (1 - a), 1];
+
+const linear = (value) => {
+  const c = value / 255;
+  return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+};
+const luminance = ([r, g, b]) => 0.2126 * linear(r) + 0.7152 * linear(g) + 0.0722 * linear(b);
+
+function contrastOf(front, back) {
+  const [light, dark] = [luminance(front), luminance(back)].sort((one, other) => other - one);
+  return (light + 0.05) / (dark + 0.05);
+}
+
+function checkContrast() {
+  const blocks = tokenBlocks();
+  for (const [theme, conditions] of Object.entries(THEMES)) {
+    const tokens = tokensOf(blocks, conditions);
+    const colours = new Map([...tokens.keys()].map((name) => [name, colourOf(resolveToken(tokens, `var(${name})`))]));
+    const page = colours.get('--background');
+    for (const { front, back, least } of CONTRAST_PAIRS) {
+      if (!colours.get(front) || !colours.get(back) || !page) {
+        report(TOKEN_FILE, 1, 'contrast', `${front} on ${back} in ${theme}: not a colour this check can read`);
+        continue;
+      }
+      const ground = laidOver(colours.get(back), page);
+      const ratio = contrastOf(laidOver(colours.get(front), ground), ground);
+      if (ratio < least) {
+        report(TOKEN_FILE, 1, 'contrast', `${front} on ${back} in ${theme} is ${ratio.toFixed(2)}:1, under ${least}:1`);
+      }
+    }
+  }
+}
+
+checkContrast();
+
 for (const { file, line, rule, text } of problems) console.log(`${file}:${line}  ${rule}  ${text}`);
 const byRule = {};
 for (const { rule } of problems) byRule[rule] = (byRule[rule] ?? 0) + 1;
