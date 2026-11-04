@@ -1,6 +1,6 @@
 /** Shared primitives: the bloom filter every accent stroke uses, icons, small controls. */
 
-import type { ReactNode } from 'react';
+import type { KeyboardEvent, ReactNode } from 'react';
 import { Icon, IconFrame, OptionRow, Picked, PowerKey } from '../../../../src/design-system';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
@@ -128,15 +128,37 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   labels?: Record<string, string>;
 }) {
   return (
-    <div className="tabs">
+    <div className="tabs" role="tablist" onKeyDown={e => stepTab(e, items, value, onChange)}>
       {items.map(it => (
-        <Key key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
+        <Key key={it} role="tab" aria-selected={it === value} tabIndex={it === value ? 0 : -1}
+             onClick={() => onChange(it)}>
           <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
         </Key>
       ))}
       <span className="tabrule" />
     </div>
   );
+}
+
+const TAB_STEP: Record<string, (at: number, count: number) => number> = {
+  ArrowRight: (at, count) => (at + 1) % count,
+  ArrowLeft: (at, count) => (at - 1 + count) % count,
+  Home: () => 0,
+  End: (_, count) => count - 1,
+};
+
+/**
+ * A TAB LIST BY KEYBOARD (AC-8, NA-17). Only the chosen tab is in the Tab order; the arrows,
+ * Home and End choose the next one and move the focus with it, as a platform tab list does.
+ */
+function stepTab<T extends string>(e: KeyboardEvent<HTMLDivElement>, items: readonly T[], value: T, onChange: (v: T) => void) {
+  const step = TAB_STEP[e.key];
+  if (!step) return;
+  e.preventDefault();
+  const next = step(items.indexOf(value), items.length);
+  onChange(items[next]!);
+  const tabs = e.currentTarget.querySelectorAll<HTMLElement>('[role="tab"]');
+  tabs[next]?.focus();
 }
 
 /**
