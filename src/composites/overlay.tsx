@@ -1,14 +1,14 @@
 import type { ReactNode } from 'react';
 import { Eyebrow } from '../design-system';
 import { ChoiceList } from './choice-list';
-import { Sheet, SheetBody } from './sheet';
+import { Sheet, SheetBody, type SheetPart } from './sheet';
 
-type OverlayProps = { label: string; actions: ReactNode; children: ReactNode; onClose: () => void };
+type OverlayProps = { label: string; actions: SheetPart; children: SheetPart; onClose: () => void };
 
 export function Overlay({ label, actions, children, onClose }: OverlayProps) {
   return (
     <Sheet label={label} actions={actions} onClose={onClose}>
-      <SheetBody>{children}</SheetBody>
+      {(close) => <SheetBody>{typeof children === 'function' ? children(close) : children}</SheetBody>}
     </Sheet>
   );
 }

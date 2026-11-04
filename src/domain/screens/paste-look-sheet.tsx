@@ -12,26 +12,26 @@ export function PasteLookSheet({ onClose }: { onClose: () => void }) {
     void copiedLookText().then((copied) => setText((typed) => typed || copied));
   }, []);
 
-  const add = async () => {
+  const add = async (close: () => void) => {
     const reason = await addLookFromText(text);
     if (reason) setProblem(reason);
-    else onClose();
+    else close();
   };
 
   return (
     <Overlay
       label="Paste a look"
       onClose={onClose}
-      actions={
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={onClose}>
+          <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={text.trim() === ''} onClick={() => void add()}>
+          <TextKey disabled={text.trim() === ''} onClick={() => void add(close)}>
             ADD TO MINE
           </TextKey>
         </KeyRow>
-      }
+      )}
     >
       <OverlayText>COPY under a look in Manage puts it on the clipboard. Paste it here to add it to Mine.</OverlayText>
       <TextArea label="The copied look" placeholder="Paste the copied look here" value={text} onChange={setText} />

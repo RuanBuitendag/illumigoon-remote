@@ -35,16 +35,22 @@ export function WhichLightsSheet({ rooms, room, picked, onDone, onClose }: Which
     <Overlay
       label="Which lights"
       onClose={onClose}
-      actions={
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={onClose}>
+          <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={chosen.length === 0} onClick={() => onDone(chosen)}>
+          <TextKey
+            disabled={chosen.length === 0}
+            onClick={() => {
+              onDone(chosen);
+              close();
+            }}
+          >
             DONE
           </TextKey>
         </KeyRow>
-      }
+      )}
     >
       {shownRooms.length === 0 && <OverlayText>No light can take a look right now.</OverlayText>}
       {shownRooms.length > 0 && (

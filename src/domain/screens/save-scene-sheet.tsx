@@ -48,25 +48,25 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
   const [scope, setScope] = useState(room?.id ?? WHOLE_HOUSE);
   const captured = keeping ? { name: name.trim(), lights: keeping } : captureScene(name.trim(), rooms, scope);
 
-  const save = () => {
+  const save = (close: () => void) => {
     void (renaming ? renameScene(renaming, name.trim()) : saveScene(captured));
-    onClose();
+    close();
   };
 
   return (
     <Overlay
       label={renaming ? 'Rename scene' : 'Save scene'}
       onClose={onClose}
-      actions={
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={onClose}>
+          <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={save}>
+          <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={() => save(close)}>
             SAVE
           </TextKey>
         </KeyRow>
-      }
+      )}
     >
       <TextField size="large" label="Scene name" placeholder="Name" value={name} onChange={setName} />
       {!renaming && <SceneScope rooms={rooms} scope={scope} captured={captured} isKeeping={Boolean(keeping)} onScope={setScope} />}

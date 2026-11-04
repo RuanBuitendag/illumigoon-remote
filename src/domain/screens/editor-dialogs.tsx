@@ -1,5 +1,5 @@
 import type { HostDialogs } from '@illumigoon/patch-editor';
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { Overlay, OverlayText } from '../../composites';
 import { KeyRow, TextField, TextKey } from '../../design-system';
 
@@ -13,20 +13,28 @@ type Question = {
 function QuestionSheet({ text, suggestion, onAnswer }: Question) {
   const [name, setName] = useState(suggestion ?? '');
   const isNaming = suggestion !== undefined;
+  // The answer waits for the sheet's leaving motion, and every way out but SAVE or YES answers no.
+  const answer = useRef<string | null>(null);
   return (
     <Overlay
       label={isNaming ? text : 'Check'}
-      onClose={() => onAnswer(null)}
-      actions={
+      onClose={() => onAnswer(answer.current)}
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={() => onAnswer(null)}>
+          <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={isNaming && !name.trim()} onClick={() => onAnswer(name.trim())}>
+          <TextKey
+            disabled={isNaming && !name.trim()}
+            onClick={() => {
+              answer.current = name.trim();
+              close();
+            }}
+          >
             {isNaming ? 'SAVE' : 'YES'}
           </TextKey>
         </KeyRow>
-      }
+      )}
     >
       {isNaming ? (
         <TextField size="large" label={text} placeholder="Name" value={name} onChange={setName} />

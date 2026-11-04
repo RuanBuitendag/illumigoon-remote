@@ -26,7 +26,7 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
   const isWaiting = offTimersOf(lights).length > 0;
   const hasSpace = isWaiting || hasScheduleSpace(lights);
 
-  const start = (minutes: string) => {
+  const start = (minutes: string, close: () => void) => {
     cancelTimers(lights);
     const entry = timerEntry(Number(minutes));
     writeSchedule(lights, entry);
@@ -35,33 +35,37 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
       moments: [],
       restore: () => removeSchedule(lights, entry.id),
     });
-    onClose();
+    close();
   };
 
-  const cancel = () => {
+  const cancel = (close: () => void) => {
     cancelTimers(lights);
     showNotice(`${room.name} stays on`);
-    onClose();
+    close();
   };
 
   return (
     <Overlay
       label="Off timer"
       onClose={onClose}
-      actions={
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={onClose}>
+          <TextKey isQuiet onClick={close}>
             CLOSE
           </TextKey>
-          {isWaiting && <TextKey onClick={cancel}>CANCEL TIMER</TextKey>}
+          {isWaiting && <TextKey onClick={() => cancel(close)}>CANCEL TIMER</TextKey>}
         </KeyRow>
-      }
+      )}
     >
-      {isWaiting && <OverlayText>{offTimerNote(lights)}.</OverlayText>}
-      {hasSpace ? (
-        <ChoiceList label="Off in" choices={LENGTHS} chosen={[]} onChoose={start} />
-      ) : (
-        <OverlayText>These lights hold all the schedules they can. Remove one in Schedules first.</OverlayText>
+      {(close) => (
+        <>
+          {isWaiting && <OverlayText>{offTimerNote(lights)}.</OverlayText>}
+          {hasSpace ? (
+            <ChoiceList label="Off in" choices={LENGTHS} chosen={[]} onChoose={(minutes) => start(minutes, close)} />
+          ) : (
+            <OverlayText>These lights hold all the schedules they can. Remove one in Schedules first.</OverlayText>
+          )}
+        </>
       )}
     </Overlay>
   );

@@ -1,6 +1,9 @@
 import type { ReactNode } from 'react';
 import { Dialog, Eyebrow, Icon, Press, useCloseDialog } from '../design-system';
 
+// A part of a sheet can take the sheet's own way out, so a key that closes it leaves with the motion.
+export type SheetPart = ReactNode | ((close: () => void) => ReactNode);
+
 type SheetProps = {
   // Names the sheet in its head, and to a screen reader.
   label: string;
@@ -8,10 +11,10 @@ type SheetProps = {
   // What the head says beside the name: a count, a folder.
   detail?: ReactNode;
   // The sheet's own keys, such as CANCEL and SAVE. A sheet without them closes with a cross.
-  actions?: ReactNode;
+  actions?: SheetPart;
   // Room for a table. Without it the sheet is the width of a form.
   isWide?: boolean;
-  children: ReactNode;
+  children: SheetPart;
   // What the quiet way out does. Escape and a press outside the sheet do the same.
   onClose: () => void;
 };
@@ -26,6 +29,12 @@ function SheetClose() {
   );
 }
 
+// Draws a part, handing it the close that leaves with the sheet's motion.
+function WithClose({ part }: { part: SheetPart }) {
+  const close = useCloseDialog();
+  return typeof part === 'function' ? part(close) : part;
+}
+
 // The one sheet, in the app and in Edit: a head with the name and the way out, over what the sheet holds.
 export function Sheet({ label, icon, detail, actions, isWide, children, onClose }: SheetProps) {
   return (
@@ -37,10 +46,10 @@ export function Sheet({ label, icon, detail, actions, isWide, children, onClose 
         </div>
         <div className="sheet-keys">
           {detail}
-          {actions ?? <SheetClose />}
+          {actions ? <WithClose part={actions} /> : <SheetClose />}
         </div>
       </div>
-      {children}
+      <WithClose part={children} />
     </Dialog>
   );
 }

@@ -8,25 +8,25 @@ export function RenameLookSheet({ look, onClose }: { look: LookFile; onClose: ()
   const [name, setName] = useState(look.name);
   const [notes, setNotes] = useState(look.notes);
 
-  const save = async () => {
+  const save = async (close: () => void) => {
     await renameLook(look, name.trim(), notes.trim());
-    onClose();
+    close();
   };
 
   return (
     <Overlay
       label="Rename"
       onClose={onClose}
-      actions={
+      actions={(close) => (
         <KeyRow>
-          <TextKey isQuiet onClick={onClose}>
+          <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={name.trim() === ''} onClick={() => void save()}>
+          <TextKey disabled={name.trim() === ''} onClick={() => void save(close)}>
             SAVE
           </TextKey>
         </KeyRow>
-      }
+      )}
     >
       <TextField size="large" label="Name of the look" placeholder="Name" value={name} onChange={setName} />
       <TextArea label="Description" placeholder="What the look does" value={notes} onChange={setNotes} />

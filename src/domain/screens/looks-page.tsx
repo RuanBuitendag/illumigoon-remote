@@ -49,7 +49,6 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
 
   const pick = (addresses: string[]) => {
     setPicked(addresses);
-    setSheet(null);
     if (room && isRoomOpen) keepInRoom(room, writable.filter(({ address }) => addresses.includes(address)));
   };
 
