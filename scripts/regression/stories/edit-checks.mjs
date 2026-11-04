@@ -4,6 +4,7 @@
 //   - axe finds nothing on Edit, dark and light, on the phone and the laptop (NA-17, CM-9).
 //   - A dial and a layer move by keyboard as well as by pointer (NA-17).
 //   - A layer is chosen, a tab is changed and a modulator is bound to a dial by keyboard alone (NA-17, AC-5, AC-8).
+//   - Each tab list names its panel, and the control menu opens, steps and closes by keyboard (AC-5, AC-8, MO-5).
 import { AxeBuilder } from '@axe-core/playwright';
 import { expect, LOUNGE, onTop, openEdit, press, until } from './steps.mjs';
 import { smallControls } from './tap-targets.mjs';
@@ -192,6 +193,53 @@ const tabsByKeyboard = {
   },
 };
 
+const tabPanels = {
+  name: "AC-5 each of Edit's tab lists names the panel it shows",
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const lists = onTop(page).getByRole('tablist');
+    const count = await lists.count();
+    expect(count > 0, 'Edit shows no tab list');
+    for (let at = 0; at < count; at += 1) {
+      const chosen = lists.nth(at).locator('[role=tab][aria-selected=true]');
+      const panelId = await chosen.getAttribute('aria-controls');
+      const panel = page.locator(`[role=tabpanel][id="${panelId}"]`);
+      expect((await panel.count()) === 1, `the tab ${await chosen.textContent()} points at no panel`);
+      const tabId = await chosen.getAttribute('id');
+      expect((await panel.getAttribute('aria-labelledby')) === tabId, `the panel of ${tabId} is named by another tab`);
+    }
+  },
+};
+
+const menuByKeyboard = {
+  name: 'NA-17 the control menu opens on a dial by keyboard, steps with the arrows and closes with Escape',
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const dial = onTop(page).locator('[data-expose] svg.dial[role=slider]:not([aria-disabled])').first();
+    await dial.focus();
+    await page.keyboard.press('Shift+F10');
+    const menu = page.getByRole('menu', { name: 'Control menu' });
+    await menu.waitFor();
+    // A context menu opens at once (MO-5): nothing in it is still moving.
+    const moving = await menu.evaluate((element) => element.getAnimations({ subtree: true }).length);
+    expect(moving === 0, `the control menu opens with ${moving} motions`);
+    const items = menu.locator('[role=menuitem]:not(:disabled):not([aria-disabled])');
+    const first = await items.first().textContent();
+    expect((await focusedLabel(page)) === first?.trim(), 'the first item does not take the focus');
+    if ((await items.count()) > 1) {
+      await page.keyboard.press('ArrowDown');
+      expect((await focusedLabel(page)) !== first?.trim(), 'the down arrow does not move to the next item');
+    }
+    await page.keyboard.press('Escape');
+    await menu.waitFor({ state: 'hidden' });
+    expect(await dial.evaluate((element) => element === document.activeElement), 'Escape does not give the focus back to the dial');
+  },
+};
+
 const modulatorByKeyboard = {
   name: 'NA-17 a modulator is bound to a dial by keyboard: Space on the tile, Enter on the dial',
   viewport: 'laptop',
@@ -227,5 +275,7 @@ export const editChecks = [
   layerByKeyboard,
   layerChosenByKeyboard,
   tabsByKeyboard,
+  tabPanels,
+  menuByKeyboard,
   modulatorByKeyboard,
 ];

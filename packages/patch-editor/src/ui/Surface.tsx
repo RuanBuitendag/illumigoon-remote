@@ -19,7 +19,7 @@
  * and hiding it would hide the only place to fix it.
  */
 
-import { useState, type CSSProperties, type DragEvent } from 'react';
+import { useState, type CSSProperties, type DragEvent, type KeyboardEvent } from 'react';
 import { Icon } from '../../../../src/design-system';
 import { LIMITS } from '../domain/catalog';
 import { specForPath, type Patch } from '../domain/patch';
@@ -66,6 +66,36 @@ export const Catch = ({ onClose }: { onClose(): void }) => (
        onContextMenu={e => { e.preventDefault(); onClose(); }} />
 );
 
+const MENU_STEP: Record<string, (at: number, count: number) => number> = {
+  ArrowDown: (at, count) => (at + 1) % count,
+  ArrowUp: (at, count) => (at - 1 + count) % count,
+  Home: () => 0,
+  End: (_, count) => count - 1,
+};
+
+/**
+ * A MENU BY KEYBOARD (AC-8, NA-17). The first item takes the focus when the menu opens. The arrows, Home and End
+ * move it between the items that can be pressed, and Escape closes the menu.
+ */
+function stepMenu(e: KeyboardEvent<HTMLDivElement>, onClose: () => void, opener: Element | null) {
+  if (e.key === 'Escape') {
+    e.preventDefault();
+    onClose();
+    // The focus goes back to what opened the menu, so a keyboard user is where they were.
+    (opener as HTMLElement | null)?.focus?.();
+    return;
+  }
+  const step = MENU_STEP[e.key];
+  if (!step) return;
+  e.preventDefault();
+  const items = [...e.currentTarget.querySelectorAll<HTMLElement>('[role="menuitem"]:not(:disabled)')];
+  if (!items.length) return;
+  items[step(items.indexOf(document.activeElement as HTMLElement), items.length)]?.focus();
+}
+
+const focusFirstItem = (menu: HTMLDivElement | null) =>
+  menu?.querySelector<HTMLElement>('[role="menuitem"]:not(:disabled)')?.focus();
+
 /** Each modulator not yet driving this target. A phone has no way to drag one here. */
 function freeSources({ modulators, matrix }: Patch, target: string) {
   const taken = (slot: number) => matrix.some(row => row.src === slot && row.dst === target);
@@ -82,6 +112,7 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
   const r = existing ? null : resolveTarget(ctl.patch, at.target);
   const full = !existing && keptControls(ctl.patch).length >= LIMITS().SURFACE;
   const sources = specForPath(ctl.patch, at.target) ? freeSources(ctl.patch, at.target) : [];
+  const [opener] = useState(() => document.activeElement);
 
   const remove = () => {
     const reached = ctl.structural(d => {
@@ -95,19 +126,25 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
     <>
       <Catch onClose={onClose} />
       <div
+        ref={focusFirstItem}
         className="surfacemenu"
+        role="menu"
+        aria-label="Control menu"
         style={placed(at, 240, 120 + sources.length * 44)}
         onContextMenu={e => e.preventDefault()}
+        onKeyDown={e => stepMenu(e, onClose, opener)}
       >
         {existing ? (
           <>
-            <Key onClick={() => onEdit(existing, false)}>
+            <Key role="menuitem" tabIndex={-1} onClick={() => onEdit(existing, false)}>
               Edit room control “{existing.label}”…
             </Key>
-            <Key onClick={remove}>Take off the room</Key>
+            <Key role="menuitem" tabIndex={-1} onClick={remove}>Take off the room</Key>
           </>
         ) : r ? (
           <Key
+            role="menuitem"
+            tabIndex={-1}
             disabled={full}
             onClick={() => {
               // Seeded here rather than in the menu's render, so the key is taken against the
@@ -119,11 +156,13 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
             {full ? `The room has all ${LIMITS().SURFACE} controls` : 'Show on the room…'}
           </Key>
         ) : (
-          <span className="menunote">Nothing here a person can be handed</span>
+          <span className="menunote" role="menuitem" aria-disabled="true">Nothing here a person can be handed</span>
         )}
         {sources.map(m => (
           <Key
             key={m.slot}
+            role="menuitem"
+            tabIndex={-1}
             onClick={() => {
               ctl.bind({ kind: 'mod', slot: m.slot }, at.target);
               onClose();

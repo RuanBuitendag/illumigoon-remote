@@ -121,7 +121,9 @@ export function Seg<T extends string>({ label, items, value, onChange, tight, la
  * switches which controls exist at all, and in the signal chain one sits directly above an
  * emitter seg -- same chrome for both and the mode reads as one more parameter.
  */
-export function Tabs<T extends string>({ items, value, onChange, labels }: {
+export function Tabs<T extends string>({ id, items, value, onChange, labels }: {
+  /** Names the tab list, so each tab and its `TabPanel` point at each other (AC-5). */
+  id: string;
   items: readonly T[];
   value: T;
   onChange: (v: T) => void;
@@ -130,8 +132,8 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   return (
     <div className="tabs" role="tablist" onKeyDown={e => stepTab(e, items, value, onChange)}>
       {items.map(it => (
-        <Key key={it} role="tab" aria-selected={it === value} tabIndex={it === value ? 0 : -1}
-             onClick={() => onChange(it)}>
+        <Key key={it} id={`${id}-${it}`} role="tab" aria-selected={it === value} aria-controls={`${id}-panel`}
+             tabIndex={it === value ? 0 : -1} onClick={() => onChange(it)}>
           <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
         </Key>
       ))}
@@ -139,6 +141,13 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
     </div>
   );
 }
+
+/** What the chosen tab of a `Tabs` with the same `id` shows. It is named by that tab (AC-5). */
+export const TabPanel = ({ id, value, children }: { id: string; value: string; children: React.ReactNode }) => (
+  <div className="tabpanel" role="tabpanel" id={`${id}-panel`} aria-labelledby={`${id}-${value}`}>
+    {children}
+  </div>
+);
 
 const TAB_STEP: Record<string, (at: number, count: number) => number> = {
   ArrowRight: (at, count) => (at + 1) % count,

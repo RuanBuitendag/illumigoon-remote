@@ -57,6 +57,8 @@
 .patch-editor .grow { flex-grow: 1; }
 .patch-editor .row { display: flex; align-items: center; }
 .patch-editor .col { display: flex; flex-direction: column; }
+/* A tab's panel takes the room under its tabs, as its content did before it had a panel. */
+.patch-editor .tabpanel { display: flex; flex-direction: column; flex-grow: 1; min-height: 0; }
 .patch-editor .namedfield { gap: var(--space-1); flex-grow: 1; min-width: 0; }
 
 /* ------------------------------------------------------------- controls */

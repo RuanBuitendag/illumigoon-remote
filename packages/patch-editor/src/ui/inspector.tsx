@@ -16,7 +16,7 @@
  */
 
 import type { ReactNode } from 'react';
-import { Blurb, Hr, Lab, Mono, Tabs, layerName } from './bits';
+import { Blurb, Hr, Lab, Mono, TabPanel, Tabs, layerName } from './bits';
 import { ColourBody, MasterColourBody } from './ColourBodies';
 import { EmitterBody, WarpBody } from './NodeBodies';
 import { MASTER_NAME } from './LayerStack';
@@ -106,9 +106,9 @@ export function SideColumn({ side, onSide, children }: {
   return (
     <div className="panel" style={{ width: 'var(--edit-side-panel)', flexShrink: 0 }}>
       <div className="sidetabs" style={{ padding: 'var(--space-2) var(--space-3) 0', flexShrink: 0 }}>
-        <Tabs items={SIDES} value={side} onChange={onSide} labels={SIDE_NAMES} />
+        <Tabs id="edit-side" items={SIDES} value={side} onChange={onSide} labels={SIDE_NAMES} />
       </div>
-      {children}
+      <TabPanel id="edit-side" value={side}>{children}</TabPanel>
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Icon, Picked } from '../../../../src/design-system';
 import { LIMITS, nodeById, requireParam, globalParam, GLOBAL_NODE } from '../domain/catalog';
 import { makeWarp, pathOf, type Layer, type Warp } from '../domain/patch';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, Tabs, Switch, Blurb, RackToggle, RowGrip, layerName } from './bits';
+import { Hr, Lab, Mono, TabPanel, Tabs, Switch, Blurb, RackToggle, RowGrip, layerName } from './bits';
 import { Stages } from './Stages';
 import { useCollapsed } from './collapsed';
 import { unlessReached, type Ctl, type Tab } from './ctl';
@@ -58,16 +58,16 @@ export function EmitterPanel({ ctl, layer, tab, onTab }: {
                   crumb={CRUMB} lit={CRUMB_FOR[tab]} tab={tab} onTab={onTab} />
 
       {/* The emitter is not a rack row, so its controls live on this tab. */}
-      {tab === 'source' && (
-        <>
-          <EmitterBody ctl={ctl} layer={layer} />
-          <LayerLevel ctl={ctl} layer={layer} />
-        </>
-      )}
+      <TabPanel id="edit-centre" value={tab}>
+        {tab === 'source' && (
+          <>
+            <EmitterBody ctl={ctl} layer={layer} />
+            <LayerLevel ctl={ctl} layer={layer} />
+          </>
+        )}
 
-      {tab === 'fx' && <Chain ctl={ctl} host={layerRack(layer)} />}
-
-      <div className="grow" />
+        {tab === 'fx' && <Chain ctl={ctl} host={layerRack(layer)} />}
+      </TabPanel>
     </div>
   );
 }
@@ -382,6 +382,7 @@ function CentreHead<C extends string>({ name, sub, crumb, lit, tab, onTab }: {
           name describing less than the rack holds (LIFE-850). */}
       <div style={{ padding: 'var(--space-4) var(--space-5) 0', flexShrink: 0 }}>
         <Tabs
+          id="edit-centre"
           items={['source', 'fx'] as const}
           labels={{ fx: 'fx rack' }}
           value={tab}
@@ -442,25 +443,25 @@ export function MasterPanel({ ctl, tab, onTab }: { ctl: Ctl; tab: Tab; onTab(tab
         </div>
       )}
 
-      {tab === 'source' && (
-        <div className="col" style={{ padding: 'var(--space-5)', gap: 'var(--space-4)' }}>
-          {MASTER_KNOBS.map(key => {
-            const spec = globalParam(key);
-            return (
-              <div key={key} className="row" style={{ gap: 'var(--space-5)', alignItems: 'center' }}>
-                <Param ctl={ctl} spec={spec} path={`G.${key}`} value={G[key]} />
-                {spec.desc && <Blurb>{spec.desc}</Blurb>}
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <TabPanel id="edit-centre" value={tab}>
+        {tab === 'source' && (
+          <div className="col" style={{ padding: 'var(--space-5)', gap: 'var(--space-4)' }}>
+            {MASTER_KNOBS.map(key => {
+              const spec = globalParam(key);
+              return (
+                <div key={key} className="row" style={{ gap: 'var(--space-5)', alignItems: 'center' }}>
+                  <Param ctl={ctl} spec={spec} path={`G.${key}`} value={G[key]} />
+                  {spec.desc && <Blurb>{spec.desc}</Blurb>}
+                </div>
+              );
+            })}
+          </div>
+        )}
 
-      {tab === 'fx' && (
-        <Chain ctl={ctl} host={globalRack(ctl.patch)} top={<MasterColourSlot ctl={ctl} />} />
-      )}
-
-      <div className="grow" />
+        {tab === 'fx' && (
+          <Chain ctl={ctl} host={globalRack(ctl.patch)} top={<MasterColourSlot ctl={ctl} />} />
+        )}
+      </TabPanel>
     </div>
   );
 }
