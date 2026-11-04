@@ -3,6 +3,7 @@
 //     in each of Edit's sections, and at 320 px nothing in Edit scrolls sideways (LA-7).
 //   - axe finds nothing on Edit, dark and light, on the phone and the laptop (NA-17, CM-9).
 //   - A dial and a layer move by keyboard as well as by pointer (NA-17).
+//   - A layer is chosen, a tab is changed and a modulator is bound to a dial by keyboard alone (NA-17, AC-5, AC-8).
 import { AxeBuilder } from '@axe-core/playwright';
 import { expect, LOUNGE, onTop, openEdit, press, until } from './steps.mjs';
 import { smallControls } from './tap-targets.mjs';
@@ -151,6 +152,69 @@ const layerByKeyboard = {
   },
 };
 
+const focusedLabel = (page) => page.evaluate(() => document.activeElement?.textContent?.trim());
+
+const layerChosenByKeyboard = {
+  name: 'NA-17 a layer is chosen with Enter on its name, not only by a tap',
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const other = onTop(page).locator('.layerrow .name[aria-pressed="false"]').first();
+    const name = await other.getAttribute('aria-label');
+    await other.focus();
+    await page.keyboard.press('Enter');
+    await until(
+      async () => (await onTop(page).getByRole('button', { name, exact: true }).getAttribute('aria-pressed')) === 'true',
+      `Enter to choose ${name}`,
+    );
+  },
+};
+
+const tabsByKeyboard = {
+  name: "NA-17 Edit's tabs change with the arrow keys, and only the chosen tab takes Tab",
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const list = onTop(page).getByRole('tablist').first();
+    const chosen = list.locator('[role=tab][aria-selected=true]');
+    const before = await chosen.textContent();
+    const inTabOrder = await list.locator('[role=tab][tabindex="0"]').count();
+    expect(inTabOrder === 1, `one tab in the Tab order, not ${inTabOrder}`);
+    await chosen.focus();
+    await page.keyboard.press('ArrowRight');
+    await until(async () => (await chosen.textContent()) !== before, 'the right arrow to choose the next tab');
+    const focused = await focusedLabel(page);
+    expect(focused === (await chosen.textContent())?.trim(), `the focus to move with the choice, not stay on ${focused}`);
+    await page.keyboard.press('Home');
+    await until(async () => (await chosen.textContent()) === before, 'Home to choose the first tab again');
+  },
+};
+
+const modulatorByKeyboard = {
+  name: 'NA-17 a modulator is bound to a dial by keyboard: Space on the tile, Enter on the dial',
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const top = onTop(page);
+    const tiles = top.locator('.dock .modslot[role=button]');
+    if ((await tiles.count()) === 0) {
+      await top.getByRole('button', { name: 'Add a modulator', exact: true }).focus();
+      await page.keyboard.press('Enter');
+      await until(async () => (await tiles.count()) > 0, 'Enter on + to add a modulator');
+    }
+    const chips = top.locator('.modchip');
+    const before = await chips.count();
+    await tiles.first().focus();
+    await page.keyboard.press('Space');
+    await top.locator('[data-path] svg.dial[role=slider]:not([aria-disabled])').first().focus();
+    await page.keyboard.press('Enter');
+    await until(async () => (await chips.count()) > before, 'Enter on the dial to bind the modulator to it');
+  },
+};
+
 export const editChecks = [
   targetsAt('phone', '375 x 812'),
   targetsAt('laptop', '1280 x 800'),
@@ -161,4 +225,7 @@ export const editChecks = [
   axeAt('laptop', 'light'),
   dialByKeyboard,
   layerByKeyboard,
+  layerChosenByKeyboard,
+  tabsByKeyboard,
+  modulatorByKeyboard,
 ];
