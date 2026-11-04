@@ -5,5 +5,6 @@ import { cornerOwner } from './corner-owner.mjs';
 import { otherContexts } from './other-contexts.mjs';
 import { tapTargets } from './tap-targets.mjs';
 import { keyboardRoutes } from './keyboard-routes.mjs';
+import { componentPage } from './component-page.mjs';
 
-export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...keyboardRoutes];
+export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...keyboardRoutes, ...componentPage];
