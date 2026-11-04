@@ -1,4 +1,10 @@
-import { useEffect, useRef, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react';
+import {
+  useEffect,
+  useRef,
+  type KeyboardEvent,
+  type MouseEvent,
+  type PointerEvent as ReactPointerEvent,
+} from 'react';
 import { flushSync } from 'react-dom';
 import { watchPress, type Pointer } from './hold';
 
@@ -128,12 +134,17 @@ type DragOrderOptions = {
   ids: string[];
   handle: string;
   needsHold: boolean;
+  // The handle is also a key: the up and down arrows move its item one place (NA-17, AC-5).
+  movesByKeys?: boolean;
   onOrder: (ids: string[]) => void;
 };
 
+const MOVE_KEYS: Record<string, number> = { ArrowUp: -1, ArrowDown: 1 };
+
 // Each child of the list is one id, in order. A press on a `handle` starts a drag: straight away on
-// a grip that does nothing else, and after a hold on something that also taps or scrolls.
-export function useDragOrder({ ids, handle, needsHold, onOrder }: DragOrderOptions) {
+// a grip that does nothing else, and after a hold on something that also taps or scrolls. With `movesByKeys`,
+// an arrow key on a handle moves its item, and the focus stays on that handle in its new place.
+export function useDragOrder({ ids, handle, needsHold, movesByKeys, onOrder }: DragOrderOptions) {
   const listRef = useRef<HTMLDivElement>(null);
   const drag = useRef<Drag | null>(null);
   const endPress = useRef<(() => void) | null>(null);
@@ -190,5 +201,17 @@ export function useDragOrder({ ids, handle, needsHold, onOrder }: DragOrderOptio
     if ((event.target as Element).closest(handle)) event.preventDefault();
   };
 
-  return { listRef, onPointerDown, onContextMenu };
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    const delta = MOVE_KEYS[event.key];
+    const pressed = (event.target as Element).closest<HTMLElement>(handle);
+    if (!movesByKeys || !delta || !pressed || drag.current) return;
+    const from = [...event.currentTarget.children].findIndex((child) => child.contains(pressed));
+    const to = from + delta;
+    if (from === -1 || to < 0 || to >= ids.length) return;
+    event.preventDefault();
+    flushSync(() => onOrder(movedOrder(ids, from, to)));
+    if (document.activeElement !== pressed) pressed.focus();
+  };
+
+  return { listRef, onPointerDown, onContextMenu, onKeyDown };
 }

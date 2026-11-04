@@ -95,9 +95,9 @@ export function ArrangeRow({ name, maxLength, hasGrip, onRename, action }: Arran
   return (
     <div className="arrange-row">
       {hasGrip && (
-        <span className="arrange-grip">
+        <Press className="arrange-grip" label={`Move ${name}`} onClick={() => undefined}>
           <Icon.Grip />
-        </span>
+        </Press>
       )}
       <TextField size="small" label={`Name of ${name}`} maxLength={maxLength} defaultValue={name} onLeave={onRename} />
       {action}

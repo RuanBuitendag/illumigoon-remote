@@ -224,7 +224,7 @@
 .drag-list { display: contents; }
 .arrange-row { display: flex; align-items: center; gap: var(--space-1); border-bottom: var(--line) solid var(--track); }
 .arrange-row .text-field { border-bottom: 0; }
-.arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: var(--grip-width); height: var(--row); margin-left: calc(-1 * var(--space-3)); color: var(--text-5); cursor: grab; touch-action: none; }
+.arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: var(--row); height: var(--row); margin-left: calc(-1 * var(--space-4)); color: var(--text-5); cursor: grab; touch-action: none; }
 .scan-note { margin-top: var(--section); }
 
 /* Search */

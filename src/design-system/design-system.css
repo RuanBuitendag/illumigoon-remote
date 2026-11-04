@@ -73,7 +73,6 @@
   --scene-card: 172px;
   /* A level beside its fader, up to 100. */
   --level-value: 26px;
-  --grip-width: 36px;
   --chip-width: 22px;
   --chip-height: 12px;
   /* How wide a page's intro may run, so it reads as a few short lines. */

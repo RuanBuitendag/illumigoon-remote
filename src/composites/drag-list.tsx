@@ -7,7 +7,7 @@ type DragListProps = {
   children: ReactNode;
 };
 
-type DragListOptions = DragListProps & { handle: string; needsHold: boolean };
+type DragListOptions = DragListProps & { handle: string; needsHold: boolean; movesByKeys?: boolean };
 
 function DragList({ children, ...options }: DragListOptions) {
   const { listRef, ...press } = useDragOrder(options);
@@ -18,8 +18,9 @@ function DragList({ children, ...options }: DragListOptions) {
   );
 }
 
+// Each grip is also a key, "Move Left": the up and down arrows move the light one place.
 export function LightDragList(props: DragListProps) {
-  return <DragList {...props} handle=".arrange-grip" needsHold={false} />;
+  return <DragList {...props} handle=".arrange-grip" needsHold={false} movesByKeys />;
 }
 
 // The card opens on a tap and lets the page scroll, so it only lifts after a hold.

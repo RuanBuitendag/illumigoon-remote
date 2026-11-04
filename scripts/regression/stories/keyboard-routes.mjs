@@ -93,4 +93,33 @@ export const keyboardRoutes = [
       await heading(page, 'Looks');
     },
   },
+  {
+    name: 'NA-17 a light moves down the list of a room with the arrow keys, not only by drag',
+    viewport: 'laptop',
+    lights: LOUNGE,
+    async run({ page }) {
+      await openLounge(page);
+      const room = await page.evaluate(() => window.location.hash);
+      await page.goto(`${page.url().split('#')[0]}${room}/room-settings`);
+      await heading(page, 'Room settings');
+      await onTop(page).getByRole('button', { name: /^Rename and arrange/ }).click();
+      await heading(page, 'Rename and arrange');
+      const grips = onTop(page).getByRole('button', { name: /^Move / });
+      const order = () => grips.evaluateAll((keys) => keys.map((key) => key.getAttribute('aria-label')));
+      const focused = () => page.evaluate(() => document.activeElement?.getAttribute('aria-label'));
+      const before = await order();
+      expect(before.length === 4, `four grips, one for each light, not ${before.length}`);
+      await grips.first().focus();
+      await page.keyboard.press('ArrowDown');
+      const swapped = [before[1], before[0], ...before.slice(2)];
+      await until(async () => (await order()).join() === swapped.join(), `the order to become ${swapped.join(', ')}`);
+      const after = await focused();
+      expect(after === before[0], `the focus to stay on "${before[0]}" in its new place, not "${after}"`);
+      await page.keyboard.press('ArrowUp');
+      await page.keyboard.press('ArrowUp');
+      await until(async () => (await order()).join() === before.join(), 'the light to go back to the top, and stay there');
+      const top = await focused();
+      expect(top === before[0], `the focus to stay on "${before[0]}" at the top, not "${top}"`);
+    },
+  },
 ];
