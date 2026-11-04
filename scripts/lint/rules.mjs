@@ -13,9 +13,11 @@
 //   - Layers, opacity, motion and line widths come only from the tokens in composites, the design system and
 //     the editor, in its style sheet and in the inline styles of its components.
 //   - Every media query width in the app and the editor is the --wide token.
+//   - The words the app shows keep the style rules of docs/design-system/voice.md that a machine can check.
 
 import fs from 'node:fs';
 import path from 'node:path';
+import ts from 'typescript';
 
 const SOURCE = 'src';
 const LAYERS = ['design-system', 'composites', 'domain'];
@@ -265,6 +267,80 @@ function checkComponentPage() {
 }
 
 checkComponentPage();
+
+// The style rules of voice.md that a machine can check (BR-5, BR-6), over the words the app shows in src: the
+// text in JSX, a text prop such as `label`, and every string with a space in it, which is a phrase, not a key or
+// a class. Edit says palette and preset in its own store, and has its own gate.
+const VOICE = [
+  [/(?<![\w-])(palettes?|presets?|firmware|OTA|lamps?|bulbs?|zones?|snapshots?|intensity|patch editor)(?![\w-])/i, 'is not a word of the app (voice.md, Words)'],
+  [/(?<![\w-])(successfully|please|oops)(?![\w-])/i, 'is a word voice.md asks not to write'],
+  [/(?<![\w-])(color|colors|center|centered|gray|favorite)(?![\w-])/i, 'is not British spelling'],
+  [/(?<![\w:])\d{1,2}(?::\d{2})?\s?[ap]\.?m\b\.?/i, 'times use the 24-hour clock, 18:00'],
+  [/(?<=[A-Za-z])!(?=\s|$)/, 'the app does not exclaim'],
+];
+const TWELVE_HOUR_CLOCK = /hour12:\s*true|hourCycle:\s*'h1[12]'/g;
+const TEXT_PROPS = new Set([
+  'label',
+  'text',
+  'title',
+  'note',
+  'hint',
+  'intro',
+  'placeholder',
+  'aria-label',
+  'description',
+  'detail',
+  'actionLabel',
+  'laterLabel',
+  'backLabel',
+]);
+const NOT_WORDS = new Set(['className', 'type', 'key', 'role', 'id', 'href', 'inputMode', 'autoComplete']);
+
+const attributeOf = (node) => {
+  for (let at = node.parent; at; at = at.parent) if (ts.isJsxAttribute(at)) return at.name.getText();
+  return null;
+};
+
+const STRING_KINDS = ['isStringLiteral', 'isNoSubstitutionTemplateLiteral', 'isTemplateHead', 'isTemplateMiddle', 'isTemplateTail'];
+
+// Text in JSX, a text prop, or a phrase: a string with a space in it.
+function isShown(node, attribute) {
+  if (ts.isJsxText(node)) return node.text.trim() !== '';
+  if (!STRING_KINDS.some((kind) => ts[kind](node))) return false;
+  return /\s\S/.test(node.text) || TEXT_PROPS.has(attribute);
+}
+
+function shownWords(source) {
+  const words = [];
+  const visit = (node) => {
+    if (ts.isImportDeclaration(node) || ts.isExportDeclaration(node)) return;
+    const attribute = attributeOf(node);
+    if (NOT_WORDS.has(attribute)) return;
+    if (isShown(node, attribute)) words.push(node);
+    ts.forEachChild(node, visit);
+  };
+  visit(source);
+  return words;
+}
+
+function checkVoice(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  const kind = file.endsWith('.tsx') ? ts.ScriptKind.TSX : ts.ScriptKind.TS;
+  const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, kind);
+  for (const node of shownWords(source)) {
+    for (const [pattern, help] of VOICE) {
+      const match = pattern.exec(node.text);
+      if (match) report(file, lineOf(text, node.getStart(source)), 'voice', `"${match[0].trim()}": ${help}`);
+    }
+  }
+  for (const match of text.matchAll(TWELVE_HOUR_CLOCK)) {
+    report(file, lineOf(text, match.index), 'voice', `${match[0]}: times use the 24-hour clock`);
+  }
+}
+
+for (const file of walk(SOURCE)) {
+  if (/\.tsx?$/.test(file) && !file.endsWith('.test.ts') && !GENERATED.test(file)) checkVoice(file);
+}
 
 for (const { file, line, rule, text } of problems) console.log(`${file}:${line}  ${rule}  ${text}`);
 const byRule = {};

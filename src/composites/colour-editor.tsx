@@ -224,7 +224,7 @@ function PaletteChoices({ field, sets, onApply, onKeep, onChangeColours }: Palet
   return (
     <>
       {isNaming ? (
-        <NamingRow label="Name of the palette" onCancel={() => setNaming(false)} onKeep={keep} />
+        <NamingRow label="Name of the colours" onCancel={() => setNaming(false)} onKeep={keep} />
       ) : (
         <HeadingRow
           heading={
@@ -298,7 +298,7 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
           <>
             <TextKey onClick={() => goTo({ key, step: 'palettes' })}>
               <Icon.Back c="currentColor" />
-              OTHER PALETTES
+              OTHER COLOURS
             </TextKey>
             {details(field)}
           </>

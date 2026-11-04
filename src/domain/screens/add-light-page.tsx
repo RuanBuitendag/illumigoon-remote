@@ -92,7 +92,7 @@ function AddressForm() {
   return (
     <PageSection>
       <Eyebrow>BY ADDRESS</Eyebrow>
-      <PageHint>Your router lists the address of each device on the network.</PageHint>
+      <PageHint>Your router lists the address of every light on its network.</PageHint>
       <TextField
         size="large"
         label="Address of the light"
