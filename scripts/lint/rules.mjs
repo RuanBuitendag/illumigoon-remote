@@ -284,6 +284,8 @@ function checkComponentPage() {
   const imported = new Set(namesIn(page, DOOR_IMPORTS));
   for (const layer of ['design-system', 'composites']) {
     const door = `${SOURCE}/${layer}/index.ts`;
+    // A missing door is already reported as missing-door, so there is nothing here to read.
+    if (!fs.existsSync(door)) continue;
     const text = fs.readFileSync(door, 'utf8');
     for (const name of namesIn(text, DOOR_EXPORTS).filter((name) => /^[A-Z][a-z]/.test(name))) {
       if (!imported.has(name) || !page.includes(`'${name}'`)) {
