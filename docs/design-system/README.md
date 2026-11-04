@@ -27,21 +27,23 @@ The rules are in `voice-rules.json`. `lint:rules` reads them for the app, and Ed
 It checks:
 
 - the words the app shows in `src`: text in JSX, text props such as `label`, `title` and `aria-label`, and every
-  string with a space in it;
-- words the app does not use, such as palette, preset and firmware;
+  string with a space in it, and a one-word label such as `'Colours'`;
+- words the app does not use, such as palette, preset, firmware and node;
 - words `voice.md` asks not to write: successfully, please, oops;
 - British spelling: colour, centre, grey, favourite;
 - the 24-hour clock, in text and in date formats;
-- no exclamation marks.
+- no exclamation marks;
+- no sentence over 25 words;
+- no title case: three capitalised words in a row.
 
 It does not check, so a person reads for these:
 
-- sentence case, and full stops at the end of a sentence;
+- full stops at the end of a sentence;
 - capitals on keys;
 - how numbers and units are written, such as `60 %`;
 - tone: plain, calm, and saying what happens;
-- a one-word string with no space, such as a key in a store or a file name;
-- hex codes and other values that are not words.
+- a one-word string in small letters, such as a key in a store or a file name;
+- hex codes and other values that are not words. Edit shows none since D94.
 
 ## Put a new component on the component page
 

@@ -5,7 +5,9 @@
     { "pattern": "(?<![\\w-])(successfully|please|oops)(?![\\w-])", "flags": "i", "help": "is a word voice.md asks not to write" },
     { "pattern": "(?<![\\w-])(color|colors|center|centered|gray|favorite)(?![\\w-])", "flags": "i", "help": "is not British spelling" },
     { "pattern": "(?<![\\w:])\\d{1,2}(?::\\d{2})?\\s?[ap]\\.?m\\b\\.?", "flags": "i", "help": "times use the 24-hour clock, 18:00" },
-    { "pattern": "(?<=[A-Za-z])!(?=\\s|$)", "flags": "", "help": "the app does not exclaim" }
+    { "pattern": "(?<=[A-Za-z])!(?=\\s|$)", "flags": "", "help": "the app does not exclaim" },
+    { "pattern": "(?:[^.?!\\s]+\\s+){25,}[^.?!\\s]+", "flags": "", "help": "a sentence has more than 25 words; split it (voice.md, Style)" },
+    { "pattern": "(?<![\\w'-])(?:[A-Z][a-z]+ ){2,}[A-Z][a-z]+(?![\\w'-])", "flags": "", "help": "is in title case; use sentence case (voice.md, Style)" }
   ],
   "edit": {
     "about": "Words voice.md lets Edit say that the app may not: the palette store is Edit's own (voice.md, Words: colours).",

@@ -103,8 +103,8 @@ function PublishNotes({ publishing, verdict }: { publishing: boolean; verdict: V
           from every other reason it might not be. */}
       {!publishing && verdict?.referenceMissing ? (
         <Mono className="dim sm">
-          published as v{verdict.identity?.version}, but there is no local copy of what was sent — a
-          variation needs one, so this can only be a version or a new patch
+          Published as version {verdict.identity?.version}. This device has no copy of what was sent, so it
+          can only be a new version or a new look.
         </Mono>
       ) : null}
     </>

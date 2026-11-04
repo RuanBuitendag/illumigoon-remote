@@ -1054,3 +1054,13 @@ Chosen: the `--edit-*` sizes move from the `:root` block of Edit's `styles.css` 
 that holds a length in `styles.css`. D85 still holds for how they are named.
 Why: TO-1, LIFE-1948. Tokens lived in two files.
 Date: 2026-11-04
+
+**D94. Edit shows no codes, and the voice check reads more**
+
+Chosen: Edit's colour rows drop the hex code field. The swatch opens the picker, which sets the colour. Edit's error
+screen and connection notes say what happened and what to do, with no node names, ids or "fw". Both voice checks
+also read a one-word label (a capital, then small letters), and fail "node", "fw", a sentence over 25 words and
+three capitalised words in a row.
+Why: BR-5, BR-6, LIFE-1956. "Palettes", "Pick another device" and "a device over the mesh" passed the check,
+because they sat in a record, a template or a function.
+Date: 2026-11-04
