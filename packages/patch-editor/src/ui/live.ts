@@ -103,11 +103,7 @@ export function sample(m: Modulator | undefined, t: number): number | undefined 
   const p = m.params;
   switch (m.type) {
     case 'lfo': return lfoAt(m, t);
-    case 'periodic': {
-      const period = Math.max(0.01, p.period ?? 1);
-      // A trigger, not a level: a short flash on each fire reads as what it is.
-      return (t % period) / period < 0.06 ? 1 : 0;
-    }
+    case 'periodic': return periodicAt(p, t);
     case 'macro': return p.knob ?? 0;
     case 'envelope':
       // Shaped by an edge we cannot see from here.
@@ -115,6 +111,18 @@ export function sample(m: Modulator | undefined, t: number): number | undefined 
     default:
       return undefined;   // audio and thresholds depend on the room
   }
+}
+
+/**
+ * A trigger, not a level: a short flash on each fire reads as what it is. Randomness moves the
+ * flash inside its lap and Chance skips laps, drawn per lap as the engine does.
+ */
+function periodicAt(p: Modulator['params'], t: number): number {
+  const period = Math.max(0.01, p.period ?? 1);
+  const lap = Math.floor(t / period);
+  if (pseudoRandom(lap + 0.5) >= (p.chance ?? 1)) return 0;
+  const at = t / period - lap - (p.jitter ?? 0) * pseudoRandom(lap);
+  return at >= 0 && at < 0.06 ? 1 : 0;
 }
 
 /** Deterministic per-step value for sample-and-hold, so it does not shimmer. */

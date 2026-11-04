@@ -532,7 +532,7 @@ export const NODE_BLURBS: Record<string, string> = {
   beat:
     'A pulse on every beat or every bar, and an edge for anything that fires. Follows the ' +
     'music’s beat, not just its loud moments. Needs a microphone.',
-  periodic: 'A metronome. Fires an edge every period.',
+  periodic: 'A metronome. Fires an edge every period, or at random times with Randomness.',
   threshold: 'Turns a continuous source into an edge when it crosses a level.',
   macro: 'A knob you drive by hand, so one gesture can move several parameters.',
 }

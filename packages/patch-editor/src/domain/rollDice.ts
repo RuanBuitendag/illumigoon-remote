@@ -176,6 +176,8 @@ const ROLL_RANGE: Record<string, readonly [number, number]> = {
   'audio_band.slew': [0, 0.2],
   'periodic.period': [0.3, 6],
   'periodic.slew': [0, 0.2],
+  'periodic.jitter': [0, 1],
+  'periodic.chance': [0.5, 1],
   'threshold.level': [0.3, 0.8],
   'threshold.hysteresis': [0.02, 0.2],
   'threshold.slew': [0, 0.2],

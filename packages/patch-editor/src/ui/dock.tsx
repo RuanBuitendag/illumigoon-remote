@@ -103,7 +103,9 @@ const DETAIL: Record<string, (m: Modulator) => string> = {
     m.source === undefined
       ? 'no source'
       : `on ${m.source} · ${(m.params.attack ?? 0).toFixed(2)}/${(m.params.decay ?? 0).toFixed(2)}`,
-  periodic: ({ params: p }) => `every ${(p.period ?? 1).toFixed(2)} s`,
+  periodic: ({ params: p }) =>
+    `${(p.jitter ?? 0) > 0 || (p.chance ?? 1) < 1 ? 'about every' : 'every'} ` +
+    `${(p.period ?? 1).toFixed(2)} s`,
   math: mathDetail,
 }
 

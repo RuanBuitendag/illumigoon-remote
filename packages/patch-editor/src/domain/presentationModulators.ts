@@ -170,6 +170,14 @@ export const MODULATOR_PRESENTATION: Record<string, Presentation> = {
     curve: 3.5,
     desc: 'Seconds between fires. This is the metronome the rest of a patch can hang off.',
   },
+  'periodic.jitter': {
+    desc:
+      'How far each fire may land from the beat. At 0 it ticks evenly; at 1 the gaps run ' +
+      'from nothing to twice the period.',
+  },
+  'periodic.chance': {
+    desc: 'How likely each period is to fire at all. Lower it for sparse, uneven hits.',
+  },
 
   'threshold.level': { desc: 'The value the input must reach for this to fire.' },
   'threshold.hysteresis': {

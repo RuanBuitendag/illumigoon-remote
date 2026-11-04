@@ -1438,6 +1438,24 @@
      "unit": "s"
     },
     {
+     "key": "jitter",
+     "label": "Randomness",
+     "min": 0,
+     "max": 1,
+     "def": 0,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
+     "key": "chance",
+     "label": "Chance",
+     "min": 0,
+     "max": 1,
+     "def": 1,
+     "mod": true,
+     "overflow": "clamp"
+    },
+    {
      "key": "slew",
      "label": "Slew",
      "min": 0,
@@ -1858,5 +1876,5 @@
    ]
   }
  },
- "catalogHash": 3160481149
+ "catalogHash": 3108613810
 }
