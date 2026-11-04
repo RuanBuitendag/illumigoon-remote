@@ -26,7 +26,7 @@
     "ws": "^8.21.3"
   },
   "scripts": {
-    "lint": "npm run lint:types && npm run lint:code && npm run lint:complexity && npm run lint:layers && npm run lint:dupes && npm run lint:rules",
+    "lint": "node scripts/lint-all.mjs",
     "lint:types": "tsc --noEmit -p tsconfig.json",
     "lint:code": "oxlint --deny-warnings src server",
     "lint:complexity": "biome lint --max-diagnostics=none",
