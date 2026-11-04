@@ -107,29 +107,31 @@ const LINKED_PAGES = new Set<PageKind>([
 
 const isLinked = (page: PageKind | null): page is PageKind => page !== null && LINKED_PAGES.has(page);
 
-export function addressOf({ roomId, isRoomOpen, page, isPageOpen, pageRoomId }: Navigation) {
+type Screen = Pick<Navigation, 'roomId' | 'isRoomOpen' | 'page' | 'isPageOpen' | 'pageRoomId'>;
+
+export function addressOf({ roomId, isRoomOpen, page, isPageOpen, pageRoomId }: Screen) {
   const room = isRoomOpen && roomId ? `/room/${encodeURIComponent(roomId)}` : '';
   if (!isPageOpen || !isLinked(page)) return room ? `#${room}` : '';
   const pageRoom = pageRoomId ? `/room/${encodeURIComponent(pageRoomId)}` : '';
   return `#${pageRoom || room}/${page}`;
 }
 
+const ADDRESS = /^#(?:\/room\/([^/]+))?(?:\/([a-z-]+))?$/;
+
 export function openAddress(address: string) {
-  const [, roomId, page] = /^#(?:\/room\/([^/]+))?(?:\/([a-z-]+))?$/.exec(address) ?? [];
+  const [, roomId, page] = ADDRESS.exec(address) ?? [];
   const room = roomId ? decodeURIComponent(roomId) : null;
   if (room) openRoom(room);
   const kind = page as PageKind | undefined;
   if (kind && isLinked(kind)) openPage(kind, room);
 }
 
-// The address follows the screens without adding history steps, so a back gesture never walks through them.
-export function keepAddress() {
-  openAddress(window.location.hash);
-  useNavigation.subscribe((state) => {
-    const address = addressOf(state);
-    if (address !== window.location.hash) {
-      window.history.replaceState(null, '', address || `${window.location.pathname}${window.location.search}`);
-    }
-  });
-  window.addEventListener('hashchange', () => openAddress(window.location.hash));
+// Shows the screens an address names and closes the rest. An address that names nothing changes nothing,
+// and one that names the screens already open leaves them as they are.
+export function followAddress(address: string) {
+  if ((address && !ADDRESS.test(address)) || address === addressOf(useNavigation.getState())) return;
+  const [, roomId] = ADDRESS.exec(address) ?? [];
+  if (!roomId) closeRoom();
+  useNavigation.setState({ isPageOpen: false, parentPage: null });
+  openAddress(address);
 }

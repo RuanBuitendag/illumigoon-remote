@@ -1,5 +1,17 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { addressOf, chooseLight, chooseLights, closePage, closeRoom, openAddress, openPage, openRoom, useNavigation } from './navigation-store';
+import {
+  addressOf,
+  chooseLight,
+  chooseLights,
+  closePage,
+  closeRoom,
+  followAddress,
+  openAddress,
+  openPage,
+  openRoom,
+  useNavigation,
+} from './navigation-store';
+import { addressOfLink } from './screen-history';
 
 const reset = () => {
   closePage();
@@ -35,6 +47,21 @@ describe('screen addresses', () => {
     openAddress('#/room/front%20room/schedules');
     const state = useNavigation.getState();
     expect([state.roomId, state.isRoomOpen, state.page, state.isPageOpen]).toEqual(['front room', true, 'schedules', true]);
+  });
+
+  it('follows an address back to fewer screens, and to Home', () => {
+    openAddress('#/room/lounge/looks');
+    followAddress('#/room/lounge');
+    expect(addressOf(useNavigation.getState())).toBe('#/room/lounge');
+    followAddress('');
+    expect(addressOf(useNavigation.getState())).toBe('');
+  });
+
+  it('reads the screen from a link to the app', () => {
+    expect(addressOfLink('illumigoon://room/lounge/looks')).toBe('#/room/lounge/looks');
+    expect(addressOfLink('illumigoon:///looks')).toBe('#/looks');
+    expect(addressOfLink('https://example.test/app/#/room/lounge')).toBe('#/room/lounge');
+    expect(addressOfLink('illumigoon:nothing')).toBe('');
   });
 
   it('opens nothing for an address it does not know', () => {

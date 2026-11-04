@@ -9,6 +9,7 @@ import { noteState, useFleet, type Light } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
 import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
+import { guardBack } from '../store/screen-history';
 import { momentsOf, offerUndo, pauseUndo } from '../store/undo';
 import { useEditorDialogs } from './editor-dialogs';
 
@@ -179,8 +180,13 @@ export function EditorPage({ room }: { room: Room | undefined }) {
     if (light && look && room) leaveEdit({ light, room, scope, before }, { name: lookName, look, isSaved });
   };
 
-  // The lights keep an unsaved look, but nothing else does, so a person is asked before it goes.
+  // The lights keep an unsaved look, but nothing else does, so a person is asked before it goes. The system
+  // Back gesture asks the same.
   const back = () => void askToLeave(isUnsaved, lookName, dialogs);
+  useEffect(() => {
+    if (!isOpen) return undefined;
+    return guardBack(() => void askToLeave(isUnsaved, lookName, dialogs));
+  }, [isOpen, isUnsaved, lookName, dialogs]);
 
   if (hasLeft || (!light && !isOpen)) return null;
   const frame = { backLabel, isOneLight, lookName, room, playing, section, onSection: setSection, onSave: () => setSaving(true) };

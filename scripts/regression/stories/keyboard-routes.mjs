@@ -15,6 +15,12 @@ async function tabTo(page, control, what) {
 }
 
 const named = (scope, name) => scope.getByRole('button', { name, exact: true });
+const heading = (page, name) => onTop(page).getByRole('heading', { name, level: 1 }).waitFor();
+
+async function atHome(page) {
+  await until(async () => (await page.evaluate(() => window.location.hash)) === '', 'the address to go back to Home');
+  await onTop(page).getByRole('button', { name: 'Open Lounge' }).waitFor();
+}
 
 export const keyboardRoutes = [
   {
@@ -55,18 +61,36 @@ export const keyboardRoutes = [
     },
   },
   {
-    name: 'K-3 an address opens its screen, and the screen keeps its address',
+    name: 'K-3 addresses open their screens, Back goes back one screen, and a screen keeps its address',
     lights: LOUNGE,
     async run({ page }) {
       await openLounge(page);
       const room = await page.evaluate(() => window.location.hash);
       expect(/^#\/room\/[^/]+$/.test(room), `the Lounge has the address "${room}"`);
-      await page.goto(page.url().replace(/#.*$/, `${room}/looks`));
-      await onTop(page).getByRole('heading', { name: 'Looks', level: 1 }).waitFor();
+      const go = (address) => page.goto(`${page.url().split('#')[0]}${address}`);
+      await go(`${room}/looks`);
+      await heading(page, 'Looks');
       await see(onTop(page), 'On Lounge');
+      await go(`${room}/room-settings`);
+      await heading(page, 'Room settings');
       await page.goBack();
+      await heading(page, 'Looks');
+      await page.goBack();
+      await heading(page, 'Lounge');
+      await page.goBack();
+      await atHome(page);
+      // The app's own way back goes back through the history too, so Back after it leaves the room.
+      await page.goForward();
+      await heading(page, 'Lounge');
+      await named(onTop(page), 'LOOKS').click();
+      await heading(page, 'Looks');
+      await named(onTop(page), 'Lounge').click();
+      await heading(page, 'Lounge');
+      await page.goBack();
+      await atHome(page);
+      await go(`${room}/looks`);
       await page.reload();
-      await onTop(page).getByRole('heading', { name: 'Lounge', level: 1 }).waitFor();
+      await heading(page, 'Looks');
     },
   },
 ];
