@@ -20,6 +20,7 @@ import type { ParamSpec } from '../domain/catalog';
 import { clamp, clamp01, DRAG_SPAN, fineOf, depthAfterDrag, slotNumber } from './bits';
 import { onFrame } from './live';
 import { doubleClick } from './touch';
+import { useKnobKeys } from './useKnobKeys';
 
 const RI = 19.5;
 const CI = 2 * Math.PI * RI;
@@ -499,6 +500,12 @@ export function Knob({
     spec, value, lo, hi, mods, svgRef, disabled, onChange, onCommit, onDepth, onDepthCommit,
   });
 
+  const keys = useKnobKeys({
+    spec, value, disabled, onChange, onCommit,
+    text: `${format(value, spec)}${spec.unit ? ` ${spec.unit}` : ''}`,
+    taper: { toPos: v => toPos(v, lo, hi, spec.curve), toValue: t => toValue(t, lo, hi, spec.curve) },
+  });
+
   const col = disabled ? 'var(--text-5)' : 'var(--text-2)';
   const [tx, ty] = polar(11, f);
   const [tx2, ty2] = polar(16, f);
@@ -511,6 +518,7 @@ export function Knob({
         width="56"
         height="56"
         viewBox="0 0 56 56"
+        {...keys}
         onPointerDown={pointer.onPointerDown}
         onPointerMove={pointer.onPointerMove}
         onPointerUp={pointer.endDrag}
