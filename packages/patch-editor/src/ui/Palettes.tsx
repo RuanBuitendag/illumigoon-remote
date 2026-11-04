@@ -94,9 +94,10 @@ function PaletteSaveForm({ ctl, where, entries, rows, onSaved, onError }: {
   return (
     <SaveBar clash={!!clash} onSave={save} ready={!!name.trim() && !!entries.length}>
       <SaveField
+        label="Name"
         value={name}
         wide
-        placeholder={where === 'master' ? 'Name the colours on MASTER' : 'Name the colours on this layer'}
+        placeholder={where === 'master' ? 'The colours on MASTER' : 'The colours on this layer'}
         onChange={setName}
         onEnter={save}
         font="var(--type-note)"

@@ -57,6 +57,7 @@
 .patch-editor .grow { flex-grow: 1; }
 .patch-editor .row { display: flex; align-items: center; }
 .patch-editor .col { display: flex; flex-direction: column; }
+.patch-editor .namedfield { gap: var(--space-1); flex-grow: 1; min-width: 0; }
 
 /* ------------------------------------------------------------- controls */
 

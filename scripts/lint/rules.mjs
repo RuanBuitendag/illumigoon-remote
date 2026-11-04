@@ -15,6 +15,7 @@
 //     the editor, in its style sheet and in the inline styles of its components.
 //   - Every media query width in the app and the editor is the --wide token.
 //   - The words the app shows keep the style rules of docs/design-system/voice.md that a machine can check.
+//   - No name is cut off with an ellipsis or a line clamp in composites or the design system. It wraps (DA-14).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -59,6 +60,10 @@ const CSS_RAW_COLOUR = [
   /(?<![\w-])#[0-9a-fA-F]{3,8}\b|\brgba?\(\s*\d|\bhsla?\(/g,
   'use a token from design-system.css',
 ];
+
+// A name cut off with its full text out of reach: an ellipsis or a line clamp. A name that does not fit wraps (DA-14).
+const CSS_CUT_OFF = ['cut-off-text', /text-overflow\s*:\s*ellipsis|line-clamp\s*:/g, 'let the text wrap, so all of it shows'];
+const INLINE_CUT_OFF = ['cut-off-text', /\b(?:textOverflow\s*:\s*['"]ellipsis|WebkitLineClamp|lineClamp)\b/g, 'let the text wrap, so all of it shows'];
 
 const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem)?(?![\d.]))\d*\.?\d+(?:px|em|rem)\b/;
 const BARE_WEIGHT = /(?<![\w.-])[1-9]00\b/;
@@ -206,6 +211,7 @@ function checkSizes(file, from = 0) {
 
 function checkCss(file, layer) {
   if (layer === 'domain') report(file, 1, 'look-in-domain', 'the domain holds no CSS: move it to a composite');
+  if (layer !== 'domain') runChecks(file, [CSS_CUT_OFF]);
   if (layer === 'composites') {
     runChecks(file, [CSS_RAW_COLOUR]);
     checkTokens(file, TYPE_PROPERTY, 'raw-type');
@@ -230,6 +236,7 @@ for (const file of walk(SOURCE)) {
   else if (file.endsWith('.css')) checkCss(file, layer);
   else if (/\.tsx?$/.test(file)) runChecks(file, CODE_CHECKS[layer]);
   if (file.endsWith('.tsx') && (layer === 'design-system' || layer === 'composites')) {
+    runChecks(file, [INLINE_CUT_OFF]);
     checkInlineGeometry(file, [...INLINE_GEOMETRY, ...INLINE_SIZE]);
   }
   if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);

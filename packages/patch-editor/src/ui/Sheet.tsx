@@ -8,7 +8,7 @@ import { Sheet } from '../../../../src/composites';
 import { ask } from '../host';
 import { Lab } from './bits';
 import { suspend } from './live';
-import { Field, Pill } from './controls';
+import { NamedField, Pill } from './controls';
 
 /** Run a write, and hand what went wrong to the sheet's own error line. */
 export async function attempt(work: () => Promise<void>, onError: (message: string) => void) {
@@ -68,9 +68,12 @@ export function SaveBar({ label, ready, clash, onSave, children }: {
   );
 }
 
-/** One text field of a save bar. Enter saves. */
-export function SaveField({ value, placeholder, disabled, wide, font, colour, onChange, onEnter }: {
+/** One text field of a save bar, with its name shown above it (FO-1). Enter saves. */
+export function SaveField({ label, value, placeholder, disabled, wide, font, colour, onChange, onEnter }: {
+  /** The field's name, shown above it, so it stays when the person types. */
+  label: string;
   value: string;
+  /** A hint of what to type, never the field's name. */
   placeholder: string;
   disabled?: boolean;
   /** Take what is left of the bar, rather than the fixed width of a name. */
@@ -83,7 +86,7 @@ export function SaveField({ value, placeholder, disabled, wide, font, colour, on
   return (
     <div className={wide ? 'row well grow' : 'row well'}
          style={{ padding: 'var(--space-3)', width: wide ? undefined : 'var(--edit-shelf-field)' }}>
-      <Field label={placeholder}
+      <NamedField label={label}
         value={value}
         placeholder={placeholder}
         spellCheck={false}

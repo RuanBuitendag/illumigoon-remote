@@ -128,10 +128,10 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
     <>
       <SaveBar label={layer ? `Save ${layerName(layer.slot)} as` : 'Save as'} clash={!!clash} onSave={save}
                ready={!!layer && !!name.trim()}>
-        <SaveField value={name} wide={false} disabled={!layer} onChange={setName} onEnter={save}
-                   placeholder={layer ? 'Name it' : 'Select a layer first'}
+        <SaveField label="Name" value={name} wide={false} disabled={!layer} onChange={setName} onEnter={save}
+                   placeholder={layer ? 'Warm flicker' : 'Select a layer first'}
                    font="var(--type-note)" colour="var(--text-1)" />
-        <SaveField value={notes} wide disabled={!layer} onChange={setNotes} onEnter={save}
+        <SaveField label="Notes" value={notes} wide disabled={!layer} onChange={setNotes} onEnter={save}
                    placeholder="What it is, in a sentence"
                    font="var(--type-note)" colour="var(--text-3)" />
       </SaveBar>
