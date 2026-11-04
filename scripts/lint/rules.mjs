@@ -215,7 +215,7 @@ for (const file of walk(SOURCE)) {
   else if (!layer) report(file, 1, 'outside-the-layers', `move it into ${LAYERS.join(', ')}`);
   else if (file.endsWith('.css')) checkCss(file, layer);
   else if (/\.tsx?$/.test(file)) runChecks(file, CODE_CHECKS[layer]);
-  if (/\.tsx$/.test(file) && (layer === 'design-system' || layer === 'composites')) {
+  if (file.endsWith('.tsx') && (layer === 'design-system' || layer === 'composites')) {
     checkInlineGeometry(file, [...INLINE_GEOMETRY, ...INLINE_SIZE]);
   }
   if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);
