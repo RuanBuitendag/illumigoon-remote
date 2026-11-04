@@ -27,4 +27,5 @@ export { Icon, IconFrame } from './icons';
 export { SoundMark, StatusMark } from './marks';
 export { Presence } from './presence';
 export { Eyebrow, Picked, ValueText } from './text';
+export { UNDO_SECONDS } from './timing';
 export { TextArea, TextField } from './text-field';

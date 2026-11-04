@@ -1,10 +1,9 @@
 import { create } from 'zustand';
+import { UNDO_SECONDS } from '../../design-system';
 import type { AnimationState } from '../light-network/protocol';
 import { applyState, noteState, setPower, useFleet, type Light } from './fleet-store';
 import { cancelWaiting, gapOf, laterOn } from './light-timing';
 import { lookNameOf } from './rooms';
-
-const UNDO_MS = 10000;
 
 // What one light was doing before a change.
 export type LightMoment = {
@@ -34,7 +33,7 @@ export const pauseUndo = () => window.clearTimeout(timer);
 
 export function resumeUndo() {
   pauseUndo();
-  timer = window.setTimeout(() => useUndo.setState({ offer: null }), UNDO_MS);
+  timer = window.setTimeout(() => useUndo.setState({ offer: null }), UNDO_SECONDS * 1000);
 }
 
 export const momentsOf = (lights: Light[]): LightMoment[] =>
