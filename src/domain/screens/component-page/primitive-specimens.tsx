@@ -227,7 +227,7 @@ const COLOURS: Specimen[] = [
       line: <LedStrip recording={RECORDING} shape="line" onFirstView={nothing} />,
       dim: <LedStrip recording={RECORDING} shape="line" brightness={0.3} onFirstView={nothing} />,
       off: <LedStrip recording={RECORDING} shape="line" isOn={false} onFirstView={nothing} />,
-      'no recording yet': <LedStrip recording={null} shape="line" onFirstView={nothing} />,
+      'loading, no recording yet': <LedStrip recording={null} shape="line" onFirstView={nothing} />,
     },
   },
 ];
@@ -268,6 +268,7 @@ const MARKS: Specimen[] = [
   { name: 'ValueText', states: { default: <ValueText>60 %</ValueText>, 'long text': <ValueText>{LONG_NAME}</ValueText> } },
   {
     name: 'Dialog',
+    focus: null,
     states: {
       'open on demand': (
         <OnDemand label="OPEN DIALOG">

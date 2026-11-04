@@ -154,7 +154,7 @@ const LISTS: Specimen[] = [
   },
   { name: 'LockStatus', states: { default: <LockStatus>Locked to this phone</LockStatus> } },
   { name: 'PageHint', states: { default: <PageHint>Hold a look to see it here first.</PageHint> } },
-  { name: 'ScanNote', states: { default: <ScanNote strip={strip}>Looking for lights on this Wi-Fi.</ScanNote> } },
+  { name: 'ScanNote', states: { loading: <ScanNote strip={strip}>Looking for lights on this Wi-Fi.</ScanNote> } },
   {
     name: 'ArrangeRow',
     states: {

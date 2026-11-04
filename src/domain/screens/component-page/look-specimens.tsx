@@ -148,7 +148,7 @@ const ROOMS: Specimen[] = [
     states: {
       default: <RoomCard {...card} />,
       open: <RoomCard {...card} isOpen hasSound />,
-      'not answered yet': <RoomCard {...card} lookName="" onOpen={undefined} onLooks={undefined} note="Waiting for the lights." />,
+      'loading, not answered yet': <RoomCard {...card} lookName="" onOpen={undefined} onLooks={undefined} note="Waiting for the lights." />,
       'held by someone else': <RoomCard {...card} name={LONG_NAME} onLooks={undefined} note="Locked by another phone." />,
     },
   },
@@ -176,7 +176,7 @@ const ROOMS: Specimen[] = [
     states: {
       default: <LightCard {...lightCard} />,
       chosen: <LightCard {...lightCard} isChosen note="Plays Candle" />,
-      disabled: <LightCard {...lightCard} disabled note="Does not answer" />,
+      'error, does not answer': <LightCard {...lightCard} disabled note="Does not answer" />,
       'long text': <LightCard {...lightCard} name={LONG_NAME} />,
     },
   },

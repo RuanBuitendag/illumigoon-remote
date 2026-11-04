@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ColourFill } from '../design-system';
 
 // The frame of the component page (D68): every primitive and composite of the two doors, in each of its
@@ -19,18 +19,54 @@ export function ComponentPageLayout({ title, intro, children }: ComponentPageLay
   );
 }
 
-type ComponentEntryProps = { name: string; door: string; children: ReactNode };
+type ComponentEntryProps = { name: string; door: string; notes?: ReactNode; children: ReactNode };
 
-// One export of a door, with its states side by side.
-export function ComponentEntry({ name, door, children }: ComponentEntryProps) {
+// One export of a door: its notes, then its states side by side.
+export function ComponentEntry({ name, door, notes, children }: ComponentEntryProps) {
   return (
     <section className="component-entry" aria-label={name}>
       <h2 className="component-entry-name">
         {name}
         <span className="component-entry-door">{door}</span>
       </h2>
+      {notes}
       <div className="component-states">{children}</div>
     </section>
+  );
+}
+
+// What a component is made of and how it is used (CM-7): each note is a term and a line of text.
+export function ComponentNotes({ notes }: { notes: { term: string; text: string }[] }) {
+  return (
+    <dl className="component-notes">
+      {notes.map(({ term, text }) => (
+        <div key={term} className="component-note">
+          <dt>{term}</dt>
+          <dd>{text}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
+const FOCUSABLE = 'button:not(:disabled), input:not(:disabled):not([type="hidden"]), select, textarea, [href], [tabindex="0"], [role="slider"]';
+
+// A state drawn with the keyboard focus on its first control (ST-1). The ring is the one focus ring, worn
+// through `data-focus-visible`, so every cell shows it at once. A state with no control shows no focus cell.
+export function ComponentFocusState({ children }: { children: ReactNode }) {
+  const cell = useRef<HTMLDivElement>(null);
+  const [hasControl, setHasControl] = useState(true);
+  useEffect(() => {
+    const control = cell.current?.querySelector<HTMLElement>(FOCUSABLE);
+    if (control) control.dataset.focusVisible = 'true';
+    else setHasControl(false);
+  }, []);
+  if (!hasControl) return null;
+  return (
+    <div ref={cell} className="component-state">
+      <span className="component-state-name">focus</span>
+      {children}
+    </div>
   );
 }
 

@@ -269,7 +269,8 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 /* Focus. Every control reached by keyboard shows the same ring. The fader's real input is hidden
    inside its thumb, so the bar carries the ring for it. */
 :focus-visible,
-.fader-control:has(:focus-visible) { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
+[data-focus-visible],
+.fader-control:has(:focus-visible, [data-focus-visible]) { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
 :focus:not(:focus-visible) { outline: 0; }
 
 /* A finger on iPhone: a text field under 16 px makes Safari zoom in when it is tapped. */

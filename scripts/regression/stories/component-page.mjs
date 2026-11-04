@@ -1,13 +1,16 @@
 // The component page (D68, LIFE-1955) draws every component of the two doors without an error, on the phone
 // and on the laptop, and nothing on it scrolls the page sideways. Each sheet and dialog on it opens and closes.
-// It fails on an error thrown in the page, an error in the console, a door's component with no drawn states,
-// a page wider than the window, or a key that opens nothing.
+// Each component has its notes, and a control shows the focus ring in its focus state (CM-7, ST-1).
+// It fails on an error thrown in the page, an error in the console, a door's component with no drawn states or
+// no notes, a focus state with no ring, a page wider than the window, or a key that opens nothing.
 import fs from 'node:fs';
 import { expect } from './steps.mjs';
 
 const DOORS = ['src/design-system/index.ts', 'src/composites/index.ts'];
 const DOOR_EXPORTS = /^export\s*\{([^}]*)\}\s*from/gm;
 const OPEN_KEYS = /^OPEN /;
+// A key of the app, a switch, a fader and one of Edit's keys, each of which shows a focus state.
+const FOCUSED = ['TextKey', 'PowerKey', 'Fader', 'Pill'];
 
 // The components of the two doors, by the rule lint:rules uses.
 const components = DOORS.flatMap((door) =>
@@ -21,6 +24,10 @@ function drawn() {
   const sections = [...document.querySelectorAll('.component-entry')].map((section) => ({
     name: section.getAttribute('aria-label'),
     states: section.querySelectorAll(':scope > .component-states > .component-state').length,
+    hasNotes: section.querySelector(':scope > .component-notes') !== null,
+    ring: [...section.querySelectorAll(':scope > .component-states > .component-state')]
+      .filter((state) => state.querySelector('.component-state-name')?.textContent === 'focus')
+      .map((state) => getComputedStyle(state.querySelector('[data-focus-visible]') ?? state).outlineStyle)[0] ?? 'none',
   }));
   const scroller = document.querySelector('.component-page');
   return { sections, width: scroller?.scrollWidth ?? 0, window: scroller?.clientWidth ?? 0 };
@@ -59,6 +66,11 @@ const checkAt = ([viewport, size]) => ({
     const { sections, width, window } = await page.evaluate(drawn);
     const missing = components.filter((name) => !sections.some((section) => section.name === name && section.states > 0));
     expect(missing.length === 0, `no states drawn for ${missing.join(', ')}`);
+    const ours = sections.filter((section) => components.includes(section.name));
+    const noNotes = ours.filter((section) => !section.hasNotes).map((section) => section.name);
+    expect(noNotes.length === 0, `no notes for ${noNotes.join(', ')}`);
+    const noRing = FOCUSED.filter((name) => sections.find((section) => section.name === name)?.ring === 'none');
+    expect(noRing.length === 0, `no focus ring in the focus state of ${noRing.join(', ')}`);
     expect(width <= window, `the page is ${width} px wide in a ${window} px window`);
     const opened = await openEach(page);
     expect(opened > 0, 'no sheet or dialog to open');

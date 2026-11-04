@@ -1,7 +1,9 @@
 import {
   BottomNotice,
   ComponentEntry,
+  ComponentFocusState,
   ComponentFrame,
+  ComponentNotes,
   ComponentPageLayout,
   ComponentState,
   EditLayout,
@@ -58,6 +60,7 @@ const undo = <TextKey onClick={nothing}>UNDO</TextKey>;
 const HOME: Specimen[] = [
   {
     name: 'HomeLayout',
+    focus: null,
     states: {
       default: <ComponentFrame size="screen">{home}</ComponentFrame>,
       'with a notice': (
@@ -90,6 +93,7 @@ const HOME: Specimen[] = [
 const PAGES: Specimen[] = [
   {
     name: 'ScreenStack',
+    focus: null,
     states: {
       home: <ComponentFrame size="screen"><ScreenStack {...stack} /></ComponentFrame>,
       'room open': <ComponentFrame size="screen"><ScreenStack {...stack} isRoomOpen /></ComponentFrame>,
@@ -113,9 +117,10 @@ const PAGES: Specimen[] = [
       ),
     },
   },
-  { name: 'RoomLayout', states: { default: <ComponentFrame size="screen">{room}</ComponentFrame> } },
+  { name: 'RoomLayout', focus: null, states: { default: <ComponentFrame size="screen">{room}</ComponentFrame> } },
   {
     name: 'EditLayout',
+    focus: null,
     states: {
       default: (
         <ComponentFrame size="screen">
@@ -135,13 +140,14 @@ const PAGES: Specimen[] = [
   },
   {
     name: 'SearchLayout',
+    focus: null,
     states: {
-      searching: (
+      'loading, searching': (
         <ComponentFrame size="screen">
           <SearchLayout strip={strip} text="Looking for lights." note="On this Wi-Fi." />
         </ComponentFrame>
       ),
-      'nothing found': (
+      'error, nothing found': (
         <ComponentFrame size="screen">
           <SearchLayout strip={strip} text="No lights found." hint="Check that the lights are on." note="On this Wi-Fi.">
             <TextKey onClick={nothing}>TRY AGAIN</TextKey>
@@ -152,13 +158,15 @@ const PAGES: Specimen[] = [
   },
   {
     name: 'Toast',
+    focus: 'with a key',
     states: {
       'tells only': <ComponentFrame size="line"><Toast text="Saved." /></ComponentFrame>,
       'with a key': <ComponentFrame size="line"><Toast text="Lounge turned off.">{undo}</Toast></ComponentFrame>,
       'long text': <ComponentFrame size="line"><Toast text={LONG_NAME}>{undo}</Toast></ComponentFrame>,
+      error: <ComponentFrame size="line"><Toast text="Could not reach the clipboard." /></ComponentFrame>,
     },
   },
-  { name: 'Presence', states: { 'a toast that leaves': <LeavingToast /> } },
+  { name: 'Presence', focus: null, states: { 'a toast that leaves': <LeavingToast /> } },
 ];
 
 // A toast inside Presence: HIDE lets it leave with its motion, SHOW brings it back.
@@ -175,6 +183,7 @@ function LeavingToast() {
 const SHEETS: Specimen[] = [
   {
     name: 'Sheet',
+    focus: null,
     states: {
       'closes with a cross': (
         <OnDemand label="OPEN SHEET">
@@ -214,6 +223,7 @@ const SHEETS: Specimen[] = [
   },
   {
     name: 'Overlay',
+    focus: null,
     states: {
       'open on demand': (
         <OnDemand label="OPEN OVERLAY">
@@ -258,6 +268,15 @@ const PAGE_PARTS: Specimen[] = [
   { name: 'ComponentState', states: { default: <ComponentState state="a state">{null}</ComponentState> } },
   { name: 'ComponentFrame', states: { line: <ComponentFrame size="line">{null}</ComponentFrame> } },
   { name: 'PaintSample', states: { default: <PaintSample paint="var(--text-3)" /> } },
+  {
+    name: 'ComponentNotes',
+    states: { default: <ComponentNotes notes={[{ term: 'Parts', text: 'What it is made of.' }]} /> },
+  },
+  {
+    name: 'ComponentFocusState',
+    focus: null,
+    states: { 'on a key': <ComponentFocusState><TextKey onClick={nothing}>SAVE</TextKey></ComponentFocusState> },
+  },
 ];
 
 export const SCREENS = [...HOME, ...PAGES, ...SHEETS, ...PAGE_PARTS];

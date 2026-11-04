@@ -55,7 +55,7 @@
 .toast[data-over-dock='true'] { bottom: var(--clear-dock); z-index: var(--layer-editor-toast); }
 .toast-text { min-width: 0; padding: var(--space-3) 0; font: var(--type-note); }
 .toast .text-key { min-height: 0; color: inherit; font: var(--type-label); letter-spacing: var(--tracking-label); }
-.toast :focus-visible { outline-color: var(--on-fill); }
+.toast :focus-visible, .toast [data-focus-visible] { outline-color: var(--on-fill); }
 
 .home-screen { display: flex; flex-direction: column; height: 100%; }
 .home-screen > .home-scroll { flex: 1; min-height: 0; height: auto; }

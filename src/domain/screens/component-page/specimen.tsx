@@ -2,8 +2,10 @@ import { useState, type ReactNode } from 'react';
 import { ComponentFrame } from '../../../composites';
 import { LED_COUNT, STARTER_COLOUR_SETS, TextKey, type StripRecording } from '../../../design-system';
 
-// One export of a door on the component page (D68), and what it looks like in each of its states.
-export type Specimen = { name: string; states: Record<string, ReactNode> };
+// One export of a door on the component page (D68), and what it looks like in each of its states. `focus` names
+// the state drawn again with the focus ring (ST-1): the first state when left out, none when null, as for a
+// screen, a sheet that takes the focus itself, or a part with no control.
+export type Specimen = { name: string; states: Record<string, ReactNode>; focus?: string | null };
 
 export const nothing = () => undefined;
 

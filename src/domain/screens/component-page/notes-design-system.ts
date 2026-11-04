@@ -1,0 +1,215 @@
+// The notes of each component of the design-system door on the component page (CM-7): what it is made of, its
+// keys, what a screen reader hears, one thing to do and one not to do. lint:rules fails a component with no note.
+export type Notes = { parts: string; keys: string; role: string; use: string; avoid: string };
+
+type NoteLines = [parts: string, keys: string, role: string, use: string, avoid: string];
+
+export const note = (...[parts, keys, role, use, avoid]: NoteLines): Notes => ({
+  parts,
+  keys,
+  role,
+  use,
+  avoid,
+});
+
+const DRAWN = 'None. It holds no control.';
+const PRESSES = 'Tab reaches it, and Enter or Space presses it.';
+
+export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
+  Press: note(
+    'A button with no look of its own around what it holds.',
+    `${PRESSES} A hold has no key, so what a hold does has another way too.`,
+    'A button. It says aria-pressed when it is a choice that stays on.',
+    'Use it when a whole row or card is the thing to press.',
+    'Give it a look of its own here. A new look is a composite with its own class.',
+  ),
+  TextKey: note(
+    'One or two words in the label type, in capitals.',
+    PRESSES,
+    'A button, named by its words.',
+    'Say a verb or a noun the person knows: SAVE, EDIT.',
+    'Write a sentence on it.',
+  ),
+  ActionKey: note(
+    'A sentence-case line across the row, with a chevron at its end.',
+    PRESSES,
+    'A button, named by its words.',
+    'Use it for the one next step on a page, such as joining a Wi-Fi.',
+    'Put two on one page.',
+  ),
+  LinkKey: note(
+    'Words in the text around them, underlined.',
+    PRESSES,
+    'A button. It never leaves the app, so it is not a link.',
+    'Use it for a step inside a note: Update now.',
+    'Use it on its own row. That is a TextKey.',
+  ),
+  AddKey: note(
+    'A plus and a word in capitals, on one line.',
+    PRESSES,
+    'A button, named by its words.',
+    'Start its words with +: + ADD A LIGHT.',
+    'Use it for anything that does not add.',
+  ),
+  FileKey: note(
+    'A TextKey with a hidden file field behind it.',
+    'Tab reaches it, and Enter opens the device’s file chooser.',
+    'A button. The file field is hidden from the reader.',
+    'Say in its words what it takes.',
+    'Show the file’s name after it loads. Say what was loaded.',
+  ),
+  BackKey: note(
+    'A chevron and the name of the screen it goes back to.',
+    `${PRESSES} The device’s Back and the iPhone’s swipe go back the same way.`,
+    'A button, named by the screen behind.',
+    'Name the screen behind: Lounge.',
+    'Write Back on it, or put two ways back on one screen.',
+  ),
+  KeyRow: note(
+    'A row that keeps its keys a step apart.',
+    'Each key is a stop of its own, in reading order.',
+    'No role of its own.',
+    'Use it for two or three keys that act on the same thing.',
+    'Mix a key and a switch in one row.',
+  ),
+  PowerKey: note(
+    'A track and a thumb. The thumb is ink when on and steps down the ramp when off.',
+    'Tab reaches it, and Space or Enter turns it on or off.',
+    'A switch, with aria-checked, named by what it powers.',
+    'Name it by what it powers: Lounge power.',
+    'Write ON or OFF beside it. The switch says it.',
+  ),
+  OptionRow: note(
+    'A row of words. The picked one wears the selected line.',
+    'Tab reaches each word, and Enter or Space picks it.',
+    'A group named by its label, of buttons with aria-pressed.',
+    'Use it for two to four choices that fit on one line.',
+    'Use it for on and off. That is a PowerKey.',
+  ),
+  Fader: note(
+    'A track, a lit band from the start to the value, and a thumb.',
+    'The arrows step it, Page Up and Page Down step further, and Home and End go to the ends.',
+    'A slider, named by its label, with its value.',
+    'Show the value in words beside it, as SliderRow does.',
+    'Use it for a few named steps. That is an OptionRow.',
+  ),
+  FaderBand: note(
+    'A faint band over a fader’s track, edged by a line.',
+    DRAWN,
+    'Drawn only. The fader’s value is what the reader hears.',
+    'Use it for the range something sweeps the fader through.',
+    'Use it for the fader’s own value.',
+  ),
+  FaderDot: note(
+    'A dot on a fader’s track that its owner moves without a render.',
+    DRAWN,
+    'Drawn only.',
+    'Use it for a value that moves many times a second.',
+    'Move it through React state. Move it by its ref.',
+  ),
+  TextField: note(
+    'A line of text with an underline. The label is read; the placeholder is only a hint.',
+    'Tab in and type. It keeps the text when the focus leaves.',
+    'A text box named by its label.',
+    'Give every field a label, even when the placeholder says the same.',
+    'Set its text under the field size on a phone. Safari zooms in.',
+  ),
+  TextArea: note(
+    'A box of lines with the field’s underline.',
+    'Tab in and type. Enter starts a new line, and Tab leaves.',
+    'A text box of many lines, named by its label.',
+    'Use it for a pasted look.',
+    'Use it for a name. That is a TextField.',
+  ),
+  Swatch: note(
+    'A box painted one colour, with a fine edge so a pale colour keeps its shape.',
+    'As a key, Tab reaches it, and Enter opens the device’s colour picker.',
+    'Drawn only, or a colour input named by its label.',
+    'Name it by what it colours: Colour 1.',
+    'Show its hex code beside it.',
+  ),
+  ColourSlot: note(
+    'A swatch in a press. The selected one is ringed.',
+    PRESSES,
+    'A button with aria-pressed, named by its label.',
+    'Use it for one colour of a set.',
+    'Use it for a colour that cannot be picked. That is a Swatch.',
+  ),
+  ColourPad: note(
+    'A square for strength and brightness, and a hue bar under it.',
+    'Tab reaches the square, then the bar, and the arrows move each.',
+    'Two sliders.',
+    'Use it where a person picks a colour by eye.',
+    'Squeeze it into a narrow column. It needs a thumb’s room.',
+  ),
+  ColourFill: note(
+    'An area painted one colour or a run of colours.',
+    DRAWN,
+    'Drawn only.',
+    'Let the place it sits in give its size.',
+    'Use it as a key. That is a Swatch with onPick.',
+  ),
+  LedStrip: note(
+    'A drawing of the LEDs with their glow, played from a recording of the look.',
+    DRAWN,
+    'Hidden from the reader. The look’s name beside it says what plays.',
+    'Pick the shape that fits the place: room, tile or line.',
+    'Show a photo of a light instead.',
+  ),
+  Icon: note(
+    'A line drawing on the one 14 canvas, with the one 1.2 line.',
+    DRAWN,
+    'Hidden from the reader. The key that holds it carries the name.',
+    'Put it in a key that has a label.',
+    'Draw one at another size or with another line.',
+  ),
+  IconFrame: note(
+    'The frame of an icon, for a drawing that is not in the set.',
+    DRAWN,
+    'Hidden from the reader.',
+    'Use it for Edit’s wave shapes.',
+    'Use it for a new icon. Add the icon to the set.',
+  ),
+  StatusMark: note(
+    'A short flat bar: ink when on, grey when off, dotted when the light does not answer.',
+    DRAWN,
+    'Drawn only. The reader hears the light’s name beside it.',
+    'Put the light’s name next to it.',
+    'Give a state a colour. The mark stays in the ink ramp.',
+  ),
+  SoundMark: note(
+    'Three short bars.',
+    DRAWN,
+    'An image named Moves to music.',
+    'Show it beside a look that moves to music.',
+    'Also write that the look moves to music in the same row.',
+  ),
+  Eyebrow: note(
+    'A small capital label in the label type.',
+    DRAWN,
+    'A heading, level 2.',
+    'Use it to title a section: LIGHTS.',
+    'Use it as a key or a note.',
+  ),
+  Picked: note(
+    'The one selected mark: a line under the words, or a rule down the side of a row.',
+    DRAWN,
+    'Drawn only. The key that holds it says aria-pressed.',
+    'Use it for every chosen thing, in the app and in Edit.',
+    'Mark a choice with a wash or a colour as well.',
+  ),
+  ValueText: note(
+    'A number in the value type.',
+    DRAWN,
+    'Plain text.',
+    'Write whole numbers, with a space before a unit: 60 %.',
+    'Show a raw fraction such as 0.6.',
+  ),
+  Dialog: note(
+    'A scrim, and a box in the middle with its own keys.',
+    'The focus moves in when it opens and stays inside. Escape closes it and gives the focus back.',
+    'A modal dialog, named by its label.',
+    'Use it on the laptop for a form or a table.',
+    'Open one dialog over another.',
+  ),
+};

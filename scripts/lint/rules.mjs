@@ -264,6 +264,13 @@ const DOOR_IMPORTS = /^import\s*\{([^}]*)\}\s*from\s*'[./]*(?:design-system|comp
 const namesIn = (text, pattern) =>
   [...text.matchAll(pattern)].flatMap(([, names]) => names.split(',').map((name) => name.trim().split(/\s+as\s+/).at(-1)));
 
+// Every component also has notes on the page (CM-7), and so has each of Edit's controls, which the editor
+// package draws and the app's page describes.
+const EDIT_SPECIMEN_FILE = 'packages/patch-editor/src/ui/specimens.tsx';
+const hasNotes = (page, name) => new RegExp(`\\b${name}: note\\(`).test(page);
+const missingNotes = (file, name) =>
+  report(file, 1, 'missing-notes', `${name}: give it notes, note(parts, keys, role, use, avoid), in ${COMPONENT_PAGE}`);
+
 function checkComponentPage() {
   const page = COMPONENT_PAGE_FILES.map((file) => fs.readFileSync(file, 'utf8')).join('\n');
   const imported = new Set(namesIn(page, DOOR_IMPORTS));
@@ -274,7 +281,12 @@ function checkComponentPage() {
       if (!imported.has(name) || !page.includes(`'${name}'`)) {
         report(door, 1, 'missing-from-component-page', `${name}: give it a specimen in ${COMPONENT_PAGE}`);
       }
+      if (!hasNotes(page, name)) missingNotes(door, name);
     }
+  }
+  const editSpecimens = fs.readFileSync(EDIT_SPECIMEN_FILE, 'utf8');
+  for (const [, name] of editSpecimens.matchAll(/^\s*name: '(\w+)'/gm)) {
+    if (!hasNotes(page, name)) missingNotes(EDIT_SPECIMEN_FILE, name);
   }
 }
 
