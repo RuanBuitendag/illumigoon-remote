@@ -24,6 +24,7 @@
 import { Component, type ReactNode } from 'react';
 import { MissingNode } from '../domain/catalog';
 import { Lab, Mono } from './bits';
+import { Pill } from './controls';
 
 interface Props {
   children: ReactNode;
@@ -74,7 +75,7 @@ export class Boundary extends Component<Props, State> {
               : error.message}
           </p>
           {this.props.firmware && <Mono className="dim sm">fw {this.props.firmware}</Mono>}
-          <button className="pill raise" onClick={this.props.onLeave}>Pick another device</button>
+          <Pill className="raise" onClick={this.props.onLeave}>Pick another device</Pill>
         </div>
       </div>
     );

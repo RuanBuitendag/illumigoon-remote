@@ -19,6 +19,8 @@ import { Blurb, Lab, Mono, Seg, Switch } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { format } from './Knob';
 import { words, num, arrange, Catch, placed } from './Surface';
+import { Choice, Field, IconKey, Pill } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 /** What the popover holds while it is open. Numbers as text, so a half-typed `-0.` stays put. */
 interface Draft {
@@ -213,7 +215,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
 
         <label className="popfield">
           <Lab className="dim">Label</Lab>
-          <input
+          <Field label="Label"
             className="popin"
             value={d.label}
             autoFocus
@@ -228,9 +230,7 @@ export function ControlEditor({ ctl, at, control, isNew, onClose }: {
         <TypeFields patch={patch} control={control} next={next} d={d} set={set} />
 
         {problem && (
-          <span className="warnline">
-            {problem}
-          </span>
+          <LookProblem>{problem}</LookProblem>
         )}
 
         <EditorButtons isNew={isNew} canSave={!problem} onRemove={remove} onClose={onClose}
@@ -283,17 +283,17 @@ function EditorButtons({ isNew, canSave, onRemove, onClose, onSave }: {
       {isNew ? (
         <span />
       ) : (
-        <button className="pill" onClick={onRemove}>
+        <Pill onClick={onRemove}>
           REMOVE
-        </button>
+        </Pill>
       )}
       <div className="row" style={{ gap: 'var(--space-1)' }}>
-        <button className="pill" onClick={onClose}>
+        <Pill onClick={onClose}>
           CANCEL
-        </button>
-        <button className="pill" data-primary="true" disabled={!canSave} onClick={onSave}>
+        </Pill>
+        <Pill isPrimary disabled={!canSave} onClick={onSave}>
           {isNew ? 'EXPOSE' : 'SAVE'}
-        </button>
+        </Pill>
       </div>
     </div>
   );
@@ -347,7 +347,7 @@ function NumberFields({ patch, path, spec, d, set }: {
         <b style={{ left: at(base) }} title={`now ${base}`} />
       </div>
       <div className="row" style={{ gap: 'var(--space-2)' }}>
-        <input
+        <Field label="Lowest value"
           className="popin grow"
           type="number"
           step="any"
@@ -355,7 +355,7 @@ function NumberFields({ patch, path, spec, d, set }: {
           onChange={e => set({ lo: e.target.value })}
         />
         <Mono className="dim sm">to</Mono>
-        <input
+        <Field label="Highest value"
           className="popin grow"
           type="number"
           step="any"
@@ -372,6 +372,7 @@ function NumberFields({ patch, path, spec, d, set }: {
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="dim">Show as</Lab>
         <Seg
+          label="Show as"
           items={['value', 'percent'] as const}
           value={d.percent ? 'percent' : 'value'}
           tight
@@ -383,7 +384,7 @@ function NumberFields({ patch, path, spec, d, set }: {
       {d.percent ? (
         <label className="popfield">
           <Lab className="dim">Curve — 1 is even; above 1 spends more travel at the low end</Lab>
-          <input
+          <Field label="Curve"
             className="popin"
             type="number"
             step={0.1}
@@ -396,7 +397,7 @@ function NumberFields({ patch, path, spec, d, set }: {
       ) : (
         <label className="popfield">
           <Lab className="dim">Unit — optional</Lab>
-          <input
+          <Field label="Unit"
             className="popin"
             value={d.unit}
             spellCheck={false}
@@ -420,7 +421,7 @@ function SectionField({ d, set, groups }: {
     <div className="popfield">
       <Lab className="dim">Section</Lab>
       {d.newGroup === null ? (
-        <select
+        <Choice label="Section"
           className="popin"
           value={d.group}
           onChange={e =>
@@ -434,10 +435,10 @@ function SectionField({ d, set, groups }: {
             </option>
           ))}
           <option value={'\0new'}>New section…</option>
-        </select>
+        </Choice>
       ) : (
         <div className="row" style={{ gap: 'var(--space-2)' }}>
-          <input
+          <Field label="New section"
             className="popin grow"
             value={d.newGroup}
             autoFocus
@@ -446,13 +447,13 @@ function SectionField({ d, set, groups }: {
             placeholder="Motion"
             onChange={e => set({ newGroup: e.target.value })}
           />
-          <button
-            className="iconbtn sm"
-            title="Pick an existing section"
+          <IconKey
+            isSmall
+            label="Pick an existing section"
             onClick={() => set({ newGroup: null })}
           >
             <Icon.X />
-          </button>
+          </IconKey>
         </div>
       )}
     </div>
@@ -473,7 +474,7 @@ function OptionFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
               set({ offered: d.offered.map((x, j) => (j === i ? { ...x, on } : x)) })
             }
           />
-          <input
+          <Field label={`Name of ${o.choice}`}
             className="popin grow"
             value={o.label}
             disabled={!o.on}
@@ -500,7 +501,7 @@ function PaletteFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
     <div className="row" style={{ gap: 'var(--space-3)' }}>
       <label className="popfield grow">
         <Lab className="dim">Fewest colours</Lab>
-        <input
+        <Field label="Fewest colours"
           className="popin"
           type="number"
           min={1}
@@ -511,7 +512,7 @@ function PaletteFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
       </label>
       <label className="popfield grow">
         <Lab className="dim">Most</Lab>
-        <input
+        <Field label="Most colours"
           className="popin"
           type="number"
           min={1}

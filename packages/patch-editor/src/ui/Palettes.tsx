@@ -29,6 +29,8 @@ import {
 } from '../library/palettes';
 import { Hr } from './bits';
 import type { Ctl } from './ctl';
+import { Key } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 interface Section {
   key: string;
@@ -181,7 +183,7 @@ export function PaletteSheet({ ctl, where, entries, onRecall, onClose }: {
         onSaved={refresh}
         onError={setError}
       />
-      {error && <div className="warnline palerror">{error}</div>}
+      {error && <div className="palerror"><LookProblem>{error}</LookProblem></div>}
       <Hr />
 
       <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) var(--space-5)' }}>
@@ -230,7 +232,7 @@ function PaletteTile({ e, on, deleting, onRecall, onDrop }: {
   const kept = e.entries.slice(0, LIMITS().PALETTE);
   const broken = !!e.error || !kept.length;
   return (
-    <button
+    <Key
       className="paltile"
       disabled={broken && !deleting}
       aria-label={deleting ? `Delete ${e.name}` : e.name}
@@ -242,6 +244,6 @@ function PaletteTile({ e, on, deleting, onRecall, onDrop }: {
         {deleting && <Icon.X c="currentColor" />}
       </span>
       {e.error && <span className="palnote">Could not read these colours.</span>}
-    </button>
+    </Key>
   );
 }

@@ -31,6 +31,8 @@ import type { Ctl } from './ctl';
 import { BandScope } from './BandScope';
 import type { AudioFeed } from '../domain/scope';
 import { deadReason } from './modulatorStatus';
+import { Key, Toggle } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 /**
  * The row that opens under a rack when a slot is clicked. ONE editor for both racks.
@@ -101,7 +103,7 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
             }
           />
         </span>
-        <button
+        <Key
           title="Remove this modulator and every row it drives"
           onClick={() => {
             ctl.structural(d => removeModulator(d, m.slot))
@@ -109,7 +111,7 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
           }}
         >
           <Icon.X />
-        </button>
+        </Key>
       </div>
     </div>
   )
@@ -146,6 +148,7 @@ function ModTypePicker({ ctl, m, spec }: {
         would be worse: a one-way door out of the macro rack.
       */}
         <Seg
+          label="Modulator type"
           items={nodesOfKind('modulator')
             .map(x => x.id)
             .filter(id => id !== 'macro')}
@@ -172,7 +175,7 @@ function ModTypePicker({ ctl, m, spec }: {
 }
 
 function DeadLine({ dead }: { dead: string }) {
-  return <span className="warnline">{dead}</span>
+  return <LookProblem>{dead}</LookProblem>
 }
 
 /** A parameter's value on the slot, or the node's default for it. */
@@ -277,10 +280,9 @@ function SourceWire({ ctl, m, others, wire, label }: {
           </span>
         ) : (
           others.map(o => (
-            <button
+            <Toggle
               key={o.slot}
-              className={`tog ${src === o.slot ? '' : 'well'}`}
-              data-on={src === o.slot}
+              isOn={src === o.slot}
               style={{ width: 26 }}
               title={`${o.label || o.name || o.type} in slot ${o.slot}`}
               onClick={() =>
@@ -290,7 +292,7 @@ function SourceWire({ ctl, m, others, wire, label }: {
               }
             >
               {o.slot}
-            </button>
+            </Toggle>
           ))
         )}
       </div>
@@ -391,14 +393,14 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
             <div key={r.id} className="destrow">
               <span className="dst">{pathName(r.dst)}</span>
               <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
-              <button className="poltog" disabled={!slotSwings}
+              <Key className="poltog" disabled={!slotSwings}
                       title={slotSwings
                         ? 'Bipolar takes the source at ±1; unipolar remaps it to 0–1 first'
                         : 'This source is one-way (0–1) — there is no negative half to fold'}
                       onClick={() => { if (slotSwings) ctl.togglePolarity(r.id); }}>
                 {r.bipolar && slotSwings ? '±' : '+'}
-              </button>
-              <button title="Unbind" onClick={() => ctl.removeRow(r.id)}><Icon.X /></button>
+              </Key>
+              <Key title="Unbind" onClick={() => ctl.removeRow(r.id)}><Icon.X /></Key>
             </div>
           );
         })}

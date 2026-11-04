@@ -8,6 +8,7 @@ import { Sheet } from '../../../../src/composites';
 import { ask } from '../host';
 import { Lab } from './bits';
 import { suspend } from './live';
+import { Field, Pill } from './controls';
 
 /** Run a write, and hand what went wrong to the sheet's own error line. */
 export async function attempt(work: () => Promise<void>, onError: (message: string) => void) {
@@ -60,9 +61,9 @@ export function SaveBar({ label, ready, clash, onSave, children }: {
     <div className="row" style={{ gap: 'var(--space-3)', padding: 'var(--space-4) var(--space-5)', flexShrink: 0 }}>
       {label && <Lab className="dim">{label}</Lab>}
       {children}
-      <button className="pill raise" data-primary="true" disabled={!ready} onClick={onSave}>
+      <Pill className="raise" isPrimary disabled={!ready} onClick={onSave}>
         {clash ? 'REPLACE' : 'SAVE'}
-      </button>
+      </Pill>
     </div>
   );
 }
@@ -82,7 +83,7 @@ export function SaveField({ value, placeholder, disabled, wide, font, colour, on
   return (
     <div className={wide ? 'row well grow' : 'row well'}
          style={{ padding: 'var(--space-3)', width: wide ? undefined : 232 }}>
-      <input
+      <Field label={placeholder}
         value={value}
         placeholder={placeholder}
         spellCheck={false}
@@ -113,9 +114,9 @@ export function ShelfHeading({ label, emphasis, action }: {
 /** The key that turns a group of saved rows into rows that delete, and back. */
 export function ManageKey({ managing, onToggle }: { managing: boolean; onToggle(): void }) {
   return (
-    <button className="pill" data-primary={managing || undefined} onClick={onToggle}>
+    <Pill isPrimary={managing} onClick={onToggle}>
       {managing ? 'DONE' : 'MANAGE'}
-    </button>
+    </Pill>
   );
 }
 

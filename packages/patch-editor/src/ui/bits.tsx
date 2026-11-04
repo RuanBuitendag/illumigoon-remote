@@ -1,10 +1,11 @@
 /** Shared primitives: the bloom filter every accent stroke uses, icons, small controls. */
 
 import type { ReactNode } from 'react';
-import { Icon, IconFrame, Picked, PowerKey } from '../../../../src/design-system';
+import { Icon, IconFrame, OptionRow, Picked, PowerKey } from '../../../../src/design-system';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
 import { useRowDrag } from './useRowDrag';
+import { Key } from './controls';
 
 export const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 export const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);
@@ -97,20 +98,18 @@ export const Blurb = ({ children, className = '', title }: TextProps) => (
 export const Hr = () => <div className="hr" />;
 export const Vr = () => <div className="vr" />;
 
-export function Seg<T extends string>({ items, value, onChange, tight, labels }: {
+export function Seg<T extends string>({ label, items, value, onChange, tight, labels }: {
+  label: string;
   items: readonly T[];
   value: T;
   onChange: (v: T) => void;
   tight?: boolean;
   labels?: Record<string, string>;
 }) {
+  const options = items.map(it => ({ value: it, name: labels?.[it] ?? it }));
   return (
     <div className={`seg well${tight ? ' tight' : ''}`}>
-      {items.map(it => (
-        <button key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
-          <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
-        </button>
-      ))}
+      <OptionRow label={label} options={options} value={value} onChange={onChange} />
     </div>
   );
 }
@@ -131,9 +130,9 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   return (
     <div className="tabs">
       {items.map(it => (
-        <button key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
+        <Key key={it} aria-pressed={it === value} onClick={() => onChange(it)}>
           <Picked isOn={it === value}>{labels?.[it] ?? it}</Picked>
-        </button>
+        </Key>
       ))}
       <span className="tabrule" />
     </div>
@@ -163,7 +162,14 @@ export const StructField = ({ node, field, value, onChange }: {
   // "structural, not a modulation target" was the whole tooltip, on every one of these. It
   // is true and it is not the question — so it moves to the end, behind what the field does.
   const blurb = STRUCT_BLURBS[`${node}.${field.key}`];
+  // What each choice does, since a choice in the row has no title of its own.
+  const choices = (field.options ?? [])
+    .map(o => [o, STRUCT_OPTION_BLURBS[`${node}.${field.key}.${o}`]] as const)
+    .filter(([, text]) => text)
+    .map(([o, text]) => `${o.replace(/_/g, ' ')}: ${text}\n`)
+    .join('');
   const title = (blurb ? `${field.label}\n${blurb}\n\n` : `${field.label}\n`)
+    + (choices ? `${choices}\n` : '')
     + 'structural, not a modulation target';
 
   if (field.kind === 'toggle') {
@@ -172,14 +178,14 @@ export const StructField = ({ node, field, value, onChange }: {
   return (
     <div className="col" style={{ gap: 'var(--space-2)' }}>
       <Lab title={title}>{field.label}</Lab>
-      <div className="seg well tight">
-        {field.options!.map(o => (
-          <button key={o} aria-pressed={o === v} onClick={() => onChange(o)}
-                  title={STRUCT_OPTION_BLURBS[`${node}.${field.key}.${o}`]}>
-            <Picked isOn={o === v}>{o.replace(/_/g, ' ')}</Picked>
-          </button>
-        ))}
-      </div>
+      <Seg
+        label={field.label}
+        items={field.options!}
+        value={String(v)}
+        tight
+        labels={Object.fromEntries(field.options!.map(o => [o, o.replace(/_/g, ' ')]))}
+        onChange={onChange}
+      />
     </div>
   );
 };
@@ -284,7 +290,7 @@ export function RackToggle({ shut, onToggle, children }: {
   shut: boolean; onToggle(): void; children: React.ReactNode;
 }) {
   return (
-    <button className="row" style={{ gap: 'var(--space-2)' }} onClick={onToggle}
+    <Key className="row" style={{ gap: 'var(--space-2)' }} onClick={onToggle}
             title={shut ? 'show this rack' : 'fold this rack away'}>
       {/* Down when open, right when shut — the arrow points at what it will reveal. */}
       <span style={{ display: 'flex', transform: shut ? 'rotate(-90deg)' : 'none',
@@ -292,7 +298,7 @@ export function RackToggle({ shut, onToggle, children }: {
         <Icon.Chev />
       </span>
       <Lab className="head">{children}</Lab>
-    </button>
+    </Key>
   );
 }
 

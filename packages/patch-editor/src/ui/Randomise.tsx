@@ -28,6 +28,7 @@ import {
   type Part,
   type RollOptions,
 } from '../domain/roll'
+import { IconKey, Key, Pill, Toggle } from './controls';
 
 const LABEL: Record<Part, string> = {
   layers: 'Layers',
@@ -46,7 +47,7 @@ function StepButton({ can, title, Icon, onClick }: {
   can: boolean; title: string; Icon: (p: { c?: string }) => ReactNode; onClick(): void;
 }) {
   return (
-    <button
+    <Key
       className={`iconbtn ${can ? 'raise' : 'well'}`}
       style={{ width: 34, height: 34 }}
       disabled={!can}
@@ -54,7 +55,7 @@ function StepButton({ can, title, Icon, onClick }: {
       onClick={onClick}
     >
       <Icon c={can ? 'var(--text-3)' : 'var(--text-5)'} />
-    </button>
+    </Key>
   )
 }
 
@@ -82,9 +83,9 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
       </div>
 
       <div className="row" style={{ gap: 'var(--space-1)' }}>
-        <button
-          className="pill row"
-          data-primary="true"
+        <Pill
+          className="row"
+          isPrimary
           disabled={everything}
           style={{
             flexGrow: 1,
@@ -102,7 +103,7 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
         >
           <Icon.Dice c="var(--background)" />
           {opts.keep.length ? 'ROLL UNLOCKED' : 'ROLL'}
-        </button>
+        </Pill>
         <StepButton can={back} title="The roll before this one" Icon={Icon.Back}
                     onClick={() => onStep(history.at - 1)} />
         <StepButton can={fwd} title="The roll after this one" Icon={Icon.Fwd}
@@ -127,7 +128,7 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
       <span className="stripnote" style={{ minWidth: 0 }}>
         {connected ? `live on ${deviceName}` : 'not connected — rolls stay here'}
       </span>
-      <button
+      <Key
         className="row raise"
         style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
         onClick={onSave}
@@ -135,7 +136,7 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
       >
         <Icon.Folder />
         <Lab className="mid">Save to library</Lab>
-      </button>
+      </Key>
     </div>
   )
 }
@@ -296,7 +297,7 @@ function RollStrip({ history, start, shown, onStep }: {
           const i = start + k
           const current = i === history.at
           return (
-            <button
+            <Key
               key={i}
               className="col"
               onClick={() => onStep(i)}
@@ -326,7 +327,7 @@ function RollStrip({ history, start, shown, onStep }: {
                   background: e.tweaked ? 'var(--text-3)' : 'transparent',
                 }}
               />
-            </button>
+            </Key>
           )
         })}
       </div>
@@ -347,9 +348,8 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
       className="row flatcard"
       style={{ height: 'var(--space-6)', gap: 'var(--space-2)', padding: '0 var(--space-1)' }}
     >
-      <button
-        className="tog"
-        data-on={on}
+      <Toggle
+        isOn={on}
         style={{ width: 22, height: 20 }}
         title={
           on
@@ -359,7 +359,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
         onClick={onToggle}
       >
         {on ? <Icon.Lock c="var(--text-1)" /> : <Icon.Unlock />}
-      </button>
+      </Toggle>
       <span
         style={{
           flexGrow: 1,
@@ -372,15 +372,14 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
       <Mono className="dim sm">{count}</Mono>
       {/* A locked row has no dice: rolling only the part you just locked is a
           contradiction. */}
-      <button
-        className="iconbtn"
+      <IconKey
         style={{ width: 24, height: 20, visibility: on ? 'hidden' : undefined }}
         disabled={on}
-        title={`Roll only ${LABEL[part].toLowerCase()}, keeping everything else`}
+        label={`Roll only ${LABEL[part].toLowerCase()}, keeping everything else`}
         onClick={onRollOnly}
       >
         <Icon.Dice s={12} c="var(--text-4)" />
-      </button>
+      </IconKey>
     </div>
   );
 }

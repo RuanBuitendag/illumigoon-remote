@@ -13,6 +13,8 @@ import { unlessReached, type Ctl } from './ctl';
 import { Param } from './Param';
 import type { RackHost } from './rack';
 import { exposeProps } from './Surface';
+import { Key, Toggle } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 /**
  * The trigger wire, and the other end of the dock's TRG badge.
@@ -61,7 +63,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
     <div className="col" style={{ padding: 'var(--space-4) var(--space-5) 0', gap: 'var(--space-2)' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="head">Trigger</Lab>
-        {warn && <span className="warnline">{warn}</span>}
+        {warn && <LookProblem>{warn}</LookProblem>}
       </div>
 
       {/* data-path is what the dock's drag hit-tests against; see Ctl.drag. A macro cannot
@@ -80,26 +82,25 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
       >
         <div className="row" style={{ gap: 'var(--space-1)', flexWrap: 'wrap' }}>
           {sources.map(o => (
-            <button
+            <Toggle
               key={o.slot}
-              className={`tog ${wired === o.slot ? '' : 'well'}`}
-              data-on={wired === o.slot}
+              isOn={wired === o.slot}
               style={{ width: 26 }}
               title={`${o.type} ${slotNumber(o.slot)} — tap to ` +
                 `${wired === o.slot ? 'stop it firing this layer' : 'make it fire this layer'}`}
               onClick={() => wire(wired === o.slot ? null : o.slot)}
             >
               {slotNumber(o.slot)}
-            </button>
+            </Toggle>
           ))}
-          <button
-            className="tog well"
+          <Key
+            className="tog"
             style={{ width: 26 }}
             title="Add a metronome in the next free slot and wire it here"
             onClick={addPeriodic}
           >
             +
-          </button>
+          </Key>
         </div>
         <div className="grow" />
         <span
@@ -145,6 +146,7 @@ export function EmitterBody({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
     <>
       <div style={{ padding: 'var(--space-5) var(--space-5) 0', flexShrink: 0 }}>
         <Seg
+          label="Emitter"
           items={nodesOfKind('emitter').map(e => e.id)}
           value={layer.emitter.type}
           onChange={type =>
@@ -223,6 +225,7 @@ export function WarpBody({ ctl, host, i }: { ctl: Ctl; host: RackHost; i: number
   return (
     <div style={{ padding: 'var(--space-4) var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-3)' }}>
       <Seg
+        label="Effect"
         items={nodesOfKind('warp').map(w => w.id)}
         value={warp.type}
         tight

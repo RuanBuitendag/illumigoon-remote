@@ -38,6 +38,7 @@ import { Lab, Mono, RackToggle, Blurb } from './bits';
 import { slotsOfKind, freeSlot, SlotTile, AddSlot } from './dock';
 import { ModEditor } from './modEditor';
 import type { Ctl } from './ctl';
+import { Field } from './controls';
 
 export function MacroRack({ ctl }: { ctl: Ctl }) {
   const macros = slotsOfKind(ctl.patch, 'macro');
@@ -179,7 +180,7 @@ function MacroNaming({ ctl, m }: { ctl: Ctl; m: Modulator }) {
     <div className="col" style={{ gap: 'var(--space-2)', paddingTop: 'var(--space-half)' }}>
       <Lab className="dim">Name — what it says on the knob</Lab>
       <div className="row well" style={{ padding: 'var(--space-2) var(--space-3)' }}>
-        <input
+        <Field label="Name"
           value={text}
           spellCheck={false}
           placeholder={uniqueSlotName(ctl.patch)}

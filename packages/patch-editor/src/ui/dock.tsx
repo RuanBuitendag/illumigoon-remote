@@ -25,6 +25,7 @@ import type { AudioFeed } from '../domain/scope';
 import { ModEditor } from './modEditor';
 import { deadReason } from './modulatorStatus';
 import { pointAt } from './touch';
+import { Key } from './controls';
 
 export const M = ({ children }: { children: ReactNode }) => (
   <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)' }}>{children}</span>
@@ -383,7 +384,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
           >
             drag one onto a dial, or hold the dial
           </span>
-          <button
+          <Key
             className="row raise"
             style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
             onClick={onOpenMatrix}
@@ -393,7 +394,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
             <Mono className="dim sm">
               {ctl.patch.matrix.length} / {LIMITS().MATRIX}
             </Mono>
-          </button>
+          </Key>
         </div>
       </div>
 

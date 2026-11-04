@@ -21,6 +21,8 @@ import { EditorSheet } from './Sheet';
 import type { Ctl } from './ctl';
 import { M } from './dock';
 import { DepthDrag } from './modEditor';
+import { Key } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 // =================================================================== matrix
 
@@ -123,9 +125,9 @@ function MatrixToggle({ width, title, disabled, onClick, children }: {
 }) {
   return (
     <div className="row" style={{ width, justifyContent: 'flex-end' }}>
-      <button disabled={disabled} title={title} onClick={onClick}>
+      <Key disabled={disabled} title={title} onClick={onClick}>
         <Lab className="dim">{children}</Lab>
-      </button>
+      </Key>
     </div>
   );
 }
@@ -163,7 +165,7 @@ function MatrixRoute({
         <span className="dst" style={{ color: 'var(--text-1)' }}>
           {pathName(r.dst)}
         </span>
-        {warn && <span className="warnline">{warn}</span>}
+        {warn && <LookProblem>{warn}</LookProblem>}
       </div>
     </>
   )
@@ -278,7 +280,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
           }
         />
       </span>
-      <button
+      <Key
         title="Remove row"
         onClick={() =>
           ctl.structural(d => {
@@ -287,7 +289,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
         }
       >
         <Icon.X />
-      </button>
+      </Key>
     </div>
   )
 }

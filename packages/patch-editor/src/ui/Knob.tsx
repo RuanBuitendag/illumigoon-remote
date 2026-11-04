@@ -21,6 +21,7 @@ import { clamp, clamp01, DRAG_SPAN, fineOf, depthAfterDrag, slotNumber } from '.
 import { onFrame } from './live';
 import { doubleClick } from './touch';
 import { useKnobKeys } from './useKnobKeys';
+import { Key } from './controls';
 
 const RI = 19.5;
 const CI = 2 * Math.PI * RI;
@@ -319,7 +320,7 @@ function ModChip({ m, onPolarity, onUnbind }: {
 }) {
   return (
     <span className="modchip" data-inert={m.inert || undefined}>
-      <button
+      <Key
         className="src"
         // A one-way source has no negative half to fold, so the toggle would do
         // nothing to the light. Said plainly and disabled, rather than left live
@@ -338,8 +339,8 @@ function ModChip({ m, onPolarity, onUnbind }: {
       >
         {m.src}
         <i>{m.bipolar && m.srcBipolar ? '±' : '+'}</i>
-      </button>
-      <button
+      </Key>
+      <Key
         className="drop"
         title="Unbind"
         onClick={e => {
@@ -348,7 +349,7 @@ function ModChip({ m, onPolarity, onUnbind }: {
         }}
       >
         ×
-      </button>
+      </Key>
     </span>
   );
 }

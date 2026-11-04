@@ -67,11 +67,13 @@
  * what "the knobs are in weird places" was: they were where they belonged, under a control
  * that had overflowed onto them. Two lines of selector is the right trade.
  */
-.patch-editor .seg { display: flex; flex-wrap: wrap; gap: var(--space-half) var(--space-4); width: fit-content; background: none; }
-.patch-editor .seg > button { position: relative; padding: var(--space-2) 0; font: var(--type-note); color: var(--text-4); }
-@media (hover: hover) { .patch-editor .seg > button:hover { color: var(--text-2); } }
-.patch-editor .seg.tight { gap: var(--space-half) var(--space-3); }
-.patch-editor .seg.tight > button { font-size: var(--size-small); }
+/* A seg is the app's `OptionRow` (CM-4), set closer and smaller to sit inline with what it sets. */
+.patch-editor .seg { width: fit-content; background: none; }
+.patch-editor .seg .option-row { gap: var(--space-half) var(--space-4); }
+.patch-editor .seg .option { height: auto; padding: var(--space-2) 0; font: var(--type-note); }
+@media (hover: hover) { .patch-editor .seg .option:hover { color: var(--text-2); } }
+.patch-editor .seg.tight .option-row { gap: var(--space-half) var(--space-3); }
+.patch-editor .seg.tight .option { font-size: var(--size-small); }
 
 .patch-editor .pill { padding: var(--space-2) 0 !important; font: var(--type-label); letter-spacing: var(--tracking-label); color: var(--text-2); }
 @media (hover: hover) { .patch-editor .pill:hover { color: var(--text-1); } }
@@ -191,7 +193,7 @@
   font: var(--type-label);
   color: var(--text-4);
 }
-.patch-editor .tog[data-on='true'] { color: var(--text-1); background: var(--wash-strong); }
+.patch-editor .tog[aria-pressed='true'] { color: var(--text-1); }
 
 /* --------------------------------------------------------------- knobs */
 
@@ -449,7 +451,6 @@
 .patch-editor .mrow[data-odd='true'] { background: var(--wash); }
 @media (hover: hover) { .patch-editor .mrow:hover { background: var(--wash-strong); } }
 .patch-editor .mrow .dst { font: var(--type-value); }
-.patch-editor .warnline { font: var(--type-small-sans); color: var(--warn); }
 .patch-editor .warn     { color: var(--warn); }
 .patch-editor .srcdot { width: 5px; height: 5px; background: var(--modulation); }
 
@@ -830,7 +831,7 @@
   .patch-editor :where(input:not([type='color'])) { min-height: var(--row); }
   .patch-editor .numdrag { display: inline-flex; align-items: center; min-width: var(--row); min-height: var(--row); }
   .patch-editor :is(
-    button, .seg > button, .seg.tight > button, .tabs > button, .lab, .mono, .blurb,
+    button, .seg .option, .seg.tight .option, .tabs > button, .lab, .mono, .blurb,
     .kval, .kunit, .pill, .tog, .blendchip, .modchip .src, .modchip .drop, .mname, .reach, .trg,
     .detail, .ctlglyph, .ctllabel, .ctlheadname
   ) { font-size: var(--size-note); }

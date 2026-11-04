@@ -35,6 +35,7 @@ import { forgetKeptDraft } from './useKeptDraft';
 import type { Rolls } from './useRolls';
 import type { Toast as ToastLine } from './useToast';
 import { sectionOfSide, type EditorSection } from './useSection';
+import { Pill } from '../ui/controls';
 
 /** How full a look gets before the size meter shows. */
 const NEAR_FULL = 0.8;
@@ -92,7 +93,7 @@ export function AwaitingCatalog({ ready, label, notice, onBack }: {
         <div className="catalog-fail">
           <Lab className="head">{label || 'This device'} cannot be edited</Lab>
           <p>{ready.why}</p>
-          <button className="pill raise" onClick={onBack}>Back</button>
+          <Pill className="raise" onClick={onBack}>Back</Pill>
         </div>
       ) : (notice ?? 'Reading what this device can build…')}
     </div>
@@ -245,14 +246,14 @@ function StripHead({ deviceName, history }: { deviceName: string; history: Histo
     <>
       <Mono className="dim sm">live on {deviceName}</Mono>
       <span className="grow" />
-      <button className="pill" disabled={!history.canUndo} onClick={history.undo}
+      <Pill disabled={!history.canUndo} onClick={history.undo}
               title="Undo the last change (Ctrl+Z)">
         UNDO
-      </button>
-      <button className="pill" disabled={!history.canRedo} onClick={history.redo}
+      </Pill>
+      <Pill disabled={!history.canRedo} onClick={history.redo}
               title="Redo what was undone (Ctrl+Shift+Z)">
         REDO
-      </button>
+      </Pill>
     </>
   );
 }

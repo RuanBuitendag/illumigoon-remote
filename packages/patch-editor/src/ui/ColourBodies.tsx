@@ -11,6 +11,7 @@ import { Hr, Lab, Mono, Seg, Switch, Blurb } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { exposeProps } from './Surface';
 import { Param } from './Param';
+import { Field, IconKey, Key, Pill } from './controls';
 
 /** Deal MASTER's stops out again, and say so. Shared by the row's dice and the inspector's. */
 export function reshuffle(ctl: Ctl) {
@@ -75,22 +76,20 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
       {/* Save and recall live in the sheet: this header has room for one more
           control, and the store is a list of forty-five. */}
       {!locked && onBrowse && (
-        <button
-          className="iconbtn"
-          title="Palette store — save this one, or recall another"
+        <IconKey
+          label="Palette store — save this one, or recall another"
           onClick={onBrowse}
         >
           <Icon.Folder />
-        </button>
+        </IconKey>
       )}
       {/* Disabled at PALETTE_NEW, not at PALETTE. A palette that arrived longer than
           the house rule keeps every stop it came with -- it simply cannot grow. */}
       {!locked && (
-        <button
-          className="iconbtn"
+        <IconKey
           disabled={full}
           style={{ opacity: full ? 'var(--opacity-behind)' : 1 }}
-          title={
+          label={
             full
               ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
               : 'Add a stop'
@@ -98,7 +97,7 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
           onClick={onAdd}
         >
           <Icon.Plus />
-        </button>
+        </IconKey>
       )}
     </div>
   )
@@ -175,9 +174,8 @@ function PaletteStops({
               onPick={hex => setEntry(i, hex.slice(1).toLowerCase())}
             />
             <Mono className="dim sm">{i + 1}</Mono>
-            <input
+            <Field label={`Colour ${i + 1} code`}
               className="hexin grow"
-              aria-label={`Colour ${i + 1} code`}
               value={c}
               spellCheck={false}
               disabled={locked}
@@ -193,14 +191,14 @@ function PaletteStops({
               }}
             />
             {!locked && (
-              <button
+              <Key
                 title="Remove stop"
                 disabled={entries.length <= 1}
                 style={{ opacity: entries.length <= 1 ? 'var(--opacity-behind)' : 1 }}
                 onClick={() => onChange(entries.filter((_, j) => j !== i))}
               >
                 <Icon.X />
-              </button>
+              </Key>
             )}
           </div>
         ))}
@@ -238,21 +236,20 @@ export function MasterColourBody({
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <Lab className="head">Deal</Lab>
           {ctl.masterMode !== 'all' && (
-            <button
-              className="iconbtn"
-              title="Reshuffle — every layer draws again"
+            <IconKey
+              label="Reshuffle — every layer draws again"
               onClick={() => reshuffle(ctl)}
             >
               <Icon.Dice />
-            </button>
+            </IconKey>
           )}
         </div>
-        <Seg items={DEAL_MODES} value={ctl.masterMode} onChange={ctl.setMasterMode} />
+        <Seg label="How the layers share the palette" items={DEAL_MODES} value={ctl.masterMode} onChange={ctl.setMasterMode} />
         <Blurb>{DEAL_BLURBS[ctl.masterMode]}</Blurb>
         {ctl.masterMode === 'some' && (
           <div className="row" style={{ justifyContent: 'space-between' }}>
             <Lab className="dim">Stops each</Lab>
-            <Seg tight items={DEAL_COUNTS} value={ctl.masterCount} onChange={ctl.setMasterCount} />
+            <Seg label="Stops each" tight items={DEAL_COUNTS} value={ctl.masterCount} onChange={ctl.setMasterCount} />
           </div>
         )}
       </div>
@@ -303,7 +300,7 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
         {/* The device publishes its index names as plain strings; the document's field is a
             union. `deserialise` is what actually validates one, so the cast is the boundary
             and not an assumption -- an index this build has never heard of falls back there. */}
-        <Seg items={colourIndices()} value={layer.colour.index}
+        <Seg label="Index" items={colourIndices()} value={layer.colour.index}
              onChange={index => ctl.structural(d => {
                d.layers.find(x => x.slot === layer.slot)!.colour.index =
                  index as Layer['colour']['index'];
@@ -334,10 +331,10 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
                 ? 'Palette from Master — every layer plays its stops.'
                 : `Palette dealt from Master (${ctl.masterMode}).`}
             </Blurb>
-            <button className="pill" title="Edit the palette every layer plays"
+            <Pill title="Edit the palette every layer plays"
                     onClick={() => { ctl.selectMaster(); ctl.selectNode({ kind: 'colour' }); }}>
               EDIT THERE
-            </button>
+            </Pill>
           </div>
         )}
         onChange={entries => ctl.sampleStructural(d => {

@@ -17,6 +17,7 @@ import {
 } from './rack';
 import { EmitterBody } from './NodeBodies';
 import { reshuffle } from './ColourBodies';
+import { Key } from './controls';
 
 /**
  * The pipeline, in the order `Layer::shade` actually runs it.
@@ -517,7 +518,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       >
         {warp.type}
       </span>
-      <button
+      <Key
         title="Remove"
         onClick={e => {
           e.stopPropagation();
@@ -525,7 +526,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
         }}
       >
         <Icon.X />
-      </button>
+      </Key>
     </div>
   );
 }
@@ -642,7 +643,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
         {dealt ? `${ctl.masterMode} ·` : 'overrides'} {n} layer{n === 1 ? '' : 's'}
       </Mono>
       {dealt && (
-        <button
+        <Key
           title="Reshuffle — every layer draws again"
           onClick={e => {
             e.stopPropagation();
@@ -650,9 +651,9 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
           }}
         >
           <Icon.Dice />
-        </button>
+        </Key>
       )}
-      <button
+      <Key
         title="Remove — every layer gets its own palette back"
         onClick={e => {
           e.stopPropagation();
@@ -661,7 +662,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
         }}
       >
         <Icon.X />
-      </button>
+      </Key>
     </ColourRow>
   );
 }

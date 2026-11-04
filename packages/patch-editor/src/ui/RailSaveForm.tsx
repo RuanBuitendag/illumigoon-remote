@@ -6,6 +6,7 @@ import { whyNoVersion, type PublishKind } from '../domain/publish';
 import { Blurb, Mono, budgetNote } from './bits';
 import type { RailSave } from './railPublish';
 import type { useRailVerdict } from './useRailVerdict';
+import { Field, Pill } from './controls';
 
 type Verdict = ReturnType<typeof useRailVerdict>['verdict'];
 
@@ -46,44 +47,43 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
 }) {
   if (publishing) {
     return (
-      <button
-        className="pill"
+      <Pill
         style={{ padding: 'var(--space-2) var(--space-3)' }}
         disabled
         title="waiting for the patch server — it sleeps, so the first publish of the day is slow"
       >
         PUBLISHING…
-      </button>
+      </Pill>
     );
   }
   // The snapshot has not been read yet. Drawing a guess here would flash the wrong
   // offer onto the screen for as long as a disk read takes.
   if (!verdict)
     return (
-      <button className="pill" style={{ padding: 'var(--space-2) var(--space-3)' }} disabled>
+      <Pill style={{ padding: 'var(--space-2) var(--space-3)' }} disabled>
         PUBLISH
-      </button>
+      </Pill>
     );
   // Nothing has moved, so none of the three is a NEW thing -- but sending it again
   // is how a patch comes back after the server loses its disk (#65).
   if (verdict.unchanged) {
     return (
-      <button className="pill" style={{ padding: 'var(--space-2) var(--space-3)' }}
+      <Pill style={{ padding: 'var(--space-2) var(--space-3)' }}
               disabled={!save.name.trim()} onClick={() => onPublish('version')}
               title="Send this document again — the server already has it, so nothing changes">
         RE-PUBLISH v{verdict.identity?.version}
-      </button>
+      </Pill>
     );
   }
   return (
     <>
       {verdict.offered.map((kind, i) => (
-        <button key={kind} className="pill" data-primary={i === 0 ? 'true' : undefined}
+        <Pill key={kind} isPrimary={i === 0}
                 style={{ padding: 'var(--space-2) var(--space-3)' }}
                 disabled={!save.name.trim()} onClick={() => onPublish(kind)}
                 title={PUBLISH_MEANS[kind]}>
           {publishLabel(kind, verdict)}
-        </button>
+        </Pill>
       ))}
     </>
   );
@@ -124,27 +124,27 @@ function PresetCopyRow({ canCapture, presetCount, onCapture, onCopy }: {
       {/* Saving WHERE THE KNOBS ARE, as distinct from saving the patch. A patch is the
           instrument; a preset is a set of positions on it, and many belong to one patch. */}
       <div className="row" style={{ gap: 'var(--space-2)' }}>
-        <button
-          className="pill sm"
+        <Pill
+          isSmall
           style={{ padding: 'var(--space-1) var(--space-3)' }}
           disabled={!canCapture}
           onClick={() => onCapture()}
           title="Save where the controls are now as a preset of this patch"
         >
           + PRESET
-        </button>
+        </Pill>
         <Mono className="dim sm">
           {presetCount === 1 ? '1 preset' : `${presetCount || 'No'} presets`}
         </Mono>
         <span className="grow" />
-        <button
-          className="pill sm"
+        <Pill
+          isSmall
           style={{ padding: 'var(--space-1) var(--space-3)' }}
           onClick={() => onCopy()}
           title="Copy the patch on the light as JSON"
         >
           COPY
-        </button>
+        </Pill>
       </div>
     </>
   );
@@ -180,7 +180,7 @@ export function RailSaveForm({
   return (
     <div className="railsave">
       <div className="row" style={{ gap: 'var(--space-2)' }}>
-        <input
+        <Field label="Name this look"
           ref={nameInput}
           className="well"
           value={save.name}
@@ -192,7 +192,7 @@ export function RailSaveForm({
           }}
         />
       </div>
-      <input
+      <Field label="Notes"
         className="well railnotes"
         value={save.notes}
         placeholder="Notes: warm, slow, good at night"
@@ -204,16 +204,15 @@ export function RailSaveForm({
       />
       {size > BUDGET.NVS && <Blurb>{budgetNote(size)}</Blurb>}
       <div className="row" style={{ gap: 'var(--space-4)' }}>
-        <button
-          className="pill"
-          data-primary="true"
+        <Pill
+          isPrimary
           style={{ padding: 'var(--space-2) var(--space-3)' }}
           disabled={!save.name.trim()}
           onClick={() => onSave()}
           title={saveMeans}
         >
           {clash ? 'REPLACE' : 'SAVE'}
-        </button>
+        </Pill>
         {/* Beside Save rather than on a screen of its own: publishing is something you do to
             a patch you are already looking at, not an errand.
 

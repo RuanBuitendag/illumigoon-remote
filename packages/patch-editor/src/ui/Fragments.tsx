@@ -37,6 +37,8 @@ import {
 import { Hr, layerName } from './bits';
 import type { Layer } from '../domain/patch';
 import type { Ctl } from './ctl';
+import { Pill } from './controls';
+import { LookProblem } from '../../../../src/composites';
 
 const MINE = 'YOUR FRAGMENTS';
 const STARTERS = 'STARTERS';
@@ -134,8 +136,8 @@ function FragmentSaveForm({ ctl, layer, rows, onSaved, onError }: {
                    font="var(--type-note)" colour="var(--text-3)" />
       </SaveBar>
       {leftBehind && (
-        <div className="warnline fragnotice">
-          Saved without the movement it gave other layers.
+        <div className="fragnotice">
+          <LookProblem>Saved without the movement it gave other layers.</LookProblem>
         </div>
       )}
     </>
@@ -276,12 +278,12 @@ function FragmentRow({ ctl, e, deleting, onAdd, onDrop }: {
         {line && <span className="fragnote">{line}</span>}
       </div>
       {deleting ? (
-        <button className="pill" aria-label={`Delete ${e.name}`} onClick={() => onDrop(e)}>DELETE</button>
+        <Pill aria-label={`Delete ${e.name}`} onClick={() => onDrop(e)}>DELETE</Pill>
       ) : (
-        <button className="pill" data-primary="true" aria-label={`Add ${e.name}`}
+        <Pill isPrimary aria-label={`Add ${e.name}`}
                 disabled={!!e.error || full} onClick={() => onAdd(e)}>
           + ADD
-        </button>
+        </Pill>
       )}
     </div>
   );

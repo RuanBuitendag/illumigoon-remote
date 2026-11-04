@@ -15,6 +15,7 @@ import { Hr, Lab, Mono, RowGrip, layerName, layerNumber } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
+import { Choice, IconKey, Key, Toggle } from './controls';
 
 /**
  * What a removal took with it, said out loud.
@@ -169,10 +170,9 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
           <Mono className="dim sm">
             {ctl.patch.layers.length} / {LIMITS().SLOTS}
           </Mono>
-          <button
-            className="iconbtn"
+          <IconKey
             disabled={freeSlot === undefined}
-            title="Add a layer in the lowest free slot"
+            label="Add a layer in the lowest free slot"
             onClick={() =>
               freeSlot !== undefined &&
               ctl.structural(d => {
@@ -182,7 +182,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
             }
           >
             <Icon.Plus c={freeSlot === undefined ? 'var(--text-5)' : 'var(--text-4)'} />
-          </button>
+          </IconKey>
         </div>
       </div>
       <Hr />
@@ -386,7 +386,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
         <span className="name grow">{L.emitter.type}</span>
         {/* The actions show on hover or when this row is the selected one. */}
         <div className="row rowacts">
-          <button
+          <Key
             title={`Copy ${layerName(L.slot)} — paste it into any patch in this window`}
             onClick={e => {
               e.stopPropagation();
@@ -394,8 +394,8 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             }}
           >
             <Icon.Copy />
-          </button>
-          <button
+          </Key>
+          <Key
             title={`Duplicate ${layerName(L.slot)} — the copy is driven by the same modulators`}
             onClick={e => {
               e.stopPropagation();
@@ -403,8 +403,8 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             }}
           >
             <Icon.Dup />
-          </button>
-          <button
+          </Key>
+          <Key
             title={`Remove ${layerName(L.slot)}, its rows and any modulator left driving nothing — paste ` +
               `puts it back`}
             onClick={e => {
@@ -413,12 +413,11 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             }}
           >
             <Icon.X />
-          </button>
+          </Key>
         </div>
         <div className="row" style={{ gap: 'var(--space-2)' }}>
-          <button
-            className={`tog ${L.muted ? '' : 'well'}`}
-            data-on={L.muted}
+          <Toggle
+            isOn={L.muted}
             title="Mute — applies live"
             {...exposeProps(ctl.patch, `L${L.slot}.mute`)}
             onClick={e => {
@@ -429,10 +428,9 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             }}
           >
             M
-          </button>
-          <button
-            className={`tog ${L.solo ? '' : 'well'}`}
-            data-on={L.solo}
+          </Toggle>
+          <Toggle
+            isOn={L.solo}
             title="Solo — applies live"
             {...exposeProps(ctl.patch, `L${L.slot}.solo`)}
             onClick={e => {
@@ -443,7 +441,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
             }}
           >
             S
-          </button>
+          </Toggle>
         </div>
       </div>
 
@@ -480,7 +478,7 @@ function LayerStrip({ ctl, L, selected }: { ctl: Ctl; L: Layer; selected: boolea
       }}
     >
       <span className="exposewrap" {...exposeProps(ctl.patch, `L${L.slot}.blend`)}>
-        <select
+        <Choice label={`${layerName(L.slot)} blend`}
           className="blendchip"
           value={L.blend}
           title={BLEND_BLURBS[L.blend]}
@@ -501,7 +499,7 @@ function LayerStrip({ ctl, L, selected }: { ctl: Ctl; L: Layer; selected: boolea
               {b.id}
             </option>
           ))}
-        </select>
+        </Choice>
       </span>
       <ParamFader
         ctl={ctl}

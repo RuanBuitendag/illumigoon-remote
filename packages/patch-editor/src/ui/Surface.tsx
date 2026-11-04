@@ -34,6 +34,7 @@ import {
 import { type Control } from '../domain/control';
 import { Blurb, Hr, Lab, Mono, RowGrip, pathName, slotNumber } from './bits';
 import { unlessReached, type Ctl } from './ctl';
+import { Field, IconKey, Key } from './controls';
 
 // ---------------------------------------------------------------- exposing
 
@@ -100,13 +101,13 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
       >
         {existing ? (
           <>
-            <button onClick={() => onEdit(existing, false)}>
+            <Key onClick={() => onEdit(existing, false)}>
               Edit room control “{existing.label}”…
-            </button>
-            <button onClick={remove}>Take off the room</button>
+            </Key>
+            <Key onClick={remove}>Take off the room</Key>
           </>
         ) : r ? (
-          <button
+          <Key
             disabled={full}
             title={full ? `A patch hands a person at most ${LIMITS().SURFACE} controls` : undefined}
             onClick={() => {
@@ -117,12 +118,12 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
             }}
           >
             {full ? `The room has all ${LIMITS().SURFACE} controls` : 'Show on the room…'}
-          </button>
+          </Key>
         ) : (
           <span className="menunote">Nothing here a person can be handed</span>
         )}
         {sources.map(m => (
-          <button
+          <Key
             key={m.slot}
             onClick={() => {
               ctl.bind({ kind: 'mod', slot: m.slot }, at.target);
@@ -130,7 +131,7 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
             }}
           >
             Move with {m.label || m.name || m.type} {slotNumber(m.slot)}
-          </button>
+          </Key>
         ))}
       </div>
     </>
@@ -225,7 +226,7 @@ function SectionName({ name, renaming, setRenaming, onRename }: {
     );
   }
   return (
-    <input className="popin grow" autoFocus value={renaming.to} spellCheck={false} maxLength={23}
+    <Field label="Section name" className="popin grow" autoFocus value={renaming.to} spellCheck={false} maxLength={23}
            onChange={e => setRenaming({ from: name, to: e.target.value })}
            onBlur={() => onRename(name, renaming.to)}
            onKeyDown={e => {
@@ -272,13 +273,13 @@ function SectionHead({
       <SectionName name={name} renaming={renaming} setRenaming={setRenaming} onRename={onRename} />
       {name !== null && empty && <Mono className="dim sm">empty · this session only</Mono>}
       {name !== null && (
-        <button
-          className="iconbtn sm"
-          title={`Delete the ${name} section — its controls become ungrouped`}
+        <IconKey
+          isSmall
+          label={`Delete the ${name} section — its controls become ungrouped`}
           onClick={() => onDelete(name)}
         >
           <Icon.X />
-        </button>
+        </IconKey>
       )}
     </div>
   );
@@ -336,19 +337,19 @@ function AddSection({ taken, onAdd }: { taken: readonly string[]; onAdd(name: st
   const [naming, setNaming] = useState<string | null>(null);
   if (naming === null) {
     return (
-      <button
+      <Key
         className="ghostrow well"
         style={{ justifyContent: 'center' }}
         onClick={() => setNaming('')}
       >
         <Icon.Plus c="var(--text-5)" />
         <Lab className="dim">Section</Lab>
-      </button>
+      </Key>
     );
   }
   return (
     <div className="row" style={{ gap: 'var(--space-2)' }}>
-      <input
+      <Field label="New section"
         className="popin grow"
         autoFocus
         value={naming}
@@ -517,10 +518,10 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
         })}
 
         {kept.length < cap && (
-          <button className="ghostrow well" style={{ justifyContent: 'center' }} onClick={onAdd}>
+          <Key className="ghostrow well" style={{ justifyContent: 'center' }} onClick={onAdd}>
             <Icon.Plus c="var(--text-5)" />
             <Lab className="dim">Control</Lab>
-          </button>
+          </Key>
         )}
         <AddSection taken={[...docGroups, ...empty]} onAdd={name => setEmpty(e => [...e, name])} />
       </div>
