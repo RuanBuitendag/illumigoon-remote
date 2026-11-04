@@ -197,7 +197,7 @@ export function FragmentSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
   };
 
   return (
-    <EditorSheet icon={<Icon.Copy />} title="LAYER FRAGMENTS" onClose={onClose}>
+    <EditorSheet icon={<Icon.Copy />} title="FRAGMENTS" onClose={onClose}>
       <FragmentSaveForm ctl={ctl} layer={layer} rows={rows} onSaved={refresh} onError={setError} />
       <Hr />
 

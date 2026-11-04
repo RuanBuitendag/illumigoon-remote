@@ -58,6 +58,7 @@ One word for one thing. Use the left column, never the right.
 | device | the phone or laptop the app runs on | (never a light) |
 | Edit | the page that changes how a look is made | patch editor (in the app) |
 | layer | one part of a look in Edit | slot, track |
+| fragment | a saved layer that Edit can add to another look | snippet, layer preset, part |
 | Mine | the looks a person saved | user presets, custom |
 
 ## Media and senses (BR-12, BR-13, BR-14)
