@@ -5,16 +5,16 @@ when she leaves. Test: `scripts/regression/stories/look-maker.mjs`.
 
 ### P2-S1 add a layer in Edit and take it to the whole room
 
-Features: Edit layers, leave warning. Contexts: phone. Should take: 1 tap to add, 2 to leave.
+Features: Edit layers. Contexts: phone. Should take: 1 tap to add, 1 to leave.
 
 1. `EDIT` opens Candle, "On Back Left, then all 4 Lounge lights when you leave".
 2. `Add a layer in the lowest free slot`: 3 / 8, and Back Left plays three layers.
-3. `Lounge` asks "Leave without saving". `CANCEL` keeps her in Edit with the change.
-4. `Lounge` and `YES`: all four lights take the layer and the room says "Candle, changed".
+3. `Lounge` asks nothing (LIFE-1966): all four lights take the layer and the room says "Candle, changed". The bar
+   offers SAVE and UNDO.
 
 - **Failures:** none.
-- **Wrong actions:** she leaves without saving (E9).
-- **Changes of mind:** CANCEL, then leave after all.
+- **Wrong actions:** she leaves without saving (E9), and the bar still offers SAVE.
+- **Changes of mind:** none.
 
 ### P2-S2 undo and redo a change in Edit
 
@@ -108,6 +108,18 @@ Features: NEW LOOK, Edit SAVE. Contexts: phone. Should take: 2 taps and a name.
 
 1. Looks, `New look`: Edit opens with its layer count.
 2. `SAVE` as "Test new look": the saved look has as many layers as Edit showed.
+
+- **Failures:** none.
+- **Wrong actions:** none.
+- **Changes of mind:** none.
+
+### P2-S13 a new look is a draft in Mine: no question on the way in or out
+
+Features: NEW LOOK, drafts (LIFE-1966). Contexts: phone. Should take: 1 tap in, 1 tap out.
+
+1. Looks, `New look`: Edit opens at once, with no sheet or dialog, and Mine has "Untitled 1", "Not named yet."
+2. A new layer: the draft file takes it while Edit is open, so a reload or iOS closing the app loses nothing.
+3. Back asks nothing, and the bar says "Untitled 1 is in Mine".
 
 - **Failures:** none.
 - **Wrong actions:** none.

@@ -1,10 +1,8 @@
 [
   "back-and-forth | P1-S5 change one light, then the whole room again | Lounge <> Looks",
-  "back-and-forth | P2-S1 add a layer in Edit and take it to the whole room | Candle <> Candle > Check",
   "back-and-forth | P3-S6 a deleted look leaves the room recent looks | Looks <> Lounge",
   "back-and-forth | P3-S6 a deleted look leaves the room recent looks | Lounge <> Looks",
   "back-and-forth | The Looks page shows only the kept looks, and a played look lands in Most used | screen-home <> Looks",
-  "confirmation | Candle > Check | div.dialog \"CHECK CANCEL YES Leave without saving Ca\"",
   "confirmation | Candle > Check | div.dialog \"CHECK CANCEL YES Remove all 2 layers? Ea\"",
   "empty-section | Bedroom | section.scene-shelf \"SCENE + SAVE\"",
   "empty-section | Lounge | section.scene-shelf \"SCENE + SAVE\"",
@@ -34,5 +32,6 @@
   "too-many-controls | Candle | 74 controls in view",
   "too-many-controls | Candle | 76 controls in view",
   "too-many-controls | Candle | 80 controls in view",
-  "too-many-controls | Candle | 82 controls in view"
+  "too-many-controls | Candle | 82 controls in view",
+  "too-many-controls | Untitled 1 | 28 controls in view"
 ]

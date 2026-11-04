@@ -25,8 +25,6 @@ async function addLayer(page) {
   await until(async () => (await layerCount(page)) === before + 1, 'the new layer to show');
 }
 
-const leaveDialog = (page) => page.getByRole('dialog').filter({ hasText: 'Leave without saving' });
-
 async function saveAs(page, name) {
   await press(onTop(page), 'SAVE');
   const field = page.getByRole('textbox', { name: 'Name this look' });
@@ -51,14 +49,8 @@ export const lookMaker = [
       await see(onTop(page), 'On Back Left, then all 4 Lounge lights when you leave');
       await addLayer(page);
       await until(() => layersOn(lights['10.0.0.13']) === 3, 'Back Left to play the new layer');
+      // Back asks nothing (LIFE-1966): the lights keep the change, and the bar offers SAVE and UNDO.
       await press(onTop(page), 'Lounge');
-      await leaveDialog(page).waitFor();
-      await press(leaveDialog(page), 'CANCEL');
-      // The question leaves with its motion, so the next one is a new dialog, not this one closing.
-      await leaveDialog(page).waitFor({ state: 'hidden' });
-      expect((await layerCount(page)) === 3, 'CANCEL did not keep the change in Edit');
-      await press(onTop(page), 'Lounge');
-      await press(leaveDialog(page), 'YES');
       await until(() => everyLight(lights, (light) => layersOn(light) === 3), 'every Lounge light to take the layer');
       await onTop(page).getByText('Candle, changed').first().waitFor();
     },
@@ -104,7 +96,6 @@ export const lookMaker = [
       await openEdit(page);
       await addLayer(page);
       await press(onTop(page), 'Lounge');
-      await press(leaveDialog(page), 'YES');
       await onTop(page).getByText('Candle, changed').first().waitFor();
       await press(onTop(page), 'RESET');
       await until(() => everyLight(lights, (light) => layersOn(light) === 2), 'every light to play the saved Candle');
@@ -207,6 +198,26 @@ export const lookMaker = [
       const saved = savedLooks().find(({ name }) => name === 'Test new look');
       const savedLayers = Object.keys(saved.layers ?? {}).length;
       expect(savedLayers === shown, `NEW LOOK showed ${shown} layers and saved ${savedLayers}`);
+    },
+  },
+  {
+    name: 'P2-S13 a new look is a draft in Mine: no question on the way in or out',
+    lights: LOUNGE,
+    async run({ page }) {
+      const draft = () => savedLooks().find(({ name }) => name === 'Untitled 1');
+      await openLooks(page);
+      await onTop(page).getByRole('button', { name: 'New look' }).click();
+      await see(onTop(page), /^\d \/ 8$/);
+      expect((await page.getByRole('dialog').count()) === 0, 'New look opened a sheet or a dialog before Edit');
+      await until(() => draft()?.notes === 'Not named yet.', 'the draft Untitled 1 to be in Mine');
+      const shown = await layerCount(page);
+      await addLayer(page);
+      const layersOf = () => Object.keys(draft()?.layers ?? {}).length;
+      await until(() => layersOf() === shown + 1, 'the draft to take the new layer while Edit is open');
+      await onTop(page).locator('.back-key').click();
+      expect((await page.getByRole('dialog').count()) === 0, 'Back asked a question');
+      await see(page.getByRole('status'), 'Untitled 1 is in Mine');
+      expect(layersOf() === shown + 1, 'the draft lost the new layer on the way out');
     },
   },
   {

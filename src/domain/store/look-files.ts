@@ -163,6 +163,14 @@ export const addLook = (name: string, preset: Preset) =>
 export const saveLook = (name: string, animation: AnimationState, notes = '') =>
   addLook(name, fileOfLook(name, notes, animation));
 
+// A file of Mine takes a new look and keeps its place.
+export const replaceLook = (file: string, name: string, animation: AnimationState, notes: string) =>
+  attempt(async () => {
+    const { writePreset } = await library();
+    await writePreset(file, fileOfLook(name, notes, animation));
+    await loadLooks();
+  });
+
 const sameLook = ({ doc }: LookFile, { name, animation }: SavedLook) => {
   if (!doc) return false;
   const { created: _created, notes: _notes, ...kept } = doc;

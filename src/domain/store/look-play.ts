@@ -1,8 +1,7 @@
 import type { AnimationState } from '../light-network/protocol';
 import { NEW_LOOK } from '../looks/looks';
 import { chooseLights, openPage } from './navigation-store';
-
-const NEW_LOOK_NAME = 'New look';
+import { draftName, startDraft } from './drafts';
 import { applyLook, noteLook, noteState, setPower, type Light } from './fleet-store';
 import { rememberRecentLook, useHousehold } from './household-store';
 import { useLibrary } from './library-store';
@@ -19,13 +18,15 @@ function wakeThenPlay(light: Light, name: string, animation: AnimationState) {
   laterOn(light.address, gapOf(light), () => applyLook([light], name, animation));
 }
 
-// A new look starts on the lights from the starter, and the editor opens on the room of the first
-// light that answers. Only lights that are on and online can be edited, so the rest only play it.
+// A new look starts on the lights from the starter, as a draft in Mine, and the editor opens on the room of the
+// first light that answers. Only lights that are on and online can be edited, so the rest only play it.
 export function startNewLook(lights: Light[]) {
   const editable = lights.filter(({ isOnline, isOn }) => isOnline && isOn);
   const [first] = editable;
   if (!first) return false;
-  playLook(editable, NEW_LOOK_NAME, NEW_LOOK);
+  const name = draftName();
+  startDraft(name, NEW_LOOK);
+  playLook(editable, name, NEW_LOOK);
   chooseLights(editable.length === 1 ? [first.address] : []);
   openPage('editor', first.roomId);
   return true;

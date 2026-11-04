@@ -11,7 +11,6 @@ import { useConnection } from './useConnection';
 import { useCtl } from './useCtl';
 import { useDialogs } from './useDialogs';
 import { useHistory } from './useHistory';
-import { useKeptDraft } from './useKeptDraft';
 import { useLongPress } from './useLongPress';
 import { useMasterPalette } from './useMasterPalette';
 import { useNavigation } from './useNavigation';
@@ -42,7 +41,6 @@ export function useEditor(light: OpenLight | undefined) {
   const ctl = useCtl({ draft, writes, nav, gesture, masterActs, say, sayUndoable });
   const history = useHistory({ draft, writes, nav, isEditing: ready.at === 'editing', say });
   const dialogs = useDialogs();
-  useKeptDraft({ draft, ready, pushScene: writes.pushScene, leftPatch: nav.leftPatch, say });
 
   // Opens once. The name goes on the draft first, so the first write keeps what the light had.
   const { patchNameRef, setPatchName } = draft;

@@ -11,6 +11,8 @@ import { useSection, type EditorSection } from './app/useSection';
 
 export type { EditedLook, EditorSection, OpenLight };
 
+const KEEP_AFTER_MS = 400;
+
 export type EditorPageProps = {
   light: OpenLight;
   /** False once the page has been left: the socket closes, and `onLeave` says it is done. */
@@ -26,6 +28,11 @@ export type EditorPageProps = {
   onOpened(look: EditedLook): void;
   /** Whether the look has changes no file holds yet. */
   onUnsaved?(isUnsaved: boolean): void;
+  /**
+   * The look once a change has rested, for a host that keeps it (LIFE-1966). A reload, or iOS closing the app,
+   * ends the page while the lights play on, so the host writes it where the person will look for it.
+   */
+  onChange?(look: EditedLook): void;
   /** The socket has closed. Carries the document on the light if this session changed it. */
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   /** The light cannot be edited. */
@@ -34,7 +41,7 @@ export type EditorPageProps = {
 
 export default function App(props: EditorPageProps) {
   const { light, isOpen, section, isSaving, onSaveOpen, onSaveClosed } = props;
-  const { onSection, onName, onOpened, onUnsaved, onLeave, onClose } = props;
+  const { onSection, onName, onOpened, onUnsaved, onChange, onLeave, onClose } = props;
   const editor = useEditor(light);
   const { draft, connection, writes, nav, dialogs, canEdit } = editor;
   const { link, label, hb, info, ready, audioFeed, disconnect } = connection;
@@ -56,6 +63,14 @@ export default function App(props: EditorPageProps) {
   useEffect(() => {
     unsaved.current?.(hasEditedRef.current && savedPatchRef.current !== patch);
   }, [patch, saves, hasEditedRef, savedPatchRef, unsaved]);
+
+  // A drag changes the patch every frame, so the host hears of it once it rests.
+  const changed = useLatest(onChange);
+  useEffect(() => {
+    if (!hasEditedRef.current) return undefined;
+    const timer = window.setTimeout(() => changed.current?.(lookOf(current.current)), KEEP_AFTER_MS);
+    return () => window.clearTimeout(timer);
+  }, [patch, hasEditedRef, changed, current]);
 
   // Decided here and not by unmounting: what is still waiting goes out before the socket closes.
   const { commit } = writes;

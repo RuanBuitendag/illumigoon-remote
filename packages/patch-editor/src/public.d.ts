@@ -29,6 +29,11 @@ export function PatchEditor(props: {
   onOpened(look: EditedLook): void;
   /** Whether the look has changes no file holds yet. */
   onUnsaved?(isUnsaved: boolean): void;
+  /**
+   * The look once a change has rested, for a host that keeps it (LIFE-1966). A reload, or iOS closing the app,
+   * ends the page while the lights play on, so the host writes it where the person will look for it.
+   */
+  onChange?(look: EditedLook): void;
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 }): ReactNode;

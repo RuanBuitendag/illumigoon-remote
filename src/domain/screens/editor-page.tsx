@@ -4,12 +4,12 @@ import { EditLayout } from '../../composites';
 import { APP_IDENTITY } from '../light-network/app-identity';
 import type { AnimationState } from '../light-network/protocol';
 import { finishEdit, holdForEdit } from '../store/edit-follow';
+import { isDraft, keepDraft, leaveDraft } from '../store/drafts';
 import { editorApi } from '../store/editor-host';
 import { noteState, useFleet, type Light } from '../store/fleet-store';
 import { loadLibrary } from '../store/library-store';
 import { closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, lookNameOf, type Room } from '../store/rooms';
-import { guardBack } from '../store/screen-history';
 import { momentsOf, offerUndo, pauseUndo } from '../store/undo';
 import { useEditorDialogs } from './editor-dialogs';
 
@@ -50,21 +50,35 @@ function noteOpened(address: string, lookName: string, look: AnimationState) {
   if (light) noteState(light, { isOn: true, lookName: lookName || undefined, animation: look });
 }
 
-type EditScope = { light: EditorLight; room: Room; scope: string[]; before: ReturnType<typeof momentsOf> };
+type EditScope = {
+  light: EditorLight;
+  room: Room;
+  scope: string[];
+  before: ReturnType<typeof momentsOf>;
+  draft: string | undefined;
+};
+
+type Left = { name: string; look: AnimationState; isSaved: boolean };
+
+// What the bar says after Edit. A draft keeps itself, so it has nothing to save.
+function offerAfter({ before, draft }: EditScope, { name, look, isSaved }: Left) {
+  if (draft === name) return { text: `${name} is in Mine`, moments: before };
+  const unsaved = isSaved ? undefined : { name, animation: look };
+  return { text: 'Changes are on the light', moments: before, unsaved };
+}
 
 // The others in scope take the look, and UNDO stays until the person saves, undoes or changes more.
-function leaveEdit({ light, room, scope, before }: EditScope, { name, look, isSaved }: { name: string; look: AnimationState; isSaved: boolean }) {
-  const unsaved = isSaved ? undefined : { name, animation: look };
-  offerUndo({ text: 'Changes are on the light', moments: before, unsaved });
+function leaveEdit(edit: EditScope, left: Left) {
+  const { light, room, scope, draft } = edit;
+  if (draft) void leaveDraft(draft, left.name, left.look);
+  offerUndo(offerAfter(edit, left));
   pauseUndo();
-  finishEdit(light.address, lightsInScope(room, scope), name, look);
+  finishEdit(light.address, lightsInScope(room, scope), left.name, left.look);
 }
 
-async function askToLeave(isUnsaved: boolean, lookName: string, dialogs: ReturnType<typeof useEditorDialogs>['dialogs']) {
-  const name = lookName.trim() || 'this look';
-  if (isUnsaved && !(await dialogs.ask(`Leave without saving ${name}? The lights keep playing it.`))) return;
-  closePage();
-}
+// A draft takes each change as it rests (LIFE-1966).
+const keeperOf = (draft: string | undefined, lookName: string) =>
+  draft ? (look: AnimationState) => void keepDraft(draft, lookName, look) : undefined;
 
 // Lights that are off sit an edit out, so nothing has to go back on them.
 const litLights = (room: Room | undefined, chosenAddresses: string[]) =>
@@ -76,8 +90,10 @@ const isOneLightIn = (room: Room | undefined, chosenAddresses: string[]) =>
 // Chosen once: the editor stays on this light whatever the fleet does while it is open.
 function editStart(room: Room | undefined, chosenAddresses: string[]) {
   const playing = litLights(room, chosenAddresses);
+  const light = firstLight(room, chosenAddresses);
   return {
-    light: firstLight(room, chosenAddresses),
+    light,
+    draft: isDraft(light?.lookName) ? light?.lookName : undefined,
     scope: chosenAddresses,
     playing,
     before: momentsOf(playing),
@@ -110,7 +126,7 @@ type EditorPaneProps = {
   onSaving: (isSaving: boolean) => void;
   onSection: (section: EditorSection) => void;
   onName: (name: string) => void;
-  onUnsaved: (isUnsaved: boolean) => void;
+  onChange: ((look: AnimationState) => void) | undefined;
   onLeave: (look: AnimationState | null, isSaved: boolean) => void;
 };
 
@@ -165,33 +181,25 @@ function EditFrame({ lookName, lightName, isOneLight, room, playing, sheet, chil
 export function EditorPage({ room }: { room: Room | undefined }) {
   const isOpen = useNavigation((navigation) => navigation.isPageOpen);
   const chosenAddresses = useNavigation((navigation) => navigation.chosenAddresses);
-  const [{ light, scope, playing, before, isOneLight }] = useState(() => editStart(room, chosenAddresses));
+  const [{ light, draft, scope, playing, before, isOneLight }] = useState(() => editStart(room, chosenAddresses));
   const backLabel = useBackLabel(room);
   const [lookName, setLookName] = useState(light?.lookName ?? '');
   const [section, setSection] = useState<EditorSection>('layers');
   const [isSaving, setSaving] = useState(false);
   const [hasLeft, setLeft] = useState(false);
   const { dialogs, sheet } = useEditorDialogs();
-  const [isUnsaved, setUnsaved] = useState(false);
   useEditorHold(hasLeft ? undefined : light?.address, isOpen);
 
   const leave = (look: AnimationState | null, isSaved: boolean) => {
     setLeft(true);
-    if (light && look && room) leaveEdit({ light, room, scope, before }, { name: lookName, look, isSaved });
+    if (light && look && room) leaveEdit({ light, room, scope, before, draft }, { name: lookName, look, isSaved });
   };
-
-  // The lights keep an unsaved look, but nothing else does, so a person is asked before it goes. The system
-  // Back gesture asks the same.
-  const back = () => void askToLeave(isUnsaved, lookName, dialogs);
-  useEffect(() => {
-    if (!isOpen) return undefined;
-    return guardBack(() => void askToLeave(isUnsaved, lookName, dialogs));
-  }, [isOpen, isUnsaved, lookName, dialogs]);
+  const keep = keeperOf(draft, lookName);
 
   if (hasLeft || (!light && !isOpen)) return null;
   const frame = { backLabel, isOneLight, lookName, room, playing, section, onSection: setSection, onSave: () => setSaving(true) };
   return (
-    <EditFrame {...frame} lightName={light?.name} onBack={back} sheet={sheet}>
+    <EditFrame {...frame} lightName={light?.name} onBack={closePage} sheet={sheet}>
       {light && (
         <EditorPane
           light={light}
@@ -202,7 +210,7 @@ export function EditorPage({ room }: { room: Room | undefined }) {
           onSaving={setSaving}
           onSection={setSection}
           onName={setLookName}
-          onUnsaved={setUnsaved}
+          onChange={keep}
           onLeave={leave}
         />
       )}

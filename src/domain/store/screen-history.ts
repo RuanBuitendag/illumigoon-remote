@@ -32,16 +32,6 @@ let at = 0;
 // While a step back or forward is shown, the screens follow the history, not the other way round.
 let isPopping = false;
 
-// A page that must ask before it closes, such as Edit with unsaved changes, takes the Back gesture itself.
-let backGuard: (() => void) | null = null;
-
-export function guardBack(guard: () => void) {
-  backGuard = guard;
-  return () => {
-    if (backGuard === guard) backGuard = null;
-  };
-}
-
 const urlOf = (screen: Screen) => addressOf(screen) || `${window.location.pathname}${window.location.search}`;
 
 function record(screen: Screen, how: 'push' | 'replace') {
@@ -84,14 +74,8 @@ function showStep(event: PopStateEvent) {
     return;
   }
   const current = screenOf(useNavigation.getState());
-  const wasAt = at;
   at = step;
   if (target.key === keyOf(current)) return;
-  if (backGuard && step < wasAt) {
-    record(current, 'push');
-    queueMicrotask(backGuard);
-    return;
-  }
   useNavigation.setState(({ pageVisit }) => ({ ...target.screen, pageVisit: pageVisit + 1 }));
 }
 
@@ -114,7 +98,8 @@ export function addressOfLink(url: string) {
 }
 
 function openLink(url: string) {
-  if (backGuard) return;
+  const { page, isPageOpen } = useNavigation.getState();
+  if (page === 'editor' && isPageOpen) return;
   followAddress(addressOfLink(url));
 }
 

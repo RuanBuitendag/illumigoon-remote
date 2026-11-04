@@ -31,7 +31,6 @@ import type { Dialogs } from './useDialogs';
 import type { History } from './useHistory';
 import type { Navigation } from './useNavigation';
 import type { PatchDraft } from './usePatchDraft';
-import { forgetKeptDraft } from './useKeptDraft';
 import type { Rolls } from './useRolls';
 import type { Toast as ToastLine } from './useToast';
 import { sectionOfSide, type EditorSection } from './useSection';
@@ -66,10 +65,7 @@ export function SaveSheet({ draft, say, saveNudge, onClose }: {
               setPatchName(n);
             },
             onNotes: setPatchNotes,
-            onSaved: () => {
-              markSaved();
-              forgetKeptDraft();
-            },
+            onSaved: markSaved,
           }}
           say={say}
           saveNudge={saveNudge}
