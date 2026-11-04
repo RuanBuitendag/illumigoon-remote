@@ -13,12 +13,51 @@ that prove they hold.
 | Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `Presence`, `TextField`, `Icon` and `IconFrame` on one 14 canvas with one 1.2 line (D74), marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
 | Composites | `src/composites`, with `composites.css`. Primitives put together, with no data, among them `Sheet` with `SheetBody` and `Toast` |
 | The editor's look | `packages/patch-editor/src/styles.css`, and inline styles in `packages/patch-editor/src` |
-| Component page | `?components` on the dev server: every component of the two doors in each state, from `src/domain/screens/component-page` (D68) |
-| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D74 |
+| Component page | `?components` on the dev server: every component of the two doors and of Edit in each state, with its notes and a focus state, from `src/domain/screens/component-page` (D68) |
+| Decisions | `docs/design-system/decisions.md`, one dated choice each, numbered from D1. A new one takes the next free number at the end |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
-| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing, sizes, box-shadow edges and controls, the style rules of `voice.md` that a machine can check, and a door's component missing from the component page |
+| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing, sizes, offsets, box-shadow edges and controls, the contrast of every token pair, the style rules of `voice.md` that a machine can check, and a component with no specimen or no notes on the component page |
 
 The domain (`src/domain`) holds no look. `CLAUDE.md` has the layer rules.
+
+## What the voice check covers
+
+The rules are in `voice-rules.json`. `lint:rules` reads them for the app, and Edit's gate reads them for Edit (D82).
+
+It checks:
+
+- the words the app shows in `src`: text in JSX, text props such as `label`, `title` and `aria-label`, and every
+  string with a space in it;
+- words the app does not use, such as palette, preset and firmware;
+- words `voice.md` asks not to write: successfully, please, oops;
+- British spelling: colour, centre, grey, favourite;
+- the 24-hour clock, in text and in date formats;
+- no exclamation marks.
+
+It does not check, so a person reads for these:
+
+- sentence case, and full stops at the end of a sentence;
+- capitals on keys;
+- how numbers and units are written, such as `60 %`;
+- tone: plain, calm, and saying what happens;
+- a one-word string with no space, such as a key in a store or a file name;
+- hex codes and other values that are not words.
+
+## Put a new component on the component page
+
+`lint:rules` fails until each step is done.
+
+1. Export the component from its layer's door, `index.ts`.
+2. Give it a specimen in one of the specimen files in `src/domain/screens/component-page`, with made-up props, in
+   each state the app shows. Name a loading state `loading, ...` and an error state `error, ...` when it has them.
+3. Add its notes to a notes file in the same folder: `Name: note(parts, keys, role, use, avoid)`. Write each in one
+   short line, in the voice of `voice.md`.
+4. The page draws the first state again with the focus ring. Set `focus` to another state's name, or to `null` for
+   a screen, a sheet or dialog that takes the focus itself, or a part with no control.
+5. Run `STORY_PORT=5291 node scripts/regression/run.mjs --only LIFE-1955`.
+
+A control of Edit's goes into `packages/patch-editor/src/ui/specimens.tsx`, and its notes still go in the app's
+notes files.
 
 ## Two sets of looks, one set of tokens
 

@@ -998,3 +998,51 @@ Date: 2026-11-04
 Chosen: Edit's undo offer lasts `UNDO_SECONDS` from the design-system door, 10 seconds, as the app's does.
 Why: ST-13, AC-14. Edit's lasted 6 seconds.
 Date: 2026-11-04
+
+**D87. The iPhone's back swipe walks back through the app's screens**
+
+Chosen: the iPhone shell turns on the web view's back and forward swipe, in `ios/App/App/AppViewController.swift`.
+A swipe from the left edge goes back one screen, the same as the back key and the device's Back. Each screen has
+its own history step, so the swipe has somewhere to go.
+Why: NA-6, NA-7. A swipe from the edge did nothing on the iPhone.
+Date: 2026-11-04
+
+**D88. Offsets are tokens too**
+
+Chosen: `lint:rules` reads `inset`, `top`, `right`, `bottom`, `left`, `scroll-margin`, `scroll-padding` and
+`outline-offset` in the app's style sheets and inline styles, and fails a raw length. A negative offset is
+`calc(-1 * var(--token))`. The room to clear a sticky heading is `--clear-sticky`.
+Why: TO-2, SP-1. Offsets were the last lengths written by hand.
+Date: 2026-11-04
+
+**D89. A light moves in a list by keys**
+
+Chosen: the grip of a light in Rename and arrange is a key named "Move" and the light's name. The up and down arrows
+move the light one place, and the focus stays on its grip. A drag still works.
+Why: AC-5, NA-17. A light could only be moved by a drag.
+Date: 2026-11-04
+
+**D90. The component page says how each component is used**
+
+Chosen: each component on the page has five short notes: its parts, its keys, its role, one thing to do and one not
+to. The first state is drawn again in a focus state, with the one focus ring worn through `data-focus-visible`.
+Loading and error states are named so. There is no hover state, because the app has no hover look. `lint:rules`
+fails a component with no notes.
+Why: ST-1, CM-7. The page showed states only, and nothing showed the focus ring without a keyboard.
+Date: 2026-11-04
+
+**D91. Every token pair passes contrast**
+
+Chosen: `lint:rules` works out the contrast of each word and mark token on each ground, in dark, light and more
+contrast, and fails text under 4.5:1 and marks and edges under 3:1. To pass, the danger red, the off thumb and
+light's quiet words are darker in light and lighter in dark. Hairlines on `--track` are not checked, because they
+only divide.
+Why: TL-11. Sixteen pairs failed, among them the danger red on a strong wash in dark.
+Date: 2026-11-04
+
+**D92. One undo time for the whole app**
+
+Chosen: `UNDO_SECONDS`, 10, exported from the design-system door, is how long an undo stays on offer. The app's
+store and Edit use it.
+Why: ST-13, AC-14. The time was written in two places.
+Date: 2026-11-04
