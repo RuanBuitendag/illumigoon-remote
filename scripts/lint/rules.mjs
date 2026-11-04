@@ -7,7 +7,9 @@
 //   - The two CSS files stay with their layer.
 //   - The editor's style sheet takes every colour from the tokens.
 //   - Type comes only from the tokens, in composites, the design system and the editor.
-//   - Spacing, row heights and corners come only from the tokens in composites and the editor.
+//   - Spacing, row heights and corners come only from the tokens in composites, the design system and the editor.
+//   - Heights, widths and box-shadow edges come only from the tokens in composites and the design system, in their
+//     CSS and in their inline styles (GE-4, GE-10, TO-2).
 //   - Layers, opacity, motion and line widths come only from the tokens in composites, the design system and
 //     the editor, in its style sheet and in the inline styles of its components.
 //   - Every media query width in the app and the editor is the --wide token.
@@ -61,6 +63,8 @@ const TYPE_PROPERTY = /(?:^|[;{\s])(font|font-size|font-weight|line-height|lette
 const SPACE_PROPERTY =
   /(?:^|[;{\s])(gap|row-gap|column-gap|margin(?:-\w+)?|padding(?:-\w+)?|min-height|border-radius)\s*:\s*([^;}]+)/g;
 const BORDER_PROPERTY = /(?:^|[;{\s])(border(?:-top|-right|-bottom|-left)?(?:-width)?|outline(?:-width)?)\s*:\s*([^;}]+)/g;
+const SIZE_PROPERTY = /(?:^|[;{\s])(height|width|min-width|max-width|max-height)\s*:\s*([^;}]+)/g;
+const SHADOW_PROPERTY = /(?:^|[;{\s])(box-shadow)\s*:\s*([^;}]+)/g;
 const LAYER_PROPERTY = /(?:^|[;{\s])(z-index|opacity)\s*:\s*([^;}]+)/g;
 const MOTION_PROPERTY = /(?:^|[;{\s])((?:transition|animation)(?:-duration|-delay|-timing-function)?)\s*:\s*([^;}]+)/g;
 const RAW_NUMBER = /^(?!0$|1$)\d*\.?\d+$/;
@@ -81,6 +85,11 @@ const INLINE_GEOMETRY = [
   { rule: 'raw-line', pattern: /(?<![\w.])(border(?:Top|Right|Bottom|Left)?(?:Width)?|outline(?:Width)?)\s*:\s*([^,}\n]+)/g, ones: false },
   { rule: 'raw-layer', pattern: /(?<![\w.])(zIndex|opacity)\s*:\s*([^,}\n]+)/g, ones: true },
   { rule: 'raw-motion', pattern: /(?<![\w.])((?:transition|animation)(?:Duration|Delay|TimingFunction)?)\s*:\s*([^,}\n]+)/g, ones: false },
+];
+// The same sizes and edges in the inline styles of the app's own layers. Edit has its own gate.
+const INLINE_SIZE = [
+  { rule: 'raw-size', pattern: /(?<![\w.])((?:min|max)?(?:[Hh]eight|[Ww]idth))\s*:\s*([^,}\n]+)/g, ones: false },
+  { rule: 'raw-line', pattern: /(?<![\w.])(boxShadow)\s*:\s*([^,}\n]+)/g, ones: false },
 ];
 const INLINE_NUMBER = /(?<![\w.$#-])\d*\.?\d+(?![\w.%])/g;
 
@@ -157,10 +166,10 @@ function isRawInline(value, ones) {
   return [...bare.matchAll(INLINE_NUMBER)].some(([number]) => Number(number) !== 0 && !(ones && Number(number) === 1));
 }
 
-function checkInlineGeometry(file) {
+function checkInlineGeometry(file, checks = INLINE_GEOMETRY) {
   const text = fs.readFileSync(file, 'utf8');
   for (const { at, body } of inlineStyles(text)) {
-    for (const { rule, pattern, ones } of INLINE_GEOMETRY) {
+    for (const { rule, pattern, ones } of checks) {
       for (const match of body.matchAll(pattern)) {
         const [, property, value] = match;
         if (isRawInline(value, ones)) {
@@ -175,6 +184,12 @@ function checkInlineType(file) {
   runChecks(file, [['raw-type', INLINE_TYPE, 'use a type token from design-system.css']]);
 }
 
+// Sizes and box-shadow edges, in the app's layers only.
+function checkSizes(file, from = 0) {
+  checkValues(file, { pattern: SIZE_PROPERTY, rule: 'raw-size', isRaw: (value) => LITERAL.test(value) }, from);
+  checkValues(file, { pattern: SHADOW_PROPERTY, rule: 'raw-line', isRaw: (value) => LITERAL.test(value) }, from);
+}
+
 function checkCss(file, layer) {
   if (layer === 'domain') report(file, 1, 'look-in-domain', 'the domain holds no CSS: move it to a composite');
   if (layer === 'composites') {
@@ -182,11 +197,14 @@ function checkCss(file, layer) {
     checkTokens(file, TYPE_PROPERTY, 'raw-type');
     checkTokens(file, SPACE_PROPERTY, 'raw-spacing');
     checkGeometry(file);
+    checkSizes(file);
   }
   if (layer === 'design-system') {
     const tokensEnd = fs.readFileSync(file, 'utf8').search(TOKENS_END);
     checkTokens(file, TYPE_PROPERTY, 'raw-type', tokensEnd);
+    checkTokens(file, SPACE_PROPERTY, 'raw-spacing', tokensEnd);
     checkGeometry(file, tokensEnd);
+    checkSizes(file, tokensEnd);
   }
 }
 
@@ -197,6 +215,9 @@ for (const file of walk(SOURCE)) {
   else if (!layer) report(file, 1, 'outside-the-layers', `move it into ${LAYERS.join(', ')}`);
   else if (file.endsWith('.css')) checkCss(file, layer);
   else if (/\.tsx?$/.test(file)) runChecks(file, CODE_CHECKS[layer]);
+  if (/\.tsx$/.test(file) && (layer === 'design-system' || layer === 'composites')) {
+    checkInlineGeometry(file, [...INLINE_GEOMETRY, ...INLINE_SIZE]);
+  }
   if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);
 }
 

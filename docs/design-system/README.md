@@ -16,7 +16,7 @@ that prove they hold.
 | Component page | `?components` on the dev server: every component of the two doors in each state, from `src/domain/screens/component-page` (D68) |
 | Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D68 |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
-| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing and controls, and for a door's component missing from the component page |
+| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing, sizes, box-shadow edges and controls, and for a door's component missing from the component page |
 
 The domain (`src/domain`) holds no look. `CLAUDE.md` has the layer rules.
 

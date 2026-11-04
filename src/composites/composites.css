@@ -34,7 +34,7 @@
 /* Home */
 
 .home-scroll, .room-scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.home-header { display: flex; align-items: flex-start; height: 104px; padding: var(--page-top) var(--gutter) 0; }
+.home-header { display: flex; align-items: flex-start; height: var(--home-header); padding: var(--page-top) var(--gutter) 0; }
 .wordmark { position: relative; color: var(--text-3); font: var(--type-value); letter-spacing: var(--tracking-label); }
 .wordmark::after { content: ''; position: absolute; inset: -15px 0; }
 .home-column { display: flex; flex-direction: column; gap: var(--section); padding: var(--space-1) 0 var(--clear-notice); }
@@ -52,7 +52,7 @@
 .bottom-notice { flex: none; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--gutter) var(--space-6); border-top: var(--line) solid var(--track); color: var(--text-3); font: var(--type-note); }
 
 .level-row { display: flex; align-items: center; gap: var(--space-3); }
-.level-value { width: 26px; text-align: right; }
+.level-value { width: var(--level-value); text-align: right; }
 
 /* Scenes */
 
@@ -60,7 +60,7 @@
 /* A section opens as Edit's panels do: its small capital name over a hairline (D57). */
 .heading-row { display: flex; align-items: center; justify-content: space-between; min-height: var(--row); border-bottom: var(--line) solid var(--track); }
 .scene-list, .palette-row { display: flex; gap: var(--space-5); margin: 0 var(--edge); padding: 0 var(--gutter) var(--space-1); overflow-x: auto; scrollbar-width: none; }
-.scene-card { flex: none; display: flex; flex-direction: column; gap: var(--space-2); width: 172px; }
+.scene-card { flex: none; display: flex; flex-direction: column; gap: var(--space-2); width: var(--scene-card); }
 .scene-apply { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); }
 .scene-name { font: var(--type-body); }
 .scene-line { display: flex; flex-direction: column; gap: var(--space-1); }
@@ -112,7 +112,7 @@
 .light-pick { flex: 1; display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--row); color: var(--text-4); }
 .light-note { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .light-tape { display: block; width: 100%; }
-.light-tape .led-strip-room { height: 56px; margin: 0 var(--edge); }
+.light-tape .led-strip-room { height: var(--row-tall); margin: 0 var(--edge); }
 .room-scroll .scene-shelf { margin-top: var(--space-5); padding: 0; }
 .library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: 88px; }
 .library-group { display: flex; flex-direction: column; gap: var(--space-5); }
@@ -179,7 +179,7 @@
 .colour-field .control-label { min-height: var(--row); }
 .slots { display: flex; gap: var(--space-1); }
 .slot-add { flex: none; width: var(--row); height: var(--row); color: var(--text-3); outline: var(--line) dashed var(--text-5); outline-offset: -1px; text-align: center; font: var(--type-heading); }
-.paste-chip { width: 22px; height: 12px; }
+.paste-chip { width: var(--chip-width); height: var(--chip-height); }
 .colour-picker { display: flex; flex-direction: column; gap: var(--space-2); }
 .palette-current { display: flex; flex-direction: column; gap: var(--space-2); width: 100%; color: var(--text-1); text-align: left; font: var(--type-body); }
 .palette-current-name { display: flex; align-items: center; justify-content: space-between; }
@@ -202,7 +202,7 @@
 /* A page names itself as Edit does: the name in the heading type under the way back (D54). */
 .page-title { margin-top: var(--space-1); font: var(--type-heading); }
 .page-intro + .add-key { margin-top: var(--space-5); }
-.page-intro { max-width: 330px; margin-top: var(--space-1); color: var(--text-3); font: var(--type-note); }
+.page-intro { max-width: var(--measure); margin-top: var(--space-1); color: var(--text-3); font: var(--type-note); }
 .page-section { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); margin-top: var(--section); }
 .page-section > .text-key { align-self: flex-start; }
 .info-row { display: flex; align-items: center; gap: var(--space-4); min-height: var(--row-tall); }
@@ -214,7 +214,7 @@
 .drag-list { display: contents; }
 .arrange-row { display: flex; align-items: center; gap: var(--space-1); border-bottom: var(--line) solid var(--track); }
 .arrange-row .text-field { border-bottom: 0; }
-.arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: 36px; height: var(--row); margin-left: calc(-1 * var(--space-3)); color: var(--text-5); cursor: grab; touch-action: none; }
+.arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: var(--grip-width); height: var(--row); margin-left: calc(-1 * var(--space-3)); color: var(--text-5); cursor: grab; touch-action: none; }
 .scan-note { margin-top: var(--section); }
 
 /* Search */
@@ -233,7 +233,7 @@
 /* Laptop */
 
 @media (min-width: 900px) {
-  .home-header { height: 76px; padding: var(--space-6) var(--gutter) 0; }
+  .home-header { height: calc(var(--space-6) + var(--row)); padding: var(--space-6) var(--gutter) 0; }
   .scene-list { flex-wrap: wrap; margin: 0; padding: 0; overflow: visible; }
   .room-scroll, .screen-page, .search { padding-inline: max(var(--gutter), calc(50% - var(--half-column))); }
   .room-scroll::before { margin-inline: 0; }
