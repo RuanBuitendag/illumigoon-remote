@@ -809,3 +809,23 @@ Why: a two-sentence instruction in the heading type filled three lines on the ph
 in Edit, and on the laptop the strip, the text and the keys' arrows ran the full 1440 px apart. Take back already
 reads like the other pages and keeps its look.
 Date: 2026-11-04
+
+**D68. One component page, a plain page on the dev server**
+
+Chosen: `?components` on the dev server (`npm run dev`, then `http://localhost:5173/?components`) shows every
+component that the two doors export, in each of its states, with made-up props: default, pressed or selected,
+held, disabled, empty, long text and error where the component has them. The page is a screen in
+`src/domain/screens/component-page`, laid out by `ComponentPageLayout`, `ComponentEntry`, `ComponentState`,
+`ComponentFrame` and `PaintSample` in `src/composites/component-page-layout.tsx`. A screen, sheet or toast that fills
+the window stands in a `ComponentFrame`, whose `contain` keeps it inside the frame; a sheet or dialog opens on a key,
+because an open one makes the rest of the page inert. The app has no hover look, and the one focus ring shows on
+Tab, so neither has a cell of its own. `lint:rules` fails when a door exports a component that the page does not
+import and name, and the story `LIFE-1955 the component page draws every component` draws it at 375 by 812 and 1440
+by 900 and fails on any error. `src/main.tsx` asks for the page only under `import.meta.env.DEV`, and its style
+sheet `component-page.css` loads when the page first shows, so the release build carries none of it.
+Why: TL-2, ST-1 and CM-7 had no page that shows each component in each state (LIFE-1955). Storybook and Ladle were
+weighed. Both add a dependency tree and a second build, and their story files would sit outside the three layers,
+so the lint would need an exception for them. Ladle is the lighter of the two, but it still needs its own
+config and a story glob for every check. A plain page uses the app's own Vite server, as `?demo` does, and the
+layer rules allow it as it is: a domain screen that joins fixed data to composites. One job, one way.
+Date: 2026-11-04

@@ -45,8 +45,11 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 | `lint:layers` | dependency-cruiser | imports that go up or past a door, libraries in the wrong layer |
 | `lint:dupes` | jscpd | copied blocks |
 | `lint:unused` | knip | unused files, exports and dependencies |
-| `lint:rules` | `scripts/lint/rules.mjs` | files outside the layers, a look in the domain, raw colours and controls, type or spacing outside the tokens |
+| `lint:rules` | `scripts/lint/rules.mjs` | files outside the layers, a look in the domain, raw colours and controls, type or spacing outside the tokens, a door's component missing from the component page |
 | `lint:editor` | the package gate | the same tools over `packages/patch-editor` |
+
+A new export of a door gets a specimen on the component page, `?components` on the dev server, in
+`src/domain/screens/component-page` (D68).
 
 Fix the code when a check fails. Do not weaken a rule, and do not add an exception for one file.
 `packages/patch-editor/src/engine/generated` is a generated WebAssembly build, so the checks skip it.

@@ -13,9 +13,10 @@ that prove they hold.
 | Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `TextField`, `Icon` and `IconFrame`, marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
 | Composites | `src/composites`, with `composites.css`. Primitives put together, with no data, among them `Sheet` with `SheetBody` and `Toast` |
 | The editor's look | `packages/patch-editor/src/styles.css`, and inline styles in `packages/patch-editor/src` |
-| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D50 |
+| Component page | `?components` on the dev server: every component of the two doors in each state, from `src/domain/screens/component-page` (D68) |
+| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D68 |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
-| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing and controls |
+| Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing and controls, and for a door's component missing from the component page |
 
 The domain (`src/domain`) holds no look. `CLAUDE.md` has the layer rules.
 
