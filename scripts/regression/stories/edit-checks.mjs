@@ -61,7 +61,6 @@ const sidewaysAtSmallestPhone = {
   name: 'LIFE-1953 nothing in Edit scrolls sideways at 320 x 640',
   viewport: 'smallPhone',
   lights: LOUNGE,
-  fails: 'the section row under Edit, `.edit-sections` in composites.css, does not wrap and reaches 323 px',
   async run({ page }) {
     await openEdit(page);
     const problems = [];
