@@ -8,13 +8,13 @@ that prove they hold.
 
 | What | Where |
 | -- | -- |
-| Tokens | `src/design-system/design-system.css`, the `:root` block, with light values under `prefers-color-scheme: light` |
+| Tokens | `src/design-system/design-system.css`, the `:root` block, with light values under `prefers-color-scheme: light`, and answers to `prefers-contrast: more`, `forced-colors: active` and `prefers-reduced-motion` (D70, D71) |
 | Fonts | `src/design-system/index.ts` imports Geist and Geist Mono from `@fontsource` |
-| Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `TextField`, `Icon` and `IconFrame`, marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
+| Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `Presence`, `TextField`, `Icon` and `IconFrame` on one 14 canvas with one 1.2 line (D74), marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
 | Composites | `src/composites`, with `composites.css`. Primitives put together, with no data, among them `Sheet` with `SheetBody` and `Toast` |
 | The editor's look | `packages/patch-editor/src/styles.css`, and inline styles in `packages/patch-editor/src` |
 | Component page | `?components` on the dev server: every component of the two doors in each state, from `src/domain/screens/component-page` (D68) |
-| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D68 |
+| Decisions | `docs/design-system/decisions.md`, one dated choice for each of D1 to D74 |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
 | Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing, sizes, box-shadow edges and controls, the style rules of `voice.md` that a machine can check, and a door's component missing from the component page |
 

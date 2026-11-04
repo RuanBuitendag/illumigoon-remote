@@ -829,3 +829,72 @@ so the lint would need an exception for them. Ladle is the lighter of the two, b
 config and a story glob for every check. A plain page uses the app's own Vite server, as `?demo` does, and the
 layer rules allow it as it is: a domain screen that joins fixed data to composites. One job, one way.
 Date: 2026-11-04
+
+**D69. Every size outside the tokens is a lint failure**
+
+Chosen: `lint:rules` reports a raw `height`, `width`, `min-*` or `max-*` and a raw `box-shadow` edge in the CSS of
+`src/design-system` below the tokens and of `src/composites`, and in the inline styles of their components. Sizes
+that recur or have a job are tokens in the size group (`--home-header`, `--scene-card`, `--switch-width`,
+`--measure`, `--strip-tile` and the rest); a part of a mark is a `calc` on the mark's token or a percentage of it.
+Edges are `--line`, `--line-strong` or the new `--line-thick`. `design-system.css` now gets the spacing check too,
+which found `gap: 1.5px`. `--space-half` is the space inside one small thing: a chip's padding, a mark beside its
+word, the rows of one wrapped control, a ring's offset, a scrollbar thumb's inset. Never a size.
+Why: GE-10, GE-4, TO-2, SP-1 and SP-2. Sizes were the one kind of geometry no check covered, so 24 raw ones had
+gathered.
+Date: 2026-11-04
+
+**D70. Sheets, dialogs and the toast come and go with one short motion**
+
+Chosen: four tokens, `--ease-enter` (decelerate), `--ease-exit` (accelerate), `--duration-enter` 200 ms and
+`--duration-exit` 140 ms. A sheet or dialog rises in and sinks out over a fading scrim; the toast rises in and sinks
+out. Base UI marks a leaving popup with `data-ending-style` and calls `onOpenChangeComplete` when its motion ends,
+and only then does `Dialog` call `onClose`. The new primitive `Presence` keeps a child that has gone on the page
+until its motion ends. Under `prefers-reduced-motion` every one of them only fades.
+Why: MO-2. Things appeared and vanished in one frame, so a toast's going read as a flicker. Exit is shorter than
+enter, since a thing that is going needs less of the eye.
+Date: 2026-11-04
+
+**D71. The tokens answer more contrast and forced colours**
+
+Chosen: under `prefers-contrast: more`, in dark and in light, the quiet text steps (`--text-3` to `--text-5`) move
+one place up the ramp, and the track, the off thumb, the washes and the scrim grow strong enough to read as edges.
+Under `forced-colors: active` the tokens hold system colours (Highlight for focus and fill, CanvasText for text and
+track, GrayText for quiet text), and the switch, the fader, the marks and the chosen line take
+`forced-color-adjust: none` so the system does not wipe their fills. Lit strips, swatches, the colour pad and a bar
+of colours keep the colours of the look. The toast has a clear outline that forced colours draw. `--info` is the
+colour of the bottom notice; `--radius-pill`, `--radius-round` and `--background-clear` were used nowhere and are
+gone.
+Why: CO-7, CO-8 and the unused tokens of GE-1 and CO-3.
+Date: 2026-11-04
+
+**D72. Each move deeper is a step of the browser's history, and a link opens its screen**
+
+Chosen: `src/domain/store/screen-history.ts` follows the navigation store. A move deeper (a room, a page, a page
+under Room settings) pushes a history step; a move to the side replaces it; a way back in the app goes back through
+the history, so the system Back gesture and the browser's Back go back one screen. A step the browser added for a
+typed address is taken as the app's own. Edit with unsaved changes takes the Back gesture and asks first. On the
+iPhone the `illumigoon` scheme opens the screen its link names (`illumigoon://room/<id>/looks`), through
+`appUrlOpen` and the launch link of `@capacitor/app`; Edit is never opened from a link, and a link that comes while
+Edit is open is let go.
+Why: NA-7. The address changed with `replaceState` only, so Back left the app.
+Date: 2026-11-04
+
+**D73. The voice rules that a machine can check are a lint**
+
+Chosen: `lint:rules` parses each source file in `src` and checks the words the app shows (text in JSX, a text prop
+such as `label` or `title`, and every string with a space in it) against `voice.md`: none of the words the app does
+not use (palette, preset, firmware, lamp, zone and the rest), no "please", "successfully" or "oops", British
+spelling, the 24-hour clock in text and in date formats, and no exclamation. That a light is called a light and
+never a device is a matter of meaning, and stays with review.
+Why: BR-5 and BR-6. Two slips, "Name of the palette" and "each device on the network", had passed every check.
+Date: 2026-11-04
+
+**D74. One icon canvas and one icon line**
+
+Chosen: `ICON_CANVAS` 14 and `ICON_STROKE` 1.2, in `src/design-system/icons.tsx`. Every icon of the set is drawn on
+the 14 by 14 canvas with the 1.2 line; a glyph smaller than the canvas sits at its middle, so every icon takes the
+same box beside a word. The grip joins the frame, in `--text-5` with no opacity. `icons.test.ts` renders every icon
+and fails on another canvas, another line or an opacity. Edit's own line drawings, its wave shapes, still take their
+own canvas through `IconFrame`, as they are drawings and not icons of the set.
+Why: BR-8. The set had ten canvases and four line weights.
+Date: 2026-11-04
