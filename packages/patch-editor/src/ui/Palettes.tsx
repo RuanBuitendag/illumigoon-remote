@@ -40,7 +40,7 @@ interface Section {
   list: PaletteEntry[];
 }
 
-const COULD_NOT_READ = 'Could not read the palettes. The ones on this layer still play.';
+const COULD_NOT_READ = 'Could not read the palette store. The colours on this layer still play.';
 
 /** The folder of palettes, and the ones lifted out of the looks. */
 function usePaletteShelf() {
@@ -174,7 +174,7 @@ export function PaletteSheet({ ctl, where, entries, onRecall, onClose }: {
   const groups = useMemo(() => paletteGroups(rows), [rows]);
 
   return (
-    <EditorSheet icon={<Icon.Folder />} title="PALETTES" onClose={onClose}>
+    <EditorSheet icon={<Icon.Folder />} title="PALETTE STORE" onClose={onClose}>
       <PaletteSaveForm
         ctl={ctl}
         where={where}
@@ -187,7 +187,7 @@ export function PaletteSheet({ ctl, where, entries, onRecall, onClose }: {
       <Hr />
 
       <div className="scroll" style={{ padding: 'var(--space-2) var(--space-2) var(--space-5)' }}>
-        {busy && rows.length === 0 && <div className="libempty">Reading the palettes…</div>}
+        {busy && rows.length === 0 && <div className="libempty">Reading the palette store…</div>}
 
         {groups.map(({ key, label, mine, list }) => (
           <div key={key} className="col" style={{ gap: 'var(--space-2)' }}>

@@ -147,7 +147,7 @@ function SidePanel({ ctl, nav, patch, rolled, dialogs, connected, deviceName, on
         onEdit={(control, x, y) => dialogs.setEditingControl({ control, isNew: false, x, y })}
         onAdd={() => {
           dialogs.setPicking(true);
-          ctl.say('Now tap the knob, switch, blend or palette it should move');
+          ctl.say('Now tap the knob, switch, blend or colours it should move');
         }}
       />
     );
@@ -246,12 +246,10 @@ function StripHead({ deviceName, history }: { deviceName: string; history: Histo
     <>
       <Mono className="dim sm">live on {deviceName}</Mono>
       <span className="grow" />
-      <Pill disabled={!history.canUndo} onClick={history.undo}
-              title="Undo the last change (Ctrl+Z)">
+      <Pill disabled={!history.canUndo} onClick={history.undo} aria-keyshortcuts="Control+Z">
         UNDO
       </Pill>
-      <Pill disabled={!history.canRedo} onClick={history.redo}
-              title="Redo what was undone (Ctrl+Shift+Z)">
+      <Pill disabled={!history.canRedo} onClick={history.redo} aria-keyshortcuts="Control+Shift+Z">
         REDO
       </Pill>
     </>

@@ -150,9 +150,7 @@
 .patch-editor .layerrow .name {
   font: var(--type-note);
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 .patch-editor .layerstrip { gap: var(--space-2); padding-left: calc(var(--space-3) + 2 * var(--space-2) + var(--space-4)); }
 .patch-editor .layerrow[data-muted='true'] .name { color: var(--text-4); }
@@ -242,9 +240,8 @@
   font: var(--type-small);
   color: var(--text-3);
   flex-grow: 1;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 .patch-editor .poltog {
   width: 18px;
@@ -477,9 +474,7 @@
 .patch-editor .tilenote {
   font: var(--type-small-sans);
   color: var(--text-4);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow-wrap: anywhere;
   min-width: 0;
 }
 .patch-editor .tilenote.warn { color: var(--warn); }
@@ -546,7 +541,7 @@
 .patch-editor .fragname[data-dead='true'] { color: var(--text-4); }
 .patch-editor .fragnote {
   font: var(--type-small-sans); color: var(--text-4);
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden;
+  overflow-wrap: anywhere;
 }
 .patch-editor .fragnotice { padding: 0 var(--space-5) var(--space-4); }
 
@@ -582,7 +577,7 @@
   display: block; height: var(--row); border-radius: var(--radius); background: var(--track);
 }
 .patch-editor .palname { display: flex; align-items: center; gap: var(--space-2); font: var(--type-note); min-width: 0; }
-.patch-editor .palname .picked { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.patch-editor .palname .picked { min-width: 0; overflow-wrap: anywhere; }
 .patch-editor .palnote { font: var(--type-small-sans); color: var(--text-4); }
 .patch-editor .palerror { padding: 0 var(--space-5) var(--space-4); }
 
@@ -704,7 +699,7 @@
   flex-grow: 1;
   font: var(--type-note);
   color: var(--text-1);
-  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  min-width: 0; overflow-wrap: anywhere;
 }
 .patch-editor .stagename.dim { color: var(--text-4); }
 .patch-editor .stageslot { font: var(--type-small); color: var(--text-4); }
@@ -783,8 +778,8 @@
 .patch-editor .ctlrow { gap: var(--space-2); padding: var(--space-2) var(--space-3); min-height: var(--row); cursor: pointer; }
 .patch-editor .ctlrow[data-dead='true'] { opacity: var(--opacity-disabled); }
 .patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
-.patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.patch-editor .ctltarget { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); min-width: 0; overflow-wrap: anywhere; }
+.patch-editor .ctltarget { min-width: 0; overflow-wrap: anywhere; }
 .patch-editor .ctlend { height: 6px; border-radius: var(--radius); }
 
 /* ------------------------------------------------------ press targets

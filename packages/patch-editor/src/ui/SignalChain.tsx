@@ -17,7 +17,7 @@ import {
 } from './rack';
 import { EmitterBody } from './NodeBodies';
 import { reshuffle } from './ColourBodies';
-import { Key } from './controls';
+import { IconKey, Key } from './controls';
 
 /**
  * The pipeline, in the order `Layer::shade` actually runs it.
@@ -111,7 +111,7 @@ function ChainCaption({ coloured, prefix }: { coloured: boolean; prefix: string 
           'Composed top to bottom. Warps above Colour bend the shape before it has a colour; ' +
           'warps under it move the coloured light. Colour effects only act under it.'
         :
-          'Colour gives every layer one palette, before the blend. The rows under it are ' +
+          'Colour gives every layer the same colours, before the blend. The rows under it are ' +
           'composed top to bottom, over every layer already blended and coloured.'}{' '}
       Reordering rewrites any matrix row addressing these slots —{' '}
       <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)' }}>{prefix}.warp0..7</span> is
@@ -436,7 +436,7 @@ export function MasterPanel({ ctl, tab, onTab }: { ctl: Ctl; tab: Tab; onTab(tab
       {!nodeById(GLOBAL_NODE) && (
         <div style={{ padding: 'var(--space-4) var(--space-5) 0', flexShrink: 0 }}>
           <Blurb>
-            Not on this light yet — its firmware does not read the master stage (LIFE-715). What you
+            Not on this light yet — its light software does not read the master stage. What you
             set here is kept in the patch and saved with it.
           </Blurb>
         </div>
@@ -480,18 +480,22 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
 }) {
   if (!warp) {
     return (
-      <div
-        className="row rackrow"
-        style={{ height: 'var(--row)', padding: '0 var(--space-3)', gap: 'var(--space-3)', cursor: 'pointer' }}
-        {...drag}
-        onClick={onAdd}
-      >
-        <span style={{ width: 10 }} />
-        <Mono className="dim sm">warp{i}</Mono>
-        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
-          —
-        </span>
-        <Icon.Plus c="var(--text-5)" />
+      // The row takes the drop and the key inside it takes the press: a dragged warp lands on
+      // an empty slot as on a full one.
+      <div className="row rackrow" style={{ height: 'var(--row)' }} {...drag}>
+        <Key
+          className="row grow"
+          style={{ height: '100%', padding: '0 var(--space-3)', gap: 'var(--space-3)' }}
+          aria-label={`Add a warp in warp${i}`}
+          onClick={onAdd}
+        >
+          <span style={{ width: 10 }} />
+          <Mono className="dim sm">warp{i}</Mono>
+          <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
+            —
+          </span>
+          <Icon.Plus c="var(--text-5)" />
+        </Key>
       </div>
     );
   }
@@ -507,26 +511,32 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       <span onClick={e => e.stopPropagation()} {...expose}>
         <Switch
           on={!warp.bypass}
-          title="Bypass this warp — it keeps its slot, so nothing rewires"
+          name={`warp${i} ${warp.type} on`}
           onChange={v => onBypass(!v)}
         />
       </span>
       <Mono className={sel ? '' : 'dim'}>warp{i}</Mono>
-      <span
+      <Key
         className="grow"
+        aria-pressed={sel}
+        aria-label={`warp${i} ${warp.type}`}
         style={{ font: 'var(--type-note)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        onClick={e => {
+          e.stopPropagation();
+          onSelect();
+        }}
       >
         {warp.type}
-      </span>
-      <Key
-        title="Remove"
+      </Key>
+      <IconKey
+        label={`Remove warp${i} ${warp.type}`}
         onClick={e => {
           e.stopPropagation();
           onRemove();
         }}
       >
         <Icon.X />
-      </Key>
+      </IconKey>
     </div>
   );
 }
@@ -542,10 +552,11 @@ const rackRowClass = (sel: boolean) => `row rackrow ${sel ? 'raise-hi' : 'flatca
  * MOVABLE and SELECTABLE, never removed or bypassed: every layer has exactly one. It drags like a
  * warp does, and selecting it is how the palette reaches the inspector column.
  */
-function ColourRow({ sel, title, lead, gradient, row, children }: {
+function ColourRow({ sel, lead, gradient, row, onSelect, children }: {
   sel: boolean;
-  title: string;
   lead: ReactNode;
+  /** Chooses the row, from its name key, so it is chosen by keyboard as well (AC-8). */
+  onSelect(): void;
   gradient: string;
   row: HTMLAttributes<HTMLDivElement>;
   children: ReactNode;
@@ -554,7 +565,6 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
     <div
       className={rackRowClass(sel)}
       style={RACK_ROW}
-      title={title}
       {...row}
     >
       <Picked isOn={sel} edge="side" />
@@ -569,12 +579,17 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
           boxShadow: 'inset 0 0 0 var(--line) var(--track)',
         }}
       />
-      <span
+      <Key
         className="grow"
+        aria-pressed={sel}
         style={{ font: 'var(--type-note)', color: sel ? 'var(--text-1)' : 'var(--text-3)' }}
+        onClick={e => {
+          e.stopPropagation();
+          onSelect();
+        }}
       >
         colour
-      </span>
+      </Key>
       {children}
     </div>
   );
@@ -584,12 +599,10 @@ function ColourSlot({ layer, sel, drag, fromMaster, onSelect }: {
   layer: Layer; sel: boolean; drag: RowDrag; fromMaster: boolean; onSelect(): void;
 }) {
   return (
-    <ColourRow sel={sel} lead={<RowGrip />} row={{ ...drag, onClick: onSelect }}
-               gradient={gradientOf(layer.colour.palette.entries, layer.colour.wrap)}
-               title={fromMaster
-           ? 'Palette from Master. Drag it to move it; select it for the rest of the colour'
-           : 'One per layer. Drag it to move it; select it to edit the palette'}>
+    <ColourRow sel={sel} lead={<RowGrip />} row={{ ...drag, onClick: onSelect }} onSelect={onSelect}
+               gradient={gradientOf(layer.colour.palette.entries, layer.colour.wrap)}>
       <Mono className={sel ? '' : 'dim'}>{layer.colour.index}</Mono>
+      {fromMaster && <Mono className="dim sm">from Master</Mono>}
     </ColourRow>
   );
 }
@@ -609,10 +622,10 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
 
   if (!entries) {
     return (
-      <div
+      <Key
         className="row rackrow"
         style={{ height: 'var(--row)', padding: '0 var(--space-3)', gap: 'var(--space-3)', cursor: 'pointer' }}
-        title="Give every layer one palette. Their own come back when you remove it"
+        aria-label="Add colour: every layer plays the same colours"
         onClick={() => {
           const reached = ctl.addMasterPalette();
           ctl.selectNode({ kind: 'colour' });
@@ -625,7 +638,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
           —
         </span>
         <Icon.Plus c="var(--text-5)" />
-      </div>
+      </Key>
     );
   }
 
@@ -636,33 +649,33 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
       sel={sel}
       lead={<span style={{ width: 10 }} />}
       gradient={gradientOf(entries)}
-      title={dealt ? 'Every layer draws from this palette' : 'Every layer plays this palette'}
       row={{ onClick: () => ctl.selectNode({ kind: 'colour' }) }}
+      onSelect={() => ctl.selectNode({ kind: 'colour' })}
     >
       <Mono className={sel ? 'sm' : 'dim sm'}>
         {dealt ? `${ctl.masterMode} ·` : 'overrides'} {n} layer{n === 1 ? '' : 's'}
       </Mono>
       {dealt && (
-        <Key
-          title="Reshuffle — every layer draws again"
+        <IconKey
+          label="Reshuffle: every layer draws again"
           onClick={e => {
             e.stopPropagation();
             reshuffle(ctl);
           }}
         >
           <Icon.Dice />
-        </Key>
+        </IconKey>
       )}
-      <Key
-        title="Remove — every layer gets its own palette back"
+      <IconKey
+        label="Remove Master colour: every layer gets its own colours back"
         onClick={e => {
           e.stopPropagation();
           const reached = ctl.removeMasterPalette();
-          ctl.say(`every layer has its own palette back${unlessReached(reached)}`);
+          ctl.say(`every layer has its own colours back${unlessReached(reached)}`);
         }}
       >
         <Icon.X />
-      </Key>
+      </IconKey>
     </ColourRow>
   );
 }

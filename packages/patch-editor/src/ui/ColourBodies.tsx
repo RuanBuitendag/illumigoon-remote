@@ -11,7 +11,7 @@ import { Hr, Lab, Mono, Seg, Switch, Blurb } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { exposeProps } from './Surface';
 import { Param } from './Param';
-import { Field, IconKey, Key, Pill } from './controls';
+import { Field, IconKey, Pill } from './controls';
 
 /** Deal MASTER's stops out again, and say so. Shared by the row's dice and the inspector's. */
 export function reshuffle(ctl: Ctl) {
@@ -54,7 +54,7 @@ function NodeKnobs({ ctl, title, bottom, slot, node, values }: {
   )
 }
 
-/** The palette header's count, store and add buttons. */
+/** The colours header's count, store and add buttons. */
 function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
   count: number; full: boolean; locked: boolean; onBrowse?(): void; onAdd(): void;
 }) {
@@ -62,22 +62,15 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
   return (
     <div className="row" style={{ gap: 'var(--space-2)' }}>
       {/* `dim` is dropped rather than overridden, so there is no question of which
-          colour rule wins. */}
-      <Mono
-        className={warns ? 'sm warn' : 'dim sm'}
-        title={
-          warns
-            ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
-            : undefined
-        }
-      >
-        {count}
+          colour rule wins. Full, the count says the most there can be. */}
+      <Mono className={warns ? 'sm warn' : 'dim sm'}>
+        {warns ? `${count} / ${LIMITS().PALETTE_NEW}` : count}
       </Mono>
       {/* Save and recall live in the sheet: this header has room for one more
           control, and the store is a list of forty-five. */}
       {!locked && onBrowse && (
         <IconKey
-          label="Palette store — save this one, or recall another"
+          label="Palette store: keep these colours, or bring back others"
           onClick={onBrowse}
         >
           <Icon.Folder />
@@ -91,8 +84,8 @@ function StopsHeadControls({ count, full, locked, onBrowse, onAdd }: {
           style={{ opacity: full ? 'var(--opacity-behind)' : 1 }}
           label={
             full
-              ? `${LIMITS().PALETTE_NEW} stops is the most this tool will build`
-              : 'Add a stop'
+              ? `${LIMITS().PALETTE_NEW} colours is the most Edit makes`
+              : 'Add a colour'
           }
           onClick={onAdd}
         >
@@ -153,7 +146,7 @@ function PaletteStops({
       {...expose?.(null)}
     >
       <div className="row" style={{ justifyContent: 'space-between' }}>
-        <Lab className="head">Palette</Lab>
+        <Lab className="head">Colours</Lab>
         <StopsHeadControls count={entries.length} full={full} locked={locked} onBrowse={onBrowse}
                            onAdd={() => onChange([...entries, 'ffffff'])} />
       </div>
@@ -164,7 +157,9 @@ function PaletteStops({
 
       {children}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-half)' }}>
+      {/* Each row is named in words and shows the colour itself. The code field stays, for a person who
+          types one, but it is not what names the colour (BR-5, FO-1). */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         {entries.map((c, i) => (
           <div className="swrow" key={i} {...expose?.(i)}>
             <Swatch
@@ -173,9 +168,9 @@ function PaletteStops({
               disabled={locked}
               onPick={hex => setEntry(i, hex.slice(1).toLowerCase())}
             />
-            <Mono className="dim sm">{i + 1}</Mono>
-            <Field label={`Colour ${i + 1} code`}
-              className="hexin grow"
+            <Lab className="grow">Colour {i + 1}</Lab>
+            <Field label={`Colour ${i + 1}, typed as a code`}
+              className="hexin"
               value={c}
               spellCheck={false}
               disabled={locked}
@@ -191,14 +186,14 @@ function PaletteStops({
               }}
             />
             {!locked && (
-              <Key
-                title="Remove stop"
+              <IconKey
+                label={`Remove colour ${i + 1}`}
                 disabled={entries.length <= 1}
                 style={{ opacity: entries.length <= 1 ? 'var(--opacity-behind)' : 1 }}
                 onClick={() => onChange(entries.filter((_, j) => j !== i))}
               >
                 <Icon.X />
-              </Key>
+              </IconKey>
             )}
           </div>
         ))}
@@ -226,8 +221,8 @@ export function MasterColourBody({
     <>
       <div style={{ padding: 'var(--space-4)' }}>
         <Blurb>
-          Every layer plays from these stops. Index, mapping, transform and wrap stay each
-          layer&rsquo;s own, and removing the row gives every layer its own palette back.
+          Every layer plays from these colours. Index, mapping, transform and wrap stay each
+          layer&rsquo;s own, and removing the row gives every layer its own colours back.
         </Blurb>
       </div>
       <Hr />
@@ -287,11 +282,10 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
       <div className="row" style={{ padding: 'var(--space-4)', justifyContent: 'space-between' }}>
         <span {...exposeProps(ctl.patch, `L${layer.slot}.colour.bypass`)}>
           <Switch on={!layer.colour.bypass} label="Colour"
-                  title="Bypass the colour stage — applies live, so you can A/B it"
                   onChange={v => ctl.setStructural(`L${layer.slot}.colour.bypass`, !v,
                     d => { d.layers.find(x => x.slot === layer.slot)!.colour.bypass = !v; })} />
         </span>
-        <Blurb className="rt">off draws the shape white, so you can A/B the palette</Blurb>
+        <Blurb className="rt">off draws the shape white, so you can compare it with the colours</Blurb>
       </div>
       <Hr />
 
@@ -328,12 +322,11 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
           <div className="row" style={{ gap: 'var(--space-3)', justifyContent: 'space-between' }}>
             <Blurb>
               {ctl.masterMode === 'all'
-                ? 'Palette from Master — every layer plays its stops.'
-                : `Palette dealt from Master (${ctl.masterMode}).`}
+                ? 'Colours from Master: every layer plays them.'
+                : `Colours dealt from Master (${ctl.masterMode}).`}
             </Blurb>
-            <Pill title="Edit the palette every layer plays"
-                    onClick={() => { ctl.selectMaster(); ctl.selectNode({ kind: 'colour' }); }}>
-              EDIT THERE
+            <Pill onClick={() => { ctl.selectMaster(); ctl.selectNode({ kind: 'colour' }); }}>
+              EDIT ON MASTER
             </Pill>
           </div>
         )}
@@ -353,7 +346,6 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
           */}
         <div className="row" style={{ justifyContent: 'space-between' }}>
           <Switch on={layer.colour.wrap} label="Wrap"
-                  title="Treat the palette as a wheel: the last colour blends back into the first"
                   onChange={wrap => ctl.structural(d => {
                     d.layers.find(x => x.slot === layer.slot)!.colour.wrap = wrap;
                   })} />
@@ -368,7 +360,7 @@ export function ColourBody({ ctl, layer, onBrowsePalettes }: {
 
       {/* Under the swatches on purpose: these apply to the entries above rather than
           replacing them, and they are modulation targets where an entry is not. */}
-      <NodeKnobs ctl={ctl} title="Palette transform" bottom={22} slot={layer.slot} node="palette"
+      <NodeKnobs ctl={ctl} title="Colour transform" bottom={22} slot={layer.slot} node="palette"
                  values={pal.params} />
     </>
   );

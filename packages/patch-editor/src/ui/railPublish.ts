@@ -48,7 +48,7 @@ export async function documentToSend(
     // positions ride up beside it as a preset of the version that is already there.
     // Sending the edited document instead would mint a version nobody asked for, and the
     // preset would then belong to a patch the author never meant to make.
-    const named = await askName('Name this preset', 'Untitled preset');
+    const named = await askName('Name this variation', 'Untitled variation');
     if (!named || !named.trim()) return {};
     const values = positionsNow(save.patch);
     if (!Object.keys(values).length) {
@@ -110,7 +110,7 @@ export async function markPresets(
 }
 
 export function publishMessage(kind: PublishKind, result: Published): string {
-  if (kind === 'preset') return `preset published against v${result.version}`;
+  if (kind === 'preset') return `variation published against v${result.version}`;
   return result.created
     ? `published as v${result.version}`
     : `already published — v${result.version}`;
@@ -127,8 +127,8 @@ export function publishMessage(kind: PublishKind, result: Published): string {
  */
 export function publishWarning(result: Published): string | null {
   if (result.presetsRefused) {
-    return `${result.presetsRefused} preset(s) were refused — the patch published as `
-      + `v${result.version}, but those presets are still local only. `
+    return `${result.presetsRefused} variation(s) were refused — the patch published as `
+      + `v${result.version}, but those variations are still local only. `
       + 'The server may be running an older build.';
   }
   return result.atRisk && result.warning ? result.warning : null;

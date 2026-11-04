@@ -21,7 +21,7 @@ import { EditorSheet } from './Sheet';
 import type { Ctl } from './ctl';
 import { M } from './dock';
 import { DepthDrag } from './modEditor';
-import { Key } from './controls';
+import { IconKey, Key } from './controls';
 import { LookProblem } from '../../../../src/composites';
 
 // =================================================================== matrix
@@ -116,16 +116,17 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
 }
 
 /** One toggle in a matrix row: a short word that flips one setting of the wire. */
-function MatrixToggle({ width, title, disabled, onClick, children }: {
+function MatrixToggle({ width, means, disabled, onClick, children }: {
   width: number;
-  title: string;
+  /** What the word means, after the word itself in the accessible name. */
+  means: string;
   disabled?: boolean;
   onClick(): void;
   children: string;
 }) {
   return (
     <div className="row" style={{ width, justifyContent: 'flex-end' }}>
-      <Key disabled={disabled} title={title} onClick={onClick}>
+      <Key disabled={disabled} aria-label={`${children}: ${means}`} onClick={onClick}>
         <Lab className="dim">{children}</Lab>
       </Key>
     </div>
@@ -197,10 +198,10 @@ function MatrixToggles({ ctl, r, srcBipolar, edit }: {
       <MatrixToggle
         width={54}
         disabled={!srcBipolar}
-        title={
+        means={
           srcBipolar
-            ? 'both: the source swings the setting above and below where it is; up: only above'
-            : 'This source only rises from 0, so it only moves the setting up'
+            ? 'the source swings the setting above and below where it is'
+            : 'this source only rises from 0, so it only moves the setting up'
         }
         onClick={() =>
           ctl.structural(
@@ -214,7 +215,7 @@ function MatrixToggles({ ctl, r, srcBipolar, edit }: {
       </MatrixToggle>
       <MatrixToggle
         width={46}
-        title="adds: moves the setting up and down; scales: multiplies it"
+        means={r.op === 'multiply' ? 'multiplies the setting' : 'moves the setting up and down'}
         onClick={() =>
           ctl.structural(
             edit(row => {
@@ -268,7 +269,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
       <span style={{ marginRight: 'var(--space-3)' }}>
         <Switch
           on={!r.bypass}
-          title="Bypass this one wire — applies live"
+          name={`Wire ${i + 1} on`}
           onChange={v =>
             ctl.setStructural(
               `R${i}.bypass`,
@@ -280,8 +281,8 @@ function MatrixLine({ ctl, r, i, drop, note }: {
           }
         />
       </span>
-      <Key
-        title="Remove row"
+      <IconKey
+        label={`Remove wire ${i + 1}`}
         onClick={() =>
           ctl.structural(d => {
             d.matrix = d.matrix.filter(x => x.id !== r.id)
@@ -289,7 +290,7 @@ function MatrixLine({ ctl, r, i, drop, note }: {
         }
       >
         <Icon.X />
-      </Key>
+      </IconKey>
     </div>
   )
 }

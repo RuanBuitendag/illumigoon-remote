@@ -383,7 +383,7 @@ export function useConnection({ patchRef, setPatch, dropMaster, say, dragRef }:
 
   const onDescribed = useCallback((w: Wire, a: Answer, seen: DeviceInfo | null) => {
     if (wireRef.current !== w) return;
-    const fw = seen?.firmware_version ? `fw ${seen.firmware_version}` : 'this firmware';
+    const fw = seen?.firmware_version ? `light software ${seen.firmware_version}` : 'this light software';
 
     if (!a.ok) {
       stepReady({ ev: 'describeTimeout', why: notDescribed(seen, fw) });

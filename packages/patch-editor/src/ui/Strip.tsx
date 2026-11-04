@@ -22,7 +22,6 @@ import {
 } from '../engine/preview';
 
 /** Hex the way a person compares two hashes: fixed width, so a mismatch lines up. */
-const hex = (h: number) => (h >>> 0).toString(16).padStart(8, '0');
 
 const TAPE: LedShape = { padding: 20, spread: 5, chip: 3.4, glow: 1.25 };
 
@@ -74,11 +73,8 @@ export function Strip({ deviceCatalogHash, meter, head }: {
           {head}
           {meter}
           {mismatch && (
-            <span
-              className="stripwarn"
-              title={`engine catalog ${hex(status.catalogHash)} · light ${hex(deviceCatalogHash!)}`}
-            >
-              this engine is not this light&rsquo;s firmware
+            <span className="stripwarn">
+              this engine is not this light&rsquo;s software
             </span>
           )}
         </div>

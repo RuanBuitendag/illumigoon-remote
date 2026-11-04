@@ -137,7 +137,7 @@ export function Inspector({ ctl, layer, host, onBrowsePalettes }: {
           <Blurb>
             {colour
               ? `The mix has no colour of its own. Add Colour at the top of ${MASTER_NAME}’s FX ` +
-                `rack to give every layer one palette.`
+                `rack to give every layer the same colours.`
               : `No effects on ${layer ? layerName(layer.slot) : MASTER_NAME} yet. Add a row in the effects ` +
                 `rack and its controls land here.`}
           </Blurb>

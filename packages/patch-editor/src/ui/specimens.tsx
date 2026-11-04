@@ -44,7 +44,7 @@ function LiveSeg({ tight }: { tight?: boolean }) {
 function LiveToggle({ disabled }: { disabled?: boolean }) {
   const [isOn, setIsOn] = useState(false);
   return (
-    <Toggle isOn={isOn} disabled={disabled} title="Mute" onClick={() => setIsOn(!isOn)}>
+    <Toggle isOn={isOn} disabled={disabled} aria-label="Mute" onClick={() => setIsOn(!isOn)}>
       M
     </Toggle>
   );
@@ -75,7 +75,7 @@ export const EDIT_SPECIMENS: Specimen[] = [
     name: 'Toggle',
     states: states({
       'off, tap to turn on': <LiveToggle />,
-      on: <Toggle isOn title="Solo" onClick={nothing}>S</Toggle>,
+      on: <Toggle isOn aria-label="Solo" onClick={nothing}>S</Toggle>,
       disabled: <LiveToggle disabled />,
     }),
   },

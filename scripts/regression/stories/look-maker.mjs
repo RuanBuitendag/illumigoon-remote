@@ -117,7 +117,7 @@ export const lookMaker = [
       await readTheLook(page);
       await onTop(page).getByRole('button', { name: /^Remove Layer 2/ }).click();
       await until(async () => (await layerCount(page)) === 1, 'the layer to go');
-      await onTop(page).getByTitle(/^Undo the last change/).click();
+      await onTop(page).getByRole('button', { name: 'UNDO', exact: true }).first().click();
       await until(async () => (await layerCount(page)) === 2, 'UNDO to bring the layer back');
       await until(() => layersOn(lights['10.0.0.13']) === 2, 'Back Left to play both layers again');
       await page.keyboard.press('Control+Shift+z');

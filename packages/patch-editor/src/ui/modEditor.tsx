@@ -31,7 +31,7 @@ import type { Ctl } from './ctl';
 import { BandScope } from './BandScope';
 import type { AudioFeed } from '../domain/scope';
 import { deadReason } from './modulatorStatus';
-import { Key, Toggle } from './controls';
+import { IconKey, Key, Toggle } from './controls';
 import { LookProblem } from '../../../../src/composites';
 
 /**
@@ -95,7 +95,7 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
         <span {...exposeProps(ctl.patch, `M${m.slot}.bypass`)}>
           <Switch
             on={!m.bypass}
-            title="Bypass this modulator — every wire it drives, at once. Applies live."
+            name={`${m.type === 'macro' ? 'Macro' : 'Modulator'} ${slotNumber(m.slot)} on`}
             onChange={v =>
               ctl.setStructural(`M${m.slot}.bypass`, !v, d => {
                 d.modulators.find(x => x.slot === m.slot)!.bypass = !v
@@ -103,15 +103,15 @@ function ModHead({ ctl, m, onClose }: { ctl: Ctl; m: Modulator; onClose(): void 
             }
           />
         </span>
-        <Key
-          title="Remove this modulator and every row it drives"
+        <IconKey
+          label={`Remove ${m.type === 'macro' ? 'macro' : 'modulator'} ${slotNumber(m.slot)} and every row it drives`}
           onClick={() => {
             ctl.structural(d => removeModulator(d, m.slot))
             onClose()
           }}
         >
           <Icon.X />
-        </Key>
+        </IconKey>
       </div>
     </div>
   )
@@ -284,7 +284,7 @@ function SourceWire({ ctl, m, others, wire, label }: {
               key={o.slot}
               isOn={src === o.slot}
               style={{ width: 26 }}
-              title={`${o.label || o.name || o.type} in slot ${o.slot}`}
+              aria-label={`${o.slot}: ${o.label || o.name || o.type}`}
               onClick={() =>
                 ctl.structural(d => {
                   toggleWire(d.modulators.find(y => y.slot === m.slot)!, wire, o.slot)
@@ -325,9 +325,6 @@ export function DepthDrag({ ctl, row, spec }: {
   return (
     <span
       className="numdrag"
-      title={'Drag up or down to change depth'
-             + (spec ? '\nhold shift for fine'
-                     : '\nthe target is not loaded, so this drags in unit steps')}
       onPointerDown={e => {
         (e.currentTarget as Element).setPointerCapture?.(e.pointerId);
         from.current = { y: e.clientY, v: row.depth };
@@ -394,21 +391,20 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
               <span className="dst">{pathName(r.dst)}</span>
               <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
               <Key className="poltog" disabled={!slotSwings}
-                      title={slotSwings
-                        ? 'Bipolar takes the source at ±1; unipolar remaps it to 0–1 first'
-                        : 'This source is one-way (0–1) — there is no negative half to fold'}
+                      aria-label={slotSwings
+                        ? `${r.bipolar ? '±: both ways' : '+: up only'}, ${pathName(r.dst)}`
+                        : `+: this source only rises, ${pathName(r.dst)}`}
                       onClick={() => { if (slotSwings) ctl.togglePolarity(r.id); }}>
                 {r.bipolar && slotSwings ? '±' : '+'}
               </Key>
-              <Key title="Unbind" onClick={() => ctl.removeRow(r.id)}><Icon.X /></Key>
+              <IconKey label={`Unbind ${pathName(r.dst)}`} onClick={() => ctl.removeRow(r.id)}><Icon.X /></IconKey>
             </div>
           );
         })}
 
         {/* A wire, so it carries no depth and no polarity — the row is the whole fact. */}
         {reach.triggers.map(L => (
-          <div key={`t${L}`} className="destrow" data-wire="true"
-               title={`Fires ${layerName(L)}'s emitter — unwire it on that layer's Trigger row`}>
+          <div key={`t${L}`} className="destrow" data-wire="true">
             <span className="dst">{layerName(L)} trigger</span>
             <Lab className="dim">trig</Lab>
           </div>
@@ -431,8 +427,7 @@ function FeedRow({ to, at, slot }: { to: Modulator | undefined; at: number; slot
   const side = to ? [to.source === slot && 'A', to.sourceB === slot && 'B'].filter(Boolean).join('+') : '';
   const name = to ? to.label || to.name || to.type : undefined;
   return (
-    <div className="destrow" data-wire="true"
-         title={`Operand ${side} of ${name} in slot ${at} — unwire it on that node`}>
+    <div className="destrow" data-wire="true">
       <span className="dst">M{at} · {name}</span>
       <Lab className="dim">in {side}</Lab>
     </div>

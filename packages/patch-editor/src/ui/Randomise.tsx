@@ -43,19 +43,19 @@ const rollTitle = (entry: History['entries'][number] | undefined, at: number) =>
   return entry.seed === null ? 'Before rolling' : `Roll ${at}`;
 }
 
-function StepButton({ can, title, Icon, onClick }: {
-  can: boolean; title: string; Icon: (p: { c?: string }) => ReactNode; onClick(): void;
+function StepButton({ can, label, Icon, onClick }: {
+  can: boolean; label: string; Icon: (p: { c?: string }) => ReactNode; onClick(): void;
 }) {
   return (
-    <Key
-      className={`iconbtn ${can ? 'raise' : 'well'}`}
+    <IconKey
+      className={can ? 'raise' : 'well'}
       style={{ width: 34, height: 34 }}
       disabled={!can}
-      title={title}
+      label={label}
       onClick={onClick}
     >
       <Icon c={can ? 'var(--text-3)' : 'var(--text-5)'} />
-    </Key>
+    </IconKey>
   )
 }
 
@@ -94,21 +94,17 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
             gap: 'var(--space-2)',
             opacity: everything ? 'var(--opacity-disabled)' : 1,
           }}
-          title={
-            everything
-              ? 'Every part is locked, so there is nothing to roll'
-              : 'Roll a new patch — it replaces this one, on the light as well'
-          }
           onClick={() => onRoll({ ...opts, only: undefined })}
         >
           <Icon.Dice c="var(--background)" />
           {opts.keep.length ? 'ROLL UNLOCKED' : 'ROLL'}
         </Pill>
-        <StepButton can={back} title="The roll before this one" Icon={Icon.Back}
+        <StepButton can={back} label="The roll before this one" Icon={Icon.Back}
                     onClick={() => onStep(history.at - 1)} />
-        <StepButton can={fwd} title="The roll after this one" Icon={Icon.Fwd}
+        <StepButton can={fwd} label="The roll after this one" Icon={Icon.Fwd}
                     onClick={() => onStep(history.at + 1)} />
       </div>
+      {everything && <Blurb>Every part is locked, so there is nothing to roll.</Blurb>}
 
       {shown.length > 0 && (
         <RollStrip history={history} start={start} shown={shown} onStep={onStep} />
@@ -132,7 +128,6 @@ function RandomiseFoot({ connected, deviceName, onSave }: Pick<
         className="row raise"
         style={{ gap: 'var(--space-2)', padding: 'var(--space-2) var(--space-3)' }}
         onClick={onSave}
-        title="Save this patch to the library"
       >
         <Icon.Folder />
         <Lab className="mid">Save to library</Lab>
@@ -302,12 +297,11 @@ function RollStrip({ history, start, shown, onStep }: {
               className="col"
               onClick={() => onStep(i)}
               style={{ flex: '1 1 0', minWidth: 0, gap: 'var(--space-1)', alignItems: 'center', padding: 0 }}
-              title={
-                (e.seed === null
-                  ? 'The patch before the first roll'
-                  : `Roll ${i} · seed ${seedLabel(e.seed)}`) +
-                (e.tweaked ? ' · edited since it landed' : '')
+              aria-label={
+                (e.seed === null ? 'The look before the first roll' : `Roll ${i}`) +
+                (e.tweaked ? ', changed since it landed' : '')
               }
+              aria-pressed={current}
             >
               <span
                 style={{
@@ -351,11 +345,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
       <Toggle
         isOn={on}
         style={{ width: 22, height: 20 }}
-        title={
-          on
-            ? `Unlock ${LABEL[part].toLowerCase()}`
-            : `Lock ${LABEL[part].toLowerCase()} — the next roll keeps them`
-        }
+        aria-label={`Lock ${LABEL[part].toLowerCase()}, so the next roll keeps them`}
         onClick={onToggle}
       >
         {on ? <Icon.Lock c="var(--text-1)" /> : <Icon.Unlock />}

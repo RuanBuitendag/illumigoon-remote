@@ -344,7 +344,7 @@ function NumberFields({ patch, path, spec, d, set }: {
             width: `calc(${at(Math.max(lo, hi))} - ${at(Math.min(lo, hi))})`,
           }}
         />
-        <b style={{ left: at(base) }} title={`now ${base}`} />
+        <b style={{ left: at(base) }} />
       </div>
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Field label="Lowest value"
@@ -469,7 +469,7 @@ function OptionFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
         <div key={o.choice} className="row" style={{ gap: 'var(--space-2)' }}>
           <Switch
             on={o.on}
-            title={`Offer ${o.label || o.choice}`}
+            name={`Offer ${o.label || o.choice}`}
             onChange={on =>
               set({ offered: d.offered.map((x, j) => (j === i ? { ...x, on } : x)) })
             }

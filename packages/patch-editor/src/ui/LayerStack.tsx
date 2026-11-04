@@ -11,7 +11,7 @@ import {
 } from '../domain/layerops';
 import { ask } from '../host';
 import { gradientOf } from '../library/palettes';
-import { Hr, Lab, Mono, RowGrip, layerName, layerNumber } from './bits';
+import { Blurb, Hr, Lab, Mono, RowGrip, layerName, layerNumber } from './bits';
 import { unlessReached, type Ctl, type Reached } from './ctl';
 import { ParamFader } from './Param';
 import { exposeProps } from './Surface';
@@ -216,7 +216,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
         ))}
 
         {freeSlot !== undefined && (
-          <div
+          <Key
             className="ghostrow well"
             onClick={() =>
               ctl.structural(d => {
@@ -227,40 +227,28 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
           >
             <Icon.Plus c="var(--text-5)" />
             <Lab className="dim">Add layer</Lab>
-          </div>
+          </Key>
         )}
 
         {/* Offered even when the patch is full: the refusal names the limit that stopped it,
             which is more use than a row that quietly is not there. */}
         {ctl.clip && (
-          <div
-            className="ghostrow well"
-            onClick={acts.paste}
-            title={`A copy of ${layerName(ctl.clip.from)}, with the modulators that drove it`}
-          >
+          <Key className="ghostrow well" onClick={acts.paste}>
             <Icon.Copy />
-            <Lab className="dim">Paste {ctl.clip.label}</Lab>
-          </div>
+            <Lab className="dim">Paste {ctl.clip.label}, from {layerName(ctl.clip.from)}</Lab>
+          </Key>
         )}
 
-        <div
-          className="ghostrow well"
-          onClick={onFragments}
-          title="Save this layer as a fragment, or pull one into the patch"
-        >
+        <Key className="ghostrow well" onClick={onFragments}>
           <Icon.Copy />
           <Lab className="dim">Fragments</Lab>
-        </div>
+        </Key>
 
         {/* At the end of the list, away from the count and the +, and it asks first. */}
         {ctl.patch.layers.length > 0 && (
-          <div
-            className="ghostrow well"
-            onClick={() => void acts.clear()}
-            title="Remove every layer, and the modulators that only drove them"
-          >
+          <Key className="ghostrow well" onClick={() => void acts.clear()}>
             <Lab className="dim">Clear all layers</Lab>
-          </div>
+          </Key>
         )}
       </div>
 
@@ -293,15 +281,20 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
     <div
       className={`layerrow ${on ? 'raise-hi' : 'flatcard'}`}
       onClick={ctl.selectMaster}
-      title="The whole mix: brightness, speed and a rack over every layer"
     >
       <Picked isOn={on} edge="side" />
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <span style={{ width: 35, display: 'flex', justifyContent: 'flex-end' }}>
           <Icon.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
         </span>
-        <span
+        {/* A key, so the mix is chosen by keyboard as a layer is: Enter or Space (AC-8). */}
+        <Key
           className="name grow"
+          aria-pressed={on}
+          onClick={e => {
+            e.stopPropagation();
+            ctl.selectMaster();
+          }}
           style={{
             font: 'var(--type-label)',
             letterSpacing: 'var(--tracking-label)',
@@ -309,11 +302,12 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
           }}
         >
           {MASTER_NAME}
-        </span>
+        </Key>
         {/* Visible from any layer: something up here is setting every palette (LIFE-846). */}
         {ctl.masterPalette && (
           <span
-            title="Master colour — every layer plays this palette"
+            role="img"
+            aria-label="Master colours: every layer plays these"
             style={{
               width: 22,
               height: 10,
@@ -390,42 +384,53 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
         >
           {layerNumber(L.slot)}
         </span>
-        <span className="name grow">{L.emitter.type}</span>
+        {/* The row's name is a key, so a layer is chosen by keyboard as well: Tab to it, then Enter or
+            Space (AC-8). A click anywhere else on the row still chooses it. */}
+        <Key
+          className="name grow"
+          aria-pressed={selected}
+          aria-label={`${layerName(L.slot)} ${L.emitter.type}`}
+          onClick={e => {
+            e.stopPropagation();
+            ctl.selectLayer(L.slot);
+          }}
+        >
+          {L.emitter.type}
+        </Key>
         {/* The actions show on hover or when this row is the selected one. */}
         <div className="row rowacts">
-          <Key
-            title={`Copy ${layerName(L.slot)} — paste it into any patch in this window`}
+          <IconKey
+            label={`Copy ${layerName(L.slot)}`}
             onClick={e => {
               e.stopPropagation();
               acts.copy(L.slot);
             }}
           >
             <Icon.Copy />
-          </Key>
-          <Key
-            title={`Duplicate ${layerName(L.slot)} — the copy is driven by the same modulators`}
+          </IconKey>
+          <IconKey
+            label={`Duplicate ${layerName(L.slot)}`}
             onClick={e => {
               e.stopPropagation();
               acts.duplicate(L.slot);
             }}
           >
             <Icon.Dup />
-          </Key>
-          <Key
-            title={`Remove ${layerName(L.slot)}, its rows and any modulator left driving nothing — paste ` +
-              `puts it back`}
+          </IconKey>
+          <IconKey
+            label={`Remove ${layerName(L.slot)}`}
             onClick={e => {
               e.stopPropagation();
               acts.remove(L.slot);
             }}
           >
             <Icon.X />
-          </Key>
+          </IconKey>
         </div>
         <div className="row" style={{ gap: 'var(--space-2)' }}>
           <Toggle
             isOn={L.muted}
-            title="Mute — applies live"
+            aria-label={`Mute ${layerName(L.slot)}`}
             {...exposeProps(ctl.patch, `L${L.slot}.mute`)}
             onClick={e => {
               e.stopPropagation();
@@ -438,7 +443,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
           </Toggle>
           <Toggle
             isOn={L.solo}
-            title="Solo — applies live"
+            aria-label={`Solo ${layerName(L.slot)}`}
             {...exposeProps(ctl.patch, `L${L.slot}.solo`)}
             onClick={e => {
               e.stopPropagation();
@@ -469,6 +474,8 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
        * blend menu does not pick the whole row up. The top line still drags it.
        */}
       <LayerStrip ctl={ctl} L={L} selected={selected} />
+      {/* What the blend does, in words, on the chosen layer: the menu shows only its name (CM-8). */}
+      {selected && <Blurb>{BLEND_BLURBS[L.blend]}</Blurb>}
     </div>
   );
 }
@@ -488,7 +495,6 @@ function LayerStrip({ ctl, L, selected }: { ctl: Ctl; L: Layer; selected: boolea
         <Choice label={`${layerName(L.slot)} blend`}
           className="blendchip"
           value={L.blend}
-          title={BLEND_BLURBS[L.blend]}
           onClick={e => e.stopPropagation()}
           onChange={e => {
             const blend = e.target.value as Layer['blend'];

@@ -70,14 +70,14 @@ export const Defs = () => (
   </svg>
 );
 
-interface TextProps { children: ReactNode; className?: string; title?: string }
+interface TextProps { children: ReactNode; className?: string }
 
-export const Lab = ({ children, className = '', title }: TextProps) => (
-  <span className={`lab ${className}`} title={title}>{children}</span>
+export const Lab = ({ children, className = '' }: TextProps) => (
+  <span className={`lab ${className}`}>{children}</span>
 );
 
-export const Mono = ({ children, className = '', title }: TextProps) => (
-  <span className={`mono ${className}`} title={title}>{children}</span>
+export const Mono = ({ children, className = '' }: TextProps) => (
+  <span className={`mono ${className}`}>{children}</span>
 );
 
 /**
@@ -91,8 +91,8 @@ export const Mono = ({ children, className = '', title }: TextProps) => (
  * `.blurb.rt` right-aligns for the handful that sit at the end of a row rather than under
  * one. Anything needing more than that should ask whether it is really this role.
  */
-export const Blurb = ({ children, className = '', title }: TextProps) => (
-  <span className={`blurb ${className}`} title={title}>{children}</span>
+export const Blurb = ({ children, className = '' }: TextProps) => (
+  <span className={`blurb ${className}`}>{children}</span>
 );
 
 export const Hr = () => <div className="hr" />;
@@ -139,12 +139,15 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   );
 }
 
-/** An on/off switch: the app's `PowerKey`, with its name beside it. A tap on the name throws it too. */
-export const Switch = ({ on, onChange, label, title }: {
-  on: boolean; onChange(v: boolean): void; label?: string; title?: string;
+/**
+ * An on/off switch: the app's `PowerKey`, with its name beside it. A tap on the name throws it too. A switch
+ * with no word beside it, in a row that already says what it is, gives its accessible name in `name`.
+ */
+export const Switch = ({ on, onChange, label, name }: {
+  on: boolean; onChange(v: boolean): void; label?: string; name?: string;
 }) => (
-  <label className="row" style={{ gap: 'var(--space-2)', cursor: 'pointer' }} title={title}>
-    <PowerKey label={label ?? title ?? 'On'} isOn={on} onChange={onChange} />
+  <label className="row" style={{ gap: 'var(--space-2)', cursor: 'pointer' }}>
+    <PowerKey label={name ?? label ?? 'On'} isOn={on} onChange={onChange} />
     {label && <Lab className={on ? 'mid' : ''}>{label}</Lab>}
   </label>
 );
@@ -159,25 +162,21 @@ export const StructField = ({ node, field, value, onChange }: {
 }) => {
   const v = value ?? field.def;
 
-  // "structural, not a modulation target" was the whole tooltip, on every one of these. It
-  // is true and it is not the question — so it moves to the end, behind what the field does.
-  const blurb = STRUCT_BLURBS[`${node}.${field.key}`];
-  // What each choice does, since a choice in the row has no title of its own.
-  const choices = (field.options ?? [])
-    .map(o => [o, STRUCT_OPTION_BLURBS[`${node}.${field.key}.${o}`]] as const)
-    .filter(([, text]) => text)
-    .map(([o, text]) => `${o.replace(/_/g, ' ')}: ${text}\n`)
-    .join('');
-  const title = (blurb ? `${field.label}\n${blurb}\n\n` : `${field.label}\n`)
-    + (choices ? `${choices}\n` : '')
-    + 'structural, not a modulation target';
+  // What the chosen value does, or else what the field does, in words under it, so a finger reads it
+  // as well as a pointer (CM-8). The same place `Index` and `Deal` say theirs.
+  const blurb = STRUCT_OPTION_BLURBS[`${node}.${field.key}.${String(v)}`] ?? STRUCT_BLURBS[`${node}.${field.key}`];
 
   if (field.kind === 'toggle') {
-    return <Switch on={v === true} label={field.label} onChange={onChange} title={title} />;
+    return (
+      <div className="col" style={{ gap: 'var(--space-2)' }}>
+        <Switch on={v === true} label={field.label} onChange={onChange} />
+        {blurb && <Blurb>{blurb}</Blurb>}
+      </div>
+    );
   }
   return (
     <div className="col" style={{ gap: 'var(--space-2)' }}>
-      <Lab title={title}>{field.label}</Lab>
+      <Lab>{field.label}</Lab>
       <Seg
         label={field.label}
         items={field.options!}
@@ -186,6 +185,7 @@ export const StructField = ({ node, field, value, onChange }: {
         labels={Object.fromEntries(field.options!.map(o => [o, o.replace(/_/g, ' ')]))}
         onChange={onChange}
       />
+      {blurb && <Blurb>{blurb}</Blurb>}
     </div>
   );
 };
@@ -252,9 +252,9 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
   const max = 10240;
   const f = clamp01(bytes / max);
   const col = budgetColour(bytes);
-  const title = budgetNote(bytes);
   return (
-    <div className="row" style={{ gap: 'var(--space-3)' }} title={title}>
+    <div className="col" style={{ gap: 'var(--space-1)' }}>
+    <div className="row" style={{ gap: 'var(--space-3)' }}>
       <Lab>Size</Lab>
       <div className="budget" style={{ width: w }}>
         <div className="groove well" style={{ width: w }} />
@@ -271,6 +271,9 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
       <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}>
         4K · 8K
       </span>
+    </div>
+    {/* What the size means for the light, once it means something: past the size that survives a power cut. */}
+    {bytes > BUDGET.NVS && <Blurb>{budgetNote(bytes)}</Blurb>}
     </div>
   )
 }
@@ -290,8 +293,7 @@ export function RackToggle({ shut, onToggle, children }: {
   shut: boolean; onToggle(): void; children: React.ReactNode;
 }) {
   return (
-    <Key className="row" style={{ gap: 'var(--space-2)' }} onClick={onToggle}
-            title={shut ? 'show this rack' : 'fold this rack away'}>
+    <Key className="row" style={{ gap: 'var(--space-2)' }} onClick={onToggle} aria-expanded={!shut}>
       {/* Down when open, right when shut — the arrow points at what it will reveal. */}
       <span style={{ display: 'flex', transform: shut ? 'rotate(-90deg)' : 'none',
                      transition: 'transform var(--duration-press) var(--ease-out)' }}>
@@ -319,7 +321,6 @@ export function RowGrip({ move }: { move?: { label: string; onMove(delta: number
     <Key
       {...drag}
       aria-label={move.label}
-      title={`${move.label}: drag it, or press the up and down arrows`}
       aria-keyshortcuts="ArrowUp ArrowDown"
       onKeyDown={e => {
         const delta = rowMoveOf(e.key);

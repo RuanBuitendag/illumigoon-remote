@@ -6,7 +6,7 @@ import { whyNoVersion, type PublishKind } from '../domain/publish';
 import { Blurb, Mono, budgetNote } from './bits';
 import type { RailSave } from './railPublish';
 import type { useRailVerdict } from './useRailVerdict';
-import { Field, Pill } from './controls';
+import { NamedField, Pill } from './controls';
 
 type Verdict = ReturnType<typeof useRailVerdict>['verdict'];
 
@@ -19,13 +19,14 @@ const PUBLISH_MEANS: Record<PublishKind, string> = {
 
 /** The offer, as a person reads it: what they get, not what it is called internally. */
 const publishLabel = (kind: PublishKind, v: { identity?: { version: number } } | null) =>
-  kind === 'preset' ? 'AS PRESET'
+  kind === 'preset' ? 'AS VARIATION'
     : kind === 'version' ? `AS v${(v?.identity?.version ?? 0) + 1}`
     : v?.identity ? 'AS NEW PATCH' : 'PUBLISH';
 
 /** The publish buttons on show, each with its one line. */
 function publishLines(publishing: boolean, verdict: Verdict): string[] {
-  if (publishing || !verdict) return [];
+  if (publishing) return ['The patch server sleeps, so the first publish of the day is slow'];
+  if (!verdict) return [];
   if (verdict.unchanged) return ['RE-PUBLISH sends it again: the server already has it'];
   return verdict.offered.map(kind => `${publishLabel(kind, verdict)} ${PUBLISH_MEANS[kind]}`);
 }
@@ -50,7 +51,6 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
       <Pill
         style={{ padding: 'var(--space-2) var(--space-3)' }}
         disabled
-        title="waiting for the patch server — it sleeps, so the first publish of the day is slow"
       >
         PUBLISHING…
       </Pill>
@@ -69,8 +69,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
   if (verdict.unchanged) {
     return (
       <Pill style={{ padding: 'var(--space-2) var(--space-3)' }}
-              disabled={!save.name.trim()} onClick={() => onPublish('version')}
-              title="Send this document again — the server already has it, so nothing changes">
+              disabled={!save.name.trim()} onClick={() => onPublish('version')}>
         RE-PUBLISH v{verdict.identity?.version}
       </Pill>
     );
@@ -80,8 +79,7 @@ function PublishOffer({ save, publishing, verdict, onPublish }: {
       {verdict.offered.map((kind, i) => (
         <Pill key={kind} isPrimary={i === 0}
                 style={{ padding: 'var(--space-2) var(--space-3)' }}
-                disabled={!save.name.trim()} onClick={() => onPublish(kind)}
-                title={PUBLISH_MEANS[kind]}>
+                disabled={!save.name.trim()} onClick={() => onPublish(kind)}>
           {publishLabel(kind, verdict)}
         </Pill>
       ))}
@@ -106,7 +104,7 @@ function PublishNotes({ publishing, verdict }: { publishing: boolean; verdict: V
       {!publishing && verdict?.referenceMissing ? (
         <Mono className="dim sm">
           published as v{verdict.identity?.version}, but there is no local copy of what was sent — a
-          preset needs one, so this can only be a version or a new patch
+          variation needs one, so this can only be a version or a new patch
         </Mono>
       ) : null}
     </>
@@ -129,19 +127,17 @@ function PresetCopyRow({ canCapture, presetCount, onCapture, onCopy }: {
           style={{ padding: 'var(--space-1) var(--space-3)' }}
           disabled={!canCapture}
           onClick={() => onCapture()}
-          title="Save where the controls are now as a preset of this patch"
         >
-          + PRESET
+          + VARIATION
         </Pill>
         <Mono className="dim sm">
-          {presetCount === 1 ? '1 preset' : `${presetCount || 'No'} presets`}
+          {presetCount === 1 ? '1 variation' : `${presetCount || 'No'} variations`}
         </Mono>
         <span className="grow" />
         <Pill
           isSmall
           style={{ padding: 'var(--space-1) var(--space-3)' }}
           onClick={() => onCopy()}
-          title="Copy the patch on the light as JSON"
         >
           COPY
         </Pill>
@@ -176,15 +172,13 @@ export function RailSaveForm({
   onCopy(): void;
 }) {
   const name = save.name.trim() || 'this look';
-  const saveMeans = clash ? `Puts this over ${name} in Mine` : `Keeps ${name} in Mine`;
   return (
     <div className="railsave">
       <div className="row" style={{ gap: 'var(--space-2)' }}>
-        <Field label="Name this look"
+        <NamedField label="Name this look"
           ref={nameInput}
           className="well"
           value={save.name}
-          placeholder="Name this look"
           spellCheck={false}
           onChange={e => save.onName(e.target.value)}
           onKeyDown={e => {
@@ -192,10 +186,10 @@ export function RailSaveForm({
           }}
         />
       </div>
-      <Field label="Notes"
+      <NamedField label="Notes"
         className="well railnotes"
         value={save.notes}
-        placeholder="Notes: warm, slow, good at night"
+        placeholder="warm, slow, good at night"
         spellCheck={false}
         onChange={e => save.onNotes(e.target.value)}
         onKeyDown={e => {
@@ -209,7 +203,6 @@ export function RailSaveForm({
           style={{ padding: 'var(--space-2) var(--space-3)' }}
           disabled={!save.name.trim()}
           onClick={() => onSave()}
-          title={saveMeans}
         >
           {clash ? 'REPLACE' : 'SAVE'}
         </Pill>
@@ -233,7 +226,7 @@ export function RailSaveForm({
                      onCapture={onCapture} onCopy={onCopy} />
       <SaveMeans
         lines={[
-          '+ PRESET keeps where the controls are now, under this look',
+          '+ VARIATION keeps where the controls are now, under this look',
           'COPY puts the look on the clipboard as text',
         ]}
       />

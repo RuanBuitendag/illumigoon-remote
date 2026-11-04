@@ -119,7 +119,7 @@ export function Stages({ warps, colourAt, sel, onSelect }: {
         <span className="stagedot" data-kind="colour" />
         <span className="stagename">colour</span>
       </div>
-      <span className="stagecap">the palette lands on the coordinate above</span>
+      <span className="stagecap">the colours land on the coordinate above</span>
     </div>
   );
   return (

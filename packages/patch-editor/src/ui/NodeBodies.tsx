@@ -86,8 +86,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
               key={o.slot}
               isOn={wired === o.slot}
               style={{ width: 26 }}
-              title={`${o.type} ${slotNumber(o.slot)} — tap to ` +
-                `${wired === o.slot ? 'stop it firing this layer' : 'make it fire this layer'}`}
+              aria-label={`${slotNumber(o.slot)}: ${o.type} ${slotNumber(o.slot)} fires this layer`}
               onClick={() => wire(wired === o.slot ? null : o.slot)}
             >
               {slotNumber(o.slot)}
@@ -96,7 +95,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
           <Key
             className="tog"
             style={{ width: 26 }}
-            title="Add a metronome in the next free slot and wire it here"
+            aria-label="+ Add a metronome and wire it here"
             onClick={addPeriodic}
           >
             +

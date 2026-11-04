@@ -169,16 +169,20 @@ type Drag =
   | { kind: 'value'; y: number; from: number }
   | { kind: 'depth'; y: number; from: number; row: KnobMod };
 
+/**
+ * The dial's description, read by a screen reader with the dial and never shown on hover:
+ * a finger cannot hover, so nothing here is the only place a person learns it (CM-8).
+ */
 function KnobTitle({ spec, bound }: { spec: ParamSpec; bound: boolean }) {
   return (
-    <title>
+    <desc>
       {spec.label}
       {spec.desc ? `\n${spec.desc}` : ''}
       {`\n\n${format(spec.min, spec)} … ${format(spec.max, spec)}${spec.unit ? ` ${spec.unit}` : ''}`
        + `   default ${format(spec.def, spec)}   ${spec.overflow}`}
       {bound ? '\ndrag a ring to set its depth' : ''}
       {`\n${doubleClick()} to reset`}
-    </title>
+    </desc>
   );
 }
 
@@ -326,11 +330,11 @@ function ModChip({ m, onPolarity, onUnbind }: {
         // nothing to the light. Said plainly and disabled, rather than left live
         // and inert -- a control that moves and changes nothing is the worse lie.
         disabled={!m.srcBipolar}
-        title={
-          `Modulator ${slotNumber(m.src)} · depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}` +
+        aria-label={
+          `Modulator ${slotNumber(m.src)}, depth ${m.depth >= 0 ? '+' : ''}${m.depth.toFixed(2)}, ` +
           (m.srcBipolar
-            ? ` · ${m.bipolar ? 'bipolar (±1)' : 'unipolar (0–1)'}\nclick to switch polarity`
-            : ' · source is one-way (0–1)\npolarity is fixed: there is no negative half to fold')
+            ? `${m.bipolar ? 'both ways' : 'one way'}: press to switch`
+            : 'one way: the source has no negative half')
         }
         onClick={e => {
           e.stopPropagation();
@@ -342,7 +346,7 @@ function ModChip({ m, onPolarity, onUnbind }: {
       </Key>
       <Key
         className="drop"
-        title="Unbind"
+        aria-label={`Unbind modulator ${slotNumber(m.src)}`}
         onClick={e => {
           e.stopPropagation();
           onUnbind?.(m.id);

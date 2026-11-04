@@ -185,7 +185,7 @@ function checkPalette(slot: string, L: any, verdict: Verdict) {
   const palette = L?.colour?.palette ?? {};
   const p = palette.params ?? {};
   if (p.saturation !== 2.0 || p.value !== 2.0) {
-    verdict.problems.push(`L${slot} palette is not at saturation 2.0 / value 2.0 ` +
+    verdict.problems.push(`L${slot} colours are not at saturation 2.0 / value 2.0 ` +
                           `(got ${p.saturation ?? 1} / ${p.value ?? 1})`);
   }
   checkEntries(slot, palette.entries ?? [], verdict.notes);
@@ -206,7 +206,7 @@ function checkEntries(slot: string, entries: string[], notes: string[]) {
   const spread = hueSpread(entries);
   if (spread !== undefined && spread < RING_SPREAD) {
     notes.push(
-      `L${slot} palette is an evenly-spaced hue ring (gap spread ${spread.toFixed(2)}) — pick a ` +
+      `L${slot} colours are an evenly-spaced hue ring (gap spread ${spread.toFixed(2)}) — pick a ` +
         `scheme with an accent`,
     );
   }

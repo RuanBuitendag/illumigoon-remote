@@ -21,8 +21,7 @@
 import { Fragment } from 'react';
 import { Fader as Bar, FaderBand, FaderDot } from '../../../../src/design-system';
 import type { ParamSpec } from '../domain/catalog';
-import { clamp, clamp01, slotNumber } from './bits';
-import { doubleClick } from './touch';
+import { clamp, clamp01 } from './bits';
 import { format, reachOf, toPos, toValue, useModDots, type KnobMod } from './Knob';
 
 /** Fine enough that a drag along the widest bar never steps. */
@@ -63,20 +62,6 @@ export function Fader({ spec, value, onChange, onCommit, mods = [], armed, hot, 
   };
 
   const said = `${format(value, spec)}${spec.unit ? ` ${spec.unit}` : ''}`;
-  const title =
-    `${spec.label} ${said}` +
-    (spec.desc ? `
-${spec.desc}` : '') +
-    `
-
-${spec.min} … ${spec.max}   default ${spec.def}` +
-    (mods.length
-      ? `
-modulated by ${mods.map(m => `modulator ${slotNumber(m.src)}`).join(', ')} — set depth on the Source tab's ` +
-        `knob, the modulator or the matrix`
-      : '') +
-    `
-tap to set · drag sideways · shift for fine · arrow keys step · ${doubleClick()} to reset`;
 
   return (
     <Bar
@@ -88,7 +73,6 @@ tap to set · drag sideways · shift for fine · arrow keys step · ${doubleClic
       isLit={false}
       halo={lit ? 'driven' : hot ? 'hot' : armed ? 'armed' : undefined}
       valueText={said}
-      title={title}
       onChange={setAt}
       onCommit={onCommit}
       onReset={reset}

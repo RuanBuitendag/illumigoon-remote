@@ -29,10 +29,10 @@ export function useSaveActs({ say, save, file, setProblem, listing }: SaveContex
       return;
     }
     try {
-      const name = await askName('Name this preset', 'Untitled preset');
+      const name = await askName('Name this variation', 'Untitled variation');
       if (!name || !name.trim()) return;
       await capturePreset(file, name.trim(), values);
-      say(`saved preset "${name.trim()}"`);
+      say(`saved variation "${name.trim()}"`);
       await listing.list();
     } catch (e) {
       setProblem((e as Error).message);

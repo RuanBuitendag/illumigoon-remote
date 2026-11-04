@@ -123,7 +123,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   'spawner.speedRef': {
     unit: 'strip/s',
     desc:
-      'The speed that reaches the far end of the palette; anything faster sits at the end. Only ' +
+      'The speed that reaches the far end of the colours; anything faster sits at the end. Only ' +
       'used when Colour By is Speed.',
   },
   'spawner.maxAlive': {
@@ -198,7 +198,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   'particles.speedRef': {
     unit: 'strip/s',
     desc:
-      'The speed that reaches the far end of the palette; anything faster sits at the end. Only ' +
+      'The speed that reaches the far end of the colours; anything faster sits at the end. Only ' +
       'used when Colour By is Speed.',
   },
   'particles.maxAlive': {
@@ -256,7 +256,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   'bodies.speedRef': {
     unit: 'strip/s',
     desc:
-      'The speed that reaches the far end of the palette; anything faster sits at the end. Only ' +
+      'The speed that reaches the far end of the colours; anything faster sits at the end. Only ' +
       'used when Colour By is Speed.',
   },
 
@@ -371,7 +371,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   'hue.shift': {
     unit: 'turns',
     desc:
-      'Turns every colour round the hue wheel — the same wheel the palette’s Hue uses. Wraps, ' +
+      'Turns every colour round the hue wheel — the same wheel the colours’ Hue uses. Wraps, ' +
       'so a driven shift cycles forever.',
   },
   'hue.spread': {
@@ -418,25 +418,25 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
     short: 'Offset',
     unit: 'turns',
     desc:
-      'Rotates which colour the index lands on. Wraps, so a driven offset cycles the palette ' +
+      'Rotates which colour the index lands on. Wraps, so a driven offset cycles the colours ' +
       'forever.',
   },
   'colour.paletteSpan': {
     short: 'Span',
     unit: '×',
-    desc: 'How much of the palette the index covers. Above 1 the palette repeats within the shape.',
+    desc: 'How much of the colours the index covers. Above 1 the colours repeat within the shape.',
   },
   'colour.indexBias': {
     short: 'Shift',
     desc:
       'Shifts the index before the colour is looked up, so the whole shape reads further along ' +
-      'the palette than it earned.',
+      'the colours than it earned.',
   },
 
   'palette.hueShift': {
     unit: 'turns',
     desc:
-      'Rotates every colour in the palette around the hue wheel. Wraps, because a hue is an ' +
+      'Rotates every colour around the hue wheel. Wraps, because a hue is an ' +
       'angle.',
   },
   'palette.saturation': {
@@ -449,7 +449,7 @@ export const PARAM_PRESENTATION: Record<string, Presentation> = {
   'palette.value': {
     unit: '×',
     desc:
-      'Multiplies the brightness of every entry. This is the palette’s own level, not the ' +
+      'Multiplies the brightness of every entry. This is the colours’ own level, not the ' +
       'layer’s opacity.',
   },
 
@@ -484,7 +484,7 @@ export const NODE_BLURBS: Record<string, string> = {
       'uneven rather than merely moved.',
   fade:
     'Light arrives and leaves over time, so a moving thing leaves a trail. Remembers what is ' +
-    'above it in the rack: above Colour the palette colours the tail, below it the tail keeps ' +
+    'above it in the rack: above Colour the colours tint the tail, below it the tail keeps ' +
     'its colour.',
   blur:
     'Softens the layer by smearing every point across Radius of strip. Blurs what is above it ' +
@@ -574,14 +574,14 @@ export const TRIGGER_BLURBS: Record<string, string> = {
  */
 export const STRUCT_BLURBS: Record<string, string> = {
   'block.fromEnd': 'Fill from the far end of the strip downward, instead of from 0 upward.',
-  'spawner.colouring': 'What the palette reads off each shape.',
+  'spawner.colouring': 'What the colours read off each shape.',
   'spawner.sustain':
 
       'While the trigger stays over its threshold, one unbroken line grows out of the Origin. ' +
       'When it dips, the line breaks off and flies on. Needs a Threshold or a Math comparison ' +
       'as the trigger. A trigger that only ticks behaves as if this were off.',
-  'particles.colouring': 'What the palette reads off each particle.',
-  'bodies.colouring': 'What the palette reads off each ball.',
+  'particles.colouring': 'What the colours read off each particle.',
+  'bodies.colouring': 'What the colours read off each ball.',
   'translate.wrap': 'What leaves one end comes back in at the other. Off, it simply leaves.',
   'lfo.wave': 'The shape the LFO swings through.',
   'envelope.shape': 'How the attack and decay are shaped between their endpoints.',
@@ -606,9 +606,9 @@ export const STRUCT_OPTION_BLURBS: Record<string, string> = {
   'particles.colouring.speed':
     '0 stationary, 1 at Colour Speed. The fast ones read as the hot ones.',
   'particles.colouring.random':
-    'A draw held for life, so one burst scatters across the whole palette.',
+    'A draw held for life, so one burst scatters across all the colours.',
 
-  'bodies.colouring.index': 'One palette slot per ball, held for its life.',
+  'bodies.colouring.index': 'One colour per ball, held for its life.',
   'bodies.colouring.speed': '0 stationary, 1 at Colour Speed.',
   'bodies.colouring.height':
     'Where it is on the strip, so a rising ball changes colour as it goes.',

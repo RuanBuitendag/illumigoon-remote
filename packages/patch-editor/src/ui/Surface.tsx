@@ -109,7 +109,6 @@ export function SurfaceMenu({ ctl, at, onEdit, onClose }: {
         ) : r ? (
           <Key
             disabled={full}
-            title={full ? `A patch hands a person at most ${LIMITS().SURFACE} controls` : undefined}
             onClick={() => {
               // Seeded here rather than in the menu's render, so the key is taken against the
               // surface as it is at the click.
@@ -219,10 +218,11 @@ function SectionName({ name, renaming, setRenaming, onRename }: {
   if (name === null) return <span className="grow ctlheadname">Ungrouped</span>;
   if (renaming?.from !== name) {
     return (
-      <span className="grow ctlheadname" title="Double-click to rename"
-            onDoubleClick={() => setRenaming({ from: name, to: name })}>
+      // A tap renames, so a finger can rename a section as a mouse can (CM-8).
+      <Key className="grow ctlheadname" aria-label={`${name}: rename this section`}
+           onClick={() => setRenaming({ from: name, to: name })}>
         {name}
-      </span>
+      </Key>
     );
   }
   return (
@@ -303,7 +303,6 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
       data-row-drop
       data-dead={why ? true : undefined}
       data-dragover={drag.over === `control:${c.key}` || undefined}
-      title={why ? `The light will not keep this: ${why}` : 'Click to edit · drag to reorder'}
       draggable
       onDragStart={() => drag.setDragging({ kind: 'control', key: c.key })}
       onDragEnd={() => {
@@ -325,10 +324,21 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
     >
       <RowGrip />
       <span className="ctlglyph">{GLYPH[c.type] ?? '?'}</span>
-      <div className="col grow" style={{ gap: 'var(--space-1)', minWidth: 0 }}>
+      {/* The name is a key, so a control is opened by keyboard as well as by a click on the row (AC-8). */}
+      <Key
+        className="col grow"
+        style={{ gap: 'var(--space-1)', minWidth: 0 }}
+        onClick={e => {
+          e.stopPropagation();
+          light(c.target, false);
+          const row = (e.currentTarget.closest('.ctlrow') ?? e.currentTarget).getBoundingClientRect();
+          onEdit(c, row.left - 320, row.top);
+        }}
+      >
         <span className="ctllabel">{c.label}</span>
         <Mono className="dim sm ctltarget">{pathName(c.target)}</Mono>
-      </div>
+        {why && <Mono className="sm warn">The light will not keep this: {why}</Mono>}
+      </Key>
     </div>
   );
 }
@@ -489,7 +499,7 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
         {!list.length && (
           <div style={{ padding: 'var(--space-2) var(--space-1) var(--space-1)' }}>
             <Blurb>
-              Nothing shows on the room yet. Hold any knob, switch, blend or palette and choose
+              Nothing shows on the room yet. Hold any knob, switch, blend or set of colours and choose
               Show on the room. On a laptop, right-click it.
             </Blurb>
           </div>
