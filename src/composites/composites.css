@@ -41,7 +41,11 @@
 .house-section { padding: 0 var(--gutter); }
 .house-note { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: 0 var(--gutter); }
 .home-add { align-self: flex-start; padding: 0 var(--gutter); }
-.toast { position: fixed; left: 0; right: 0; bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: var(--layer-float); display: flex; align-items: center; gap: var(--space-3); width: fit-content; max-width: calc(100% - 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--space-4); border-radius: var(--radius); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); }
+.toast { position: fixed; left: 0; right: 0; bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: var(--layer-float); display: flex; align-items: center; gap: var(--space-3); width: fit-content; max-width: calc(100% - 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--space-4); border-radius: var(--radius); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); outline: var(--line) solid transparent; }
+/* Forced colours draw the toast's clear edge in the text colour, and a bar of colours keeps its colours. */
+@media (forced-colors: active) {
+  .palette-bar { forced-color-adjust: none; }
+}
 .toast { animation: rise-in var(--duration-enter) var(--ease-enter); }
 .presence[data-leaving] > .toast { animation: sink-out var(--duration-exit) var(--ease-exit) forwards; }
 @media (prefers-reduced-motion: reduce) {
@@ -55,7 +59,7 @@
 
 .home-screen { display: flex; flex-direction: column; height: 100%; }
 .home-screen > .home-scroll { flex: 1; min-height: 0; height: auto; }
-.bottom-notice { flex: none; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--gutter) var(--space-6); border-top: var(--line) solid var(--track); color: var(--text-3); font: var(--type-note); }
+.bottom-notice { flex: none; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--gutter) var(--space-6); border-top: var(--line) solid var(--track); color: var(--info); font: var(--type-note); }
 
 .level-row { display: flex; align-items: center; gap: var(--space-3); }
 .level-value { width: var(--level-value); text-align: right; }

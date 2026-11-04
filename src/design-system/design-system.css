@@ -3,7 +3,6 @@
   color-scheme: dark;
   --ink-rgb: 236,235,231;
   --background: #09090a;
-  --background-clear: rgba(9, 9, 10, 0);
   --text-1: #ecebe7;
   --text-2: #d9d8d4;
   --text-3: #b8b7b3;
@@ -86,8 +85,6 @@
   --strip-tile: 28px;
   --strip-line: 12px;
   --radius: 2px;
-  --radius-round: 50%;
-  --radius-pill: 999px;
   --mark-line: 1.5px;
   /* How far the selected line sits under its text. A row of tabs moves it down onto the tab rule. */
   --mark-gap: 7px;
@@ -161,7 +158,6 @@
     color-scheme: light;
     --ink-rgb: 22,22,24;
     --background: #f2f1ed;
-    --background-clear: rgba(242, 241, 237, 0);
     --text-1: #161618;
     --text-2: #2c2c30;
     --text-3: #5c5c61;
@@ -182,6 +178,52 @@
     --modulation-ghost: rgba(0, 0, 0, 0.08);
     --warn: var(--text-2);
     --bad: #a8412f;
+  }
+}
+
+/* More contrast (CO-7): every quiet word steps one place up the text ramp, and hairlines, washes and the
+   scrim grow strong enough to read as edges. What is off still sits under what is on. */
+@media (prefers-contrast: more) {
+  :root {
+    --text-3: #d9d8d4;
+    --text-4: #b8b7b3;
+    --text-5: #979894;
+    --track: rgba(255, 255, 255, 0.45);
+    --thumb-off: #8a8b8f;
+    --wash: rgba(255, 255, 255, 0.1);
+    --wash-strong: rgba(255, 255, 255, 0.18);
+    --scrim: rgba(9, 9, 10, 0.9);
+  }
+}
+
+@media (prefers-contrast: more) and (prefers-color-scheme: light) {
+  :root {
+    --text-3: #2c2c30;
+    --text-4: #45454a;
+    --text-5: #5c5c61;
+    --track: rgba(0, 0, 0, 0.5);
+    --thumb-off: #6a6a6f;
+    --wash: rgba(0, 0, 0, 0.08);
+    --wash-strong: rgba(0, 0, 0, 0.16);
+    --scrim: rgba(242, 241, 237, 0.9);
+  }
+}
+
+/* Forced colours (CO-8): the system draws the page in its own few colours. The focus ring, a chosen key and
+   a filled control take the system's highlight, and edges and quiet marks its text and grey. */
+@media (forced-colors: active) {
+  :root {
+    --focus: Highlight;
+    --fill: Highlight;
+    --on-fill: HighlightText;
+    --text-1: CanvasText;
+    --text-4: GrayText;
+    --text-5: GrayText;
+    --track: CanvasText;
+    --thumb-off: GrayText;
+    --background: Canvas;
+    --modulation-dim: GrayText;
+    --modulation-soft: Highlight;
   }
 }
 
@@ -250,6 +292,16 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   button[data-held='true'] { transform: none; }
   .dialog { animation-name: fade-in; }
   .dialog[data-ending-style] { animation-name: fade-out; }
+}
+
+/* Forced colours (CO-8). A key keeps the system's key colour, and one that cannot be pressed its grey. A switch,
+   a fader, a mark and the chosen line draw with the tokens above, which hold system colours here, since the
+   system would otherwise wipe their fills. Lit strips, swatches and the colour pad are the colours of a look,
+   so they keep them. */
+@media (forced-colors: active) {
+  button:disabled { color: GrayText; }
+  .power-key, .fader-control, .status-mark, .sound-mark, .picked::after { forced-color-adjust: none; }
+  .led-strip, .swatch, .colour-slot, .colour-pad { forced-color-adjust: none; }
 }
 
 /* Marks */
