@@ -188,9 +188,10 @@ export const num = (v: string, d: number) =>
  * carries is exactly what this tab draws and what `ParameterGroups.declared()` builds on the phone.
  */
 export function arrange(list: readonly Control[], order: readonly string[]): Control[] {
+  // A heading named twice would draw its controls twice, so each one counts once.
   const known = new Set(order);
   return [
-    ...order.flatMap(g => list.filter(c => c.group === g)),
+    ...[...known].flatMap(g => list.filter(c => c.group === g)),
     // A heading not in `order` keeps its controls, in the place the list had them.
     ...list.filter(c => c.group && !known.has(c.group)),
     ...list.filter(c => !c.group),
@@ -214,7 +215,19 @@ interface SurfaceDrag {
     beforeKey: string | null,
     beforeSection: string | null,
   ): void;
+  /** The up and down arrows on a grip: what a drag does, one place at a time (NA-17). */
+  stepControl(key: string, delta: number): void;
+  stepSection(name: string, delta: number): void;
 }
+
+/** The names of the grips, which say what the arrow keys move. The focus finds a row again by them. */
+const controlMove = (label: string) => `Move ${label}`;
+const sectionMove = (name: string) => `Move the ${name} section`;
+
+/** After a key move the row is drawn in its new place, so the focus goes to its grip there. */
+const refocus = (label: string) =>
+  requestAnimationFrame(() =>
+    document.querySelector<HTMLElement>(`.patch-editor [aria-label="${CSS.escape(label)}"]`)?.focus());
 
 /** What a section's heading needs to be dragged, renamed or deleted. */
 interface SectionEdits {
@@ -246,6 +259,36 @@ function placeControl(
   }
   const last = rest.map(c => c.group ?? null).lastIndexOf(group);
   rest.splice(last >= 0 ? last + 1 : rest.length, 0, moving);
+}
+
+type Section = { name: string | null; controls: Control[] };
+
+/**
+ * Where an arrow key takes control @p key: one place up or down. At the top or the bottom of a section it goes on
+ * into the section next to it, the way a drag can take it there. Null when there is nowhere to go.
+ */
+function controlStep(sections: readonly Section[], key: string, delta: number) {
+  const at = sections.findIndex(s => s.controls.some(c => c.key === key));
+  const here = sections[at];
+  if (!here) return null;
+  const i = here.controls.findIndex(c => c.key === key);
+  const label = here.controls[i]!.label;
+  if (i + delta >= 0 && i + delta < here.controls.length) return { group: here.name, beforeKey: beforeInside(here, i, delta), label };
+  const next = sections[at + delta];
+  if (!next) return null;
+  return { group: next.name, beforeKey: delta < 0 ? null : (next.controls[0]?.key ?? null), label };
+}
+
+/** The control that control @p i goes before when it moves one place inside its own section, or null for last. */
+const beforeInside = (here: Section, i: number, delta: number) =>
+  delta < 0 ? here.controls[i - 1]!.key : (here.controls[i + 2]?.key ?? null);
+
+/** The section that section @p name goes before after an arrow key: null for last, undefined for no move. */
+function sectionStep(order: readonly string[], name: string, delta: number) {
+  const i = order.indexOf(name);
+  const to = i + delta;
+  if (i < 0 || to < 0 || to >= order.length) return undefined;
+  return delta < 0 ? order[to]! : (order[to + 1] ?? null);
 }
 
 function SectionName({ name, renaming, setRenaming, onRename }: {
@@ -308,7 +351,9 @@ function SectionHead({
       }}
       onDrop={e => drag.dropOn(e, name, firstKey, name)}
     >
-      {name !== null ? <RowGrip /> : <span style={{ width: 'var(--space-3)' }} />}
+      {name !== null && !empty
+        ? <RowGrip move={{ label: sectionMove(name), onMove: delta => drag.stepSection(name, delta) }} />
+        : <span style={{ width: 'var(--space-3)' }} />}
       <SectionName name={name} renaming={renaming} setRenaming={setRenaming} onRename={onRename} />
       {name !== null && empty && <Mono className="dim sm">empty · this session only</Mono>}
       {name !== null && (
@@ -361,7 +406,7 @@ function ControlRow({ ctl, c, list, kept, group, drag, onEdit }: {
         onEdit(c, box.left - 320, box.top);
       }}
     >
-      <RowGrip />
+      <RowGrip move={{ label: controlMove(c.label), onMove: delta => drag.stepControl(c.key, delta) }} />
       <span className="ctlglyph">{GLYPH[c.type] ?? '?'}</span>
       {/* The name is a key, so a control is opened by keyboard as well as by a click on the row (AC-8). */}
       <Key
@@ -440,7 +485,7 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
   const [over, setOver] = useState<string | null>(null);
 
   const extra = empty.filter(g => !docGroups.includes(g));
-  const sections: { name: string | null; controls: Control[] }[] = [
+  const sections: Section[] = [
     ...docGroups.map(g => ({ name: g, controls: list.filter(c => c.group === g) })),
     ...extra.map(g => ({ name: g, controls: [] })),
     { name: null, controls: list.filter(c => !c.group) },
@@ -518,7 +563,17 @@ export function UserSurface({ ctl, onEdit, onAdd }: {
     if (was?.kind === 'section' && group !== null) moveSection(was.name, beforeSection);
   };
 
-  const drag = { dragging, over, setDragging, setOver, dropOn };
+  const stepControl = (key: string, delta: number) => {
+    const to = controlStep(sections, key, delta);
+    if (to) { moveControl(key, to.group, to.beforeKey); refocus(controlMove(to.label)); }
+  };
+
+  const stepSection = (name: string, delta: number) => {
+    const before = sectionStep(docGroups, name, delta);
+    if (before !== undefined) { moveSection(name, before); refocus(sectionMove(name)); }
+  };
+
+  const drag = { dragging, over, setDragging, setOver, dropOn, stepControl, stepSection };
 
   return (
     <>
@@ -585,7 +640,7 @@ function SurfaceSection({
 }: SectionEdits & {
   rowKey: string;
   ctl: Ctl;
-  s: { name: string | null; controls: Control[] };
+  s: Section;
   list: Control[];
   kept: readonly Control[];
   onEdit(control: Control, x: number, y: number): void;

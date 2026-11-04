@@ -881,7 +881,8 @@
   .patch-editor .body .panel { border-right: 0; border-bottom: var(--line) solid var(--track); }
   .patch-editor .body .scroll, .patch-editor .centre { overflow: visible; max-height: none; }
   /* The empty spacers that push a panel's foot down. A column that grows to hold names stays. */
-  .patch-editor .body .grow:empty { display: none; }
+  /* Only a div: an input is always :empty, and this hid the fields that name a section on the phone. */
+  .patch-editor .body div.grow:empty { display: none; }
   .patch-editor .tabs { flex-wrap: wrap; }
 
   /* A sheet is the whole screen (the app's Sheet), and each row of a table wraps onto its own lines. */

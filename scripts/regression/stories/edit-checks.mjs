@@ -5,6 +5,7 @@
 //   - A dial and a layer move by keyboard as well as by pointer (NA-17).
 //   - A layer is chosen, a tab is changed and a modulator is bound to a dial by keyboard alone (NA-17, AC-5, AC-8).
 //   - Each tab list names its panel, and the control menu opens, steps and closes by keyboard (AC-5, AC-8, MO-5).
+//   - A room control, a section, a warp and Colour move with the arrow keys on their grips, and keep the focus (NA-17).
 import { AxeBuilder } from '@axe-core/playwright';
 import { expect, LOUNGE, onTop, openEdit, press, until } from './steps.mjs';
 import { smallControls } from './tap-targets.mjs';
@@ -263,6 +264,64 @@ const modulatorByKeyboard = {
   },
 };
 
+// The text of each of `rows`, in the order the screen draws them.
+const textsOf = (rows) => rows.evaluateAll((all) => all.map((row) => row.textContent?.trim() ?? ''));
+
+// Down then up on the first grip of `grips`: the row goes one place down, comes back, and keeps the focus.
+async function stepFirst(page, grips, rows, what) {
+  const before = await textsOf(rows);
+  const label = await grips.first().getAttribute('aria-label');
+  await grips.first().focus();
+  await page.keyboard.press('ArrowDown');
+  await until(async () => (await textsOf(rows))[1] === before[0], `the down arrow to move ${what} one place down`);
+  const focusedName = () => page.evaluate(() => document.activeElement?.getAttribute("aria-label"));
+  await until(async () => (await focusedName()) === label, `the focus to stay on the grip of ${what}`);
+  await page.keyboard.press('ArrowUp');
+  await until(async () => (await textsOf(rows))[0] === before[0], `the up arrow to move ${what} back`);
+}
+
+const roomControlsByKeyboard = {
+  name: 'NA-17 a room control and a section move with the arrow keys on their grips, not only by drag',
+  viewport: 'phone',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const top = onTop(page);
+    await press(top.locator('.edit-sections'), 'CONTROLS');
+    const controls = top.locator('.ctlrow');
+    expect((await controls.count()) >= 2, 'Candle shows fewer than two room controls');
+    await stepFirst(page, top.locator('.ctlrow [aria-label^="Move "]'), top.locator('.ctlrow .ctllabel'), 'a control');
+    // Candle has one section. A new one stays empty until a control moves into it, and the up arrow takes the first
+    // ungrouped control there, across the end of a section.
+    await top.getByRole('button', { name: 'Section', exact: true }).focus();
+    await page.keyboard.press('Enter');
+    await page.keyboard.type('Motion');
+    await page.keyboard.press('Enter');
+    await top.locator('.ctlsection').last().locator('.ctlrow [aria-label^="Move "]').first().focus();
+    await page.keyboard.press('ArrowUp');
+    const sections = top.locator('.ctlhead [aria-label^="Move the "]');
+    await until(async () => (await sections.count()) >= 2, 'the up arrow to move a control into the new section');
+    await stepFirst(page, sections, top.locator('.ctlhead:has([aria-label^="Move the "]) .ctlheadname'), 'a section');
+  },
+};
+
+const rackByKeyboard = {
+  name: "NA-17 a warp and a layer's Colour move up and down the chain with the arrow keys on their grips",
+  viewport: 'laptop',
+  lights: LOUNGE,
+  async run({ page }) {
+    await openEdit(page);
+    const top = onTop(page);
+    await top.getByRole('tab', { name: /^fx rack$/i }).click();
+    // Candle's layers have no warp, so the first one is added by keyboard too.
+    await top.getByRole('button', { name: /^Add a warp in / }).first().focus();
+    await page.keyboard.press('Enter');
+    const grips = top.locator('.rackrow [aria-label^="Move "]');
+    await until(async () => (await grips.count()) >= 2, 'Enter on the empty row to add a warp');
+    await stepFirst(page, grips, top.locator('.rackrow:has([aria-label^="Move "])'), 'a row of the chain');
+  },
+};
+
 export const editChecks = [
   targetsAt('phone', '375 x 812'),
   targetsAt('laptop', '1280 x 800'),
@@ -278,4 +337,6 @@ export const editChecks = [
   tabPanels,
   menuByKeyboard,
   modulatorByKeyboard,
+  roomControlsByKeyboard,
+  rackByKeyboard,
 ];
