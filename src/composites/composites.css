@@ -167,6 +167,9 @@
 .control-label .value-text { text-transform: none; letter-spacing: normal; }
 .control-line { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); }
 .control-stack { display: flex; flex-direction: column; }
+/* A name, not a label: the light's name in body type over its choices, under the section's small capitals (D65). */
+.named-select-row { display: flex; flex-direction: column; }
+.named-select-name { padding-top: var(--space-2); color: var(--text-1); }
 .stepper { display: flex; align-items: center; gap: var(--space-4); }
 .stepper .text-key { justify-content: center; width: var(--row); font: var(--type-body); letter-spacing: 0; }
 .naming-row { display: flex; align-items: center; gap: var(--space-4); }

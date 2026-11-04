@@ -3,10 +3,10 @@ import {
   ArrangeRow,
   LightDragList,
   LockStatus,
+  NamedSelectRow,
   PageFrame,
   PageHint,
   PageSection,
-  SelectRow,
   StepperRow,
   ToggleRow,
 } from '../../composites';
@@ -232,7 +232,7 @@ function MoveLights({ room }: { room: Room }) {
     <PageSection>
       <Eyebrow>ROOM OF EACH LIGHT</Eyebrow>
       {room.writableLights.map((light) => (
-        <SelectRow
+        <NamedSelectRow
           key={light.address}
           label={light.name}
           options={options}

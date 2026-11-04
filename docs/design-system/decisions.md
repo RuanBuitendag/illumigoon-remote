@@ -783,3 +783,11 @@ them. The look's name and its settings are one section, so the settings follow t
 Why: sections stood `--section` apart, and the settings were a second section with the control list's own margin on
 top, so 56 px of air split a look from its colours. Edit packs its panels close; one step reads as one page.
 Date: 2026-11-04
+
+**D65. A name over its choices**
+
+Chosen: `NamedSelectRow` in `src/composites/control-rows.tsx` puts a thing's own name in body type and `--text-1`
+over its choices. Rename and arrange uses it for the room of each light, under the section's small capitals.
+Why: the light's name was drawn as a control label, so "LEFT" sat in small capitals right under "ROOM OF EACH
+LIGHT" and two labels read as one stacked heading. A light's name is a name, as it is everywhere else in the app.
+Date: 2026-11-04

@@ -66,6 +66,16 @@ export function SelectRow<Value extends string | number>({ label, options, value
   );
 }
 
+// A thing's own name over the choices for it, such as a light over the rooms it can go in (D65).
+export function NamedSelectRow<Value extends string | number>({ label, options, value, onChange }: SelectRowProps<Value>) {
+  return (
+    <div className="named-select-row">
+      <span className="named-select-name">{label}</span>
+      <OptionRow label={label} options={options} value={value} onChange={onChange} />
+    </div>
+  );
+}
+
 type ToggleRowProps = {
   label: string;
   isOn: boolean;

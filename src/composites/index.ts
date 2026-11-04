@@ -3,6 +3,7 @@ import './composites.css';
 export { ColourEditor } from './colour-editor';
 export {
   HeadingRow,
+  NamedSelectRow,
   SelectRow,
   SliderRow,
   StepperRow,
