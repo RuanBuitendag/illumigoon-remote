@@ -294,14 +294,10 @@ checkComponentPage();
 
 // The style rules of voice.md that a machine can check (BR-5, BR-6), over the words the app shows in src: the
 // text in JSX, a text prop such as `label`, and every string with a space in it, which is a phrase, not a key or
-// a class. Edit says palette and preset in its own store, and has its own gate.
-const VOICE = [
-  [/(?<![\w-])(palettes?|presets?|firmware|OTA|lamps?|bulbs?|zones?|snapshots?|intensity|patch editor)(?![\w-])/i, 'is not a word of the app (voice.md, Words)'],
-  [/(?<![\w-])(successfully|please|oops)(?![\w-])/i, 'is a word voice.md asks not to write'],
-  [/(?<![\w-])(color|colors|center|centered|gray|favorite)(?![\w-])/i, 'is not British spelling'],
-  [/(?<![\w:])\d{1,2}(?::\d{2})?\s?[ap]\.?m\b\.?/i, 'times use the 24-hour clock, 18:00'],
-  [/(?<=[A-Za-z])!(?=\s|$)/, 'the app does not exclaim'],
-];
+// a class. The rules are the one list in voice-rules.json, which Edit's gate reads too (D82).
+const VOICE = JSON.parse(fs.readFileSync('docs/design-system/voice-rules.json', 'utf8')).rules.map(
+  ({ pattern, flags, help }) => [new RegExp(pattern, flags), help],
+);
 const TWELVE_HOUR_CLOCK = /hour12:\s*true|hourCycle:\s*'h1[12]'/g;
 const TEXT_PROPS = new Set([
   'label',
