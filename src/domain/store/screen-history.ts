@@ -67,19 +67,23 @@ function follow(state: Screen) {
   else record(screen, here && depthOf(screen) > depthOf(here.screen) ? 'push' : 'replace');
 }
 
+// A step this run did not make: a new one the browser added for a typed address or a link, or an old one from
+// before the page loaded again. The screens follow its address, and the step is taken as ours.
+function adoptStep(step: number | null) {
+  if (step === null) steps.splice(at + 1);
+  at = step ?? steps.length;
+  followAddress(window.location.hash);
+  record(screenOf(useNavigation.getState()), 'replace');
+}
+
 function showStep(event: PopStateEvent) {
   const step = typeof event.state?.step === 'number' ? (event.state.step as number) : null;
   const target = step === null ? undefined : steps[step];
-  const current = screenOf(useNavigation.getState());
   if (step === null || !target) {
-    // A step this run did not make: a new one the browser added for a typed address or a link, or an old one
-    // from before the page loaded again. The screens follow its address, and the step is taken as ours.
-    if (step === null) steps.splice(at + 1);
-    at = step ?? steps.length;
-    followAddress(window.location.hash);
-    record(screenOf(useNavigation.getState()), 'replace');
+    adoptStep(step);
     return;
   }
+  const current = screenOf(useNavigation.getState());
   const wasAt = at;
   at = step;
   if (target.key === keyOf(current)) return;
