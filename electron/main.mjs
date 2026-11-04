@@ -69,7 +69,9 @@ app.whenReady().then(async () => {
     backgroundColor: '#09090a',   // --background, so the first paint is not a white flash
     title: 'Illumigoon',
     autoHideMenuBar: true,
-    webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true },
+    // A hidden window keeps its timers: throttled, the socket deadline and the heartbeats behind it
+    // run minutes late, and the lights close sockets the page has stopped reading (LIFE-1910).
+    webPreferences: { nodeIntegration: false, contextIsolation: true, sandbox: true, backgroundThrottling: false },
   });
   win.on('page-title-updated', (e) => e.preventDefault());   // the page's <title> is the app's
   try {
