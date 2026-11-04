@@ -28,7 +28,8 @@
     "dev:laptop": "concurrently -n sidecar,ui,laptop \"node scripts/sidecar.mjs\" \"vite --port 5173 --strictPort\" \"electron . --dev\"",
     "dist:laptop": "npm run build && electron-builder --win --config electron-builder.config.mjs",
     "release:laptop": "npm run dist:laptop -- --publish always && node scripts/promote-release.mjs",
-    "lint:editor": "npm run lint --workspace @illumigoon/patch-editor"
+    "lint:editor": "npm run lint --workspace @illumigoon/patch-editor",
+    "lint:ux": "node scripts/lint/ux.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

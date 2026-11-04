@@ -5,6 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { chromium } from 'playwright';
 import { createServer } from 'vite';
+import { installRecorder, readTrace } from '../ux-lint/recorder.mjs';
 import { freshLibrary, madeUpLibrary } from './made-up-library.mjs';
 
 // STORY_PORT lets two story runs share the machine.
@@ -16,6 +17,9 @@ const VIEWPORTS = {
   largeLaptop: { width: 1440, height: 900 },
 };
 export const SHOTS = join(tmpdir(), 'illumigoon-regression');
+// With UX_LINT=1 each journey's page is watched by the UX lint, and what it saw lands here (LIFE-1891).
+const WATCHES_UX = process.env.UX_LINT === '1';
+export const uxTraces = [];
 
 function startUrl({ lights, known }, ownWifi) {
   const addresses = known ?? Object.keys(lights).filter((address) => address !== ownWifi);
@@ -50,9 +54,11 @@ export async function withJourneyPage(browser, journey, play) {
   const network = [];
   try {
     await keepLocal(page, { lights, network, latestSoftware: journey.latestSoftware });
+    if (WATCHES_UX) await installRecorder(page);
     await page.goto(startUrl(journey, '192.168.4.1'));
     return await play({ page, lights, network });
   } finally {
+    if (WATCHES_UX) uxTraces.push({ journey, trace: await readTrace(page) });
     for (const light of new Set(Object.values(lights))) light.stop();
     await context.close();
   }

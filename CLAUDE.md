@@ -51,5 +51,9 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 A new export of a door gets a specimen on the component page, `?components` on the dev server, in
 `src/domain/screens/component-page` (D68).
 
+`npm run lint:ux` checks how screens and flows feel: too many jobs on a screen, questions before an action, a fact
+said twice, slow presses. Run it before you report a change to a screen. It is not in `npm run lint` yet. See
+`docs/ux-lint/README.md`.
+
 Fix the code when a check fails. Do not weaken a rule, and do not add an exception for one file.
 `packages/patch-editor/src/engine/generated` is a generated WebAssembly build, so the checks skip it.
