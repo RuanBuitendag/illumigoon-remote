@@ -41,5 +41,22 @@ Each rule comes from a screen Ruan failed or passed. The report prints the fix f
 | `slow-response` | a press that takes more than 200 ms to show its result |
 | `layout-shift` | the page jumps (CLS over 0.1) |
 
+These rules come from published guidelines, not from a screen Ruan judged (LIFE-1891, 4 Nov 2026):
+
+| Rule | Catches | Source |
+| -- | -- | -- |
+| `small-target` | a thing to press under 44 x 44 px on the phone, 24 px on the laptop | Apple HIG 44 pt, Material 48 dp, WCAG 2.5.8 |
+| `crowded-targets` | two things to press less than 8 px apart | Apple HIG, Material |
+| `no-name` | a thing to press with no name for a screen reader | WCAG 4.1.2 |
+| `hidden-state` | a switch, tab or chosen key that shows its state only by its look | Nielsen 6, Norman (feedback) |
+| `many-primaries` | more than one filled main action in one view | von Restorff effect |
+| `dead-end-error` | an error message with no key next to it | Nielsen 9 |
+| `loose-groups` | as much space inside a group as between groups | Gestalt (proximity) |
+| `moving-nav` | the back key in a different place on two screens of one story | Jakob's law, Nielsen 4 |
+| `no-undo` | a delete, remove or reset that gives no UNDO | Shneiderman 6, Nielsen 3 |
+
+Contrast and the focus ring are axe's work (LIFE-1937), and the text size floor is in the tokens (LIFE-1938).
+Principles that need a person to judge them, such as Dieter Rams' ten, stay for reviews.
+
 When Ruan fails or passes a screen and no rule agrees, change a rule or add one, with a proof, so the lint learns
 what he wants. A rule that fires on a screen he passed is wrong: change the rule, not the screen.

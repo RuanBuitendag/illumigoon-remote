@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { HeadingRow, PageFrame, PageHint, PageSection, ScanNote } from '../../composites';
-import { ActionKey, Eyebrow, OptionRow, TextField, TextKey } from '../../design-system';
+import { ActionKey, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
 import type { NewLight } from '../light-network/protocol';
 import { SCAN_PREVIEW } from '../looks/recordings';
 import {
@@ -100,9 +100,12 @@ function AddressForm() {
         value={address}
         onChange={setAddress}
       />
-      <ActionKey disabled={!address.trim()} onClick={add}>
-        Add address
-      </ActionKey>
+      {/* The address is the way round, so its key is a text key: one main action per screen (UX lint). */}
+      <KeyRow>
+        <TextKey disabled={!address.trim()} onClick={add}>
+          ADD ADDRESS
+        </TextKey>
+      </KeyRow>
       {sought && <PageHint>{soughtText()}</PageHint>}
     </PageSection>
   );
@@ -159,8 +162,8 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
           onAdded={(message) => setAdded([...added, message])}
         />
       ))}
-      {newLights.length === 0 && <OwnWifiForm />}
-      {newLights.length === 0 && <AddressForm />}
+      {newLights.length === 0 && !isDone && <OwnWifiForm />}
+      {newLights.length === 0 && !isDone && <AddressForm />}
       {isDone && (
         <PageSection>
           <PageHint>{doneText}</PageHint>

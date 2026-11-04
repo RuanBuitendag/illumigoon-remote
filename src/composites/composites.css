@@ -113,7 +113,8 @@
 .look-heading .key-row { flex: none; gap: var(--space-4); }
 /* The room keeps one step between its parts, as Edit does: --space-5 between sections, the step between the
    controls inside them (D64). */
-.room-section { display: flex; flex-direction: column; margin-top: var(--space-5); }
+/* More space between the room's groups than inside one (Gestalt proximity, UX lint `loose-groups`). */
+.room-section { display: flex; flex-direction: column; margin-top: var(--space-6); }
 .room-section .recent-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
 .light-card { margin-bottom: var(--space-2); }
 /* A light that cannot be chosen says why in its note, so the row is not also faded. */

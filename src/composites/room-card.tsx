@@ -25,7 +25,13 @@ export function RoomCard(card: RoomCardProps) {
   const lookName = card.lookName || 'No look';
   return (
     <article className="room-card" aria-label={card.name} data-open={card.isOpen} data-has-looks={card.hasLooks}>
-      <Press className="room-open" label={`Open ${card.name}`} disabled={!card.onOpen} onClick={card.onOpen ?? noop}>
+      <Press
+        className="room-open"
+        label={`Open ${card.name}`}
+        isPressed={card.isOpen}
+        disabled={!card.onOpen}
+        onClick={card.onOpen ?? noop}
+      >
         <span className="room-heading">
           <span className="room-name">
             <Picked isOn={card.isOpen}>{card.name}</Picked>

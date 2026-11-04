@@ -29,7 +29,14 @@ export function SceneCard(props: SceneCardProps) {
   const { name, isCurrent, isEditing, onApply, onHold, onHoldEnd, onUpdate, onRename, onDelete, children } = props;
   return (
     <div className="scene-card">
-      <Press className="scene-apply" disabled={isEditing} onClick={onApply} onHold={onHold} onHoldEnd={onHoldEnd}>
+      <Press
+        className="scene-apply"
+        isPressed={isCurrent}
+        disabled={isEditing}
+        onClick={onApply}
+        onHold={onHold}
+        onHoldEnd={onHoldEnd}
+      >
         <span className="scene-name">
           <Picked isOn={isCurrent}>{name}</Picked>
         </span>

@@ -28,7 +28,12 @@ function settle(trace) {
     seen.add(key);
   }
   const last = trace.presses.at(-1);
-  if (last && !last.to) last.to = screenName();
+  if (last && !last.to) {
+    last.to = screenName();
+    last.back = window.uxBackKey();
+    last.undo = window.uxHasUndo();
+    last.asks = window.uxAsks();
+  }
 }
 
 function watchPresses(trace) {
@@ -65,7 +70,11 @@ function watchFeel(trace) {
       group = isNew ? { score: 0, first: entry.startTime, last: 0 } : group;
       group.score += entry.value;
       group.last = entry.startTime;
-      trace.shift = Math.max(trace.shift, group.score);
+      if (group.score > trace.shift) {
+        trace.shift = group.score;
+        // What jumped, so a finding says where to look.
+        trace.shifted = [...new Set(entry.sources.map(({ node }) => (node?.nodeType === 1 ? describe(node) : 'text')))];
+      }
     }
   }).observe({ type: 'layout-shift', buffered: true });
 }
