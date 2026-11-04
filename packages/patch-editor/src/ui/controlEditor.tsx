@@ -468,6 +468,7 @@ function OptionFields({ d, set }: { d: Draft; set(p: Partial<Draft>): void }) {
         <div key={o.choice} className="row" style={{ gap: 'var(--space-2)' }}>
           <Switch
             on={o.on}
+            title={`Offer ${o.label || o.choice}`}
             onChange={on =>
               set({ offered: d.offered.map((x, j) => (j === i ? { ...x, on } : x)) })
             }

@@ -92,10 +92,6 @@
 
 .patch-editor .app { height: 100%; display: flex; flex-direction: column; overflow: hidden; }
 
-.patch-editor .livedot { width: 12px; height: 2.5px; background: var(--thumb-off); flex-shrink: 0; }
-.patch-editor .livedot[data-on='true'] { background: var(--fill); }
-.patch-editor .livedot[data-warn='true'] { background: var(--warn); }
-
 /* ---------------------------------------------------------------- strip
 
    The light, under the top bar. On the ground rather than raised: it is the thing being
@@ -424,11 +420,6 @@
 }
 
 /* ------------------------------------------------------------- switches */
-
-.patch-editor .sw { width: 22px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: none; }
-.patch-editor .sw > i { width: 16px; height: 3px; background: var(--thumb-off); transition: background-color var(--duration-settle), box-shadow var(--duration-settle); }
-.patch-editor .sw-on { background: none; }
-.patch-editor .sw-on > i { background: var(--fill); }
 
 /* A bypassed tile is still there and still says what it is — just out of circuit. The fade is
    its one mark: a row with a bypass switch shows it on the switch alone (ST-15). */

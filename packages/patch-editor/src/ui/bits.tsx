@@ -1,7 +1,7 @@
 /** Shared primitives: the bloom filter every accent stroke uses, icons, small controls. */
 
 import type { ReactNode } from 'react';
-import { Icon, IconFrame, Picked } from '../../../../src/design-system';
+import { Icon, IconFrame, Picked, PowerKey } from '../../../../src/design-system';
 import { BUDGET, type StructuralField } from '../domain/catalog';
 import { STRUCT_BLURBS, STRUCT_OPTION_BLURBS } from '../domain/presentation';
 import { useRowDrag } from './useRowDrag';
@@ -140,14 +140,14 @@ export function Tabs<T extends string>({ items, value, onChange, labels }: {
   );
 }
 
-/** An on/off switch. Reads as a physical throw: recessed track, lit knuckle when on. */
+/** An on/off switch: the app's `PowerKey`, with its name beside it. A tap on the name throws it too. */
 export const Switch = ({ on, onChange, label, title }: {
   on: boolean; onChange(v: boolean): void; label?: string; title?: string;
 }) => (
-  <button className="row" style={{ gap: 'var(--space-2)' }} title={title} onClick={() => onChange(!on)}>
-    <span className={`sw ${on ? 'sw-on' : 'well'}`}><i /></span>
+  <label className="row" style={{ gap: 'var(--space-2)', cursor: 'pointer' }} title={title}>
+    <PowerKey label={label ?? title ?? 'On'} isOn={on} onChange={onChange} />
     {label && <Lab className={on ? 'mid' : ''}>{label}</Lab>}
-  </button>
+  </label>
 );
 
 /**

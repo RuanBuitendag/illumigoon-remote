@@ -791,3 +791,12 @@ over its choices. Rename and arrange uses it for the room of each light, under t
 Why: the light's name was drawn as a control label, so "LEFT" sat in small capitals right under "ROOM OF EACH
 LIGHT" and two labels read as one stacked heading. A light's name is a name, as it is everywhere else in the app.
 Date: 2026-11-04
+
+**D66. Edit throws the shared switch**
+
+Chosen: Edit's `Switch` in `packages/patch-editor/src/ui/bits.tsx` draws the app's `PowerKey` with its name beside it,
+inside a `label`, so a tap on the name throws it as before. Its own `.sw` bar and the unused `.livedot` styles are
+deleted; a live light in Edit is shown with `StatusMark` where one is needed.
+Why: Edit drew a third switch, a 16 by 3 px bar in a 22 by 16 px key, under the thumb's 44 px, beside the app's
+`PowerKey` (D52), and a second live mark beside `StatusMark` (D51). One job has one component (D44 to D50).
+Date: 2026-11-04
