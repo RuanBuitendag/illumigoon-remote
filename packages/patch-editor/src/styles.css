@@ -442,8 +442,6 @@
   border-radius: var(--radius);
 }
 .patch-editor .swatch { width: var(--edit-small-icon-key); height: var(--edit-small-icon-key); }
-.patch-editor .hexin { font: var(--type-small); color: var(--text-3); width: var(--edit-code-field); }
-.patch-editor .hexin:focus { color: var(--text-1); }
 .patch-editor .gradstrip { height: var(--edit-short-strip); border-radius: var(--radius); }
 
 /* -------------------------------------------------------------- matrix */

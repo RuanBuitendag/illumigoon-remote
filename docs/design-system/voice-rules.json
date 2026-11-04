@@ -1,7 +1,7 @@
 {
   "about": "The style rules of voice.md that a machine can check (BR-5, BR-6), as patterns. Edit's gate, packages/patch-editor/scripts/edit-rules.mjs, reads this file; scripts/lint/rules.mjs reads it for the app.",
   "rules": [
-    { "pattern": "(?<![\\w-])(palettes?|presets?|firmware|OTA|lamps?|bulbs?|zones?|snapshots?|intensity|patch editor)(?![\\w-])", "flags": "i", "help": "is not a word of the app (voice.md, Words)" },
+    { "pattern": "(?<![\\w-])(palettes?|presets?|firmware|fw|OTA|nodes?|lamps?|bulbs?|zones?|snapshots?|intensity|patch editor)(?![\\w-])", "flags": "i", "help": "is not a word of the app (voice.md, Words)" },
     { "pattern": "(?<![\\w-])(successfully|please|oops)(?![\\w-])", "flags": "i", "help": "is a word voice.md asks not to write" },
     { "pattern": "(?<![\\w-])(color|colors|center|centered|gray|favorite)(?![\\w-])", "flags": "i", "help": "is not British spelling" },
     { "pattern": "(?<![\\w:])\\d{1,2}(?::\\d{2})?\\s?[ap]\\.?m\\b\\.?", "flags": "i", "help": "times use the 24-hour clock, 18:00" },

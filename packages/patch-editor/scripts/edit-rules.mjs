@@ -190,11 +190,14 @@ const attributeOf = (node) => {
   return null;
 };
 
-// Text in JSX, a text prop, or a phrase: a string with a space in it.
+// A label of one word, such as 'Palettes' in a record of names: a capital, then small letters.
+const LABEL_WORD = /^[A-Z][a-z]+$/;
+
+// Text in JSX, a text prop, a phrase (a string with a space in it), or a label of one word.
 function isShown(node, attribute) {
   if (ts.isJsxText(node)) return node.text.trim() !== '';
   if (!STRING_KINDS.some((kind) => ts[kind](node))) return false;
-  return /\s\S/.test(node.text) || TEXT_PROPS.has(attribute);
+  return /\s\S/.test(node.text) || LABEL_WORD.test(node.text) || TEXT_PROPS.has(attribute);
 }
 
 const isIntrinsic = (tag) => /^[a-z]/.test(tag.getText());

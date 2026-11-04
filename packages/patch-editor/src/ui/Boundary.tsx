@@ -13,8 +13,8 @@
  * needs a class is the one React has never given a hook.
  *
  * IT WRAPS THE BODY, NOT THE WHOLE EDITOR. The app's Edit header stays outside it, so Back
- * still works, and this says the light's name and firmware version, which are the facts somebody
- * needs to act on it.
+ * still works, and this says the light's name and software version, which are the facts somebody
+ * needs to act on it. The missing node goes to the console, never to the screen.
  *
  * It does not offer to retry. Nothing about the light changes by rendering again, so a retry
  * button would either do nothing or loop; the honest options are to go and flash it, or to
@@ -60,22 +60,14 @@ export class Boundary extends Component<Props, State> {
     const missing = error instanceof MissingNode;
     const who = this.props.label || 'This light';
 
+    // The words follow docs/design-system/voice.md: what happened and what to do, no ids or codes (BR-4, BR-6).
     return (
       <div className="await-catalog">
         <div className="catalog-fail">
-          <Lab className="head">{who} is running a build this editor cannot draw</Lab>
-          <p>
-            {missing
-              // Named, because "which build publishes it" is the actionable half and the
-              // node id is what somebody greps for.
-              ? `Its catalog is missing ${(error as MissingNode).param
-                  ? `'${(error as MissingNode).param}' on the '${(error as MissingNode).node}' node`
-                  : `the '${(error as MissingNode).node}' node`}, which this editor needs to `
-                + 'draw its controls. Flash a current build onto it.'
-              : error.message}
-          </p>
-          {this.props.firmware && <Mono className="dim sm">fw {this.props.firmware}</Mono>}
-          <Pill className="raise" onClick={this.props.onLeave}>Pick another device</Pill>
+          <Lab className="head">{missing ? `${who} has light software Edit cannot draw` : 'Edit could not draw this look'}</Lab>
+          <p>{missing ? 'Update the light software, then open Edit again.' : 'Go back, then open Edit again.'}</p>
+          {this.props.firmware && <Mono className="dim sm">Light software {this.props.firmware}</Mono>}
+          <Pill className="raise" onClick={this.props.onLeave}>BACK</Pill>
         </div>
       </div>
     );

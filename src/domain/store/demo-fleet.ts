@@ -27,7 +27,7 @@ const FLAT_LOOKS: Manifest[] = [
         ],
       },
       { key: 'speed', label: 'Speed', type: 'slider', min: 0, max: 2, step: 0.01, default: 1 },
-      { key: 'zones', label: 'Zones', type: 'stepper', min: 1, max: 8, step: 1, default: 3 },
+      { key: 'zones', label: 'Parts', type: 'stepper', min: 1, max: 8, step: 1, default: 3 },
       { key: 'blend', label: 'Blend', type: 'toggle', default: true },
     ],
   },

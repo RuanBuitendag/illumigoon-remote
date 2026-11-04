@@ -33,7 +33,7 @@ import { IconKey, Key, Pill, Toggle } from './controls';
 const LABEL: Record<Part, string> = {
   layers: 'Layers',
   warps: 'Warps',
-  palettes: 'Palettes',
+  palettes: 'Colours',
   modulation: 'Modulation',
   macros: 'Macros',
 }
@@ -215,8 +215,8 @@ export function Randomise({
         />
         {habits === 'off' && (
           <Blurb>
-            Habits counts your library through the sidecar that npm run dev starts, and it did not
-            answer — restart it to pick up the habits route. Until then every node weighs the same.
+            Habits reads which parts your saved looks use, and the library did not answer. Until it
+            does, every part weighs the same.
           </Blurb>
         )}
         <Amount

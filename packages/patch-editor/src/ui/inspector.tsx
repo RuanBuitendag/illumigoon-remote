@@ -69,7 +69,7 @@ const INSPECTORS: { [K in NodeRef['kind']]: Kind<Extract<NodeRef, { kind: K }>> 
     head: ({ host, node }) => (
       <div className="row" style={{ gap: 'var(--space-2)' }}>
         <Lab className="head">{host.warps[node.i]?.type}</Lab>
-        <Mono className="dim sm">warp{node.i}</Mono>
+        <Mono className="dim sm">Warp {node.i + 1}</Mono>
       </div>
     ),
     body: ({ ctl, host, node }) => <WarpBody ctl={ctl} host={host} i={node.i} />,

@@ -11,7 +11,7 @@ import { Hr, Lab, Mono, Seg, Switch, Blurb } from './bits';
 import { unlessReached, type Ctl } from './ctl';
 import { exposeProps } from './Surface';
 import { Param } from './Param';
-import { Field, IconKey, Pill } from './controls';
+import { IconKey, Pill } from './controls';
 
 /** Deal MASTER's stops out again, and say so. Shared by the row's dice and the inspector's. */
 export function reshuffle(ctl: Ctl) {
@@ -157,8 +157,8 @@ function PaletteStops({
 
       {children}
 
-      {/* Each row is named in words and shows the colour itself. The code field stays, for a person who
-          types one, but it is not what names the colour (BR-5, FO-1). */}
+      {/* Each row is named in words and shows the colour itself. The swatch opens the picker, so no code is shown
+          (BR-5, FO-1). */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
         {entries.map((c, i) => (
           <div className="swrow" key={i} {...expose?.(i)}>
@@ -169,22 +169,6 @@ function PaletteStops({
               onPick={hex => setEntry(i, hex.slice(1).toLowerCase())}
             />
             <Lab className="grow">Colour {i + 1}</Lab>
-            <Field label={`Colour ${i + 1}, typed as a code`}
-              className="hexin"
-              value={c}
-              spellCheck={false}
-              disabled={locked}
-              onChange={e => {
-                const v = e.target.value
-                  .replace(/[^0-9a-fA-F]/g, '')
-                  .slice(0, 6)
-                  .toLowerCase()
-                setEntry(i, v)
-              }}
-              onBlur={e => {
-                if (!locked) setEntry(i, e.target.value.padEnd(6, '0'))
-              }}
-            />
             {!locked && (
               <IconKey
                 label={`Remove colour ${i + 1}`}

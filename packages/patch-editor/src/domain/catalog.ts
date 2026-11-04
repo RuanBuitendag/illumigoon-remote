@@ -304,8 +304,8 @@ export class MissingNode extends Error {
 
   constructor(node: string, param?: string) {
     super(param
-      ? `this light's catalog has no '${param}' on its '${node}' node`
-      : `this light's catalog has no '${node}' node`);
+      ? `this light's catalog has no '${param}' on its '${node}' part`
+      : `this light's catalog has no '${node}' part`);
     this.node = node;
     this.param = param;
     this.name = 'MissingNode';

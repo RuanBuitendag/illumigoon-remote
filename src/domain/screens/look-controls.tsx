@@ -23,7 +23,7 @@ function groupControls(controls: Parameter[]) {
 const toHexList = ({ default: value }: Parameter) =>
   (Array.isArray(value) ? value : [value as Colour]).map(colourToHex);
 
-const familyOf = ({ group, shipped }: PaletteEntry) => (shipped ? (group ?? 'Palettes') : 'Yours');
+const familyOf = ({ group, shipped }: PaletteEntry) => (shipped ? (group ?? 'Colours') : 'Yours');
 
 const toColourSet = (palette: PaletteEntry, index: number) => {
   const { file, name, entries, error, shipped } = palette;

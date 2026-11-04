@@ -265,10 +265,10 @@ export const budgetColour = (bytes: number) =>
 
 export const budgetNote = (bytes: number) =>
   bytes <= BUDGET.NVS
-    ? 'Survives a power cut, and fits over the mesh.'
+    ? 'Comes back after a power cut, and reaches every light in the room.'
     : bytes <= BUDGET.MESH
-      ? 'Over 4 KB — still runs, but the light comes back as the factory default after a power cut.'
-      : 'Over 8 KB — cannot reach a device over the mesh, and will not survive a power cut.';
+      ? 'Over 4 KB. It plays, but after a power cut the light comes back with its default look.'
+      : 'Over 8 KB. The other lights in the room cannot take it, and it does not come back after a power cut.';
 
 export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
   const max = 10240;

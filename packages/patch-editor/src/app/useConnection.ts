@@ -107,14 +107,12 @@ function notDescribed(seen: DeviceInfo | null, fw: string): string {
   // The absence is the diagnosis, not a guess: every catalog response carries
   // `catalogHash`, so firmware that publishes none does not have the patch engine.
   if (seen && seen.catalog_hash === undefined) {
-    return `${fw} does not publish a node catalog, so it has no patch engine to edit. `
-      + 'Flash a build from the patch-engine branch onto this device.';
+    return `${fw} cannot make looks in layers, so Edit has nothing to change. `
+      + 'Update the light software, then open Edit again.';
   }
-  const missing = seen
-    ? 'some of the six catalog responses never arrived'
-    : 'it never answered at all';
-  return `${fw} did not finish describing itself — ${missing}. `
-    + 'Reconnecting may help; flashing a current build will.';
+  return seen
+    ? `${fw} did not send all of what Edit needs. Open Edit again. If it stays, update the light software.`
+    : `${fw} did not answer. Open Edit again. If it stays, update the light software.`;
 }
 
 export function useConnection({ patchRef, setPatch, dropMaster, say, dragRef }:
@@ -397,8 +395,8 @@ export function useConnection({ patchRef, setPatch, dropMaster, say, dragRef }:
       writeCached(a.payload);
     } catch {
       stepReady({ ev: 'describeTimeout',
-                  why: `${fw} sent a node catalog this editor could not read. It is `
-                     + 'probably newer than this build — pull and rebuild the editor.' });
+                  why: `${fw} is newer than this app, and Edit cannot read it. `
+                     + 'Update the app, then open Edit again.' });
       return;
     }
     adoptCatalog(w);
