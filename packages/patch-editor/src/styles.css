@@ -9,6 +9,55 @@
  * in grey.
  */
 
+/*
+ * EDIT'S OWN SIZES (GE-10). Every height and width in Edit is a token: the design system's where one means
+ * the same thing, and one of these where Edit has a part the app does not. Named for the part, in full words.
+ * Edit's gate allows a length in a custom property only in this block.
+ */
+:root {
+  --edit-icon-key: 28px;
+  --edit-small-icon-key: 22px;
+  --edit-toggle-width: 17px;
+  --edit-toggle-height: 15px;
+  --edit-polarity-key: 18px;
+  --edit-row-action: 13px;
+  --edit-tile-width: 170px;
+  --edit-tile-height: 70px;
+  --edit-short-strip: 40px;
+  --edit-code-field: 70px;
+  --edit-dot: 5px;
+  --edit-stage-dot: 7px;
+  --edit-stage-label: 150px;
+  --edit-scrollbar: 10px;
+  --edit-section-head: 26px;
+  --edit-section-end: 6px;
+  --edit-side-panel: 348px;
+  --edit-layer-panel: 276px;
+  --edit-mix-column: 35px;
+  --edit-layer-number: 16px;
+  --edit-modulator-editor: 300px;
+  --edit-drives-list: 250px;
+  --edit-slot-key: 26px;
+  --edit-roll-key: 34px;
+  --edit-roll-swatch: 8px;
+  --edit-tweak-dot: 3px;
+  --edit-part-key-width: 24px;
+  --edit-part-key-height: 20px;
+  --edit-shelf-field: 232px;
+  --edit-colour-chip-width: 28px;
+  --edit-colour-chip-height: 14px;
+  --edit-matrix-number: 52px;
+  --edit-matrix-from: 118px;
+  --edit-matrix-arrow: 26px;
+  --edit-matrix-moves: 236px;
+  --edit-matrix-by: 74px;
+  --edit-matrix-range: 120px;
+  --edit-matrix-swing: 54px;
+  --edit-matrix-how: 46px;
+  --edit-matrix-ends: 58px;
+}
+
+
 .patch-editor * { box-sizing: border-box; }
 
 .patch-editor {
@@ -80,7 +129,7 @@
 .patch-editor .pill[data-primary='true'] { color: var(--text-1); }
 .patch-editor .pill:disabled { color: var(--text-5); cursor: default; }
 
-.patch-editor .iconbtn { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: var(--radius); }
+.patch-editor .iconbtn { width: var(--edit-icon-key); height: var(--edit-icon-key); display: flex; align-items: center; justify-content: center; border-radius: var(--radius); }
 
 .patch-editor .ghostrow {
   height: var(--row);
@@ -114,8 +163,8 @@
 .patch-editor .striphead { display: flex; align-items: center; flex-wrap: wrap; gap: var(--space-1) var(--space-3); min-height: var(--space-3); }
 .patch-editor .stripwarn { font: var(--type-small-sans); color: var(--warn); white-space: nowrap; }
 .patch-editor .stripbox { position: relative; }
-.patch-editor .stripcells { position: relative; display: block; width: 100%; height: 72px; }
-.patch-editor .stripempty { height: 40px; display: flex; align-items: center; justify-content: center; font: var(--type-small-sans); color: var(--text-4); }
+.patch-editor .stripcells { position: relative; display: block; width: 100%; height: var(--strip-room); }
+.patch-editor .stripempty { height: var(--edit-short-strip); display: flex; align-items: center; justify-content: center; font: var(--type-small-sans); color: var(--text-4); }
 
 .patch-editor .editscroll { flex-grow: 1; display: flex; flex-direction: column; min-height: 0; }
 .patch-editor .sectionpart { display: contents; }
@@ -170,7 +219,7 @@
    swap moves nothing below it. Shown on the selected row as well as on hover: the selected
    layer is the one being worked on, and its actions should not need to be hunted for. */
 .patch-editor .rowacts {
-  height: 13px;
+  height: var(--edit-row-action);
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -182,8 +231,8 @@
 .patch-editor [data-lifted='true'] { opacity: var(--opacity-disabled); }
 
 .patch-editor .tog {
-  width: 17px;
-  height: 15px;
+  width: var(--edit-toggle-width);
+  height: var(--edit-toggle-height);
   border-radius: var(--radius);
   display: flex;
   align-items: center;
@@ -230,7 +279,7 @@
   display: flex;
   align-items: center;
   gap: var(--space-2);
-  height: 28px;
+  height: var(--edit-icon-key);
   padding: 0 var(--space-2);
   background: var(--wash);
   border-radius: var(--radius);
@@ -244,7 +293,7 @@
   overflow-wrap: anywhere;
 }
 .patch-editor .poltog {
-  width: 18px;
+  width: var(--edit-polarity-key);
   height: var(--space-4);
   border-radius: var(--radius);
   font: var(--type-value);
@@ -275,8 +324,8 @@
 }
 
 .patch-editor .modslot {
-  width: 170px;
-  height: 70px;
+  width: var(--edit-tile-width);
+  height: var(--edit-tile-height);
   padding: var(--space-3);
   display: flex;
   flex-direction: column;
@@ -338,8 +387,8 @@
    list, and two tile shapes were two chances for them to drift apart. */
 
 .patch-editor .emptyslot {
-  width: 170px;
-  height: 70px;
+  width: var(--edit-tile-width);
+  height: var(--edit-tile-height);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -437,10 +486,10 @@
   background: var(--wash);
   border-radius: var(--radius);
 }
-.patch-editor .swatch { width: 22px; height: 22px; }
-.patch-editor .hexin { font: var(--type-small); color: var(--text-3); width: 70px; }
+.patch-editor .swatch { width: var(--edit-small-icon-key); height: var(--edit-small-icon-key); }
+.patch-editor .hexin { font: var(--type-small); color: var(--text-3); width: var(--edit-code-field); }
 .patch-editor .hexin:focus { color: var(--text-1); }
-.patch-editor .gradstrip { height: 40px; border-radius: var(--radius); }
+.patch-editor .gradstrip { height: var(--edit-short-strip); border-radius: var(--radius); }
 
 /* -------------------------------------------------------------- matrix */
 
@@ -449,15 +498,15 @@
 @media (hover: hover) { .patch-editor .mrow:hover { background: var(--wash-strong); } }
 .patch-editor .mrow .dst { font: var(--type-value); }
 .patch-editor .warn     { color: var(--warn); }
-.patch-editor .srcdot { width: 5px; height: 5px; background: var(--modulation); }
+.patch-editor .srcdot { width: var(--edit-dot); height: var(--edit-dot); background: var(--modulation); }
 
 .patch-editor .numdrag { font: var(--type-value); color: var(--modulation-soft); cursor: ns-resize; }
 
 /* -------------------------------------------------------------- budget */
 
 .patch-editor .budget { position: relative; height: var(--space-3); }
-.patch-editor .budget .groove { position: absolute; left: 0; top: 4px; height: var(--space-1); }
-.patch-editor .budget .fill { position: absolute; left: 1px; top: 5px; height: var(--line-strong); border-radius: var(--radius); }
+.patch-editor .budget .groove { position: absolute; left: 0; top: var(--space-1); height: var(--space-1); }
+.patch-editor .budget .fill { position: absolute; left: var(--line); top: calc(var(--space-1) + var(--line)); height: var(--line-strong); border-radius: var(--radius); }
 .patch-editor .budget .tick { position: absolute; top: 0; width: var(--line); height: var(--space-3); background: var(--track); }
 
 /* --------------------------------------------------------------- house
@@ -478,7 +527,7 @@
   min-width: 0;
 }
 .patch-editor .tilenote.warn { color: var(--warn); }
-.patch-editor .iconbtn.sm { width: 22px; height: 22px; }
+.patch-editor .iconbtn.sm { width: var(--edit-small-icon-key); height: var(--edit-small-icon-key); }
 @media (hover: hover) { .patch-editor .iconbtn:hover { background: var(--wash-strong); } }
 .patch-editor .iconbtn:disabled { opacity: var(--opacity-behind); cursor: default; background: none; }
 
@@ -505,7 +554,7 @@
 .patch-editor .scopebox canvas { display: block; border-radius: var(--radius); }
 .patch-editor .scopecap {
   position: absolute;
-  left: 7px;
+  left: var(--mark-gap);
   display: flex;
   align-items: center;
   gap: var(--space-1);
@@ -520,7 +569,7 @@
 
 /* -------------------------------------------------------------- scroll */
 
-.patch-editor ::-webkit-scrollbar { width: 10px; height: 10px; }
+.patch-editor ::-webkit-scrollbar { width: var(--edit-scrollbar); height: var(--edit-scrollbar); }
 .patch-editor ::-webkit-scrollbar-track { background: transparent; }
 .patch-editor ::-webkit-scrollbar-thumb { background: var(--track); border: var(--space-half) solid transparent; background-clip: content-box; }
 @media (hover: hover) { .patch-editor ::-webkit-scrollbar-thumb:hover { background: var(--text-5); background-clip: content-box; } }
@@ -605,7 +654,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: var(--space-3);
-  max-width: 460px;
+  max-width: var(--dialog-width);
 }
 
 .patch-editor .catalog-fail p {
@@ -679,8 +728,8 @@
 .patch-editor .stagerow[class*='on'] { background: var(--wash-strong); box-shadow: inset 0 0 0 var(--line) var(--track); }
 .patch-editor .stagerow:not(:first-child) { cursor: pointer; }
 @media (hover: hover) { .patch-editor .stagerow:not(:first-child):hover { background: var(--wash); } }
-.patch-editor .stagelab { width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2); }
-.patch-editor .stagedot { width: 7px; height: 7px; flex-shrink: 0; background: var(--text-2); }
+.patch-editor .stagelab { width: var(--edit-stage-label); flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2); }
+.patch-editor .stagedot { width: var(--edit-stage-dot); height: var(--edit-stage-dot); flex-shrink: 0; background: var(--text-2); }
 .patch-editor .stagedot[data-kind='source'] { background: var(--text-5); }
 /* A gate is the other kind of node in the same rack: it cuts coverage instead of moving
    the coordinate, and the strip beside it shows what it removed rather than where it
@@ -713,10 +762,10 @@
 .patch-editor [data-exposed='true']::after {
   content: '';
   position: absolute;
-  top: -2px;
-  right: -2px;
-  width: 5px;
-  height: 5px;
+  top: calc(-1 * var(--line-strong));
+  right: calc(-1 * var(--line-strong));
+  width: var(--edit-dot);
+  height: var(--edit-dot);
   border-radius: 0;
   background: var(--modulation);
   pointer-events: none;
@@ -739,6 +788,8 @@
   .patch-editor .presence[data-leaving] > .surfacemenu,
   .patch-editor .presence[data-leaving] > .surfacepop { animation-name: fade-out; }
 }
+/* A value and its unit: one small thing, so the half step (D69). */
+.patch-editor .kvalrow { gap: var(--space-half); align-items: baseline; }
 .patch-editor .surfacemenu { padding: var(--space-2); display: flex; flex-direction: column; gap: var(--line); }
 .patch-editor .surfacemenu > button {
   text-align: left;
@@ -773,13 +824,13 @@
 .patch-editor select.popin { appearance: none; -webkit-appearance: none; cursor: pointer; }
 .patch-editor .rangebar { position: relative; height: var(--space-3); }
 .patch-editor .rangebar > i {
-  position: absolute; top: 3px; bottom: 3px; border-radius: var(--radius);
+  position: absolute; top: var(--line-thick); bottom: var(--line-thick); border-radius: var(--radius);
   background: var(--modulation-dim); box-shadow: 0 0 6px var(--modulation-ghost);
 }
 .patch-editor .rangebar > b { position: absolute; top: 0; bottom: 0; width: var(--line-strong); margin-left: calc(-1 * var(--line)); background: var(--text-1); }
 
 .patch-editor .ctlsection { display: flex; flex-direction: column; gap: var(--space-1); }
-.patch-editor .ctlhead { gap: var(--space-2); height: 26px; padding: 0 var(--space-1); border-radius: var(--radius); }
+.patch-editor .ctlhead { gap: var(--space-2); height: var(--edit-section-head); padding: 0 var(--space-1); border-radius: var(--radius); }
 .patch-editor .ctlhead[draggable='true'] { cursor: grab; }
 .patch-editor .ctlhead[data-dragover='true'], .patch-editor .ctlrow[data-dragover='true'], .patch-editor .ctlend[data-dragover='true'] {
   box-shadow: inset 0 var(--line-strong) 0 var(--modulation-soft);
@@ -787,10 +838,10 @@
 .patch-editor .ctlheadname { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-3); }
 .patch-editor .ctlrow { gap: var(--space-2); padding: var(--space-2) var(--space-3); min-height: var(--row); cursor: pointer; }
 .patch-editor .ctlrow[data-dead='true'] { opacity: var(--opacity-disabled); }
-.patch-editor .ctlglyph { width: 22px; flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
+.patch-editor .ctlglyph { width: var(--edit-small-icon-key); flex-shrink: 0; text-align: center; font: var(--type-label); color: var(--modulation-soft); }
 .patch-editor .ctllabel { font: var(--type-note); color: var(--text-1); min-width: 0; overflow-wrap: anywhere; }
 .patch-editor .ctltarget { min-width: 0; overflow-wrap: anywhere; }
-.patch-editor .ctlend { height: 6px; border-radius: var(--radius); }
+.patch-editor .ctlend { height: var(--edit-section-end); border-radius: var(--radius); }
 
 /* ------------------------------------------------------ press targets
 
@@ -861,7 +912,7 @@
   .patch-editor .rackhead { height: auto !important; flex-wrap: wrap; gap: var(--space-1) var(--space-3); padding-top: var(--space-2) !important; padding-bottom: var(--space-2) !important; }
   .patch-editor .rackhead > .row { flex-wrap: wrap; row-gap: var(--space-1); }
   .patch-editor .slotrow { flex-wrap: wrap; overflow: visible; }
-  .patch-editor .modslot { width: calc(50% - 5px); }
+  .patch-editor .modslot { width: calc(50% - var(--space-2) / 2); }
 
   .patch-editor [data-section]:not([data-open='true']) { display: none; }
   .patch-editor .sidetabs { display: none; }

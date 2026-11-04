@@ -168,7 +168,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
   };
 
   return (
-    <div className="panel" style={{ width: 276, flexShrink: 0 }}>
+    <div className="panel" style={{ width: 'var(--edit-layer-panel)', flexShrink: 0 }}>
       <div className="panelhead">
         <Lab className="head">Layers</Lab>
         <div className="row" style={{ gap: 'var(--space-2)' }}>
@@ -284,7 +284,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
     >
       <Picked isOn={on} edge="side" />
       <div className="row" style={{ gap: 'var(--space-2)' }}>
-        <span style={{ width: 35, display: 'flex', justifyContent: 'flex-end' }}>
+        <span style={{ width: 'var(--edit-mix-column)', display: 'flex', justifyContent: 'flex-end' }}>
           <Icon.Mix c={on ? 'var(--text-1)' : 'var(--text-4)'} />
         </span>
         {/* A key, so the mix is chosen by keyboard as a layer is: Enter or Space (AC-8). */}
@@ -309,8 +309,8 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
             role="img"
             aria-label="Master colours: every layer plays these"
             style={{
-              width: 22,
-              height: 10,
+              width: 'var(--chip-width)',
+              height: 'var(--chip-height)',
               borderRadius: 'var(--radius)',
               flexShrink: 0,
               background: `linear-gradient(90deg, ${gradientOf(ctl.masterPalette)})`,
@@ -376,7 +376,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
         <RowGrip move={{ label: `Move ${layerName(L.slot)}`, onMove }} />
         <span
           style={{
-            width: 16,
+            width: 'var(--edit-layer-number)',
             textAlign: 'right',
             font: 'var(--type-value)',
             color: selected ? 'var(--text-1)' : 'var(--text-3)',

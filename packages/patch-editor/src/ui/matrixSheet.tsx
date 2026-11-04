@@ -46,29 +46,29 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
       }
     >
       <div className="row sheetcols" style={{ height: 'var(--space-6)', padding: '0 var(--space-5)', flexShrink: 0 }}>
-        <div style={{ width: 52 }}>
+        <div style={{ width: 'var(--edit-matrix-number)' }}>
           <Lab className="dim">NO.</Lab>
         </div>
-        <div style={{ width: 118 }}>
+        <div style={{ width: 'var(--edit-matrix-from)' }}>
           <Lab className="dim">FROM</Lab>
         </div>
-        <div style={{ width: 26 }} />
-        <div style={{ width: 236 }}>
+        <div style={{ width: 'var(--edit-matrix-arrow)' }} />
+        <div style={{ width: 'var(--edit-matrix-moves)' }}>
           <Lab className="dim">MOVES</Lab>
         </div>
-        <div style={{ width: 74, textAlign: 'right' }}>
+        <div style={{ width: 'var(--edit-matrix-by)', textAlign: 'right' }}>
           <Lab className="dim">BY</Lab>
         </div>
-        <div style={{ width: 120, textAlign: 'right' }}>
+        <div style={{ width: 'var(--edit-matrix-range)', textAlign: 'right' }}>
           <Lab className="dim">GOES FROM–TO</Lab>
         </div>
-        <div style={{ width: 54, textAlign: 'right' }}>
+        <div style={{ width: 'var(--edit-matrix-swing)', textAlign: 'right' }}>
           <Lab className="dim">SWING</Lab>
         </div>
-        <div style={{ width: 46, textAlign: 'right' }}>
+        <div style={{ width: 'var(--edit-matrix-how)', textAlign: 'right' }}>
           <Lab className="dim">HOW</Lab>
         </div>
-        <div style={{ width: 58, textAlign: 'right' }}>
+        <div style={{ width: 'var(--edit-matrix-ends)', textAlign: 'right' }}>
           <Lab className="dim">AT ENDS</Lab>
         </div>
         <div className="grow" />
@@ -145,7 +145,7 @@ function MatrixRoute({
 }) {
   return (
     <>
-      <div className="row" style={{ width: 52, gap: 'var(--space-2)' }}>
+      <div className="row" style={{ width: 'var(--edit-matrix-number)', gap: 'var(--space-2)' }}>
         <span
           className="src"
           style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}
@@ -156,13 +156,13 @@ function MatrixRoute({
       </div>
       {/* The NAME when it has one: a patch with three macros on it otherwise reads
           as three rows of `macro`, told apart only by the number in SRC. */}
-      <div style={{ width: 118 }}>
+      <div style={{ width: 'var(--edit-matrix-from)' }}>
         <span style={{ font: 'var(--type-note)', color: 'var(--text-1)' }}>{label}</span>
       </div>
-      <div className="row" style={{ width: 26 }}>
+      <div className="row" style={{ width: 'var(--edit-matrix-arrow)' }}>
         <Icon.Arrow />
       </div>
-      <div className="col" style={{ width: 236, gap: 'var(--space-2)' }}>
+      <div className="col" style={{ width: 'var(--edit-matrix-moves)', gap: 'var(--space-2)' }}>
         <span className="dst" style={{ color: 'var(--text-1)' }}>
           {pathName(r.dst)}
         </span>
@@ -255,14 +255,14 @@ function MatrixLine({ ctl, r, i, drop, note }: {
       data-odd={i % 2 === 1 || undefined}
     >
       <MatrixRoute r={r} label={modulatorLabel(mod)} warn={warn} />
-      <div style={{ width: 74, textAlign: 'right' }}>
+      <div style={{ width: 'var(--edit-matrix-by)', textAlign: 'right' }}>
         <DepthDrag ctl={ctl} row={r} spec={resolved?.spec ?? null} />
       </div>
-      <div style={{ width: 120, textAlign: 'right' }}>
+      <div style={{ width: 'var(--edit-matrix-range)', textAlign: 'right' }}>
         <Mono>{reachText(ctl, r, srcBipolar)}</Mono>
       </div>
       <MatrixToggles ctl={ctl} r={r} srcBipolar={srcBipolar} edit={edit} />
-      <div style={{ width: 58, textAlign: 'right' }}>
+      <div style={{ width: 'var(--edit-matrix-ends)', textAlign: 'right' }}>
         <Lab className="dim">{resolved ? OVERFLOW_WORDS[resolved.spec.overflow] : '—'}</Lab>
       </div>
       <div className="grow" />

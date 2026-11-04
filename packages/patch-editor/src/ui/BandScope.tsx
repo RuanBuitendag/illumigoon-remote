@@ -153,10 +153,10 @@ export function BandScope({ feed, slot, threshold, squelch }: {
       </div>
       <div className="scopebox" style={{ width: W, height: H }}>
         <canvas ref={canvas} style={{ width: W, height: H }} />
-        <span className="scopecap" style={{ top: 3 }}>
+        <span className="scopecap" style={{ top: 'var(--line-thick)' }}>
           band <i className="dash warn" /> threshold
         </span>
-        <span className="scopecap" style={{ top: PANE + GAP + 3 }}>
+        <span className="scopecap" style={{ top: `calc(${PANE + GAP}px + var(--line-thick))` }}>
           after gain · <b>out</b> <i className="dash accent" /> squelch
         </span>
       </div>

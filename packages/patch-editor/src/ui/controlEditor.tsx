@@ -279,7 +279,7 @@ function EditorButtons({ isNew, canSave, onRemove, onClose, onSave }: {
   isNew: boolean; canSave: boolean; onRemove(): void; onClose(): void; onSave(): void;
 }) {
   return (
-    <div className="row" style={{ justifyContent: 'space-between', paddingTop: 'var(--space-half)' }}>
+    <div className="row" style={{ justifyContent: 'space-between', paddingTop: 'var(--space-1)' }}>
       {isNew ? (
         <span />
       ) : (

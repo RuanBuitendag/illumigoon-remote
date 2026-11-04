@@ -407,7 +407,7 @@ function DragGhost({ gesture, patch }: { gesture: BindGesture; patch: Patch }) {
   if (!ghost || !draggingMod) return null;
   return (
     <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }}>
-      <div className="modslot raise-hi" data-dragging="true" style={{ width: 170 }}>
+      <div className="modslot raise-hi" data-dragging="true" style={{ width: 'var(--edit-tile-width)' }}>
         <div className="row" style={{ gap: 'var(--space-2)' }}>
           <span style={{ font: 'var(--type-small)', color: 'var(--modulation-soft)' }}>
             {slotNumber(draggingMod.slot)}

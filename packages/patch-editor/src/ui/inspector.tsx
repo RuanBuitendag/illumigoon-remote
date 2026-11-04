@@ -104,7 +104,7 @@ export function SideColumn({ side, onSide, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="panel" style={{ width: 348, flexShrink: 0 }}>
+    <div className="panel" style={{ width: 'var(--edit-side-panel)', flexShrink: 0 }}>
       <div className="sidetabs" style={{ padding: 'var(--space-2) var(--space-3) 0', flexShrink: 0 }}>
         <Tabs items={SIDES} value={side} onChange={onSide} labels={SIDE_NAMES} />
       </div>

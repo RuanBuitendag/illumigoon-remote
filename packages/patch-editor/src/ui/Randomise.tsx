@@ -49,7 +49,7 @@ function StepButton({ can, label, Icon, onClick }: {
   return (
     <IconKey
       className={can ? 'raise' : 'well'}
-      style={{ width: 34, height: 34 }}
+      style={{ width: 'var(--edit-roll-key)', height: 'var(--edit-roll-key)' }}
       disabled={!can}
       label={label}
       onClick={onClick}
@@ -89,7 +89,7 @@ function RollHead({ history, opts, everything, onRoll, onStep }: Pick<
           disabled={everything}
           style={{
             flexGrow: 1,
-            height: 34,
+            height: 'var(--edit-roll-key)',
             justifyContent: 'center',
             gap: 'var(--space-2)',
             opacity: everything ? 'var(--opacity-disabled)' : 1,
@@ -234,7 +234,7 @@ export function Randomise({
           <Lab className="head">Scope</Lab>
           <Blurb>a locked part survives the roll</Blurb>
         </div>
-        <div className="col" style={{ gap: 'var(--space-half)' }}>
+        <div className="col" style={{ gap: 'var(--space-1)' }}>
           {PARTS.map(part => (
             <ScopeRow
               key={part}
@@ -306,18 +306,18 @@ function RollStrip({ history, start, shown, onStep }: {
               <span
                 style={{
                   alignSelf: 'stretch',
-                  height: 8,
+                  height: 'var(--edit-roll-swatch)',
                   borderRadius: 'var(--radius)',
                   background: swatch(e.patch),
                   opacity: current ? 1 : 'var(--opacity-disabled)',
                   outline: current ? 'var(--line) solid var(--text-1)' : undefined,
-                  outlineOffset: 2,
+                  outlineOffset: 'var(--focus-gap)',
                                   }}
               />
               <span
                 style={{
-                  width: 3,
-                  height: 3,
+                  width: 'var(--edit-tweak-dot)',
+                  height: 'var(--edit-tweak-dot)',
                   background: e.tweaked ? 'var(--text-3)' : 'transparent',
                 }}
               />
@@ -344,7 +344,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
     >
       <Toggle
         isOn={on}
-        style={{ width: 22, height: 20 }}
+        style={{ width: 'var(--edit-part-key-width)', height: 'var(--edit-part-key-height)' }}
         aria-label={`Lock ${LABEL[part].toLowerCase()}, so the next roll keeps them`}
         onClick={onToggle}
       >
@@ -363,7 +363,7 @@ function ScopeRow({ part, on, count, onToggle, onRollOnly }: {
       {/* A locked row has no dice: rolling only the part you just locked is a
           contradiction. */}
       <IconKey
-        style={{ width: 24, height: 20, visibility: on ? 'hidden' : undefined }}
+        style={{ width: 'var(--edit-part-key-width)', height: 'var(--edit-part-key-height)', visibility: on ? 'hidden' : undefined }}
         disabled={on}
         label={`Roll only ${LABEL[part].toLowerCase()}, keeping everything else`}
         onClick={onRollOnly}

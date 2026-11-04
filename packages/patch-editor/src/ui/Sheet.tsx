@@ -82,7 +82,7 @@ export function SaveField({ value, placeholder, disabled, wide, font, colour, on
 }) {
   return (
     <div className={wide ? 'row well grow' : 'row well'}
-         style={{ padding: 'var(--space-3)', width: wide ? undefined : 232 }}>
+         style={{ padding: 'var(--space-3)', width: wide ? undefined : 'var(--edit-shelf-field)' }}>
       <Field label={placeholder}
         value={value}
         placeholder={placeholder}
@@ -105,7 +105,7 @@ export function ShelfHeading({ label, emphasis, action }: {
   return (
     <div className="row" style={{ gap: 'var(--space-2)', padding: 'var(--space-3) var(--space-4) var(--space-1)' }}>
       <Lab className={emphasis ? 'mid' : 'dim'}>{label}</Lab>
-      <span style={{ flexGrow: 1, height: 1, background: 'var(--track)' }} />
+      <span style={{ flexGrow: 1, height: 'var(--line)', background: 'var(--track)' }} />
       {action}
     </div>
   );
@@ -127,9 +127,9 @@ export function ShelfNotice({ label, colour, children }: {
   children: ReactNode;
 }) {
   return (
-    <div className="col" style={{ gap: 'var(--space-half)' }}>
+    <div className="col" style={{ gap: 'var(--space-1)' }}>
       <ShelfHeading label={label} emphasis={false} />
-      <div style={{ padding: 'var(--space-half) var(--space-4) var(--space-1)', font: 'var(--type-small-sans)', color: colour }}>
+      <div style={{ padding: '0 var(--space-4) var(--space-1)', font: 'var(--type-small-sans)', color: colour }}>
         {children}
       </div>
     </div>

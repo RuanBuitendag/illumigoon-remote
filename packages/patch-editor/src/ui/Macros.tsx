@@ -177,7 +177,7 @@ function MacroNaming({ ctl, m }: { ctl: Ctl; m: Modulator }) {
     '';
 
   return (
-    <div className="col" style={{ gap: 'var(--space-2)', paddingTop: 'var(--space-half)' }}>
+    <div className="col" style={{ gap: 'var(--space-2)', paddingTop: 'var(--space-1)' }}>
       <Lab className="dim">Name — what it says on the knob</Lab>
       <div className="row well" style={{ padding: 'var(--space-2) var(--space-3)' }}>
         <Field label="Name"

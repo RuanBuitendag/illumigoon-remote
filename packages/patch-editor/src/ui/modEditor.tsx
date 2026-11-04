@@ -56,7 +56,7 @@ export function ModEditor({ ctl, m, onClose, extra, audio }: {
         className="modeditor"
         style={{ padding: 'var(--space-4) var(--space-4) var(--space-5)', display: 'flex', gap: 'var(--space-5)', alignItems: 'flex-start' }}
       >
-        <div className="col" style={{ gap: 'var(--space-3)', width: 300, flexShrink: 0 }}>
+        <div className="col" style={{ gap: 'var(--space-3)', width: 'var(--edit-modulator-editor)', flexShrink: 0 }}>
           <ModHead ctl={ctl} m={m} onClose={onClose} />
 
           {m.type !== 'macro' && <ModTypePicker ctl={ctl} m={m} spec={spec} />}
@@ -283,7 +283,7 @@ function SourceWire({ ctl, m, others, wire, label }: {
             <Toggle
               key={o.slot}
               isOn={src === o.slot}
-              style={{ width: 26 }}
+              style={{ width: 'var(--edit-slot-key)' }}
               aria-label={`${o.slot}: ${o.label || o.name || o.type}`}
               onClick={() =>
                 ctl.structural(d => {
@@ -369,7 +369,7 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
   const slotSwings = srcBipolarOf(ctl.patch, slot);
   if (!reach.total) {
     return (
-      <div className="col" style={{ gap: 'var(--space-2)', minWidth: 210 }}>
+      <div className="col" style={{ gap: 'var(--space-2)', minWidth: 'var(--edit-drives-list)' }}>
         <Lab className="dim">Drives</Lab>
         <Blurb>
           Nothing yet. Drag this onto a dial, or hold the dial.
@@ -378,12 +378,12 @@ function Destinations({ ctl, slot }: { ctl: Ctl; slot: number }) {
     );
   }
   return (
-    <div className="col" style={{ gap: 'var(--space-2)', minWidth: 250 }}>
+    <div className="col" style={{ gap: 'var(--space-2)', minWidth: 'var(--edit-drives-list)' }}>
       <div className="row" style={{ justifyContent: 'space-between' }}>
         <Lab className="dim">Drives</Lab>
         <Mono className="dim sm">{reach.total}</Mono>
       </div>
-      <div className="col" style={{ gap: 'var(--space-half)' }}>
+      <div className="col" style={{ gap: 'var(--space-1)' }}>
         {reach.rows.map(r => {
           const resolved = specForPath(ctl.patch, r.dst);
           return (

@@ -85,7 +85,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
             <Toggle
               key={o.slot}
               isOn={wired === o.slot}
-              style={{ width: 26 }}
+              style={{ width: 'var(--edit-slot-key)' }}
               aria-label={`${slotNumber(o.slot)}: ${o.type} ${slotNumber(o.slot)} fires this layer`}
               onClick={() => wire(wired === o.slot ? null : o.slot)}
             >
@@ -94,7 +94,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
           ))}
           <Key
             className="tog"
-            style={{ width: 26 }}
+            style={{ width: 'var(--edit-slot-key)' }}
             aria-label="+ Add a metronome and wire it here"
             onClick={addPeriodic}
           >

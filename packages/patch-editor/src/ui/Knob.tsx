@@ -473,7 +473,7 @@ function KnobReadout({ spec, value, mods, bare, onPolarity, onUnbind }: Pick<
         half of the answer that stops a person having to hover at all: `0.35` under Launch
         Speed reads as a fraction of something, and `0.35 strip/s` does not.
       */}
-      <div className="row" style={{ gap: 'var(--space-half)', alignItems: 'baseline' }}>
+      <div className="row kvalrow">
         <span className="kval">{format(value, spec)}</span>
         {spec.unit ? <span className="kunit">{spec.unit}</span> : null}
       </div>

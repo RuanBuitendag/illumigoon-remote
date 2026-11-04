@@ -254,7 +254,7 @@ function Chain({ ctl, host, top }: {
         </div>
         <div
           className="well"
-          style={{ padding: 'var(--space-1)', display: 'flex', flexDirection: 'column', gap: 'var(--space-half)' }}
+          style={{ padding: 'var(--space-1)', display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}
         >
           {top}
           {rows.map((r, index) =>
@@ -302,7 +302,7 @@ function Chain({ ctl, host, top }: {
               onBypass={none}
             />
           ) : (
-            <div className="rackrow" style={{ height: 8 }} {...dropAtEnd} />
+            <div className="rackrow" style={{ height: 'var(--space-2)' }} {...dropAtEnd} />
           )}
         </div>
         <ChainCaption coloured={!!colour} prefix={prefix} />
@@ -489,7 +489,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
           aria-label={`Add a warp in warp${i}`}
           onClick={onAdd}
         >
-          <span style={{ width: 10 }} />
+          <span style={{ width: 'var(--space-3)' }} />
           <Mono className="dim sm">warp{i}</Mono>
           <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
             —
@@ -571,8 +571,8 @@ function ColourRow({ sel, lead, gradient, row, onSelect, children }: {
       {lead}
       <span
         style={{
-          width: 28,
-          height: 14,
+          width: 'var(--edit-colour-chip-width)',
+          height: 'var(--edit-colour-chip-height)',
           borderRadius: 'var(--radius)',
           flexShrink: 0,
           background: `linear-gradient(90deg, ${gradient})`,
@@ -632,7 +632,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
           ctl.say(`master colour over ${n} layer${n === 1 ? '' : 's'}${unlessReached(reached)}`);
         }}
       >
-        <span style={{ width: 10 }} />
+        <span style={{ width: 'var(--space-3)' }} />
         <Mono className="dim sm">colour</Mono>
         <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
           —
@@ -647,7 +647,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
   return (
     <ColourRow
       sel={sel}
-      lead={<span style={{ width: 10 }} />}
+      lead={<span style={{ width: 'var(--space-3)' }} />}
       gradient={gradientOf(entries)}
       row={{ onClick: () => ctl.selectNode({ kind: 'colour' }) }}
       onSelect={() => ctl.selectNode({ kind: 'colour' })}

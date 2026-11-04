@@ -269,7 +269,7 @@ function SectionHead({
       }}
       onDrop={e => drag.dropOn(e, name, firstKey, name)}
     >
-      {name !== null ? <RowGrip /> : <span style={{ width: 10 }} />}
+      {name !== null ? <RowGrip /> : <span style={{ width: 'var(--space-3)' }} />}
       <SectionName name={name} renaming={renaming} setRenaming={setRenaming} onRename={onRename} />
       {name !== null && empty && <Mono className="dim sm">empty · this session only</Mono>}
       {name !== null && (
@@ -565,7 +565,7 @@ function SurfaceSection({
         onDelete={onDelete}
       />
 
-      <div className="col" style={{ gap: 'var(--space-half)' }}>
+      <div className="col" style={{ gap: 'var(--space-1)' }}>
         {s.controls.map(c => (
           <ControlRow
             key={c.key}
