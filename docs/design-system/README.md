@@ -61,6 +61,20 @@ It does not check, so a person reads for these:
 A control of Edit's goes into `packages/patch-editor/src/ui/specimens.tsx`, and its notes still go in the app's
 notes files.
 
+## Add a token (GO-6)
+
+A new token is the last choice. Use an existing token when one means the same thing, even if its value is a little
+off.
+
+1. Name the token for what it is used for, in full words: `--row-tall`, `--dialog-max-height`. A size that only
+   Edit has starts with `--edit-` and names the part: `--edit-tile-width`.
+2. Put it in the first `:root` of `src/design-system/design-system.css`, beside the tokens of its kind. Another file may
+   only give an existing token a local name. A colour also needs its light, dark and more-contrast values.
+3. Use it in the style sheet in place of the raw value. `npm run lint` fails any raw length, colour or type.
+4. A colour token that holds words or a mark is in the contrast check of `lint:rules`. Run `npm run lint` and fix a
+   pair that fails.
+5. If the token comes from a choice between options, add a dated decision to `decisions.md`.
+
 ## Two sets of looks, one set of tokens
 
 There is one token set. Every colour, type, spacing and size token the editor uses comes from `design-system.css`
