@@ -204,7 +204,15 @@ function Chain({ ctl, host, top }: {
   const dropRow = (toIndex: number) => {
     const from = dragFrom;
     setDragFrom(null); setOver(null);
-    if (from === null || toIndex === from || toIndex === from + 1) return;
+    if (from !== null) moveRow(from, toIndex);
+  };
+
+  /**
+   * Move row @p from to before row @p toIndex: what a drop does, and what an arrow key on a row's grip does
+   * (NA-17). A warp's number is its place, so after a key move the focus goes to the grip at its new place.
+   */
+  const moveRow = (from: number, toIndex: number) => {
+    if (toIndex < 0 || toIndex > rows.length || toIndex === from || toIndex === from + 1) return;
     const next = reorderRack(rows, from, toIndex);
     if (!next) return;
     const { moved, order, now, at } = next;
@@ -222,7 +230,17 @@ function Chain({ ctl, host, top }: {
     ctl.selectNode(
       moved.kind === 'warp' ? { kind: 'warp', i: now.get(moved.i)! } : { kind: 'colour' },
     );
+    return moved.kind === 'warp' ? moveLabel(now.get(moved.i)!) : COLOUR_MOVE;
   };
+
+  /** What the arrow keys on row @p index's grip do: one place up or down, and the focus goes with the row. */
+  const keyMove = (index: number, label: string) => ({
+    label,
+    onMove: (delta: number) => {
+      const landed = moveRow(index, delta < 0 ? index - 1 : index + 2);
+      if (landed) requestAnimationFrame(() => document.querySelector<HTMLElement>(`[aria-label="${landed}"]`)?.focus());
+    },
+  });
 
   /** What makes rack row @p index something to drag, and somewhere to drop. */
   const dragRow = (index: number): RowDrag => ({
@@ -237,7 +255,7 @@ function Chain({ ctl, host, top }: {
   /** The bottom of the rack takes a drop too, or nothing could be moved to the end. */
   const dropAtEnd: RowDrag = { ...dragRow(rows.length), draggable: false, onDragStart: undefined };
 
-  // The empty row only adds; it still has to hand `WarpSlot` the rest of its callbacks.
+  // A full row adds nothing; it still has to hand `WarpSlot` an `onAdd`.
   const none = () => {};
 
   return (
@@ -264,6 +282,7 @@ function Chain({ ctl, host, top }: {
                 layer={colour!.layer}
                 sel={node?.kind === 'colour'}
                 drag={dragRow(index)}
+                move={keyMove(index, COLOUR_MOVE)}
                 fromMaster={ctl.masterPalette !== null}
                 onSelect={() => ctl.selectNode({ kind: 'colour' })}
               />
@@ -273,6 +292,7 @@ function Chain({ ctl, host, top }: {
                 i={r.i}
                 warp={warps[r.i]}
                 drag={dragRow(index)}
+                move={keyMove(index, moveLabel(r.i))}
                 sel={node?.kind === 'warp' && node.i === r.i}
                 onSelect={() => ctl.selectNode({ kind: 'warp', i: r.i })}
                 onAdd={none}
@@ -287,23 +307,7 @@ function Chain({ ctl, host, top }: {
               />
             ),
           )}
-          {/* ONE empty row, at the bottom, where the next warp goes. The limit is the device's
-              (`LIMITS().WARPS`), but drawing every free slot put seven `+` rows in the chain,
-              every one of them appending at the same place (LIFE-801). A full rack keeps a
-              strip to drop on, so a row can still be dragged to the end. */}
-          {n < LIMITS().WARPS ? (
-            <WarpSlot
-              i={n}
-              sel={false}
-              drag={dropAtEnd}
-              onSelect={none}
-              onAdd={() => addWarp('translate')}
-              onRemove={none}
-              onBypass={none}
-            />
-          ) : (
-            <div className="rackrow" style={{ height: 'var(--space-2)' }} {...dropAtEnd} />
-          )}
+          <RackEnd n={n} drop={dropAtEnd} onAdd={() => addWarp('translate')} />
         </div>
         <ChainCaption coloured={!!colour} prefix={prefix} />
       </div>
@@ -473,8 +477,28 @@ type RowDrag = HTMLAttributes<HTMLDivElement> & {
   'data-dragover'?: true;
 };
 
-function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, expose }: {
+/**
+ * ONE empty row, at the bottom, where the next warp goes. The limit is the device's (`LIMITS().WARPS`), but
+ * drawing every free slot put seven `+` rows in the chain, every one of them appending at the same place
+ * (LIFE-801). A full rack keeps a strip to drop on, so a row can still be dragged to the end.
+ */
+function RackEnd({ n, drop, onAdd }: { n: number; drop: RowDrag; onAdd(): void }) {
+  // The empty row only adds; it still has to hand `WarpSlot` the rest of its callbacks.
+  const none = () => {};
+  if (n >= LIMITS().WARPS) return <div className="rackrow" style={{ height: 'var(--space-2)' }} {...drop} />;
+  return <WarpSlot i={n} sel={false} drag={drop} onSelect={none} onAdd={onAdd} onRemove={none} onBypass={none} />;
+}
+
+/** The name of a rack row's grip, which says what the arrow keys move. */
+const moveLabel = (i: number) => `Move warp ${i + 1}`;
+const COLOUR_MOVE = 'Move Colour';
+
+type GripMove = { label: string; onMove(delta: number): void };
+
+function WarpSlot({ i, warp, sel, drag, move, onSelect, onAdd, onRemove, onBypass, expose }: {
   i: number; warp?: { type: string; bypass: boolean }; sel: boolean; drag: RowDrag;
+  /** The arrow keys on the grip, so the row moves by keyboard as well as by drag (NA-17). */
+  move?: GripMove;
   onSelect(): void; onAdd(): void; onRemove(): void; onBypass(v: boolean): void;
   /** The bypass switch's `exposeProps`: a slot does not know which rack's address it is. */
   expose?: Record<string, string | undefined>;
@@ -508,7 +532,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       onClick={onSelect}
     >
       <Picked isOn={sel} edge="side" />
-      <RowGrip />
+      <RowGrip move={move} />
       <span onClick={e => e.stopPropagation()} {...expose}>
         <Switch
           on={!warp.bypass}
@@ -596,11 +620,11 @@ function ColourRow({ sel, lead, gradient, row, onSelect, children }: {
   );
 }
 
-function ColourSlot({ layer, sel, drag, fromMaster, onSelect }: {
-  layer: Layer; sel: boolean; drag: RowDrag; fromMaster: boolean; onSelect(): void;
+function ColourSlot({ layer, sel, drag, move, fromMaster, onSelect }: {
+  layer: Layer; sel: boolean; drag: RowDrag; move: GripMove; fromMaster: boolean; onSelect(): void;
 }) {
   return (
-    <ColourRow sel={sel} lead={<RowGrip />} row={{ ...drag, onClick: onSelect }} onSelect={onSelect}
+    <ColourRow sel={sel} lead={<RowGrip move={move} />} row={{ ...drag, onClick: onSelect }} onSelect={onSelect}
                gradient={gradientOf(layer.colour.palette.entries, layer.colour.wrap)}>
       <Mono className={sel ? '' : 'dim'}>{layer.colour.index}</Mono>
       {fromMaster && <Mono className="dim sm">from Master</Mono>}

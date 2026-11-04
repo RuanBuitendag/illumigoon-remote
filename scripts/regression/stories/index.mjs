@@ -7,5 +7,6 @@ import { tapTargets } from './tap-targets.mjs';
 import { keyboardRoutes } from './keyboard-routes.mjs';
 import { componentPage } from './component-page.mjs';
 import { editChecks } from './edit-checks.mjs';
+import { touchDrags } from './touch-drags.mjs';
 
-export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...editChecks, ...keyboardRoutes, ...componentPage];
+export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...editChecks, ...touchDrags, ...keyboardRoutes, ...componentPage];

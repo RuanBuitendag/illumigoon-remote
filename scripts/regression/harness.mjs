@@ -43,7 +43,8 @@ const makeLights = (journey) =>
 // Opens the journey's page and hands it to `use`. The lights stop and the page closes after.
 export async function withJourneyPage(browser, journey, play) {
   freshLibrary();
-  const context = await browser.newContext({ viewport: VIEWPORTS[journey.viewport ?? 'phone'] });
+  // A journey with `touch` gets a touch screen, so it can drag with a finger's events.
+  const context = await browser.newContext({ viewport: VIEWPORTS[journey.viewport ?? 'phone'], hasTouch: journey.touch === true });
   const page = await context.newPage();
   const lights = makeLights(journey);
   const network = [];
