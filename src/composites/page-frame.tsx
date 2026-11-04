@@ -3,17 +3,22 @@ import { BackKey, Icon, Picked, Press, TextField } from '../design-system';
 
 type PageFrameProps = {
   title: string;
+  // One key beside the title, such as + NEW LOOK.
+  action?: ReactNode;
   intro?: string;
   backLabel: string;
   onBack: () => void;
   children?: ReactNode;
 };
 
-export function PageFrame({ title, intro, backLabel, onBack, children }: PageFrameProps) {
+export function PageFrame({ title, action, intro, backLabel, onBack, children }: PageFrameProps) {
   return (
     <>
       <BackKey label={backLabel} onClick={onBack} />
-      <h1 className="page-title">{title}</h1>
+      <div className="page-title-row">
+        <h1 className="page-title">{title}</h1>
+        {action}
+      </div>
       {intro && <p className="page-intro">{intro}</p>}
       {children}
     </>

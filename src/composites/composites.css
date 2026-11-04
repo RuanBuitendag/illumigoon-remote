@@ -115,7 +115,7 @@
    controls inside them (D64). */
 /* More space between the room's groups than inside one (Gestalt proximity, UX lint `loose-groups`). */
 .room-section { display: flex; flex-direction: column; margin-top: var(--space-6); }
-.room-section .recent-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
+.room-section .favourite-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
 .light-card { margin-bottom: var(--space-2); }
 /* A light that cannot be chosen says why in its note, so the row is not also faded. */
 .light-pick:disabled, .light-tape:disabled { opacity: 1; }
@@ -132,10 +132,17 @@
 .screen-page > .back-key { position: sticky; top: 0; z-index: var(--layer-above); width: calc(100% + 2 * var(--gutter)); margin: 0 var(--edge); padding: 0 var(--gutter); background: var(--background); }
 .look-search { position: sticky; top: var(--row); z-index: var(--layer-raised); display: flex; margin: 0 var(--edge); padding: 0 var(--gutter); background: var(--background); }
 .look-row { display: flex; flex-direction: column; min-width: 0; }
-.recent-block { display: flex; flex-direction: column; gap: var(--space-2); }
-.recent-looks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-5); }
-.recent-look { display: flex; flex-direction: column; min-width: 0; min-height: var(--row-tall); text-align: left; }
-.recent-look-name { color: var(--text-3); font: var(--type-note); overflow-wrap: anywhere; }
+.favourite-block { display: flex; flex-direction: column; gap: var(--space-2); }
+.favourite-looks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-5); }
+.favourite-look { display: flex; flex-direction: column; min-width: 0; min-height: var(--row-tall); text-align: left; }
+.favourite-look-name { color: var(--text-3); font: var(--type-note); overflow-wrap: anywhere; }
+.favourite-look[aria-pressed='true'] .favourite-look-name { color: var(--text-1); }
+.page-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
+.page-title-row .page-title { min-width: 0; }
+/* The star sits at the top right of a look, over the end of its heading row, in a full finger target. */
+.look-row { position: relative; }
+.look-star { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: flex-end; min-width: var(--row); min-height: var(--row); }
+.look-row:has(.look-star) .look-item-heading { padding-right: var(--row); }
 .look-item { display: block; width: 100%; scroll-margin-block: calc(var(--clear-sticky) + var(--gutter)) var(--gutter); }
 .look-item:disabled { cursor: default; }
 .look-actions { display: flex; flex-wrap: wrap; gap: var(--space-5); }

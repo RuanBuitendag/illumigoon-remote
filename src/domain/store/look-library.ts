@@ -138,11 +138,34 @@ function mineGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGr
   }));
 }
 
-export function libraryFor(lights: Light[], mine: LookFile[], shelf: Shelf, plays: Record<string, number>) {
-  const rest = [...patchGroups(lights), ...mineGroups(mine, lights, shelf)];
-  const groups = [mostUsedGroup(rest, plays), ...rest];
+// The starred looks that a light here can play, once each, in the order they were starred.
+// MANAGE keeps to the look's own group, as in Most used.
+function favouriteGroup(groups: LibraryGroup[], favourites: string[]): LibraryGroup {
+  const all = groups.flatMap(({ looks }) => looks);
+  const looks = favourites.flatMap((name) => all.find((look) => look.name === name && look.animation) ?? []);
+  return { kind: 'catalog', title: 'Favourites', note: '', looks: looks.map((look) => ({ ...look, file: null, presets: [] })) };
+}
+
+export function favouriteLooks(lights: Light[], mine: LookFile[], shelf: Shelf, favourites: string[]) {
+  return favouriteGroup([...patchGroups(lights), ...mineGroups(mine, lights, shelf)], favourites).looks;
+}
+
+// Your own looks come before the catalog, and the basics before the rest of it (LIFE-1965).
+export function libraryFor(lights: Light[], mine: LookFile[], shelf: Shelf, library: LibraryUse) {
+  const [basics, ...others] = patchGroups(lights);
+  const own = mineGroups(mine, lights, shelf);
+  const all = [...own, ...(basics ? [basics] : []), ...others];
+  const groups = [
+    favouriteGroup(all, library.favourites),
+    ...own,
+    ...(basics ? [basics] : []),
+    mostUsedGroup(all, library.plays),
+    ...others,
+  ];
   return groups.filter(({ title, looks }) => looks.length > 0 || title === 'Mine');
 }
+
+type LibraryUse = { plays: Record<string, number>; favourites: string[] };
 
 const includesText = (text: string, wanted: string) => text.toLowerCase().includes(wanted);
 

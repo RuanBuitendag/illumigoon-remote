@@ -62,13 +62,15 @@ Features: software notice, Light software. Contexts: phone, a newer version on t
 - **Wrong actions:** none.
 - **Changes of mind:** none.
 
-### P3-S6 a deleted look leaves the room recent looks
+### P3-S6 a starred look shows in the room Favourites after a reload, and a deleted one leaves
 
-Features: Mine, MANAGE, recent looks. Contexts: phone. Should take: 3 taps to delete.
+Features: stars, Favourites, Mine, MANAGE. Contexts: phone. Should take: 1 tap to star, 3 taps to delete.
 
-1. Keep a look as "Test gone", play it, then Starfield: the room shows Test gone among its recent looks.
-2. Looks, `MANAGE`, `DELETE`, `TAP AGAIN TO DELETE`, `DONE`.
-3. The room no longer shows Test gone (E10).
+1. The room says "Star a look to put it here".
+2. Keep a look as "Test gone". On Looks, tap its star: it shows under FAVOURITES and does not play (LIFE-1965).
+3. Back on the room, Test gone is in Favourites, and stays there after a reload.
+4. Looks, `MANAGE`, `DELETE`, `TAP AGAIN TO DELETE`, `DONE`.
+5. The room no longer shows Test gone (E10).
 
 - **Failures:** none.
 - **Wrong actions:** DELETE asks for a second tap.

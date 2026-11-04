@@ -18,9 +18,7 @@ import {
 import { offTimerNote, offTimersOf } from '../store/schedules';
 import { LookStrip } from './look-strip';
 import { schedulingLights } from './off-timer-sheet';
-import { RecentLookRow } from './recent-looks';
 
-const CARD_LOOKS = 2;
 
 function lockedText({ lights }: Room) {
   const until = lights.find(({ isLockedByOther }) => isLockedByOther)?.lockedUntil ?? 0;
@@ -115,11 +113,7 @@ export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
       onOpen={room.lights.length > 0 ? () => openRoom(room.id) : undefined}
       onLooks={writableLights.length > 0 ? () => openPage('looks', room.id) : undefined}
     >
-      {room.isLocked ? (
-        <RoomLockNote room={room} />
-      ) : (
-        <RecentLookRow room={room} lights={writableLights} limit={CARD_LOOKS} />
-      )}
+      {room.isLocked && <RoomLockNote room={room} />}
     </RoomCard>
   );
 }

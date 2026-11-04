@@ -192,19 +192,19 @@ const LOOK_NOTES: Record<string, Notes> = {
     'Narrow the list as the person types.',
     'Clear it when a look plays.',
   ),
-  RecentLookItem: note(
-    'A tile strip and a name.',
+  FavouriteLookItem: note(
+    'A tile strip and a name. The name is bright while the look plays.',
     PRESSES,
-    'A button, named by the look.',
-    'Show the last few looks of the room.',
+    'A button, named by the look, pressed while it plays.',
+    'Show the looks starred on Looks.',
     'Add a description. The tile is small.',
   ),
-  RecentLooks: note(
-    'Three recent looks in a row.',
+  FavouriteLooks: note(
+    'The starred looks of a room, two to a row, or a line that says how to star one.',
     ITS_PARTS,
     'No role of its own.',
-    'Put the last look first.',
-    'Show more than fit in one row.',
+    'Keep the order they were starred in.',
+    'Show recent looks here. The room keeps favourites only.',
   ),
   WhichLine: note(
     'A line that says which lights a look plays on, with a chevron.',

@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { PageFrame, WhichLine } from '../../composites';
+import { AddKey } from '../../design-system';
 import type { Light } from '../store/fleet-store';
 import type { LookFile } from '../store/look-files';
+import { startNewLook } from '../store/look-play';
 import { chooseLights, closePage, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, patchLights, type Room } from '../store/rooms';
 import { LookLibrary } from './look-library';
@@ -53,6 +55,12 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
   };
 
   const close = () => setSheet(null);
+  const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
+  const newLook = (
+    <AddKey disabled={!canEdit} onClick={() => startNewLook(lights)}>
+      + NEW LOOK
+    </AddKey>
+  );
   const chosen = lights.map(({ address }) => address);
   // The sheet opens over the page, so the key that opened it is still there to take the focus back.
   return (
@@ -62,7 +70,7 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
       {sheet?.kind === 'which' && (
         <WhichLightsSheet rooms={rooms} room={room} picked={chosen} onDone={pick} onClose={close} />
       )}
-      <PageFrame title="Looks" intro="Tap to play. Hold to try." backLabel={backLabel} onBack={closePage}>
+      <PageFrame title="Looks" action={newLook} intro="Tap to play. Hold to try." backLabel={backLabel} onBack={closePage}>
         <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
         <LookLibrary
           lights={lights}

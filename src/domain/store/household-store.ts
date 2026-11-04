@@ -38,6 +38,8 @@ type Household = {
   recentLooks: Record<string, RecentLook[]>;
   // How many times each look was played, by name, for Most used on Looks.
   lookPlays: Record<string, number>;
+  // The looks starred on Looks, by name, in the order they were starred.
+  favouriteLooks: string[];
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
   // Light software versions the notice on Home was told to leave for later.
@@ -56,6 +58,7 @@ export const useHousehold = create<Household>()(
       roomOrder: [] as string[],
       recentLooks: {} as Record<string, RecentLook[]>,
       lookPlays: {} as Record<string, number>,
+      favouriteLooks: [] as string[],
       lightAddresses: [] as string[],
       skippedSoftware: [] as string[],
       knownRooms: [] as KnownRoom[],
@@ -91,6 +94,14 @@ export function rememberRecentLook(roomId: string, look: RecentLook) {
       lookPlays: { ...lookPlays, [look.name]: (lookPlays[look.name] ?? 0) + 1 },
     };
   });
+}
+
+export function toggleFavourite(name: string) {
+  useHousehold.setState(({ favouriteLooks }) => ({
+    favouriteLooks: favouriteLooks.includes(name)
+      ? favouriteLooks.filter((kept) => kept !== name)
+      : [...favouriteLooks, name],
+  }));
 }
 
 export function skipSoftware(versions: string[]) {

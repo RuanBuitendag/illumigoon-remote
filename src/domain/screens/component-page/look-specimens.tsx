@@ -11,8 +11,8 @@ import {
   LookSearch,
   MoreRow,
   QuietNote,
-  RecentLookItem,
-  RecentLooks,
+  FavouriteLookItem,
+  FavouriteLooks,
   RoomCard,
   RoomDragList,
   RoomSection,
@@ -118,18 +118,23 @@ const LOOKS: Specimen[] = [
     states: { empty: <LookSearch value="" onChange={nothing} />, typed: <LookSearch value="cand" onChange={nothing} /> },
   },
   {
-    name: 'RecentLookItem',
-    states: { default: <RecentLookItem {...hold} name="Candle" strip={strip} />, 'long text': <RecentLookItem {...hold} name={LONG_NAME} strip={strip} /> },
+    name: 'FavouriteLookItem',
+    states: {
+      default: <FavouriteLookItem {...hold} name="Candle" isPlaying={false} strip={strip} />,
+      playing: <FavouriteLookItem {...hold} name="Candle" isPlaying strip={strip} />,
+      'long text': <FavouriteLookItem {...hold} name={LONG_NAME} isPlaying={false} strip={strip} />,
+    },
   },
   {
-    name: 'RecentLooks',
+    name: 'FavouriteLooks',
     states: {
       default: (
-        <RecentLooks>
-          <RecentLookItem {...hold} name="Candle" strip={strip} />
-          <RecentLookItem {...hold} name="Starfield" strip={strip} />
-        </RecentLooks>
+        <FavouriteLooks>
+          <FavouriteLookItem {...hold} name="Candle" isPlaying={false} strip={strip} />
+          <FavouriteLookItem {...hold} name="Starfield" isPlaying={false} strip={strip} />
+        </FavouriteLooks>
       ),
+      empty: <FavouriteLooks empty="Star a look to put it here" />,
     },
   },
   { name: 'WhichLine', states: { default: <WhichLine text="Plays on Left and Right" onClick={nothing} /> } },

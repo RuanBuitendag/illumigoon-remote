@@ -88,6 +88,14 @@ export const Icon = {
       <path d="M3 5V3.2a2 2 0 0 1 3.9-.7" />
     </IconFrame>
   ),
+  Star: ({ c, isOn }: { c?: string; isOn?: boolean } = {}) => (
+    <IconFrame colour={c ?? 'var(--text-4)'}>
+      <path
+        d="M7 2l1.35 3.64 3.88.16-3.04 2.41 1.04 3.74L7 9.8l-3.23 2.15 1.04-3.74-3.04-2.41 3.88-.16z"
+        fill={isOn ? 'currentColor' : 'none'}
+      />
+    </IconFrame>
+  ),
   Plus: ({ c, s }: { c?: string; s?: number } = {}) => (
     <IconFrame at={[1.5, 1.5]} size={s ?? ICON_CANVAS} colour={c ?? 'var(--text-4)'}>
       <path d="M5.5 1.5v8M1.5 5.5h8" />

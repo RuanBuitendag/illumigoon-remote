@@ -29,8 +29,8 @@ export {
   LookPreset,
   LookProblem,
   LookSearch,
-  RecentLookItem,
-  RecentLooks,
+  FavouriteLookItem,
+  FavouriteLooks,
   WhichLine,
 } from './look-list';
 export { NamingRow } from './naming-row';

@@ -14,13 +14,21 @@ type LookItemProps = HoldProps & {
   strip: ReactNode;
   // Keys under the look, while its group is being edited.
   actions?: ReactNode;
+  isFavourite?: boolean;
+  // One tap stars the look, and opens nothing.
+  onStar?: () => void;
   children?: ReactNode;
 };
 
-export function LookItem({ actions, children, ...look }: LookItemProps) {
+export function LookItem({ actions, children, isFavourite, onStar, ...look }: LookItemProps) {
   const { name, description, note, hasSound, isPlaying, disabled, strip, onPick, onHold, onHoldEnd } = look;
   return (
     <div className="look-row">
+      {onStar && (
+        <Press className="look-star" label={`Favourite ${name}`} isPressed={isFavourite} onClick={onStar}>
+          <Icon.Star c={isFavourite ? 'var(--text-1)' : undefined} isOn={isFavourite} />
+        </Press>
+      )}
       <Press
         className="look-item"
         isPressed={isPlaying}
@@ -44,22 +52,23 @@ export function LookItem({ actions, children, ...look }: LookItemProps) {
   );
 }
 
-type RecentLookItemProps = HoldProps & { name: string; strip: ReactNode };
+type FavouriteLookItemProps = HoldProps & { name: string; isPlaying: boolean; strip: ReactNode };
 
-export function RecentLookItem({ name, strip, onPick, onHold, onHoldEnd }: RecentLookItemProps) {
+export function FavouriteLookItem({ name, isPlaying, strip, onPick, onHold, onHoldEnd }: FavouriteLookItemProps) {
   return (
-    <Press className="recent-look" onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
-      <span className="recent-look-name">{name}</span>
+    <Press className="favourite-look" isPressed={isPlaying} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
+      <span className="favourite-look-name">{name}</span>
       {strip}
     </Press>
   );
 }
 
-export function RecentLooks({ children }: { children: ReactNode }) {
+// With no favourites, the row says how to get one.
+export function FavouriteLooks({ empty, children }: { empty?: string; children?: ReactNode }) {
   return (
-    <div className="recent-block">
-      <Eyebrow>RECENT</Eyebrow>
-      <div className="recent-looks">{children}</div>
+    <div className="favourite-block">
+      <Eyebrow>FAVOURITES</Eyebrow>
+      {empty ? <p className="note">{empty}</p> : <div className="favourite-looks">{children}</div>}
     </div>
   );
 }

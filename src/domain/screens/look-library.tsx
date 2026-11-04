@@ -8,7 +8,7 @@ import {
   LookProblem,
   LookSearch,
 } from '../../composites';
-import { ActionKey, FileKey, KeyRow, TextKey } from '../../design-system';
+import { FileKey, KeyRow, TextKey } from '../../design-system';
 import { requestRecording } from '../looks/recordings';
 import type { Light } from '../store/fleet-store';
 import {
@@ -20,10 +20,10 @@ import {
   removePreset,
   useLookActions,
 } from '../store/look-actions';
-import { useHousehold } from '../store/household-store';
+import { toggleFavourite, useHousehold } from '../store/household-store';
 import { useLibrary } from '../store/library-store';
 import { askServer, loadLooks, useLookFiles, type LookFile } from '../store/look-files';
-import { playLook, startNewLook } from '../store/look-play';
+import { playLook } from '../store/look-play';
 import {
   foundGroups,
   libraryFor,
@@ -161,6 +161,7 @@ type LookLibraryProps = {
 export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPaste, onRename }: LookLibraryProps) {
   const mine = useLookFiles((files) => files.mine);
   const [plays] = useState(() => useHousehold.getState().lookPlays);
+  const favourites = useHousehold((household) => household.favouriteLooks);
   const shelf = useLookFiles((files) => files.shelf);
   const note = useLibraryNote();
   const shownLights = useShownLights(lights);
@@ -168,7 +169,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
   const wanted = query.trim().toLowerCase();
   const deleteKey = useArmedDelete();
   useFreshLooks();
-  const library = libraryFor(lights, mine, shelf, plays);
+  const library = libraryFor(lights, mine, shelf, { plays, favourites });
   useWarmPreviews(library.flatMap(({ looks }) => looks));
   const groups = foundGroups(library, wanted);
   const playing = playingRow(groups, playingName);
@@ -177,7 +178,6 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
     const note = look.animation && partOfRoomNote(look, lights);
     return note === sharedNote ? null : note;
   };
-  const canEdit = lights.some(({ isOnline, isOn }) => isOnline && isOn);
 
   const pick = ({ name, lights: players, animation }: LibraryLook) => {
     if (!animation) return;
@@ -214,11 +214,6 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
           title === 'Mine' && <TextKey onClick={() => onEditing(!isEditing)}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>
         }
       >
-        {title === 'Mine' && !isEditing && (
-          <ActionKey disabled={!canEdit} onClick={() => startNewLook(lights)}>
-            New look
-          </ActionKey>
-        )}
         {isEditing && title === 'Mine' && (
           <KeyRow>
             <FileKey accept=".json,application/json" onFile={(file) => void addLookFromFile(file)}>
@@ -238,6 +233,8 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
             disabled={isEditing || !look.animation}
             strip={<LookStrip source={look.preview} shape="tile" brightness={TILE_BRIGHTNESS} />}
             actions={isEditing && look.file && <FileActions look={look.file} deleteKey={deleteKey} onRename={onRename} />}
+            isFavourite={favourites.includes(look.name)}
+            onStar={look.animation ? () => toggleFavourite(look.name) : undefined}
             onPick={() => pick(look)}
             onHold={() => hold(look)}
             onHoldEnd={endPreview}

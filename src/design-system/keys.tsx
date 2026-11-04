@@ -99,9 +99,9 @@ export function LinkKey({ children, onClick }: WordKeyProps) {
   );
 }
 
-export function AddKey({ children, onClick }: WordKeyProps) {
+export function AddKey({ children, disabled, onClick }: WordKeyProps & { disabled?: boolean }) {
   return (
-    <button type="button" className="add-key" onClick={onClick}>
+    <button type="button" className="add-key" disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );

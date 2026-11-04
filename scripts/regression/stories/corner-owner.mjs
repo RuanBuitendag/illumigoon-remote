@@ -98,20 +98,23 @@ export const cornerOwner = [
     },
   },
   {
-    name: 'P3-S6 a deleted look leaves the room recent looks',
+    name: 'P3-S6 a starred look shows in the room Favourites after a reload, and a deleted one leaves',
     lights: LOUNGE,
     async run({ page }) {
       await openLounge(page);
+      // The look's tile in the room Favourites is a button. The look's own name above it is not.
+      const favourite = onTop(page).getByRole('button', { name: /^Test gone/ });
+      await see(onTop(page), 'Star a look to put it here');
       await keepAsNew(page, 'Test gone');
       await press(onTop(page), 'LOOKS');
-      // A look joins the recent looks when it is played, and shows there once another look plays.
-      for (const look of [/^Starfield/, /^Test gone/, /^Starfield/]) {
-        await onTop(page).getByRole('button', { name: look }).first().click();
-        await onTop(page).getByRole('button', { name: new RegExp(`${look.source}.*PLAYING`) }).first().waitFor();
-      }
+      // One tap on the star stars the look, and plays nothing.
+      await onTop(page).getByRole('button', { name: 'Favourite Test gone' }).first().click();
+      await onTop(page).getByText('FAVOURITES', { exact: true }).first().waitFor();
       await press(onTop(page), 'Lounge');
-      const recent = onTop(page).getByText('Test gone', { exact: true });
-      await recent.first().waitFor();
+      await favourite.first().waitFor();
+      // The address keeps the room open through the reload.
+      await page.reload();
+      await favourite.first().waitFor();
       await press(onTop(page), 'LOOKS');
       const looks = onTop(page);
       await press(looks, 'MANAGE');
@@ -121,7 +124,7 @@ export const cornerOwner = [
       await until(async () => (await named.count()) === 0, 'the look to leave the Looks page');
       await press(looks, 'DONE');
       await press(looks, 'Lounge');
-      await until(async () => (await recent.count()) === 0, 'the deleted look to leave the recent looks');
+      await until(async () => (await favourite.count()) === 0, 'the deleted look to leave the Favourites');
     },
   },
   {

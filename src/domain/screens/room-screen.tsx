@@ -29,11 +29,10 @@ import { offTimerNote } from '../store/schedules';
 import { LookControls } from './look-controls';
 import { LookStrip } from './look-strip';
 import { OffTimerSheet, schedulingLights } from './off-timer-sheet';
-import { RecentLookRow } from './recent-looks';
+import { FavouriteLookRow } from './favourite-looks';
 import { RoomLockNote } from './room-summary';
 import { SceneRow } from './scene-row';
 
-const RECENT_LOOKS = 3;
 const PERCENT = 100;
 
 // The look's name stands under the lights. A light repeats it only when the lights differ.
@@ -153,7 +152,7 @@ function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
         onEdit={canChange ? () => openPage('editor', room.id) : undefined}
         onLooks={() => openPage('looks', room.id)}
       />
-      <RecentLookRow room={room} lights={lights} limit={RECENT_LOOKS} />
+      <FavouriteLookRow lights={lights} />
       {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
       {!isMixed && !canChange && <QuietNote>{offNote(lights)}</QuietNote>}
       {canChange && <LookSettings room={room} lights={lights} light={light} />}

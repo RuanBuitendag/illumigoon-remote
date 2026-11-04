@@ -82,7 +82,7 @@ Reach: 2 taps (`Open Lounge`, `Room settings`), then 1 per row.
 
 ## Recent looks and Mine
 
-- **OK** A deleted look leaves the room's recent looks (E10, P3-S6). DELETE asks for a second tap.
+- **OK** A deleted look leaves the room's Favourites (E10, P3-S6). DELETE asks for a second tap.
 
 ## Light setup and adding a light
 
