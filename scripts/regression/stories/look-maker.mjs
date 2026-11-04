@@ -54,6 +54,8 @@ export const lookMaker = [
       await press(onTop(page), 'Lounge');
       await leaveDialog(page).waitFor();
       await press(leaveDialog(page), 'CANCEL');
+      // The question leaves with its motion, so the next one is a new dialog, not this one closing.
+      await leaveDialog(page).waitFor({ state: 'hidden' });
       expect((await layerCount(page)) === 3, 'CANCEL did not keep the change in Edit');
       await press(onTop(page), 'Lounge');
       await press(leaveDialog(page), 'YES');
