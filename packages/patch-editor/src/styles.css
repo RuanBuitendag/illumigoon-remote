@@ -760,7 +760,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-height: calc(100vh - var(--space-4));
+  max-height: calc(var(--screen-height) - var(--space-4));
   overflow-y: auto;
 }
 .patch-editor .popfield { display: flex; flex-direction: column; gap: var(--space-2); }

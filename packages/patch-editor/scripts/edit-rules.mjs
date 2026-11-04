@@ -42,7 +42,8 @@ const CSS_EDGE = /box-shadow\s*:[^;}]*\binset(?:\s+[^\s;}]+)*?\s+\d*\.?\d+px/g;
 const INLINE_EDGE = /boxShadow\s*:\s*['"`][^'"`]*\binset(?:\s+[^\s'"`]+)*?\s+\d*\.?\d+px/g;
 
 // A length written out, outside a `var(--token)`: any number with a unit but a bare zero.
-const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem)?(?![\d.]))\d*\.?\d+(?:px|em|rem)\b/;
+// A length written out: any number with a unit, a screen unit such as vh too, but a bare zero.
+const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem|d?vh|vw)?(?![\d.]))\d*\.?\d+(?:px|em|rem|[dsl]?v[hw]|vmin|vmax)\b/;
 // A length with a minus sign of its own is as raw as one without: -15px is a value, var(--line) is not.
 const NEGATIVE = /(^|[\s(,'"`])-(?=\.?\d)/g;
 const CSS_SIZE = /(?:^|[;{\s])((?:min-|max-)?(?:height|width)|flex-basis)\s*:\s*([^;}]+)/g;

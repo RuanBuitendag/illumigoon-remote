@@ -11,7 +11,7 @@
 .component-state { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); min-width: 0; }
 .component-state:has(> .component-frame[data-size='screen']) { grid-column: 1 / -1; }
 .component-frame { position: relative; overflow: hidden; contain: layout paint; border: var(--line) solid var(--track); }
-.component-frame[data-size='screen'] { height: calc(100dvh + 2 * var(--line)); }
+.component-frame[data-size='screen'] { height: calc(var(--screen-height) + 2 * var(--line)); }
 .component-frame[data-size='line'] { height: calc(2 * var(--row-tall)); }
 .component-notes { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: var(--space-1) var(--space-3); max-width: var(--dialog-width); margin: 0; font: var(--type-note); }
 .component-note { display: contents; }

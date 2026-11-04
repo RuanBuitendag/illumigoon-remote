@@ -65,7 +65,8 @@ const CSS_RAW_COLOUR = [
 const CSS_CUT_OFF = ['cut-off-text', /text-overflow\s*:\s*ellipsis|line-clamp\s*:/g, 'let the text wrap, so all of it shows'];
 const INLINE_CUT_OFF = ['cut-off-text', /\b(?:textOverflow\s*:\s*['"]ellipsis|WebkitLineClamp|lineClamp)\b/g, 'let the text wrap, so all of it shows'];
 
-const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem)?(?![\d.]))\d*\.?\d+(?:px|em|rem)\b/;
+// A length written out: any number with a unit, a screen unit such as vh too, but a bare zero.
+const LITERAL = /(?<![\w.#-])(?!0(?:px|em|rem|d?vh|vw)?(?![\d.]))\d*\.?\d+(?:px|em|rem|[dsl]?v[hw]|vmin|vmax)\b/;
 const BARE_WEIGHT = /(?<![\w.-])[1-9]00\b/;
 const TYPE_PROPERTY = /(?:^|[;{\s])(font|font-size|font-weight|line-height|letter-spacing)\s*:\s*([^;}]+)/g;
 const SPACE_PROPERTY =
