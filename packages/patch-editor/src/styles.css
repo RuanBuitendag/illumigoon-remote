@@ -732,14 +732,13 @@
 
 .patch-editor .popcatch { position: fixed; inset: 0; z-index: var(--layer-editor-catcher); }
 .patch-editor .surfacemenu, .patch-editor .surfacepop { position: fixed; z-index: var(--layer-editor-popup); border-radius: var(--radius); background: var(--background); border: var(--line) solid var(--track); box-shadow: var(--float-shadow); }
-/* A popover rises in and sinks out, with the app's dialog motion and tokens (TR-4). Its `Presence` holds it
-   for the exit. Under reduced motion it only fades. */
-.patch-editor .surfacemenu, .patch-editor .surfacepop { animation: rise-in var(--duration-enter) var(--ease-enter); }
-.patch-editor .presence[data-leaving] > .surfacemenu,
+/* The control editor rises in and sinks out, with the app's dialog motion and tokens (TR-4). Its `Presence`
+   holds it for the exit. Under reduced motion it only fades. The control menu has no motion: a context menu
+   opens and closes at once (MO-5), and its `Presence` lets it go at once. */
+.patch-editor .surfacepop { animation: rise-in var(--duration-enter) var(--ease-enter); }
 .patch-editor .presence[data-leaving] > .surfacepop { animation: sink-out var(--duration-exit) var(--ease-exit) forwards; }
 @media (prefers-reduced-motion: reduce) {
-  .patch-editor .surfacemenu, .patch-editor .surfacepop { animation-name: fade-in; }
-  .patch-editor .presence[data-leaving] > .surfacemenu,
+  .patch-editor .surfacepop { animation-name: fade-in; }
   .patch-editor .presence[data-leaving] > .surfacepop { animation-name: fade-out; }
 }
 /* A value and its unit: one small thing, so the half step (D69). */

@@ -26,6 +26,7 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 | What | Where | Motion | Tokens | Reduced motion |
 | -- | -- | -- | -- | -- |
 | A room or a page opens over Home | `.screen`, `composites.css` | slides in from the right; Home moves back and dims | `--duration-push`, `--push`, `--opacity-behind` | fades in place; on the laptop the room does not move and only a page fades |
+| Back, by the back key, the device's Back or the iPhone's edge swipe | `.screen`, `composites.css` | the same push run backwards: the screen slides out to the right, and the one under it comes forward and brightens | `--duration-push`, `--push`, `--opacity-behind` | fades out in place |
 | A dialog and a sheet | `.dialog`, `.dialog-scrim`, `design-system.css` | rises a step and fades in; sinks and fades out; the scrim fades | `--duration-enter`, `--ease-enter`, `--duration-exit`, `--ease-exit` | fades |
 | A toast | `.toast` in a `Presence`, `composites.css` | rises in; sinks out after it goes | the enter and exit tokens | fades |
 | A key under a finger | `button[data-held]`, `design-system.css` | lifts a step and grows a little | `--duration-press`, `--ease-out` | stays still |
@@ -39,7 +40,10 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 
 | What | Where | Motion | Tokens | Reduced motion |
 | -- | -- | -- | -- | -- |
-| The control menu and the control editor | `.surfacemenu`, `.surfacepop` in a `Presence`, `EditorStage.tsx` and Edit's `styles.css` | rise in; sink out after they close | the enter and exit tokens, the app's `rise-in` and `sink-out` | fade |
+| A tab switch in Edit | `Tabs` in `bits.tsx`, `.tabs` in Edit's `styles.css` | none: the panel changes and the line moves under the chosen tab at once | none | the same |
+| A rack shuts or opens | `RackToggle` in `bits.tsx` | the arrow turns; the rack's rows go or show at once | `--duration-press`, `--ease-out` | the arrow jumps |
+| The control menu | `.surfacemenu` in a `Presence`, `Surface.tsx` | none: a context menu opens and closes at once (MO-5) | none | the same |
+| The control editor | `.surfacepop` in a `Presence`, `EditorStage.tsx` and Edit's `styles.css` | rises in; sinks out after it closes | the enter and exit tokens, the app's `rise-in` and `sink-out` | fades |
 | Edit's toast | the app's `Toast` in a `Presence` | as the app's toast | the enter and exit tokens | fades |
 | Edit's sheets (save, matrix, fragments) | the app's `Sheet` | as the app's dialog | the enter and exit tokens | fades |
 | A key under a finger | the app's `button[data-held]` | as the app | `--duration-press`, `--ease-out` | stays still |
