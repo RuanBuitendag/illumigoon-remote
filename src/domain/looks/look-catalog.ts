@@ -38,7 +38,7 @@ const DESCRIPTIONS: Record<string, string> = {
   candle: 'A single flame that breathes and flickers.',
   'dark-embers': 'Embers in a nearly dark room.',
   'perlin-flame-2': 'A taller, brighter flame.',
-  'beach-sunset': 'Sea, sand and sky at dusk. The sun slowly sets.',
+  'beach-sunset': 'Sea, sand and sky at dusk, held still.',
   starfield: 'Stars fade in and out, with the odd shooting star.',
   downpour: 'Rain that swells and eases, with lightning now and then.',
   'wavering-orbs': 'Coloured lights wander and drift past each other.',
