@@ -144,7 +144,7 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
       <span
         style={{
           font: 'var(--type-small)',
-          color: dead ? 'var(--text-5)' : 'var(--modulation-soft)',
+          color: dead ? 'var(--text-4)' : 'var(--modulation-soft)',
         }}
       >
         {slotNumber(m.slot)}
@@ -153,7 +153,7 @@ function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: nu
       {/* A NAMED SLOT SAYS ITS NAME. Three macros in a row all reading `macro` is three
           identical tiles for three different knobs, and the type is already in the icon.
           `label` first: it is the one a person typed, and `name` is derived from it. */}
-      <span className="mname" style={{ color: dead ? 'var(--text-5)' : 'var(--text-1)' }}>
+      <span className="mname" style={{ color: dead ? 'var(--text-4)' : 'var(--text-1)' }}>
         {m.label || m.name || m.type}
       </span>
       {nodeById(m.type)?.trigger && <span className="trg">TRG</span>}
@@ -379,7 +379,7 @@ export function ModDock({ ctl, onOpenMatrix, onEdit, editing, audio }: {
         </div>
         <div className="row" style={{ gap: 'var(--space-4)' }}>
           <span
-            style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
+            style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}
           >
             drag one onto a dial, or hold the dial
           </span>

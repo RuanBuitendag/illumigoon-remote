@@ -103,7 +103,7 @@ function TriggerRow({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
         </div>
         <div className="grow" />
         <span
-          style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
+          style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}
         >
           {sources.length === 0
             ? 'nothing here sends a beat yet: + adds one'

@@ -262,7 +262,7 @@ export function Budget({ bytes, w = 190 }: { bytes: number; w?: number }) {
       <span style={{ font: 'var(--type-small)', color: col }}>
         {(bytes / 1024).toFixed(1)} KB
       </span>
-      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
+      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}>
         4K · 8K
       </span>
     </div>

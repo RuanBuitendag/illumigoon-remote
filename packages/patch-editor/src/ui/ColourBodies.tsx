@@ -177,6 +177,7 @@ function PaletteStops({
             <Mono className="dim sm">{i + 1}</Mono>
             <input
               className="hexin grow"
+              aria-label={`Colour ${i + 1} code`}
               value={c}
               spellCheck={false}
               disabled={locked}

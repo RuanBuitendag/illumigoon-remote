@@ -104,7 +104,7 @@ function LayerLevel({ ctl, layer }: { ctl: Ctl; layer: Layer }) {
 
 function ChainCaption({ coloured, prefix }: { coloured: boolean; prefix: string }) {
   return (
-    <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
+    <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}>
       {coloured
         ?
           'Composed top to bottom. Warps above Colour bend the shape before it has a colour; ' +
@@ -127,7 +127,7 @@ function ChainStages({ ctl, warps, colourAt }: {
   const node = ctl.node;
   if (!warps.length) {
     return (
-      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)', paddingTop: 'var(--space-2)' }}>
+      <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)', paddingTop: 'var(--space-2)' }}>
         {colourAt !== null
           ? 'No warp loaded. The layer renders in its own coordinates.'
           : 'No warp loaded. The mix reaches the strip as it is.'}
@@ -319,7 +319,7 @@ function Chain({ ctl, host, top }: {
             Stages
           </RackToggle>
           <span
-            style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
+            style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}
           >
             what each row does to space
           </span>
@@ -487,7 +487,7 @@ function WarpSlot({ i, warp, sel, drag, onSelect, onAdd, onRemove, onBypass, exp
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">warp{i}</Mono>
-        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
           —
         </span>
         <Icon.Plus c="var(--text-5)" />
@@ -620,7 +620,7 @@ function MasterColourSlot({ ctl }: { ctl: Ctl }) {
       >
         <span style={{ width: 10 }} />
         <Mono className="dim sm">colour</Mono>
-        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
+        <span className="grow" style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
           —
         </span>
         <Icon.Plus c="var(--text-5)" />

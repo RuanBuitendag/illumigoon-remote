@@ -105,7 +105,7 @@ function CentrePanel({ ctl, nav }: { ctl: Ctl; nav: Navigation }) {
   if (layer) return <EmitterPanel ctl={ctl} layer={layer} tab={tab} onTab={setTab} />;
   return (
     <div className="centre" style={{ alignItems: 'center', justifyContent: 'center' }}>
-      <span style={{ font: 'var(--type-note)', color: 'var(--text-5)' }}>
+      <span style={{ font: 'var(--type-note)', color: 'var(--text-4)' }}>
         No layer selected. Add one on the left.
       </span>
     </div>

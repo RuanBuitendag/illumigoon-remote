@@ -272,7 +272,7 @@ function SourceWire({ ctl, m, others, wire, label }: {
       <Lab className="dim">{label}</Lab>
       <div className="row" style={{ gap: 'var(--space-1)', flexWrap: 'wrap' }}>
         {others.length === 0 ? (
-          <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
+          <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}>
             no other modulator loaded
           </span>
         ) : (

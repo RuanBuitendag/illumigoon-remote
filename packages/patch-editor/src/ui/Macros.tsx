@@ -72,7 +72,7 @@ export function MacroRack({ ctl }: { ctl: Ctl }) {
           </Mono>
         </div>
         <span
-          style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}
+          style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}
         >
           {macros.length
             ? 'drag a macro onto any parameter to bind it'

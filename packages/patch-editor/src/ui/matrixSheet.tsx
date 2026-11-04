@@ -80,7 +80,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
               padding: 'var(--space-6) var(--space-5)',
               textAlign: 'center',
               font: 'var(--type-small-sans)',
-              color: 'var(--text-5)',
+              color: 'var(--text-4)',
             }}
           >
             No rows yet. Drag a modulator from the bar onto any knob.
@@ -103,7 +103,7 @@ export function MatrixSheet({ ctl, onClose }: { ctl: Ctl; onClose(): void }) {
       <Hr />
       <div style={{ padding: 'var(--space-4) var(--space-5)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
         <Lab className="dim">Each row moves one setting with one source</Lab>
-        <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-5)' }}>
+        <span style={{ font: 'var(--type-small-sans)', color: 'var(--text-4)' }}>
           BY is how far, in the setting’s own numbers. <M>both</M> swings it above and below
           where it is set; <M>up</M> only above. <M>scales</M> multiplies the setting instead of
           adding to it. At its ends a setting stops, wraps round or folds back.
