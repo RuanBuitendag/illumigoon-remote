@@ -219,9 +219,9 @@ export const lookMaker = [
         expect(await editor.getByText(text).first().isVisible(), `${text} is not on the laptop screen`);
       }
       for (const tab of [/^fx$/i, /^colour$/i, /^controls$/i]) {
-        expect(await editor.getByRole('button', { name: tab }).first().isVisible(), `no ${tab} tab`);
+        expect(await editor.getByRole('tab', { name: tab }).first().isVisible(), `no ${tab} tab`);
       }
-      expect(!(await editor.getByRole('button', { name: 'LAYERS', exact: true }).isVisible()), 'the phone tabs show on the laptop');
+      expect(!(await editor.getByRole('tab', { name: 'LAYERS', exact: true }).isVisible()), 'the phone tabs show on the laptop');
     },
   },
   {

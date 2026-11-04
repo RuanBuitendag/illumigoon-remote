@@ -163,9 +163,15 @@ function tileKeys(ctl: Ctl, slot: number, onOpen: () => void) {
   };
 }
 
-function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: number }) {
+/**
+ * The head takes the focus and the keys, not the whole tile: a macro's tile also holds its dial,
+ * and a key inside a key is two controls a screen reader cannot tell apart.
+ */
+function TileHead({ m, dead, drives, keys }: {
+  m: Modulator; dead: boolean; drives: number; keys: ReturnType<typeof tileKeys> & { 'aria-label': string };
+}) {
   return (
-    <div className="row" style={{ gap: 'var(--space-2)' }}>
+    <div className="row" style={{ gap: 'var(--space-2)' }} {...keys}>
       <span
         style={{
           font: 'var(--type-small)',
@@ -330,14 +336,13 @@ export function SlotTile({ ctl, m, open, onOpen }: {
       data-dragging={dragging || undefined}
       data-traced={traced || undefined}
       data-fed={fed || undefined}
-      aria-label={tileName(m, reach.total, dead)}
-      {...tileKeys(ctl, m.slot, onOpen)}
       onPointerEnter={() => ctl.setTrace(m.slot)}
       onPointerLeave={() => ctl.setTrace(null)}
       {...tileDrag(ctl, m.slot, dragging)}
       onClick={onOpen}
     >
-      <TileHead m={m} dead={!!dead} drives={reach.total} />
+      <TileHead m={m} dead={!!dead} drives={reach.total}
+                keys={{ ...tileKeys(ctl, m.slot, onOpen), 'aria-label': tileName(m, reach.total, dead) }} />
       <TileBody ctl={ctl} m={m} played={played} dead={dead} />
     </div>
   );

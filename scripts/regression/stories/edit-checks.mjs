@@ -199,7 +199,7 @@ const modulatorByKeyboard = {
   async run({ page }) {
     await openEdit(page);
     const top = onTop(page);
-    const tiles = top.locator('.dock .modslot[role=button]');
+    const tiles = top.locator('.dock .modslot [role=button]');
     if ((await tiles.count()) === 0) {
       await top.getByRole('button', { name: 'Add a modulator', exact: true }).focus();
       await page.keyboard.press('Enter');
