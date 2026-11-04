@@ -26,7 +26,7 @@ export function HomeLayout({ wordmark, onWordmark, notice, children }: HomeLayou
   );
 }
 
-type HouseSectionProps = { title: string; action: ReactNode; children: ReactNode };
+type HouseSectionProps = { title: string; action?: ReactNode; children: ReactNode };
 
 export function HouseSection({ title, action, children }: HouseSectionProps) {
   return (

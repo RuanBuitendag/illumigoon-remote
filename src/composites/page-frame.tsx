@@ -6,15 +6,16 @@ type PageFrameProps = {
   // One key beside the title, such as + NEW LOOK.
   action?: ReactNode;
   intro?: string;
-  backLabel: string;
-  onBack: () => void;
+  // A place of the bar has no way back.
+  backLabel?: string;
+  onBack?: () => void;
   children?: ReactNode;
 };
 
 export function PageFrame({ title, action, intro, backLabel, onBack, children }: PageFrameProps) {
   return (
     <>
-      <BackKey label={backLabel} onClick={onBack} />
+      {backLabel && onBack && <BackKey label={backLabel} onClick={onBack} />}
       <div className="page-title-row">
         <h1 className="page-title">{title}</h1>
         {action}

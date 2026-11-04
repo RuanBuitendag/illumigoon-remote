@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection, RoomDragList, ToggleRow } from '../../composites';
-import { TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate, useUpdateError } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, useFleet } from '../store/fleet-store';
@@ -21,7 +20,7 @@ function HouseControls({ rooms, placeCount }: { rooms: Room[]; placeCount: numbe
   const shownLights = useShownLights(lights);
   if (placeCount < 2) return null;
   return (
-    <HouseSection title="WHOLE HOUSE" action={<TextKey onClick={() => openPage('looks')}>LOOKS</TextKey>}>
+    <HouseSection title="WHOLE HOUSE">
       <ToggleRow
         label="All lights"
         isOn={isAnyOn(shownLights)}

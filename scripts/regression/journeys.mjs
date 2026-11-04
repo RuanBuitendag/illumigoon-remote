@@ -283,7 +283,7 @@ export const journeys = [
     async run({ page }) {
       await see(page, 'Lamp');
       await page.getByText('Bedroom').first().click();
-      await page.getByRole('button', { name: 'EDIT' }).click();
+      await page.locator('main.screen:not([inert])').last().getByRole('button', { name: 'EDIT' }).click();
       await see(page, 'LAYERS');
     },
   },

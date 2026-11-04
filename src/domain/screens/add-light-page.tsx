@@ -10,7 +10,7 @@ import {
   searchAgain,
   useFleet,
 } from '../store/fleet-store';
-import { closePage } from '../store/navigation-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { LookStrip } from './look-strip';
 import { MAX_LIGHT_NAME, OwnWifiForm } from './own-wifi-form';
@@ -145,7 +145,7 @@ export function AddLightPage({ rooms }: { rooms: Room[] }) {
   return (
     <PageFrame
       title="Add a light"
-      backLabel="Rooms"
+      backLabel={useBackLabel(undefined)}
       onBack={closePage}
       intro="Plug in the new lights and stay close to them. You can set up several in one go."
     >

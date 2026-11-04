@@ -1,11 +1,17 @@
 import { create } from 'zustand';
 
+// The places of the bar (LIFE-1964). Edit is a page that opens over the place it is opened from.
+export type Place = 'rooms' | 'looks' | 'settings';
+
+const PLACE_NAMES: Record<Place, string> = { rooms: 'Rooms', looks: 'Looks', settings: 'Settings' };
+
 // A page opened from Home goes back to Home, not to a room that was never open.
 export function useBackLabel(room: { id: string; name: string } | undefined) {
-  const isBeneath = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room?.id);
+  const isBeneath = useNavigation(({ roomId, isRoomOpen, place }) => place === 'rooms' && isRoomOpen && roomId === room?.id);
   const hasParent = useNavigation(({ parentPage }) => parentPage !== null);
+  const place = useNavigation((navigation) => navigation.place);
   if (hasParent) return 'Room settings';
-  return room && isBeneath ? room.name : 'Rooms';
+  return room && isBeneath ? room.name : PLACE_NAMES[place];
 }
 
 export type PageKind =
@@ -32,7 +38,17 @@ type Navigation = {
   isPageOpen: boolean;
   pageRoomId: string | null;
   pageVisit: number;
+  place: Place;
+  // The places opened so far. A place is drawn from its first visit on, and kept after it.
+  visited: Place[];
+  // The page each place had open when it was left.
+  pagesOf: Partial<Record<Place, PageState>>;
+  isJumpOpen: boolean;
+  looksQuery: string;
+  lastEditRoomId: string | null;
 };
+
+type PageState = Pick<Navigation, 'page' | 'pageRoomId' | 'parentPage' | 'isPageOpen'>;
 
 export const useNavigation = create<Navigation>(() => ({
   roomId: null,
@@ -43,7 +59,64 @@ export const useNavigation = create<Navigation>(() => ({
   isPageOpen: false,
   pageRoomId: null,
   pageVisit: 0,
+  place: 'rooms',
+  visited: ['rooms'],
+  pagesOf: {},
+  isJumpOpen: false,
+  looksQuery: '',
+  lastEditRoomId: null,
 }));
+
+const CLOSED: PageState = { page: null, pageRoomId: null, parentPage: null, isPageOpen: false };
+
+// Each place keeps the page it had open. Edit is left when its place is, so the other lights take the look.
+export function goToPlace(place: Place) {
+  useNavigation.setState((state) => {
+    if (state.place === place) return {};
+    const { page, pageRoomId, parentPage, isPageOpen } = state;
+    const kept = isPageOpen && page !== 'editor' ? { page, pageRoomId, parentPage, isPageOpen } : CLOSED;
+    const next = state.pagesOf[place] ?? CLOSED;
+    return {
+      ...next,
+      place,
+      visited: state.visited.includes(place) ? state.visited : [...state.visited, place],
+      pagesOf: { ...state.pagesOf, [state.place]: kept },
+      pageVisit: state.pageVisit + 1,
+    };
+  });
+}
+
+// A tap on the place that is open goes back to its first screen.
+export function tapPlace(place: Place) {
+  const { place: open, isPageOpen, isRoomOpen } = useNavigation.getState();
+  if (place !== open) return goToPlace(place);
+  if (isPageOpen) return useNavigation.setState({ ...CLOSED });
+  if (place === 'rooms' && isRoomOpen) closeRoom();
+  return undefined;
+}
+
+// Edit from the bar opens over the place that is open, on the whole room it plays on.
+export function openEditFrom(roomId: string) {
+  const { roomId: openRoomId, isRoomOpen, place } = useNavigation.getState();
+  const isOwnRoom = place === 'rooms' && isRoomOpen && openRoomId === roomId;
+  if (!isOwnRoom) useNavigation.setState({ chosenAddresses: [] });
+  openPage('editor', roomId);
+}
+
+export const openJump = () => useNavigation.setState({ isJumpOpen: true });
+export const closeJump = () => useNavigation.setState({ isJumpOpen: false });
+export const setLooksQuery = (looksQuery: string) => useNavigation.setState({ looksQuery });
+
+export function jumpToRoom(roomId: string) {
+  goToPlace('rooms');
+  useNavigation.setState({ ...CLOSED });
+  openRoom(roomId);
+}
+
+export function jumpToLook(name: string) {
+  goToPlace('looks');
+  useNavigation.setState({ ...CLOSED, looksQuery: name });
+}
 
 export function openRoom(roomId: string) {
   useNavigation.setState({ roomId, isRoomOpen: true, chosenAddresses: [], parentPage: null, isPageOpen: false });
@@ -66,12 +139,13 @@ export function chooseLight(address: string, roomLights: { address: string }[]) 
 }
 
 export function openPage(page: PageKind, pageRoomId: string | null = null) {
-  useNavigation.setState(({ pageVisit }) => ({
+  useNavigation.setState(({ pageVisit, lastEditRoomId }) => ({
     page,
     pageRoomId,
     parentPage: null,
     isPageOpen: true,
     pageVisit: pageVisit + 1,
+    lastEditRoomId: page === 'editor' ? pageRoomId : lastEditRoomId,
   }));
 }
 

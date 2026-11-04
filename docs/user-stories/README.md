@@ -87,6 +87,7 @@ Status is the result of the last full run (4 Nov 2026): pass, or known fail with
 | P1-S5 change one light, then the whole room | light choice, Looks page | `stories/evening-user.mjs` | pass |
 | P1-S6 a saved look keeps its name after a reload | look controls, SAVE AS NEW, Mine | `stories/evening-user.mjs` | pass |
 | P1-S7 give the two front lights one look | light choice | `stories/evening-user.mjs` | pass |
+| P1-S8 each place is one tap away, and a room or a look two through the jump sheet | bar of places, jump sheet | `stories/evening-user.mjs` | pass |
 | P2-S1 add a layer and take it to the room | Edit layers, leave warning | `stories/look-maker.mjs` | pass |
 | P2-S2 undo and redo in Edit | Edit undo | `stories/look-maker.mjs` | pass |
 | P2-S3 put the saved Candle back | RESET on the room | `stories/look-maker.mjs` | pass |

@@ -134,6 +134,9 @@
      checks every @media width against this one, and screen-stack.tsx reads WIDE from layout.ts. */
   --wide: 900px;
   --side-column: 380px;
+  /* The bar of places: a tall row over the home indicator on the phone, a column of keys on the laptop. */
+  --place-bar: calc(var(--row-tall) + env(safe-area-inset-bottom));
+  --place-rail: 88px;
   /* The keyboard focus ring: the ink colour, so it is neutral in both themes (LIFE-1937). */
   --focus: var(--text-1);
   --focus-line: 2px;

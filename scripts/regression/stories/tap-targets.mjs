@@ -57,13 +57,17 @@ const onHome = (start) => (page) =>
 const BEDROOM = [open('Open Bedroom')];
 const LOUNGE = [open('Open Lounge')];
 const BEDROOM_SETTINGS = [...BEDROOM, open('Room settings')];
-const LOOKS = [onHome('LOOKS')];
+// The bar of places stands under every screen (LIFE-1964).
+const onBar = (name) => (page) =>
+  page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name, exact: true }).click();
+const LOOKS = [onBar('LOOKS')];
 
 // Each place is the taps from a fresh Home that reach it.
 const PLACES = {
   Home: [],
   'Save scene sheet': [onHome('\\+ SAVE')],
   'scene history': [onHome('RECENT')],
+  Settings: [onBar('SETTINGS')],
   'Add a light': [onHome('\\+ Add a light')],
   Bedroom: BEDROOM,
   'Bedroom, one light chosen': [...BEDROOM, openStarting('Choose Left')],

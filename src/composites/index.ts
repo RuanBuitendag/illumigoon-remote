@@ -50,5 +50,6 @@ export { LockNote, QuietNote, RoomCard } from './room-card';
 export { LightCard, LookHeading, MoreRow, RoomLayout, RoomSection } from './room-layout';
 export { SceneCard, SceneLine, SceneShelf, StateCard, StateList } from './scene-shelf';
 export { EditLayout, ScreenStack, SearchLayout, useIsWide } from './screen-stack';
+export { JumpSheet, PlaceBar, PlaceFrame, PlaceView, type JumpGroup } from './place-bar';
 export { ControlGroup, ControlList, Sheet, SheetBody, SheetFooter } from './sheet';
 export { Toast } from './toast';

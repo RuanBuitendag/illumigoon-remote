@@ -101,6 +101,32 @@ export const Icon = {
       <path d="M5.5 1.5v8M1.5 5.5h8" />
     </IconFrame>
   ),
+  /** The places of the bar: Rooms, Looks, Edit and Settings. */
+  Rooms: () => (
+    <IconFrame>
+      <path d="M2 6.6L7 2.8l5 3.8V12H2z" />
+      <path d="M5.6 12V9h2.8v3" />
+    </IconFrame>
+  ),
+  Looks: () => (
+    <IconFrame>
+      <path d="M2 4.9h10M2 9.1h10" />
+      <circle cx="4.9" cy="4.9" r="1.2" fill="var(--background)" />
+      <circle cx="9.1" cy="9.1" r="1.2" fill="var(--background)" />
+    </IconFrame>
+  ),
+  Faders: () => (
+    <IconFrame>
+      <path d="M3.5 11.2V2.8M7 11.2V2.8M10.5 11.2V2.8" />
+      <path d="M2.4 8.4h2.2M5.9 4.9h2.2M9.4 7h2.2" />
+    </IconFrame>
+  ),
+  Settings: () => (
+    <IconFrame>
+      <circle cx="7" cy="7" r="1.8" />
+      <path d="M7 2v1.5M7 10.5V12M2 7h1.5M10.5 7H12M3.5 3.5l1 1M9.5 9.5l1 1M3.5 10.5l1-1M9.5 4.5l1-1" />
+    </IconFrame>
+  ),
   X: ({ c }: { c?: string } = {}) => (
     <IconFrame at={[2.5, 2.5]} colour={c ?? 'var(--text-5)'}>
       <path d="M1 1l7 7M8 1l-7 7" />

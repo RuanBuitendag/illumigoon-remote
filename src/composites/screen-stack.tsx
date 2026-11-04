@@ -10,6 +10,8 @@ type ScreenStackProps = {
   isPageOpen: boolean;
   // A page that takes the whole window on a laptop.
   isPageWide: boolean;
+  // Looks and Settings take the whole window on a laptop, with no room beside them.
+  isHomeFull?: boolean;
 };
 
 function listenToWidth(onChange: () => void) {
@@ -22,12 +24,12 @@ function listenToWidth(onChange: () => void) {
 export const useIsWide = () => useSyncExternalStore(listenToWidth, () => window.matchMedia(WIDE).matches);
 
 export function ScreenStack(props: ScreenStackProps) {
-  const { home, room, page, notice, isRoomOpen, isPageOpen, isPageWide } = props;
+  const { home, room, page, notice, isRoomOpen, isPageOpen, isPageWide, isHomeFull } = props;
   const isWide = useIsWide();
   const isHomeCovered = isWide ? isPageOpen && isPageWide : isRoomOpen || isPageOpen;
   return (
     <div className="screen-stack">
-      <main className="screen screen-home" data-pushed={isRoomOpen} inert={isHomeCovered}>
+      <main className="screen screen-home" data-pushed={isRoomOpen} data-full={isHomeFull} inert={isHomeCovered}>
         {home}
       </main>
       <main className="screen screen-room" data-open={isRoomOpen} inert={!isRoomOpen || isPageOpen}>

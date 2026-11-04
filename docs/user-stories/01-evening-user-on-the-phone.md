@@ -88,3 +88,16 @@ Features: light choice. Contexts: phone. Should take: 2 taps to choose, 1 to pla
 - **Failures:** none.
 - **Wrong actions:** none.
 - **Changes of mind:** none.
+
+### P1-S8 each place is one tap away, and a room or a look two through the jump sheet
+
+Features: the bar of places, the jump sheet (LIFE-1964). Contexts: phone, 375 x 812. Should take: 1 tap for a place, 2 for a room or a look.
+
+1. LOOKS, SETTINGS, EDIT and ROOMS on the bar each open their place with 1 tap.
+2. A long press on the bar opens the jump sheet. `lou` and a tap on Lounge open the Lounge: 2 taps.
+3. A long press, `star` and a tap on Starfield open Looks on Starfield: 2 taps.
+4. ROOMS shows the Lounge still open, and LOOKS still finds Starfield.
+
+- **Failures:** none.
+- **Wrong actions:** none.
+- **Changes of mind:** none.

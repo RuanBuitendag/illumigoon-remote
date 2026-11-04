@@ -11,6 +11,7 @@ import {
   HomeLayout,
   HouseNote,
   HouseSection,
+  JumpSheet,
   Overlay,
   OverlayBlock,
   OverlayText,
@@ -18,6 +19,9 @@ import {
   PageHint,
   PageSection,
   PaintSample,
+  PlaceBar,
+  PlaceFrame,
+  PlaceView,
   QuietNote,
   RoomLayout,
   ScreenStack,
@@ -56,6 +60,17 @@ const sections = [
 const edit = { backLabel: 'Lounge', title: 'Candle', sections, section: 'look', onSection: nothing, onBack: nothing };
 const whichRooms = [{ id: 'lounge', name: 'Lounge', lights: [{ id: 'left', name: 'Left' }, { id: 'right', name: 'Right' }] }];
 const undo = <TextKey onClick={nothing}>UNDO</TextKey>;
+const places = [
+  { value: 'rooms', name: 'ROOMS', icon: <Icon.Rooms /> },
+  { value: 'looks', name: 'LOOKS', icon: <Icon.Looks /> },
+  { value: 'edit', name: 'EDIT', icon: <Icon.Faders />, disabled: true },
+  { value: 'settings', name: 'SETTINGS', icon: <Icon.Settings /> },
+];
+const bar = <PlaceBar places={places} value="rooms" onChange={nothing} onHold={nothing} />;
+const jumpGroups = [
+  { title: 'ROOMS', hits: [{ id: 'lounge', name: 'Lounge', detail: 'Candle', onPick: nothing }] },
+  { title: 'LOOKS', hits: [{ id: 'candle', name: 'Candle', detail: 'Basics', onPick: nothing }] },
+];
 
 const HOME: Specimen[] = [
   {
@@ -98,6 +113,46 @@ const PAGES: Specimen[] = [
       home: <ComponentFrame size="screen"><ScreenStack {...stack} /></ComponentFrame>,
       'room open': <ComponentFrame size="screen"><ScreenStack {...stack} isRoomOpen /></ComponentFrame>,
       'page open': <ComponentFrame size="screen"><ScreenStack {...stack} isRoomOpen isPageOpen /></ComponentFrame>,
+    },
+  },
+  {
+    name: 'PlaceFrame',
+    focus: null,
+    states: {
+      default: (
+        <ComponentFrame size="screen">
+          <PlaceFrame bar={bar}>
+            <PlaceView isShown>
+              <QuietNote>A place stands here.</QuietNote>
+            </PlaceView>
+          </PlaceFrame>
+        </ComponentFrame>
+      ),
+    },
+  },
+  { name: 'PlaceBar', states: { default: bar } },
+  {
+    name: 'PlaceView',
+    focus: null,
+    states: {
+      shown: <ComponentFrame size="screen"><PlaceView isShown isPage>{page}</PlaceView></ComponentFrame>,
+      kept: <ComponentFrame size="screen"><PlaceView isShown={false}>{page}</PlaceView></ComponentFrame>,
+    },
+  },
+  {
+    name: 'JumpSheet',
+    focus: null,
+    states: {
+      'with hits': (
+        <OnDemand label="OPEN JUMP SHEET">
+          {(close) => <JumpSheet query="" groups={jumpGroups} empty="" onQuery={nothing} onClose={close} />}
+        </OnDemand>
+      ),
+      'nothing found': (
+        <OnDemand label="OPEN EMPTY JUMP SHEET">
+          {(close) => <JumpSheet query="zz" groups={[]} empty="No room or look matches zz." onQuery={nothing} onClose={close} />}
+        </OnDemand>
+      ),
     },
   },
   {

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { PageFrame, PageHint, PageSection, StateCard, StateList } from '../../composites';
 import type { SceneLight } from '../store/library-store';
 import { endPreview, previewScene } from '../store/look-preview';
-import { closePage } from '../store/navigation-store';
+import { closePage, useBackLabel } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { applyScene, sceneSummary } from '../store/scenes';
 import { useStateHistory, type HouseState } from '../store/state-history';
@@ -19,7 +19,7 @@ export function HistoryPage({ rooms }: { rooms: Room[] }) {
     <PageFrame
       title="Recent"
       intro="The last 10 states of the house. Tap to go back. Hold to try."
-      backLabel="Rooms"
+      backLabel={useBackLabel(undefined)}
       onBack={closePage}
     >
       {states.length === 0 && (

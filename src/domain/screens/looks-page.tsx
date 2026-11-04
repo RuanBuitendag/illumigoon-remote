@@ -4,7 +4,7 @@ import { AddKey } from '../../design-system';
 import type { Light } from '../store/fleet-store';
 import type { LookFile } from '../store/look-files';
 import { startNewLook } from '../store/look-play';
-import { chooseLights, closePage, useBackLabel, useNavigation } from '../store/navigation-store';
+import { chooseLights, closePage, setLooksQuery, useBackLabel, useNavigation } from '../store/navigation-store';
 import { lightsInScope, patchLights, type Room } from '../store/rooms';
 import { LookLibrary } from './look-library';
 import { PasteLookSheet } from './paste-look-sheet';
@@ -37,14 +37,32 @@ function keepInRoom(room: Room, lights: Light[]) {
 type Sheet = { kind: 'which' } | { kind: 'paste' } | { kind: 'rename'; look: LookFile };
 
 // With no room this page is for the whole house. Which lights lasts as long as the page is open.
-export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room[] }) {
+// The Looks place shares its find text with the jump sheet. A page opened from a room keeps its own.
+function useLooksQuery(isPlace: boolean | undefined): [string, (query: string) => void] {
+  const [ownQuery, setOwnQuery] = useState('');
+  const placeQuery = useNavigation((navigation) => navigation.looksQuery);
+  return isPlace ? [placeQuery, setLooksQuery] : [ownQuery, setOwnQuery];
+}
+
+// A place of the bar has no way back.
+const backOf = (isPlace: boolean | undefined, backLabel: string) =>
+  isPlace ? {} : { backLabel, onBack: closePage };
+
+type LooksPageProps = {
+  room: Room | undefined;
+  rooms: Room[];
+  // The Looks place of the bar: no way back, and the find text is the jump sheet's too.
+  isPlace?: boolean;
+};
+
+export function LooksPage({ room, rooms, isPlace }: LooksPageProps) {
   const chosenAddresses = useNavigation((navigation) => navigation.chosenAddresses);
   const isRoomOpen = useNavigation(({ roomId, isRoomOpen: isOpen }) => isOpen && roomId === room?.id);
   const backLabel = useBackLabel(room);
   const [sheet, setSheet] = useState<Sheet | null>(null);
   const [picked, setPicked] = useState<string[] | null>(null);
   const [isEditing, setEditing] = useState(false);
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useLooksQuery(isPlace);
   const writable = rooms.flatMap(({ writableLights }) => writableLights);
   const opened = room ? lightsInScope(room, chosenAddresses) : writable;
   const lights = picked ? writable.filter(({ address }) => picked.includes(address)) : opened;
@@ -70,7 +88,12 @@ export function LooksPage({ room, rooms }: { room: Room | undefined; rooms: Room
       {sheet?.kind === 'which' && (
         <WhichLightsSheet rooms={rooms} room={room} picked={chosen} onDone={pick} onClose={close} />
       )}
-      <PageFrame title="Looks" action={newLook} intro="Tap to play. Hold to try." backLabel={backLabel} onBack={closePage}>
+      <PageFrame
+        title="Looks"
+        action={newLook}
+        intro="Tap to play. Hold to try."
+        {...backOf(isPlace, backLabel)}
+      >
         <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
         <LookLibrary
           lights={lights}

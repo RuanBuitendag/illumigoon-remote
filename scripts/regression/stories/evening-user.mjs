@@ -5,6 +5,8 @@ const { candle, starfield } = SHIPPED;
 
 // Home remembers its rooms 8 s after a start. A light that wakes is back within a few heartbeats.
 const SETTLED_MS = 9000;
+// Longer than a hold, so the press opens the jump sheet.
+const HOLD_WAIT_MS = 900;
 const WAKE_MS = 3000;
 
 export const eveningUser = [
@@ -141,6 +143,62 @@ export const eveningUser = [
       await onTop(page).getByRole('button', { name: /^Starfield/ }).click();
       const front = [lights['10.0.0.11'], lights['10.0.0.12']];
       await until(() => front.every((light) => plays(light, starfield)), 'the two front lights to play Starfield');
+    },
+  },
+  {
+    name: 'P1-S8 each place is one tap away, and a room or a look two through the jump sheet',
+    lights: LOUNGE,
+    async run({ page }) {
+      const bar = page.getByRole('navigation', { name: 'Places' });
+      let taps = 0;
+      const tap = async (name) => {
+        taps += 1;
+        await bar.getByRole('button', { name, exact: true }).click();
+      };
+      // A long press on the bar opens the jump sheet, and counts as one tap.
+      const jump = async (letters) => {
+        taps += 1;
+        const box = await bar.getByRole('button', { name: 'ROOMS', exact: true }).boundingBox();
+        await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+        await page.mouse.down();
+        await page.waitForTimeout(HOLD_WAIT_MS);
+        await page.mouse.up();
+        await page.getByRole('textbox', { name: 'Find a room or a look' }).fill(letters);
+      };
+      const pick = async (name) => {
+        taps += 1;
+        const sheet = page.getByRole('dialog', { name: 'Go to' });
+        await sheet.getByRole('button', { name: new RegExp(`^${name}`) }).first().click();
+        // The sheet leaves with its motion before the next press.
+        await sheet.waitFor({ state: 'detached' });
+      };
+      const placeTaps = async (name, shown) => {
+        taps = 0;
+        await tap(name);
+        await shown();
+        expect(taps === 1, `${name} took ${taps} taps`);
+      };
+      await see(page, 'ILLUMIGOON');
+      await placeTaps('LOOKS', () => onTop(page).getByRole('heading', { name: 'Looks', level: 1 }).waitFor());
+      await placeTaps('SETTINGS', () => onTop(page).getByRole('heading', { name: 'Settings', level: 1 }).waitFor());
+      await placeTaps('EDIT', () => page.locator('main.screen-page[data-open="true"] .edit-title').waitFor());
+      await placeTaps('ROOMS', () => see(onTop(page), 'ILLUMIGOON'));
+      taps = 0;
+      await jump('lou');
+      await pick('Lounge');
+      await onTop(page).getByRole('heading', { name: 'Lounge', level: 1 }).waitFor();
+      expect(taps === 2, `the Lounge took ${taps} taps through the jump sheet`);
+      taps = 0;
+      await jump('star');
+      await pick('Starfield');
+      await onTop(page).getByRole('button', { name: /^Starfield/ }).first().waitFor();
+      expect(taps === 2, `Starfield took ${taps} taps through the jump sheet`);
+      // Each place is as it was left: Rooms keeps the Lounge open, and Looks keeps what it found.
+      await tap('ROOMS');
+      await onTop(page).getByRole('heading', { name: 'Lounge', level: 1 }).waitFor();
+      await tap('LOOKS');
+      const found = await onTop(page).getByRole('textbox', { name: /search|find/i }).first().inputValue();
+      expect(found === 'Starfield', `Looks lost what it found: ${found}`);
     },
   },
 ];
