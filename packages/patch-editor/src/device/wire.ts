@@ -230,6 +230,9 @@ export class Wire {
    */
   private static SILENCE_MS = 5000;
 
+  /** How late the deadline may fire and still count: past this the page was asleep. */
+  private static SILENCE_LATE_MS = 2000;
+
   /** Armed with the connection, restarted by every heartbeat, cleared by the ending. */
   private silenceTimer: number | null = null;
 
@@ -400,7 +403,17 @@ export class Wire {
   /** Restart the deadline. Called on connect, and on every heartbeat. */
   private armSilence() {
     this.stopSilence();
+    const armedAt = Date.now();
     this.silenceTimer = window.setTimeout(() => {
+      // A timer this late means the page itself was asleep: a hidden pane or a backgrounded
+      // phone runs timers about once a minute, and on waking a timer can run before the
+      // heartbeats queued behind it. Silence the page did not hear is no evidence, so start the
+      // deadline again. On 2026-11-04 the soak app closed four healthy Lounge sockets at once
+      // this way, every ten minutes, while two Node clients on the same lights never dropped.
+      if (Date.now() - armedAt > Wire.SILENCE_MS + Wire.SILENCE_LATE_MS) {
+        this.armSilence();
+        return;
+      }
       // Synthesised, then made real: the socket is taken down here so nothing further
       // arrives on it, and the `onclose` that follows finds the ending already handled.
       // Captured first, because `endSession` may schedule a reconnect that replaces it.
