@@ -233,6 +233,9 @@ export class Wire {
   /** How late the deadline may fire and still count: past this the page was asleep. */
   private static SILENCE_LATE_MS = 2000;
 
+  /** How long the page listens once more before a silence counts: what it had queued arrives first. */
+  private static SILENCE_CONFIRM_MS = 1000;
+
   /** Armed with the connection, restarted by every heartbeat, cleared by the ending. */
   private silenceTimer: number | null = null;
 
@@ -414,17 +417,25 @@ export class Wire {
         this.armSilence();
         return;
       }
-      // Synthesised, then made real: the socket is taken down here so nothing further
-      // arrives on it, and the `onclose` that follows finds the ending already handled.
-      // Captured first, because `endSession` may schedule a reconnect that replaces it.
-      const dead = this.ws;
-      this.endSession(`no heartbeat for ${Wire.SILENCE_MS / 1000}s`);
-      try {
-        dead?.close();
-      } catch {
-        /* already gone */
-      }
+      // Not yet a verdict. A page busy for five seconds, but not seven, still has the heartbeats
+      // of that time queued behind this timer, and they run before the next one. Any of them
+      // re-arms the deadline and cancels this. On 2026-11-04 the soak app still closed open
+      // sockets from this timer with the late check alone.
+      this.silenceTimer = window.setTimeout(() => this.endForSilence(), Wire.SILENCE_CONFIRM_MS);
     }, Wire.SILENCE_MS);
+  }
+
+  private endForSilence() {
+    // Synthesised, then made real: the socket is taken down here so nothing further
+    // arrives on it, and the `onclose` that follows finds the ending already handled.
+    // Captured first, because `endSession` may schedule a reconnect that replaces it.
+    const dead = this.ws;
+    this.endSession(`no heartbeat for ${(Wire.SILENCE_MS + Wire.SILENCE_CONFIRM_MS) / 1000}s`);
+    try {
+      dead?.close();
+    } catch {
+      /* already gone */
+    }
   }
 
   private stopSilence() {
