@@ -244,7 +244,7 @@ export function MasterColourBody({
             </IconKey>
           )}
         </div>
-        <Seg label="How the layers share the palette" items={DEAL_MODES} value={ctl.masterMode} onChange={ctl.setMasterMode} />
+        <Seg label="How the layers share the colours" items={DEAL_MODES} value={ctl.masterMode} onChange={ctl.setMasterMode} />
         <Blurb>{DEAL_BLURBS[ctl.masterMode]}</Blurb>
         {ctl.masterMode === 'some' && (
           <div className="row" style={{ justifyContent: 'space-between' }}>

@@ -898,3 +898,53 @@ and fails on another canvas, another line or an opacity. Edit's own line drawing
 own canvas through `IconFrame`, as they are drawings and not icons of the set.
 Why: BR-8. The set had ten canvases and four line weights.
 Date: 2026-11-04
+
+**D75. Edit's text is no fainter than `--text-4`**
+
+Chosen: words in Edit, dim ones included, are `--text-4` or brighter, and the blend chip is `--text-3`. `--text-5`
+stays for disabled words, icons, meters, the scrollbar and the stage dots, which are not text a person must read.
+Why: axe found 45 places in Edit under the contrast minimum, most of them `--text-5` words. After the change it finds
+none, on the phone and the laptop, dark and light.
+Date: 2026-11-04
+
+**D76. Edit draws its controls from one folder, and its gate says so**
+
+Chosen: `packages/patch-editor/src/ui/controls` holds Edit's `Key`, `Pill`, `IconKey`, `Toggle`, `Field` and
+`Choice`, and is the only place in Edit that writes a `<button>`, `<input>`, `<select>`, `<textarea>` or `<a>`.
+`Field` and `Choice` need a `label`, and `IconKey` needs one too, which a pointer also shows. `lint:rules` in the
+package (`scripts/edit-rules.mjs`) fails a raw control anywhere else, a `:hover` outside `@media (hover: hover)`, a
+box-shadow edge written in pixels rather than `--line` or `--line-strong`, and a height or width in pixels that equals
+a size token. Edit keeps its own `Key` rather than the design system's `Press`, because `Press` takes no `title`, `ref`,
+data attributes or pointer handlers, which Edit's rows need.
+Why: TL-5, ST-5, GE-4 and GE-10. Edit had 62 raw buttons, 18 raw fields and menus, 19 bare hover rules and 7 raw edges.
+Date: 2026-11-04
+
+**D77. Edit's choice row is the app's `OptionRow`**
+
+Chosen: Edit's `Seg` draws `OptionRow` from the design-system door, set closer and in note type to sit inline with
+what it sets. It takes a `label`, which names the group for a screen reader.
+Why: CM-4. The two did one job twice.
+Date: 2026-11-04
+
+**D78. A toggle in Edit shows on with the selected mark, not a wash**
+
+Chosen: `Toggle` (mute, solo, a wired source, a kept part of a roll) is `--text-4` when off and wears `Picked`, the one
+selected mark (D48), when on. It says so with `aria-pressed`.
+Why: CM-4. A wash is how Edit says a thing is raised; on a toggle it said "chosen" a second way.
+Date: 2026-11-04
+
+**D79. One inline message**
+
+Chosen: Edit's inline messages (a control that cannot be saved, a dead modulator, a warning on a row, a fragment left
+behind, a palette store error) are the composites' `LookProblem`. Edit's `.warnline` is gone.
+Why: CM-2. There were two forms of one message.
+Date: 2026-11-04
+
+**D80. Edit's dials and layers move by keyboard**
+
+Chosen: a dial is a `slider` with its range and value text. The arrows step a hundredth of the sweep, Shift a
+thousandth, Page Up and Page Down a tenth, and Home and End go to the two ends, all in the dial's taper, so a key moves
+as evenly as a drag. A layer's grip is a key, "Move Layer 2": the up and down arrows move the layer one place, and the
+focus goes with it. Stories check both.
+Why: NA-17. Both were pointer only.
+Date: 2026-11-04
