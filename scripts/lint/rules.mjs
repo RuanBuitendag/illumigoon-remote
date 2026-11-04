@@ -217,6 +217,34 @@ for (const layer of ['design-system', 'composites']) {
   if (!fs.existsSync(door)) report(door, 1, 'missing-door', 'each UI layer has one index file');
 }
 
+// The component page shows every component that the two doors export (D68, LIFE-1955). A component is an
+// exported value whose name starts with a capital and a small letter, so constants such as WIDE and hooks such
+// as useIsWide are not counted. The page must give it a specimen by name and import it: an import that is not
+// used fails lint:types, so an imported component is drawn. The specimen's name is the export's, in quotes.
+const COMPONENT_PAGE = `${SOURCE}/domain/screens/component-page`;
+const COMPONENT_PAGE_FILES = [...walk(COMPONENT_PAGE), `${SOURCE}/composites/component-page-layout.tsx`];
+const DOOR_EXPORTS = /^export\s*\{([^}]*)\}\s*from/gm;
+const DOOR_IMPORTS = /^import\s*\{([^}]*)\}\s*from\s*'[./]*(?:design-system|composites)'/gm;
+
+const namesIn = (text, pattern) =>
+  [...text.matchAll(pattern)].flatMap(([, names]) => names.split(',').map((name) => name.trim().split(/\s+as\s+/).at(-1)));
+
+function checkComponentPage() {
+  const page = COMPONENT_PAGE_FILES.map((file) => fs.readFileSync(file, 'utf8')).join('\n');
+  const imported = new Set(namesIn(page, DOOR_IMPORTS));
+  for (const layer of ['design-system', 'composites']) {
+    const door = `${SOURCE}/${layer}/index.ts`;
+    const text = fs.readFileSync(door, 'utf8');
+    for (const name of namesIn(text, DOOR_EXPORTS).filter((name) => /^[A-Z][a-z]/.test(name))) {
+      if (!imported.has(name) || !page.includes(`'${name}'`)) {
+        report(door, 1, 'missing-from-component-page', `${name}: give it a specimen in ${COMPONENT_PAGE}`);
+      }
+    }
+  }
+}
+
+checkComponentPage();
+
 for (const { file, line, rule, text } of problems) console.log(`${file}:${line}  ${rule}  ${text}`);
 const byRule = {};
 for (const { rule } of problems) byRule[rule] = (byRule[rule] ?? 0) + 1;
