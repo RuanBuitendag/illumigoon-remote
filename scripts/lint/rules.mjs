@@ -8,8 +8,9 @@
 //   - The editor's style sheet takes every colour from the tokens.
 //   - Type comes only from the tokens, in composites, the design system and the editor.
 //   - Spacing, row heights and corners come only from the tokens in composites, the design system and the editor.
-//   - Heights, widths and box-shadow edges come only from the tokens in composites and the design system, in their
-//     CSS and in their inline styles (GE-4, GE-10, TO-2).
+//   - Heights, widths, box-shadow edges and offsets (inset, top to left, scroll margins and paddings,
+//     outline-offset) come only from the tokens in composites and the design system, in their CSS and in their
+//     inline styles (GE-4, GE-10, TO-2, SP-1).
 //   - Layers, opacity, motion and line widths come only from the tokens in composites, the design system and
 //     the editor, in its style sheet and in the inline styles of its components.
 //   - Every media query width in the app and the editor is the --wide token.
@@ -67,6 +68,10 @@ const SPACE_PROPERTY =
 const BORDER_PROPERTY = /(?:^|[;{\s])(border(?:-top|-right|-bottom|-left)?(?:-width)?|outline(?:-width)?)\s*:\s*([^;}]+)/g;
 const SIZE_PROPERTY = /(?:^|[;{\s])(height|width|min-width|max-width|max-height)\s*:\s*([^;}]+)/g;
 const SHADOW_PROPERTY = /(?:^|[;{\s])(box-shadow)\s*:\s*([^;}]+)/g;
+const OFFSET_PROPERTY =
+  /(?:^|[;{\s])(inset(?:-[a-z-]+)?|top|right|bottom|left|scroll-margin(?:-[a-z-]+)?|scroll-padding(?:-[a-z-]+)?|outline-offset)\s*:\s*([^;}]+)/g;
+// A length with a minus sign of its own is as raw as one without: -15px is a value, var(--line) is not.
+const NEGATIVE = /(^|[\s(,'"`])-(?=\.?\d)/g;
 const LAYER_PROPERTY = /(?:^|[;{\s])(z-index|opacity)\s*:\s*([^;}]+)/g;
 const MOTION_PROPERTY = /(?:^|[;{\s])((?:transition|animation)(?:-duration|-delay|-timing-function)?)\s*:\s*([^;}]+)/g;
 const RAW_NUMBER = /^(?!0$|1$)\d*\.?\d+$/;
@@ -92,6 +97,11 @@ const INLINE_GEOMETRY = [
 const INLINE_SIZE = [
   { rule: 'raw-size', pattern: /(?<![\w.])((?:min|max)?(?:[Hh]eight|[Ww]idth))\s*:\s*([^,}\n]+)/g, ones: false },
   { rule: 'raw-line', pattern: /(?<![\w.])(boxShadow)\s*:\s*([^,}\n]+)/g, ones: false },
+  {
+    rule: 'raw-offset',
+    pattern: /(?<![\w.])(inset\w*|top|right|bottom|left|scroll(?:Margin|Padding)\w*|outlineOffset)\s*:\s*([^,}\n]+)/g,
+    ones: false,
+  },
 ];
 const INLINE_NUMBER = /(?<![\w.$#-])\d*\.?\d+(?![\w.%])/g;
 
@@ -163,7 +173,7 @@ function inlineStyles(text) {
 
 // A value is raw when it writes a length, a time or a number of its own, outside a `var(--token)`.
 function isRawInline(value, ones) {
-  const bare = value.replace(/var\(--[\w-]+\)/g, '');
+  const bare = value.replace(/var\(--[\w-]+\)/g, '').replace(NEGATIVE, '$1');
   if (LITERAL.test(bare) || RAW_MOTION.test(bare)) return true;
   return [...bare.matchAll(INLINE_NUMBER)].some(([number]) => Number(number) !== 0 && !(ones && Number(number) === 1));
 }
@@ -186,10 +196,12 @@ function checkInlineType(file) {
   runChecks(file, [['raw-type', INLINE_TYPE, 'use a type token from design-system.css']]);
 }
 
-// Sizes and box-shadow edges, in the app's layers only.
+// Sizes, box-shadow edges and offsets (inset, top to left, scroll margins and paddings, outline-offset), in the
+// app's layers only (SP-1, TO-2).
 function checkSizes(file, from = 0) {
   checkValues(file, { pattern: SIZE_PROPERTY, rule: 'raw-size', isRaw: (value) => LITERAL.test(value) }, from);
   checkValues(file, { pattern: SHADOW_PROPERTY, rule: 'raw-line', isRaw: (value) => LITERAL.test(value) }, from);
+  checkValues(file, { pattern: OFFSET_PROPERTY, rule: 'raw-offset', isRaw: (value) => LITERAL.test(value.replace(NEGATIVE, '$1')) }, from);
 }
 
 function checkCss(file, layer) {
