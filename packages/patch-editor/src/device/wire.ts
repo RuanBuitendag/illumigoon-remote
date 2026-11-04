@@ -217,10 +217,12 @@ export class Wire {
    * and writes go into a socket that swallows them. That is a LIVENESS failure, and no
    * amount of work on the retry path reaches it.
    *
-   * The heartbeat is already the liveness signal, so nothing new is sent. Ten missed
-   * heartbeats at `HEARTBEAT_WS_INTERVAL_MS` costs more than a Wi-Fi retransmit, a busy
-   * httpd task or a briefly-throttled browser tab, and less than a person will wait
-   * staring at a light that is not there.
+   * The heartbeat is already the liveness signal, so nothing new is sent. The deadline must
+   * outlast a stall of the home network, because the socket lives through one and ending it
+   * drops a healthy connection. On 2026-11-04 every Lounge light went silent to every client
+   * on the laptop at once for 9.3 s, the lights went on running and closed nothing, and only
+   * the old 6 s deadline here ended a session (LIFE-1910). A light that is really gone is
+   * seen 15 s later instead of 6 s, which is still less than a person will wait.
    *
    * NOT ping/pong, which is the obvious alternative and the wrong one here: `_wsHandler`
    * (`websocket_transport.cpp:166-204`) does not answer PING frames and reads any
@@ -228,7 +230,7 @@ export class Wire {
    * the session that sent it. Enabling pings needs a firmware change; the deadline needs
    * none. See LIFE-758.
    */
-  private static SILENCE_MS = 5000;
+  private static SILENCE_MS = 14000;
 
   /** How late the deadline may fire and still count: past this the page was asleep. */
   private static SILENCE_LATE_MS = 2000;
