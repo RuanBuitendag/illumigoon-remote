@@ -101,7 +101,9 @@
 .look-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--row); }
 .look-heading-name { min-width: 0; padding: var(--space-2) 0; font: var(--type-heading); overflow-wrap: anywhere; }
 .look-heading .key-row { flex: none; gap: var(--space-4); }
-.room-section { display: flex; flex-direction: column; margin-top: var(--section); }
+/* The room keeps one step between its parts, as Edit does: --space-5 between sections, the step between the
+   controls inside them (D64). */
+.room-section { display: flex; flex-direction: column; margin-top: var(--space-5); }
 .room-section .recent-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
 .light-card { margin-bottom: var(--space-2); }
 /* A light that cannot be chosen says why in its note, so the row is not also faded. */
@@ -111,7 +113,7 @@
 .light-note { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .light-tape { display: block; width: 100%; }
 .light-tape .led-strip-room { height: 56px; margin: 0 var(--edge); }
-.room-scroll .scene-shelf { margin-top: var(--section); padding: 0; }
+.room-scroll .scene-shelf { margin-top: var(--space-5); padding: 0; }
 .library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: 88px; }
 .library-group { display: flex; flex-direction: column; gap: var(--space-5); }
 .library-group > .heading-row { margin-bottom: calc(-1 * var(--space-4)); }

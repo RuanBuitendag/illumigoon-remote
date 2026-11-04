@@ -120,7 +120,7 @@ function offNote(lights: Light[]) {
 // Level shows here only when one light of several is chosen; the room level sits at the top.
 function LookSettings({ room, lights, light }: { room: Room; lights: Light[]; light: Light }) {
   return (
-    <RoomSection>
+    <>
       {lights.length === 1 && room.writableLights.length > 1 && (
         <SliderRow
           label="Level"
@@ -133,7 +133,7 @@ function LookSettings({ room, lights, light }: { room: Room; lights: Light[]; li
         />
       )}
       <LookControls lights={lights} />
-    </RoomSection>
+    </>
   );
 }
 
@@ -146,20 +146,18 @@ function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
   if (!light) return null;
   const reset = () => edited && playLook(lights, edited.name, { type: 'patch', params: edited.document });
   return (
-    <>
-      <RoomSection>
-        <LookHeading
-          name={lookTitle(shownLights)}
-          onReset={edited ? reset : undefined}
-          onEdit={canChange ? () => openPage('editor', room.id) : undefined}
-          onLooks={() => openPage('looks', room.id)}
-        />
-        <RecentLookRow room={room} lights={lights} limit={RECENT_LOOKS} />
-        {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
-        {!isMixed && !canChange && <QuietNote>{offNote(lights)}</QuietNote>}
-      </RoomSection>
+    <RoomSection>
+      <LookHeading
+        name={lookTitle(shownLights)}
+        onReset={edited ? reset : undefined}
+        onEdit={canChange ? () => openPage('editor', room.id) : undefined}
+        onLooks={() => openPage('looks', room.id)}
+      />
+      <RecentLookRow room={room} lights={lights} limit={RECENT_LOOKS} />
+      {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
+      {!isMixed && !canChange && <QuietNote>{offNote(lights)}</QuietNote>}
       {canChange && <LookSettings room={room} lights={lights} light={light} />}
-    </>
+    </RoomSection>
   );
 }
 

@@ -775,3 +775,11 @@ lights and Save scene use it; Which lights may mark several rows.
 Why: the rows stood `--space-5` apart, so four lengths filled half the phone, and a chosen row carried the under line
 meant for a row of choices side by side.
 Date: 2026-11-04
+
+**D64. The room keeps one step**
+
+Chosen: the room's sections, its scene shelf included, stand `--space-5` apart, the step between the controls inside
+them. The look's name and its settings are one section, so the settings follow the name by that one step.
+Why: sections stood `--section` apart, and the settings were a second section with the control list's own margin on
+top, so 56 px of air split a look from its colours. Edit packs its panels close; one step reads as one page.
+Date: 2026-11-04
