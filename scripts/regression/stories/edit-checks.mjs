@@ -305,6 +305,33 @@ const roomControlsByKeyboard = {
   },
 };
 
+// LIFE-1963: "+ Control" waits for a tap on the setting the control moves. On the phone that setting is on another
+// section, so the press on the section's tab must not end the wait.
+const addRoomControlOnPhone = {
+  name: 'LIFE-1963 a room control is added on the phone: + Control, then a knob on Layers, then Expose',
+  viewport: 'phone',
+  lights: LOUNGE,
+  async run({ page }) {
+    const errors = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await openEdit(page);
+    const top = onTop(page);
+    await press(top.locator('.edit-sections'), 'CONTROLS');
+    const before = await top.locator('.ctlrow').count();
+    await top.locator('.ghostrow').filter({ hasText: 'Control' }).click();
+    await press(top.locator('.edit-sections'), 'LAYERS');
+    await page.waitForTimeout(SETTLE_MS);
+    await top.locator('[data-expose]:not([data-exposed]):visible').first().click();
+    const menu = page.getByRole('menu', { name: 'Control menu' });
+    await until(() => menu.isVisible(), 'the control menu to open on the knob after + Control');
+    await menu.getByRole('menuitem', { name: /Show on the room/ }).click();
+    await page.getByRole('button', { name: 'EXPOSE', exact: true }).click();
+    await press(top.locator('.edit-sections'), 'CONTROLS');
+    await until(async () => (await top.locator('.ctlrow').count()) === before + 1, 'one more room control after Expose');
+    expect(errors.length === 0, `page errors: ${errors.join('; ')}`);
+  },
+};
+
 const rackByKeyboard = {
   name: "NA-17 a warp and a layer's Colour move up and down the chain with the arrow keys on their grips",
   viewport: 'laptop',
@@ -338,5 +365,6 @@ export const editChecks = [
   menuByKeyboard,
   modulatorByKeyboard,
   roomControlsByKeyboard,
+  addRoomControlOnPhone,
   rackByKeyboard,
 ];

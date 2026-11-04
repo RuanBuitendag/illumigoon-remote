@@ -37,11 +37,16 @@ export function useDialogs() {
    * ADD A CONTROL by tapping the setting it moves (LIFE-1934). While picking, the next press on
    * anything exposable opens its menu, as a right-click or a long press would; a press anywhere
    * else stops picking.
+   *
+   * EXCEPT A MOVE TO ANOTHER PLACE: a tab, or anything in a `nav`. On the phone the setting is in
+   * another section than Controls, so the press that opens that section is part of the pick
+   * (LIFE-1963).
    */
   const [isPicking, setPicking] = useState(false);
   useEffect(() => {
     if (!isPicking) return undefined;
     const onPress = (e: PointerEvent) => {
+      if ((e.target as Element | null)?.closest?.('nav, [role="tab"], [role="tablist"]')) return;
       setPicking(false);
       if (!e.target || !exposeAtPoint(e.target, e.clientX, e.clientY)) return;
       e.preventDefault();
