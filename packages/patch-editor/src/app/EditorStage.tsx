@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useRef, type ReactNode } from 'react';
 import { Sheet, SheetBody, Toast } from '../../../../src/composites';
-import { TextKey } from '../../../../src/design-system';
+import { Presence, TextKey } from '../../../../src/design-system';
 import { serialisedSize } from '../domain/patchDocument';
 import { drawable, type Ready } from '../domain/connection';
 import type { Patch } from '../domain/patch';
@@ -441,6 +441,8 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
     <>
       <DragGhost gesture={gesture} patch={patch} />
 
+      {/* Each popover sits in a `Presence`, so it stays for its leaving motion after it closes (TR-4). */}
+      <Presence>
       {exposeAt && drawable(ready) && (
         <SurfaceMenu
           ctl={ctl}
@@ -452,8 +454,10 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
           }}
         />
       )}
+      </Presence>
       {/* Keyed on the control, so opening a second one while one is open starts from its own
           values. */}
+      <Presence>
       {editingControl && drawable(ready) && (
         <ControlEditor
           key={`${editingControl.control.key}:${editingControl.isNew}`}
@@ -464,12 +468,15 @@ export function EditorOverlays({ ctl, gesture, dialogs, patch, toast, ready, onU
           onClose={() => setEditingControl(null)}
         />
       )}
+      </Presence>
 
+      <Presence>
       {toast && (
         <Toast text={toast.text} isOverDock>
           {toast.canUndo && <TextKey onClick={onUndo}>UNDO</TextKey>}
         </Toast>
       )}
+      </Presence>
     </>
   );
 }

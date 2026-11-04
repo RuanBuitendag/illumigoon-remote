@@ -729,6 +729,16 @@
 
 .patch-editor .popcatch { position: fixed; inset: 0; z-index: var(--layer-editor-catcher); }
 .patch-editor .surfacemenu, .patch-editor .surfacepop { position: fixed; z-index: var(--layer-editor-popup); border-radius: var(--radius); background: var(--background); border: var(--line) solid var(--track); box-shadow: var(--float-shadow); }
+/* A popover rises in and sinks out, with the app's dialog motion and tokens (TR-4). Its `Presence` holds it
+   for the exit. Under reduced motion it only fades. */
+.patch-editor .surfacemenu, .patch-editor .surfacepop { animation: rise-in var(--duration-enter) var(--ease-enter); }
+.patch-editor .presence[data-leaving] > .surfacemenu,
+.patch-editor .presence[data-leaving] > .surfacepop { animation: sink-out var(--duration-exit) var(--ease-exit) forwards; }
+@media (prefers-reduced-motion: reduce) {
+  .patch-editor .surfacemenu, .patch-editor .surfacepop { animation-name: fade-in; }
+  .patch-editor .presence[data-leaving] > .surfacemenu,
+  .patch-editor .presence[data-leaving] > .surfacepop { animation-name: fade-out; }
+}
 .patch-editor .surfacemenu { padding: var(--space-2); display: flex; flex-direction: column; gap: var(--line); }
 .patch-editor .surfacemenu > button {
   text-align: left;
