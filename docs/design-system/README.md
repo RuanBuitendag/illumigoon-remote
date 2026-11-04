@@ -22,8 +22,10 @@ The domain (`src/domain`) holds no look. `CLAUDE.md` has the layer rules.
 
 ## Two sets of looks, one set of tokens
 
-There is one token set. The editor does not define tokens. Every colour and type token it uses comes from
+There is one token set for colour and type. Every colour and type token the editor uses comes from
 `design-system.css` through `:root`, and `lint:rules` checks that its style sheet writes no raw colour and no raw type.
+The editor names the sizes of its own parts in one `:root` block at the top of its `styles.css`, and its gate fails
+on any other raw length (D85).
 
 The two still look different, because the editor writes its own geometry by hand: spacing, corners, heights, layers
 and timings, in `styles.css` and in inline styles. Its look is flat: no shadows for depth, faint washes for raised

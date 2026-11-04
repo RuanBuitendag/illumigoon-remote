@@ -948,3 +948,53 @@ as evenly as a drag. A layer's grip is a key, "Move Layer 2": the up and down ar
 focus goes with it. Stories check both.
 Why: NA-17. Both were pointer only.
 Date: 2026-11-04
+
+**D81. Nothing in Edit is only on hover**
+
+Chosen: Edit has no `title` tooltip and no SVG `<title>`. Edit's keys, fields and text props do not take one. A name
+that does not fit wraps instead of being cut off. A reason shows as text in its row. A key that is only an icon has its
+accessible name, and a dial's help is an SVG `<desc>`. Edit's gate fails on a `title`, an ellipsis or a line clamp.
+Why: CM-8, DA-14. A finger cannot hover, and about 80 tooltips held words a phone never showed.
+Date: 2026-11-04
+
+**D82. Edit's words follow voice.md, checked by its gate**
+
+Chosen: the voice rules a machine can check live in `docs/design-system/voice-rules.json`, and Edit's gate checks
+every word Edit shows against them. A layer's colours are "colours"; only "palette store" keeps "palette". A set of
+control positions kept under a look is a "variation", never a "preset". The save form's fields have labels.
+Why: BR-5, BR-6, FO-1. `scripts/lint/rules.mjs` runs its checks when it is imported and exports nothing, so Edit
+could not import them. The root rules should read the same JSON file, so there is one list.
+Date: 2026-11-04
+
+**D83. Edit's popovers move like the app's dialogs**
+
+Chosen: the control menu, the control editor and Edit's toast sit in the app's `Presence`. They rise in with
+`--duration-enter` and `--ease-enter`, and sink out with `--duration-exit` and `--ease-exit`. Under reduced motion
+they only fade. `transitions.md` lists every motion in the app and in Edit.
+Why: TR-1, TR-4. They appeared and vanished with no motion.
+Date: 2026-11-04
+
+**D84. Edit's tabs are a tab list, and its rows and tiles take keys**
+
+Chosen: `Tabs` is a `tablist`. Only the chosen tab is in the Tab order, and the arrows, Home and End choose another.
+A layer's name is a key that chooses the layer. A modulator tile takes focus: Enter opens it, and Space picks it, so
+Enter on a focused setting binds it. Escape lets go. Tiles do not reorder, because their order is the slot number,
+which is the address. Stories check all three.
+Why: AC-5, AC-8, CM-10, NA-17. Each was pointer only.
+Date: 2026-11-04
+
+**D85. Edit names its own sizes**
+
+Chosen: every height, width and offset in Edit is a token. Edit uses the design system's token where one means the
+same thing. Otherwise it uses one of its own, defined in a single `:root` block at the top of its `styles.css` and
+named for the part in full words, such as `--edit-tile-width`. Rows are at least `--space-1` apart. The half step
+stays inside one small thing (D69). Edit's gate fails on any raw length, and it runs every check and reports all
+the failures in one run.
+Why: GE-10, SP-1, SP-2. About 90 sizes were written by hand, and the half step was used between rows.
+Date: 2026-11-04
+
+**D86. Undo lasts the same time in Edit as in the app**
+
+Chosen: Edit's undo offer lasts `UNDO_SECONDS` from the design-system door, 10 seconds, as the app's does.
+Why: ST-13, AC-14. Edit's lasted 6 seconds.
+Date: 2026-11-04
