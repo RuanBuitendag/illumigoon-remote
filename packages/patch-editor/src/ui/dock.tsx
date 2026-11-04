@@ -171,7 +171,7 @@ function TileHead({ m, dead, drives, keys }: {
   m: Modulator; dead: boolean; drives: number; keys: ReturnType<typeof tileKeys> & { 'aria-label': string };
 }) {
   return (
-    <div className="row" style={{ gap: 'var(--space-2)' }} {...keys}>
+    <div className="row tilehead" style={{ gap: 'var(--space-2)' }} {...keys}>
       <span
         style={{
           font: 'var(--type-small)',
@@ -204,7 +204,7 @@ function MacroDial({ ctl, m }: { ctl: Ctl; m: Modulator }) {
       macro's whole point is being turnable without opening anything, so the pointer has
       to stop at the dial rather than start a drag through it.
     */
-    <div className="col" style={{ alignItems: 'center' }}
+    <div className="col tiledial" style={{ alignItems: 'center' }}
          onPointerDown={e => e.stopPropagation()}
          onClick={e => e.stopPropagation()}>
       {/*
