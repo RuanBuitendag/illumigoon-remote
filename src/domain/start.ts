@@ -12,3 +12,8 @@ export function startApp() {
     startFleet();
   }
 }
+
+// `?components` on the dev server: every component of the two doors, and no lights (D68). The release
+// build drops it, because src/main.tsx asks for it only under `import.meta.env.DEV`.
+export const loadComponentPage = () =>
+  import('./screens/component-page/component-page').then(({ ComponentPage }) => ComponentPage);

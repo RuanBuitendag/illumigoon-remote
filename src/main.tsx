@@ -1,14 +1,23 @@
-import { StrictMode } from 'react';
+import { StrictMode, type ComponentType } from 'react';
 import { createRoot } from 'react-dom/client';
-import { App, startApp } from './domain';
-
-startApp();
+import { App, loadComponentPage, startApp } from './domain';
 
 const root = document.getElementById('root');
-if (root) {
-  createRoot(root).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  );
+
+function show(Page: ComponentType) {
+  if (root) {
+    createRoot(root).render(
+      <StrictMode>
+        <Page />
+      </StrictMode>,
+    );
+  }
+}
+
+// The component page is for the dev server only, so the release build leaves it out.
+if (import.meta.env.DEV && new URLSearchParams(window.location.search).has('components')) {
+  void loadComponentPage().then(show);
+} else {
+  startApp();
+  show(App);
 }

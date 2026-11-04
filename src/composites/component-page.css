@@ -1,0 +1,16 @@
+/* The component page (D68), on the dev server at `?components`. ComponentPageLayout loads this file when it
+   first shows, so the release build, which never shows it, does not carry it.
+   A frame holds what fills the window, and its `contain` makes a fixed screen, sheet or toast fill the frame
+   instead of the window. A screen frame is the window's height, as a sheet on the phone is. */
+
+.component-page { height: 100%; overflow-y: auto; padding: var(--page-top) var(--gutter) var(--space-7); }
+.component-entry { display: flex; flex-direction: column; gap: var(--space-3); margin-top: var(--section); }
+.component-entry-name { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-3); padding-bottom: var(--space-2); border-bottom: var(--line) solid var(--track); font: var(--type-value); }
+.component-entry-door, .component-state-name { color: var(--text-4); font: var(--type-small); }
+.component-states { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, var(--side-column)), 1fr)); gap: var(--space-5); }
+.component-state { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); min-width: 0; }
+.component-state:has(> .component-frame[data-size='screen']) { grid-column: 1 / -1; }
+.component-frame { position: relative; overflow: hidden; contain: layout paint; border: var(--line) solid var(--track); }
+.component-frame[data-size='screen'] { height: calc(100dvh + 2 * var(--line)); }
+.component-frame[data-size='line'] { height: calc(2 * var(--row-tall)); }
+.paint-sample { width: var(--row); height: var(--row); border-radius: var(--radius); }

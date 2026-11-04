@@ -1,6 +1,7 @@
 import './composites.css';
 
 export { ColourEditor } from './colour-editor';
+export { ComponentEntry, ComponentFrame, ComponentPageLayout, ComponentState, PaintSample } from './component-page-layout';
 export {
   HeadingRow,
   NamedSelectRow,

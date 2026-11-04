@@ -1,2 +1,2 @@
 export { App } from './screens/app';
-export { startApp } from './start';
+export { loadComponentPage, startApp } from './start';
