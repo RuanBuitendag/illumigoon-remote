@@ -3,8 +3,11 @@
 import { useCallback, useState } from 'react';
 
 const SHOW_MS = 2600;
-/** Long enough to read the line and reach the button on it. */
-const SHOW_UNDO_MS = 6000;
+/**
+ * Long enough to read the line and reach the button on it. The app's undo, `UNDO_MS` in
+ * `src/domain/store/undo.ts`, lasts as long, so UNDO waits the same time in Edit and in the app (ST-13, AC-14).
+ */
+const SHOW_UNDO_MS = 10000;
 
 /** A line, and whether it offers UNDO for what it reports. */
 export type Toast = { text: string; canUndo: boolean };
