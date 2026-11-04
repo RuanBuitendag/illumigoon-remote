@@ -73,13 +73,17 @@ export function EditLayout<Section extends string>(props: EditLayoutProps<Sectio
   );
 }
 
-type SearchLayoutProps = { strip: ReactNode; text: string; note: string; children?: ReactNode };
+type SearchLayoutProps = { strip: ReactNode; text: string; hint?: string; note: string; children?: ReactNode };
 
-export function SearchLayout({ strip, text, note, children }: SearchLayoutProps) {
+// What the search found, in the heading type, and what to do about it under it, as a page names itself (D67).
+export function SearchLayout({ strip, text, hint, note, children }: SearchLayoutProps) {
   return (
     <main className="search">
       {strip}
-      <p className="search-text">{text}</p>
+      <div>
+        <p className="search-text">{text}</p>
+        {hint && <p className="page-intro">{hint}</p>}
+      </div>
       {children}
       <p className="search-note">{note}</p>
     </main>

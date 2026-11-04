@@ -235,7 +235,7 @@
 @media (min-width: 900px) {
   .home-header { height: 76px; padding: var(--space-6) var(--gutter) 0; }
   .scene-list { flex-wrap: wrap; margin: 0; padding: 0; overflow: visible; }
-  .room-scroll, .screen-page { padding-inline: max(var(--gutter), calc(50% - var(--half-column))); }
+  .room-scroll, .screen-page, .search { padding-inline: max(var(--gutter), calc(50% - var(--half-column))); }
   .room-scroll::before { margin-inline: 0; }
   .room-scroll > .back-key { display: none; }
   .screen-home { right: auto; width: var(--side-column); box-shadow: var(--line) 0 0 var(--track); }

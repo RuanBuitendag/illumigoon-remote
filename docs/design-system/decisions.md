@@ -800,3 +800,12 @@ deleted; a live light in Edit is shown with `StatusMark` where one is needed.
 Why: Edit drew a third switch, a 16 by 3 px bar in a 22 by 16 px key, under the thumb's 44 px, beside the app's
 `PowerKey` (D52), and a second live mark beside `StatusMark` (D51). One job has one component (D44 to D50).
 Date: 2026-11-04
+
+**D67. The search screen names itself as a page does**
+
+Chosen: the search screen says what it found in the heading type ("No lights found.") and what to do about it under
+it as the page intro, in the note type. On the laptop it stands in the room's centred column, not across the window.
+Why: a two-sentence instruction in the heading type filled three lines on the phone and read louder than any title
+in Edit, and on the laptop the strip, the text and the keys' arrows ran the full 1440 px apart. Take back already
+reads like the other pages and keeps its look.
+Date: 2026-11-04
