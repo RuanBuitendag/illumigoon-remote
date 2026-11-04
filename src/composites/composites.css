@@ -186,7 +186,11 @@
 /* Choices */
 
 .overlay-text { white-space: pre-line; }
-.choice-row { display: flex; align-items: center; width: 100%; min-height: var(--row); color: var(--text-3); }
+/* A list of choices packed as Edit packs its layer rows: no gap, each row a thumb tall. The rows reach into
+   the gutter, so a name lines up with the text above it and the side mark sits left of the name (D63). */
+.choice-list { display: flex; flex-direction: column; margin: 0 calc(-1 * var(--space-3)); }
+.choice-row { position: relative; display: flex; align-items: center; width: 100%; min-height: var(--row); padding: 0 var(--space-3); color: var(--text-3); text-align: left; }
+.choice-row[aria-pressed='true'] { color: var(--text-1); }
 
 /* Pages */
 

@@ -28,7 +28,12 @@ function SceneScope({ rooms, scope, captured, isKeeping, onScope }: SceneScopePr
     <>
       {!isKeeping && (
         <OverlayBlock label="Saves">
-          <ChoiceList choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]} value={scope} onChange={onScope} />
+          <ChoiceList
+            label="Saves"
+            choices={[{ id: WHOLE_HOUSE, name: 'Whole house' }, ...rooms]}
+            chosen={[scope]}
+            onChoose={onScope}
+          />
         </OverlayBlock>
       )}
       <OverlayBlock label="What it will do">

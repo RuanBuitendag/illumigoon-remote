@@ -765,3 +765,13 @@ Chosen: Transition lays its controls out in `ControlList`, as the room does; Rec
 `PageSection`. `RoomSection` loses its unused title, and `.section-title` is removed.
 Why: two components did one job, so the same controls sat at different gaps on two pages.
 Date: 2026-11-04
+
+**D63. One list of choices**
+
+Chosen: `ChoiceList` in `src/composites/choice-list.tsx` lists choices as Edit lists its layers: rows a thumb tall
+(`--row`) with no gap between them, and the chosen row marked with `Picked` down its side (D48). The rows reach
+`--space-3` into the gutter, so a name lines up with the text above it and the mark sits left of it. Off timer, Which
+lights and Save scene use it; Which lights may mark several rows.
+Why: the rows stood `--space-5` apart, so four lengths filled half the phone, and a chosen row carried the under line
+meant for a row of choices side by side.
+Date: 2026-11-04

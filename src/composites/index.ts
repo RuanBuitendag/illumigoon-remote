@@ -24,7 +24,8 @@ export {
   WhichLine,
 } from './look-list';
 export { NamingRow } from './naming-row';
-export { ChoiceList, Overlay, OverlayBlock, OverlayText, WhichLights } from './overlay';
+export { ChoiceList } from './choice-list';
+export { Overlay, OverlayBlock, OverlayText, WhichLights } from './overlay';
 export {
   ArrangeRow,
   DayPicker,

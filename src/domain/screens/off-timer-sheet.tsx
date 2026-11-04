@@ -59,7 +59,7 @@ export function OffTimerSheet({ room, onClose }: { room: Room; onClose: () => vo
     >
       {isWaiting && <OverlayText>{offTimerNote(lights)}.</OverlayText>}
       {hasSpace ? (
-        <ChoiceList choices={LENGTHS} value="" onChange={start} />
+        <ChoiceList label="Off in" choices={LENGTHS} chosen={[]} onChoose={start} />
       ) : (
         <OverlayText>These lights hold all the schedules they can. Remove one in Schedules first.</OverlayText>
       )}
