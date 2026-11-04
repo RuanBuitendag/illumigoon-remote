@@ -134,7 +134,7 @@ export function useBindGesture({ dragRef, patchRef, structural, say }:
     // cannot drag from the rack to a knob on another part of the screen (LIFE-1934).
     if (gesture && !gesture.moved) {
       setPicked(gesture.src);
-      say('Now tap a setting to move it with this');
+      say('Now tap a setting to move it with this, or choose one and press Enter');
       return;
     }
     setDrag(null);
@@ -167,7 +167,23 @@ function useTapToBind(
       e.stopPropagation();
       bind(picked, path);
     };
+    // THE SAME ROUTE BY KEYBOARD (AC-5, NA-17). Enter or Space on a focused setting binds it,
+    // Escape lets go, and every other key (Tab, the arrows) still moves focus to find one.
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { letGo(); return; }
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      const path = (e.target as Element | null)?.closest?.('[data-path]')?.getAttribute('data-path');
+      if (!path) return;
+      e.preventDefault();
+      e.stopPropagation();
+      letGo();
+      bind(picked, path);
+    };
     window.addEventListener('pointerdown', onPress, true);
-    return () => window.removeEventListener('pointerdown', onPress, true);
+    window.addEventListener('keydown', onKey, true);
+    return () => {
+      window.removeEventListener('pointerdown', onPress, true);
+      window.removeEventListener('keydown', onKey, true);
+    };
   }, [picked, letGo, bind]);
 }

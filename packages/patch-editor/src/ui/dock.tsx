@@ -1,6 +1,6 @@
 /** The modulator bar along the bottom, and the matrix as a list. */
 
-import { useEffect, useRef, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Icon } from '../../../../src/design-system';
 import { useLatest } from './useLatest';
 import {
@@ -24,7 +24,6 @@ import type { Ctl } from './ctl';
 import type { AudioFeed } from '../domain/scope';
 import { ModEditor } from './modEditor';
 import { deadReason } from './modulatorStatus';
-import { pointAt } from './touch';
 import { Key } from './controls';
 
 export const M = ({ children }: { children: ReactNode }) => (
@@ -135,9 +134,34 @@ export const freeSlot = (patch: Patch): number | undefined => {
   return [...Array(LIMITS().MODS).keys()].find(i => !used.has(i));
 };
 
-const tileTitle = (m: Modulator, drives: number) =>
-  `${m.label || m.name ? `${m.label || m.name} · ` : ''}${m.type}`
-  + (drives ? ` — drives ${drives}; ${pointAt()} to see which` : ' — drag onto a setting, or tap here and then on the setting');
+/** The tile's accessible name: what a sighted person reads off the icon, the name and the badge. */
+const tileName = (m: Modulator, drives: number, dead: string | null) =>
+  `${slotNumber(m.slot)} ${m.label || m.name || m.type} ${m.type}`
+  + (drives ? `, drives ${drives}` : '')
+  + (dead ? `, ${dead}` : '');
+
+/**
+ * THE KEY ROUTE FOR A TILE (AC-5, NA-17). A tile's drag binds it to a setting; it has no order
+ * to move in, because the order is the slot number and the slot number is the address. Enter
+ * opens the tile, as a tap does, and Space picks it, as a tap without a drag does, so the next
+ * Enter on a focused setting binds it (`useTapToBind`).
+ */
+function tileKeys(ctl: Ctl, slot: number, onOpen: () => void) {
+  return {
+    role: 'button',
+    tabIndex: 0,
+    'aria-keyshortcuts': 'Enter Space',
+    onKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+      if (e.target !== e.currentTarget) return;
+      if (e.key === 'Enter') { e.preventDefault(); onOpen(); }
+      if (e.key === ' ') {
+        e.preventDefault();
+        ctl.beginDrag({ kind: 'mod', slot }, 0, 0);
+        ctl.dragEnd();
+      }
+    },
+  };
+}
 
 function TileHead({ m, dead, drives }: { m: Modulator; dead: boolean; drives: number }) {
   return (
@@ -221,13 +245,18 @@ function tileDrag(ctl: Ctl, slot: number, dragging: boolean) {
   };
 }
 
-/** A macro carries its dial; anything else reports the value it computes. */
-function TileBody({ ctl, m, played }: { ctl: Ctl; m: Modulator; played: boolean }) {
+/**
+ * A macro carries its dial; anything else reports the value it computes. A slot that cannot
+ * run says why in place of the value, where a finger can read it (CM-8).
+ */
+function TileBody({ ctl, m, played, dead }: {
+  ctl: Ctl; m: Modulator; played: boolean; dead: string | null;
+}) {
   if (played) return <MacroDial ctl={ctl} m={m} />;
   return (
     <div className="col" style={{ gap: 'var(--space-2)' }}>
       <LiveMeter mod={m} />
-      <span className="detail">{detailOf(m)}</span>
+      <span className="detail">{dead ?? detailOf(m)}</span>
     </div>
   );
 }
@@ -301,14 +330,15 @@ export function SlotTile({ ctl, m, open, onOpen }: {
       data-dragging={dragging || undefined}
       data-traced={traced || undefined}
       data-fed={fed || undefined}
-      title={dead ?? tileTitle(m, reach.total)}
+      aria-label={tileName(m, reach.total, dead)}
+      {...tileKeys(ctl, m.slot, onOpen)}
       onPointerEnter={() => ctl.setTrace(m.slot)}
       onPointerLeave={() => ctl.setTrace(null)}
       {...tileDrag(ctl, m.slot, dragging)}
       onClick={onOpen}
     >
       <TileHead m={m} dead={!!dead} drives={reach.total} />
-      <TileBody ctl={ctl} m={m} played={played} />
+      <TileBody ctl={ctl} m={m} played={played} dead={dead} />
     </div>
   );
 }
@@ -324,10 +354,10 @@ export function AddSlot({ slot, what, onAdd, played }: {
 }) {
   if (slot === undefined) return null;
   return (
-    <div className="emptyslot well" data-played={played || undefined}
-         title={`Add a ${what}`} onClick={() => onAdd(slot)}>
+    <Key className="emptyslot well" data-played={played || undefined}
+         aria-label={`Add a ${what}`} onClick={() => onAdd(slot)}>
       <Icon.Plus c="var(--text-5)" />
-    </div>
+    </Key>
   );
 }
 
