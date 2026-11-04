@@ -842,6 +842,8 @@
     font-size: var(--size-note) !important;
   }
   .patch-editor .rowacts { height: auto; }
+  /* At 320 px a selected layer's keys do not fit beside its name, so they take a second line. */
+  .patch-editor .layerhead { flex-wrap: wrap; row-gap: var(--space-1); }
   .patch-editor .swrow { height: auto; min-height: var(--row-tall); }
   .patch-editor .flatcard, .patch-editor .ctlhead, .patch-editor .ghostrow { height: auto; min-height: var(--row); }
   .patch-editor .rackrow { min-height: var(--row); }

@@ -371,7 +371,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
       onClick={() => ctl.selectLayer(L.slot)}
     >
       <Picked isOn={selected} edge="side" />
-      <div className="row" style={{ gap: 'var(--space-2)' }}>
+      <div className="row layerhead" style={{ gap: 'var(--space-2)' }}>
         <RowGrip />
         <span
           style={{
