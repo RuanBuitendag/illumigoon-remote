@@ -61,13 +61,12 @@ notes files.
 
 ## Two sets of looks, one set of tokens
 
-There is one token set for colour and type. Every colour and type token the editor uses comes from
-`design-system.css` through `:root`, and `lint:rules` checks that its style sheet writes no raw colour and no raw type.
-The editor names the sizes of its own parts in one `:root` block at the top of its `styles.css`, and its gate fails
-on any other raw length (D85).
+There is one token set. Every colour, type, spacing and size token the editor uses comes from `design-system.css`
+through `:root`. The sizes of the editor's own parts, named `--edit-*` for the part, sit there too, and the editor's
+gate fails on any raw length or any length token defined in its own `styles.css` (D85, D93). `lint:rules` checks
+that its style sheet writes no raw colour and no raw type.
 
-The two still look different, because the editor writes its own geometry by hand: spacing, corners, heights, layers
-and timings, in `styles.css` and in inline styles. Its look is flat: no shadows for depth, faint washes for raised
+The editor's look is flat: no shadows for depth, faint washes for raised
 things, hairlines to divide, small corners, small capital labels, and an underline for the chosen item.
 
 The audit says, row by row, where the app and the editor differ.

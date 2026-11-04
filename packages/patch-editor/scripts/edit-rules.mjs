@@ -7,12 +7,12 @@
 //     not leave a key lit (ST-5).
 //   - raw-edge: a box-shadow edge is `var(--line)` or `var(--line-strong)` wide, never a number (GE-4).
 //   - raw-size: a height, width or flex basis writes no length or number of its own, in the style sheet and in
-//     inline styles. It is a token: the design system's, or one of Edit's own sizes in the `:root` block at the
-//     top of styles.css (GE-10).
+//     inline styles. It is a token from src/design-system/design-system.css, which also holds Edit's own sizes
+//     (GE-10, TO-1).
 //   - raw-offset: inset, top to left, scroll margins and paddings and outline-offset write no length of their
 //     own, in the style sheet and in inline styles (SP-1).
-//   - size-outside-the-tokens: a custom property that holds a length is defined only in that `:root` block, so
-//     a size cannot hide in a one-off variable (GE-10).
+//   - size-outside-the-tokens: styles.css defines no custom property that holds a length, so a size cannot hide
+//     in a one-off variable. Sizes live with the app's tokens (GE-10, TO-1).
 //   - half-step-inline: `--space-half` is the space inside one small thing (D69), which a class in styles.css
 //     draws. An inline style lays out rows, so it never takes the half step (SP-2).
 //   - hover-text: no `title` on an element and no SVG `<title>`. A finger cannot hover, so what a person needs
@@ -50,8 +50,6 @@ const CSS_OFFSET =
   /(?:^|[;{\s])(inset(?:-[a-z-]+)?|top|right|bottom|left|scroll-margin(?:-[a-z-]+)?|scroll-padding(?:-[a-z-]+)?|outline-offset)\s*:\s*([^;}]+)/g;
 const CSS_CUSTOM_LENGTH = /(?:^|[;{\s])(--[\w-]+)\s*:\s*([^;}]+)/g;
 const CSS_CUT_OFF = /text-overflow\s*:\s*ellipsis|line-clamp\s*:/g;
-// The block of Edit's own sizes: the first `:root {` of styles.css.
-const TOKEN_BLOCK = /^:root\s*\{[^}]*\}/m;
 
 const INLINE_STYLE_START = /\bstyle=\{\{/g;
 const INLINE_CHECKS = [
@@ -117,10 +115,8 @@ function checkStyleRules(text) {
 }
 
 function checkStyleGeometry(text) {
-  const block = TOKEN_BLOCK.exec(text);
-  const isInBlock = (index) => block && index >= block.index && index < block.index + block[0].length;
   const checks = [
-    [CSS_SIZE, 'raw-size', 'use a size token: the design system\'s, or one of Edit\'s in the :root block of styles.css'],
+    [CSS_SIZE, 'raw-size', 'use a size token from the design system'],
     [CSS_OFFSET, 'raw-offset', 'use a spacing or line token'],
   ];
   for (const [pattern, rule, help] of checks) {
@@ -129,8 +125,8 @@ function checkStyleGeometry(text) {
     }
   }
   for (const match of text.matchAll(CSS_CUSTOM_LENGTH)) {
-    if (!isInBlock(match.index) && isRawLength(match[2])) {
-      report(STYLES, text, match.index, 'size-outside-the-tokens', `${match[1]}: Edit's sizes live in the :root block at the top`);
+    if (isRawLength(match[2])) {
+      report(STYLES, text, match.index, 'size-outside-the-tokens', `${match[1]}: sizes live in src/design-system/design-system.css`);
     }
   }
 }

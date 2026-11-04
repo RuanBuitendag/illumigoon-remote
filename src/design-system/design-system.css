@@ -152,6 +152,47 @@
   --info: var(--text-3);
   /* Text and marks on an ink fill: the toast, a power key that is on (CO-5). */
   --on-fill: var(--background);
+  /* Edit's own sizes (GE-10, TO-1): parts Edit has and the app does not, named for the part. */
+  --edit-icon-key: 28px;
+  --edit-small-icon-key: 22px;
+  --edit-toggle-width: 17px;
+  --edit-toggle-height: 15px;
+  --edit-polarity-key: 18px;
+  --edit-row-action: 13px;
+  --edit-tile-width: 170px;
+  --edit-tile-height: 70px;
+  --edit-short-strip: 40px;
+  --edit-code-field: 70px;
+  --edit-dot: 5px;
+  --edit-stage-dot: 7px;
+  --edit-stage-label: 150px;
+  --edit-scrollbar: 10px;
+  --edit-section-head: 26px;
+  --edit-section-end: 6px;
+  --edit-side-panel: 348px;
+  --edit-layer-panel: 276px;
+  --edit-mix-column: 35px;
+  --edit-layer-number: 16px;
+  --edit-modulator-editor: 300px;
+  --edit-drives-list: 250px;
+  --edit-slot-key: 26px;
+  --edit-roll-key: 34px;
+  --edit-roll-swatch: 8px;
+  --edit-tweak-dot: 3px;
+  --edit-part-key-width: 24px;
+  --edit-part-key-height: 20px;
+  --edit-shelf-field: 232px;
+  --edit-colour-chip-width: 28px;
+  --edit-colour-chip-height: 14px;
+  --edit-matrix-number: 52px;
+  --edit-matrix-from: 118px;
+  --edit-matrix-arrow: 26px;
+  --edit-matrix-moves: 236px;
+  --edit-matrix-by: 74px;
+  --edit-matrix-range: 120px;
+  --edit-matrix-swing: 54px;
+  --edit-matrix-how: 46px;
+  --edit-matrix-ends: 58px;
 }
 
 @media (prefers-color-scheme: light) {

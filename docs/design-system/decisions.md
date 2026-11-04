@@ -1046,3 +1046,11 @@ Chosen: `UNDO_SECONDS`, 10, exported from the design-system door, is how long an
 store and Edit use it.
 Why: ST-13, AC-14. The time was written in two places.
 Date: 2026-11-04
+
+**D93. Edit's sizes live with the app's tokens**
+
+Chosen: the `--edit-*` sizes move from the `:root` block of Edit's `styles.css` to the first `:root` of
+`src/design-system/design-system.css`, under a comment that names them. Edit's gate now fails on any custom property
+that holds a length in `styles.css`. D85 still holds for how they are named.
+Why: TO-1, LIFE-1948. Tokens lived in two files.
+Date: 2026-11-04
