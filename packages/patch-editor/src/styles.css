@@ -25,13 +25,16 @@
 
 /* Buttons and fields take the app's reset in design-system.css, so the app's keys keep their look in here. */
 
-/* ------------------------------------------------------- elevation recipes */
+/* ------------------------------------------------------- elevation recipes
+
+   Every :hover rule sits in `@media (hover: hover)`, so a tap on a phone does not leave a thing lit
+   (ST-5). Each stays where it was, so the order the rules meet in is the same. */
 
 .patch-editor .raise { border-radius: var(--radius); }
 .patch-editor .raise-hi { background: var(--wash); border-radius: var(--radius); }
 .patch-editor .well { border-bottom: var(--line) solid var(--track); }
 .patch-editor .flatcard { border-radius: var(--radius); }
-.patch-editor .flatcard:hover { background: var(--wash); }
+@media (hover: hover) { .patch-editor .flatcard:hover { background: var(--wash); } }
 
 /* --------------------------------------------------------------- type */
 
@@ -49,8 +52,8 @@
 .patch-editor .mono.accent { color: var(--modulation-soft); }
 .patch-editor .mono.sm { font-size: var(--size-small); }
 
-.patch-editor .hr { height: 1px; background: var(--track); flex-shrink: 0; }
-.patch-editor .vr { width: 1px; background: var(--track); align-self: stretch; flex-shrink: 0; }
+.patch-editor .hr { height: var(--line); background: var(--track); flex-shrink: 0; }
+.patch-editor .vr { width: var(--line); background: var(--track); align-self: stretch; flex-shrink: 0; }
 .patch-editor .grow { flex-grow: 1; }
 .patch-editor .row { display: flex; align-items: center; }
 .patch-editor .col { display: flex; flex-direction: column; }
@@ -66,12 +69,12 @@
  */
 .patch-editor .seg { display: flex; flex-wrap: wrap; gap: var(--space-half) var(--space-4); width: fit-content; background: none; }
 .patch-editor .seg > button { position: relative; padding: var(--space-2) 0; font: var(--type-note); color: var(--text-4); }
-.patch-editor .seg > button:hover { color: var(--text-2); }
+@media (hover: hover) { .patch-editor .seg > button:hover { color: var(--text-2); } }
 .patch-editor .seg.tight { gap: var(--space-half) var(--space-3); }
 .patch-editor .seg.tight > button { font-size: var(--size-small); }
 
 .patch-editor .pill { padding: var(--space-2) 0 !important; font: var(--type-label); letter-spacing: var(--tracking-label); color: var(--text-2); }
-.patch-editor .pill:hover { color: var(--text-1); }
+@media (hover: hover) { .patch-editor .pill:hover { color: var(--text-1); } }
 .patch-editor .pill[data-primary='true'] { color: var(--text-1); }
 .patch-editor .pill:disabled { color: var(--text-5); cursor: default; }
 
@@ -86,7 +89,7 @@
   gap: var(--space-2);
   cursor: pointer;
 }
-.patch-editor .ghostrow:hover { background: var(--wash); }
+@media (hover: hover) { .patch-editor .ghostrow:hover { background: var(--wash); } }
 
 /* ---------------------------------------------------------------- shell */
 
@@ -152,7 +155,7 @@
 .patch-editor .layerstrip { gap: var(--space-2); padding-left: calc(var(--space-3) + 2 * var(--space-2) + var(--space-4)); }
 .patch-editor .layerrow[data-muted='true'] .name { color: var(--text-4); }
 .patch-editor .layerrow[data-dragover='true'],
-.patch-editor .rackrow[data-dragover='true'] { box-shadow: inset 0 2px 0 var(--modulation-soft); }
+.patch-editor .rackrow[data-dragover='true'] { box-shadow: inset 0 var(--line-strong) 0 var(--modulation-soft); }
 /*
  * A layer the hovered slot reaches into.
  *
@@ -161,7 +164,7 @@
  * reading them in one glance means reading them in one place. Accent rather than white, and
  * inset rather than the side `Picked` mark, so a row can carry both at once.
  */
-.patch-editor .layerrow[data-lit='true'] { box-shadow: inset 2px 0 0 var(--modulation); background: var(--modulation-ghost); }
+.patch-editor .layerrow[data-lit='true'] { box-shadow: inset var(--line-strong) 0 0 var(--modulation); background: var(--modulation-ghost); }
 
 /* Copy, duplicate and remove share the line `ord` sits on, and both are 13px tall, so the
    swap moves nothing below it. Shown on the selected row as well as on hover: the selected
@@ -173,8 +176,8 @@
   gap: var(--space-2);
 }
 .patch-editor .rowacts { display: none; }
-.patch-editor .layerrow:hover .rowacts,
 .patch-editor .layerrow.raise-hi .rowacts { display: flex; }
+@media (hover: hover) { .patch-editor .layerrow:hover .rowacts { display: flex; } }
 .patch-editor .rowgrip { width: var(--space-3); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; touch-action: none; }
 .patch-editor [data-lifted='true'] { opacity: var(--opacity-disabled); }
 
@@ -218,9 +221,9 @@
   gap: var(--space-half);
 }
 .patch-editor .modchip .src > i { font-style: normal; opacity: var(--opacity-quiet); }
-.patch-editor .modchip .src:hover { background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .modchip .src:hover { background: var(--wash-strong); } }
 .patch-editor .modchip .drop { font: var(--type-small); color: var(--text-4); padding: var(--space-half) var(--space-1); border-left: var(--line) solid var(--track); }
-.patch-editor .modchip .drop:hover { color: var(--bad); background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .modchip .drop:hover { color: var(--bad); background: var(--wash-strong); } }
 
 /* A modulator's destination list: what this source drives, and how hard. */
 .patch-editor .destrow {
@@ -232,7 +235,7 @@
   background: var(--wash);
   border-radius: var(--radius);
 }
-.patch-editor .destrow:hover { background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .destrow:hover { background: var(--wash-strong); } }
 .patch-editor .destrow .dst {
   font: var(--type-small);
   color: var(--text-3);
@@ -243,13 +246,13 @@
 }
 .patch-editor .poltog {
   width: 18px;
-  height: 16px;
+  height: var(--space-4);
   border-radius: var(--radius);
   font: var(--type-value);
   color: var(--modulation-soft);
   background: var(--modulation-ghost);
 }
-.patch-editor .poltog:hover { background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .poltog:hover { background: var(--wash-strong); } }
 
 /* ------------------------------------------------------------ mod dock */
 
@@ -314,7 +317,7 @@
   outline-offset: calc(-1 * var(--line));
 }
 .patch-editor .modslot .mname { font: var(--type-note); flex-grow: 1; }
-.patch-editor .modslot .meter { height: 4px; }
+.patch-editor .modslot .meter { height: var(--space-1); }
 /*
  * No transition on the width. `LiveMeter` writes it every frame, so a 60ms ease can never
  * arrive — it re-targets every 16ms, which damps the bar and lags it rather than smoothing
@@ -324,7 +327,7 @@
  */
 .patch-editor .modslot .meter > i {
   display: block;
-  height: 2px;
+  height: var(--line-strong);
   margin: var(--line) 0;
   background: var(--modulation);
 }
@@ -349,7 +352,7 @@
 /* Closes a rack of dial-carrying macro tiles, so it stands as tall as they do — by
    stretching with them rather than by naming the same number twice. */
 .patch-editor .emptyslot[data-played] { height: auto; min-height: var(--rack-tile-dial); }
-.patch-editor .emptyslot:hover { background: var(--wash); }
+@media (hover: hover) { .patch-editor .emptyslot:hover { background: var(--wash); } }
 
 /*
  * The trigger wire's drop target.
@@ -444,7 +447,7 @@
 
 .patch-editor .mrow { display: flex; align-items: center; height: var(--row); padding: 0 var(--space-5); border-radius: var(--radius); flex-shrink: 0; }
 .patch-editor .mrow[data-odd='true'] { background: var(--wash); }
-.patch-editor .mrow:hover { background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .mrow:hover { background: var(--wash-strong); } }
 .patch-editor .mrow .dst { font: var(--type-value); }
 .patch-editor .warnline { font: var(--type-small-sans); color: var(--warn); }
 .patch-editor .warn     { color: var(--warn); }
@@ -454,10 +457,10 @@
 
 /* -------------------------------------------------------------- budget */
 
-.patch-editor .budget { position: relative; height: 12px; }
-.patch-editor .budget .groove { position: absolute; left: 0; top: 4px; height: 4px; }
-.patch-editor .budget .fill { position: absolute; left: 1px; top: 5px; height: 2px; border-radius: var(--radius); }
-.patch-editor .budget .tick { position: absolute; top: 0; width: 1px; height: 12px; background: var(--track); }
+.patch-editor .budget { position: relative; height: var(--space-3); }
+.patch-editor .budget .groove { position: absolute; left: 0; top: 4px; height: var(--space-1); }
+.patch-editor .budget .fill { position: absolute; left: 1px; top: 5px; height: var(--line-strong); border-radius: var(--radius); }
+.patch-editor .budget .tick { position: absolute; top: 0; width: var(--line); height: var(--space-3); background: var(--track); }
 
 /* --------------------------------------------------------------- house
 
@@ -480,14 +483,9 @@
 }
 .patch-editor .tilenote.warn { color: var(--warn); }
 .patch-editor .iconbtn.sm { width: 22px; height: 22px; }
-.patch-editor .iconbtn:hover { background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .iconbtn:hover { background: var(--wash-strong); } }
 .patch-editor .iconbtn:disabled { opacity: var(--opacity-behind); cursor: default; background: none; }
 
-.patch-editor .check { width: 13px; height: 13px; border-radius: var(--radius); flex-shrink: 0; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 0 0 1px var(--text-5); }
-.patch-editor .check[data-state='all'] { background: var(--text-1); box-shadow: none; }
-.patch-editor .check[data-state='some'] { box-shadow: inset 0 0 0 1px var(--text-3); }
-.patch-editor .check[data-state='some']::after { content: ''; width: 7px; height: 1.5px; background: var(--text-3); }
-.patch-editor .check[data-state='dead'] { box-shadow: inset 0 0 0 1px var(--track); }
 
 /* The Save sheet. */
 .patch-editor .railsave { display: flex; flex-direction: column; gap: var(--space-3); padding: var(--space-3) 0; flex-shrink: 0; }
@@ -520,7 +518,7 @@
   pointer-events: none;
 }
 .patch-editor .scopecap b { font-weight: var(--weight-medium); color: var(--text-3); }
-.patch-editor .scopecap .dash { display: inline-block; width: 12px; height: 0; border-top: var(--line) dashed currentColor; }
+.patch-editor .scopecap .dash { display: inline-block; width: var(--space-3); height: 0; border-top: var(--line) dashed currentColor; }
 .patch-editor .scopecap .dash.warn { color: var(--warn); }
 .patch-editor .scopecap .dash.accent { color: var(--modulation-soft); }
 
@@ -529,7 +527,7 @@
 .patch-editor ::-webkit-scrollbar { width: 10px; height: 10px; }
 .patch-editor ::-webkit-scrollbar-track { background: transparent; }
 .patch-editor ::-webkit-scrollbar-thumb { background: var(--track); border: var(--space-half) solid transparent; background-clip: content-box; }
-.patch-editor ::-webkit-scrollbar-thumb:hover { background: var(--text-5); background-clip: content-box; }
+@media (hover: hover) { .patch-editor ::-webkit-scrollbar-thumb:hover { background: var(--text-5); background-clip: content-box; } }
 
 /* ------------------------------------------------------------- library */
 
@@ -577,7 +575,7 @@
   display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2);
   padding: 0 !important; text-align: left; color: var(--text-2);
 }
-.patch-editor .paltile:hover:not(:disabled) { color: var(--text-1); }
+@media (hover: hover) { .patch-editor .paltile:hover:not(:disabled) { color: var(--text-1); } }
 .patch-editor .paltile:disabled { cursor: default; color: var(--text-4); }
 .patch-editor .palstrip {
   display: block; height: var(--row); border-radius: var(--radius); background: var(--track);
@@ -629,10 +627,10 @@
    mine". */
 .patch-editor .tabs { display: flex; align-items: flex-end; }
 .patch-editor .tabs > button { position: relative; padding: var(--space-2) 0 var(--space-3); margin-right: var(--space-4); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-4); }
-.patch-editor .tabs > button:hover { color: var(--text-3); }
+@media (hover: hover) { .patch-editor .tabs > button:hover { color: var(--text-3); } }
 /* The selected tab's line lands on the rule under the row. */
 .patch-editor .tabs { --mark-gap: var(--space-3); }
-.patch-editor .tabs > .tabrule { flex-grow: 1; height: 1px; background: var(--track); }
+.patch-editor .tabs > .tabrule { flex-grow: 1; height: var(--line); background: var(--track); }
 
 /* A layer's blend, as a chip on its row. A native select, so the menu is the platform's and
    there is no popover to build; styled down to the chip the mockup drew. */
@@ -653,7 +651,7 @@
   background: var(--wash-strong);
   cursor: pointer;
 }
-.patch-editor .blendchip:hover { color: var(--text-2); background: var(--wash-strong); }
+@media (hover: hover) { .patch-editor .blendchip:hover { color: var(--text-2); background: var(--wash-strong); } }
 .patch-editor .layerrow.raise-hi .blendchip { color: var(--text-1); background: var(--wash-strong); }
 .patch-editor .blendchip option { background: var(--background); color: var(--text-1); text-transform: none; letter-spacing: 0; }
 
@@ -680,11 +678,11 @@
   gap: var(--space-3);
   padding: var(--space-3);
   border-radius: var(--radius);
-  box-shadow: inset 0 0 0 1px var(--track);
+  box-shadow: inset 0 0 0 var(--line) var(--track);
 }
-.patch-editor .stagerow[class*='on'] { background: var(--wash-strong); box-shadow: inset 0 0 0 1px var(--track); }
+.patch-editor .stagerow[class*='on'] { background: var(--wash-strong); box-shadow: inset 0 0 0 var(--line) var(--track); }
 .patch-editor .stagerow:not(:first-child) { cursor: pointer; }
-.patch-editor .stagerow:not(:first-child):hover { background: var(--wash); }
+@media (hover: hover) { .patch-editor .stagerow:not(:first-child):hover { background: var(--wash); } }
 .patch-editor .stagelab { width: 150px; flex-shrink: 0; display: flex; align-items: center; gap: var(--space-2); }
 .patch-editor .stagedot { width: 7px; height: 7px; flex-shrink: 0; background: var(--text-2); }
 .patch-editor .stagedot[data-kind='source'] { background: var(--text-5); }
@@ -698,9 +696,9 @@
 /* A colour effect: the third job in the rack. It changes the light's colour and moves nothing,
    so its strip repeats the one above -- the dot is what says it did something. A ring in the
    palette's own colours, so it reads as acting on colour rather than as another Colour row. */
-.patch-editor .stagedot[data-kind='recolour'] { background: none; box-shadow: inset 0 0 0 2px var(--text-2); }
+.patch-editor .stagedot[data-kind='recolour'] { background: none; box-shadow: inset 0 0 0 var(--line-strong) var(--text-2); }
 .patch-editor .stagerow.editor-mark { cursor: default; padding-block: var(--space-2); }
-.patch-editor .stagerow.editor-mark:hover { background: none; }
+@media (hover: hover) { .patch-editor .stagerow.editor-mark:hover { background: none; } }
 .patch-editor .stagename {
   flex-grow: 1;
   font: var(--type-note);
@@ -743,7 +741,7 @@
   font: var(--type-note);
   color: var(--text-3);
 }
-.patch-editor .surfacemenu > button:hover:not(:disabled) { background: var(--modulation-ghost); color: var(--text-1); }
+@media (hover: hover) { .patch-editor .surfacemenu > button:hover:not(:disabled) { background: var(--modulation-ghost); color: var(--text-1); } }
 .patch-editor .surfacemenu > button:disabled { color: var(--text-5); cursor: default; }
 .patch-editor .surfacemenu .menunote { padding: var(--space-2) var(--space-3); font: var(--type-small-sans); color: var(--text-4); }
 .patch-editor .surfacepop {
@@ -751,7 +749,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  max-height: calc(100vh - 16px);
+  max-height: calc(100vh - var(--space-4));
   overflow-y: auto;
 }
 .patch-editor .popfield { display: flex; flex-direction: column; gap: var(--space-2); }
@@ -767,18 +765,18 @@
 }
 .patch-editor .popin:disabled { color: var(--text-5); }
 .patch-editor select.popin { appearance: none; -webkit-appearance: none; cursor: pointer; }
-.patch-editor .rangebar { position: relative; height: 12px; }
+.patch-editor .rangebar { position: relative; height: var(--space-3); }
 .patch-editor .rangebar > i {
   position: absolute; top: 3px; bottom: 3px; border-radius: var(--radius);
   background: var(--modulation-dim); box-shadow: 0 0 6px var(--modulation-ghost);
 }
-.patch-editor .rangebar > b { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: calc(-1 * var(--line)); background: var(--text-1); }
+.patch-editor .rangebar > b { position: absolute; top: 0; bottom: 0; width: var(--line-strong); margin-left: calc(-1 * var(--line)); background: var(--text-1); }
 
 .patch-editor .ctlsection { display: flex; flex-direction: column; gap: var(--space-1); }
 .patch-editor .ctlhead { gap: var(--space-2); height: 26px; padding: 0 var(--space-1); border-radius: var(--radius); }
 .patch-editor .ctlhead[draggable='true'] { cursor: grab; }
 .patch-editor .ctlhead[data-dragover='true'], .patch-editor .ctlrow[data-dragover='true'], .patch-editor .ctlend[data-dragover='true'] {
-  box-shadow: inset 0 2px 0 var(--modulation-soft);
+  box-shadow: inset 0 var(--line-strong) 0 var(--modulation-soft);
 }
 .patch-editor .ctlheadname { font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; color: var(--text-3); }
 .patch-editor .ctlrow { gap: var(--space-2); padding: var(--space-2) var(--space-3); min-height: var(--row); cursor: pointer; }
@@ -848,7 +846,7 @@
   .patch-editor .flatcard, .patch-editor .ctlhead, .patch-editor .ghostrow { height: auto; min-height: var(--row); }
   .patch-editor .rackrow { min-height: var(--row); }
   .patch-editor .rowgrip { min-width: var(--row); min-height: var(--row); margin: calc(-1 * var(--space-1)) calc(-1 * var(--space-2)); }
-  .patch-editor .ctlend { height: 16px; }
+  .patch-editor .ctlend { height: var(--space-4); }
   /* A fader is drawn 14 px tall but takes a thumb's 44 px, so a tap on its track lands. */
   .patch-editor .fader { margin: calc(-1 * var(--space-4)) 0; }
   .patch-editor .fader-control { height: var(--row); }

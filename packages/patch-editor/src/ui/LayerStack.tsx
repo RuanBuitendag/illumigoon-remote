@@ -314,7 +314,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
               borderRadius: 'var(--radius)',
               flexShrink: 0,
               background: `linear-gradient(90deg, ${gradientOf(ctl.masterPalette)})`,
-              boxShadow: 'inset 0 0 0 1px var(--track)',
+              boxShadow: 'inset 0 0 0 var(--line) var(--track)',
             }}
           />
         )}

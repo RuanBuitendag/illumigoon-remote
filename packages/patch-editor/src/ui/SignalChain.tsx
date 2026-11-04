@@ -565,7 +565,7 @@ function ColourRow({ sel, title, lead, gradient, row, children }: {
           borderRadius: 'var(--radius)',
           flexShrink: 0,
           background: `linear-gradient(90deg, ${gradient})`,
-          boxShadow: 'inset 0 0 0 1px var(--track)',
+          boxShadow: 'inset 0 0 0 var(--line) var(--track)',
         }}
       />
       <span
