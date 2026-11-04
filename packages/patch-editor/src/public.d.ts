@@ -32,3 +32,6 @@ export function PatchEditor(props: {
   onLeave(look: EditedLook | null, isSaved: boolean): void;
   onClose(): void;
 }): ReactNode;
+
+/** Edit's controls in their states, with made-up props, for the app's component page (D68). */
+export const EDIT_SPECIMENS: { name: string; states: Record<string, ReactNode> }[];

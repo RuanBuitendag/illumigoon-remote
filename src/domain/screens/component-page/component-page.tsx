@@ -1,3 +1,4 @@
+import { EDIT_SPECIMENS } from '@illumigoon/patch-editor';
 import { ComponentEntry, ComponentPageLayout, ComponentState } from '../../../composites';
 import { CONTROLS } from './control-specimens';
 import { LOOK_AND_ROOM_PARTS } from './look-specimens';
@@ -6,12 +7,15 @@ import { SCREENS } from './screen-specimens';
 import type { Specimen } from './specimen';
 
 const INTRO =
-  'Every export of the two doors, in each of its states, with made-up props. Nothing here talks to a light. ' +
+  'Every export of the two doors and of Edit, in each of its states, with made-up props. ' +
+  'Nothing here talks to a light. ' +
   'The app has no hover look. Tab to any control to see the one focus ring, and hold a key that holds.';
 
 const DOORS = [
   { door: 'src/design-system', specimens: PRIMITIVES },
   { door: 'src/composites', specimens: [...CONTROLS, ...LOOK_AND_ROOM_PARTS, ...SCREENS] },
+  // Edit's own controls, drawn by the editor package in its own styles (ST-1).
+  { door: 'packages/patch-editor', specimens: EDIT_SPECIMENS },
 ];
 
 function Entry({ door, specimen }: { door: string; specimen: Specimen }) {

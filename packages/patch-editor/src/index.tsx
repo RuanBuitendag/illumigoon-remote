@@ -6,6 +6,7 @@ import { setSourceId } from './device/source';
 import { setHostDialogs, setHostFetch, type HostDialogs, type HostFetch } from './host';
 
 export type { EditedLook, EditorSection, HostDialogs, HostFetch, OpenLight };
+export { EDIT_SPECIMENS } from './ui/specimens';
 
 type PatchEditorProps = EditorPageProps & {
   /** Answers the `/api` paths where the page has no server, as on the phone. */
