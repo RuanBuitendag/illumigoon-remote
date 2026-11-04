@@ -303,8 +303,35 @@ export function RackToggle({ shut, onToggle, children }: {
 }
 
 /** The grip of a row in an ordered list. A finger presses this, so a list scrolls by the rest. */
-export function RowGrip() {
-  return <span {...useRowDrag()}><Icon.Grip /></span>;
+const MOVE_KEYS: Record<string, number> = { ArrowUp: -1, ArrowDown: 1 };
+
+/** Where an arrow key moves a row: one up, one down, or nowhere for any other key. */
+const rowMoveOf = (key: string) => MOVE_KEYS[key] ?? 0;
+
+/**
+ * A row's grip. Given `move`, it is also a key, so a row moves by keyboard as well as by drag
+ * (NA-17): the up and down arrows move it one place.
+ */
+export function RowGrip({ move }: { move?: { label: string; onMove(delta: number): void } }) {
+  const drag = useRowDrag();
+  if (!move) return <span {...drag}><Icon.Grip /></span>;
+  return (
+    <Key
+      {...drag}
+      aria-label={move.label}
+      title={`${move.label}: drag it, or press the up and down arrows`}
+      aria-keyshortcuts="ArrowUp ArrowDown"
+      onKeyDown={e => {
+        const delta = rowMoveOf(e.key);
+        if (!delta) return;
+        e.preventDefault();
+        e.stopPropagation();
+        move.onMove(delta);
+      }}
+    >
+      <Icon.Grip />
+    </Key>
+  );
 }
 
 

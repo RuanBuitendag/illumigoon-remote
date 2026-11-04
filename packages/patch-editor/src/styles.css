@@ -809,6 +809,7 @@
   .patch-editor .rowacts > button { min-width: var(--space-3); display: inline-flex; justify-content: center; }
   /* axe measures the box, not the ::before, and the two keys of a chip sit side by side. */
   .patch-editor .modchip :is(.src, .drop) { padding-inline: var(--space-2); min-width: var(--pointer-target); min-height: var(--pointer-target); display: inline-flex; align-items: center; justify-content: center; }
+  .patch-editor button.rowgrip { min-width: var(--pointer-target); min-height: var(--pointer-target); margin-inline: calc(-1 * var(--space-1)); }
   .patch-editor :where(select, input:not([type='color'])) { min-height: var(--pointer-target); }
   .patch-editor .swatch { width: var(--pointer-target); height: var(--pointer-target); }
 }

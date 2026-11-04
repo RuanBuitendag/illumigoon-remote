@@ -148,18 +148,23 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
   const acts = useLayerActions(ctl, ordered);
 
   /** Dragging only rewrites `order` — the slot is the identity and never moves. */
+  /** The layer at @p from goes to place @p to in the stack. */
+  const place = (from: number, to: number) => {
+    if (from < 0 || to < 0 || to >= ordered.length || from === to) return;
+    const seq = ordered.map(l => l.slot);
+    const [moved] = seq.splice(from, 1);
+    if (moved === undefined) return;
+    seq.splice(to, 0, moved);
+    // Draw position applies live and touches no slot number, so nothing rewires.
+    seq.forEach((slot, i) => ctl.setStructural(`L${slot}.order`, i,
+      d => { const L = d.layers.find(x => x.slot === slot); if (L) L.order = i; }));
+  };
   const drop = (toIndex: number) => {
     if (dragFrom === null) return;
     const from = ordered.findIndex(l => l.slot === dragFrom);
     setDragFrom(null); setOver(null);
     if (from < 0 || from === toIndex) return;
-    const seq = ordered.map(l => l.slot);
-    const [moved] = seq.splice(from, 1);
-    if (moved === undefined) return;
-    seq.splice(toIndex > from ? toIndex - 1 : toIndex, 0, moved);
-    // Draw position applies live and touches no slot number, so nothing rewires.
-    seq.forEach((slot, i) => ctl.setStructural(`L${slot}.order`, i,
-      d => { const L = d.layers.find(x => x.slot === slot); if (L) L.order = i; }));
+    place(from, toIndex > from ? toIndex - 1 : toIndex);
   };
 
   return (
@@ -206,6 +211,7 @@ export function LayerPanel({ ctl, onFragments }: { ctl: Ctl; onFragments(): void
               setOver(null);
             }}
             onDropHere={() => drop(i)}
+            onMove={delta => place(i, i + delta)}
           />
         ))}
 
@@ -338,7 +344,7 @@ function MasterRow({ ctl }: { ctl: Ctl }) {
   );
 }
 
-function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHere }: {
+function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHere, onMove }: {
   ctl: Ctl;
   L: Layer;
   acts: ReturnType<typeof useLayerActions>;
@@ -348,6 +354,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
   onOver(): void;
   onRelease(): void;
   onDropHere(): void;
+  onMove(delta: number): void;
 }) {
   const selected = ctl.scope === 'layer' && ctl.sel === L.slot;
   return (
@@ -372,7 +379,7 @@ function LayerRow({ ctl, L, acts, over, lit, onGrab, onOver, onRelease, onDropHe
     >
       <Picked isOn={selected} edge="side" />
       <div className="row layerhead" style={{ gap: 'var(--space-2)' }}>
-        <RowGrip />
+        <RowGrip move={{ label: `Move ${layerName(L.slot)}`, onMove }} />
         <span
           style={{
             width: 16,
