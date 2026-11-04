@@ -1,7 +1,7 @@
 // Every control a thumb can tap is at least 44 by 44 px, on the phone and on the laptop (LIFE-1953), and on the
 // smallest phone no screen scrolls sideways (LA-7).
 // The made-up demo house has schedules, a lock and three rooms, so every page and sheet of the app shows.
-// Edit belongs to the editor package and has its own checks, so this leaves it out.
+// Edit opens only on a light, so its own checks, in edit-checks.mjs, run with the made-up Lounge lights.
 import { expect, onTop, press } from './steps.mjs';
 
 const SMALLEST_PX = 44;
@@ -10,8 +10,8 @@ const SHOWN_IN_REPORT = 12;
 
 // Runs in the page. A control's hit area is its box, or the box of a positioned ::before or ::after that
 // widens it, as `.power-key` and `.link-key` do. A clipped field, such as the one in a fader, is tapped
-// through the thumb that holds it.
-function smallControls({ smallest }) {
+// through the thumb that holds it. Given a `scope`, only the controls inside it count.
+export function smallControls({ smallest, scope }) {
   const CONTROLS = 'button, a, input, [role=button], [role=switch], [role=slider]';
   const pseudoSize = (element, which) => {
     const style = getComputedStyle(element, which);
@@ -31,7 +31,7 @@ function smallControls({ smallest }) {
   const isShown = (element) => {
     const { width, height } = element.getBoundingClientRect();
     if (width <= 1 || height <= 1) return false;
-    if (element.closest('[inert], [aria-hidden="true"], .edit-layout')) return false;
+    if (element.closest(scope ? '[inert], [aria-hidden="true"]' : '[inert], [aria-hidden="true"], .edit-layout')) return false;
     return getComputedStyle(element).visibility !== 'hidden';
   };
   const nameOf = (element) =>
@@ -39,7 +39,7 @@ function smallControls({ smallest }) {
       .replace(/\s+/g, ' ')
       .trim()
       .slice(0, 40);
-  return [...document.querySelectorAll(CONTROLS)]
+  return [...document.querySelectorAll(scope ? `${scope} :is(${CONTROLS})` : CONTROLS)]
     .filter(isShown)
     .map((element) => ({ name: nameOf(element), ...hitArea(element) }))
     .filter(({ width, height }) => width < smallest - 0.5 || height < smallest - 0.5)

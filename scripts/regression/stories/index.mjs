@@ -6,5 +6,6 @@ import { otherContexts } from './other-contexts.mjs';
 import { tapTargets } from './tap-targets.mjs';
 import { keyboardRoutes } from './keyboard-routes.mjs';
 import { componentPage } from './component-page.mjs';
+import { editChecks } from './edit-checks.mjs';
 
-export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...keyboardRoutes, ...componentPage];
+export const stories = [...eveningUser, ...lookMaker, ...cornerOwner, ...otherContexts, ...tapTargets, ...editChecks, ...keyboardRoutes, ...componentPage];
