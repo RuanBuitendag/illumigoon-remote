@@ -119,6 +119,12 @@
   --duration-settle: 240ms;
   --duration-push: 550ms;
   --duration-glow: 900ms;
+  /* Things that appear and leave (MO-2): a sheet, a dialog, a toast. Entering slows into place; leaving speeds
+     away and is quicker, so the screen under it is back at once. */
+  --ease-enter: cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --duration-enter: 200ms;
+  --duration-exit: 140ms;
   --opacity-disabled: 0.4;
   --opacity-behind: 0.3;
   /* A mark a step under the word it qualifies: a unit beside its value, a sign beside its source. */
@@ -226,14 +232,24 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   input, textarea, select { font-size: var(--size-field); }
 }
 
+/* Appearing and leaving (MO-2): rise a step and fade in, sink a step and fade out. */
+@keyframes rise-in { from { opacity: 0; transform: translateY(var(--space-2)); } }
+@keyframes sink-out { to { opacity: 0; transform: translateY(var(--space-2)); } }
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+.presence { display: contents; }
+
 /* Reduced motion (D36). Colour and opacity still fade; nothing slides, grows or springs. The LED
-   strips are content and keep drawing. */
+   strips are content and keep drawing. What appears or leaves only fades. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     transition-property: opacity, visibility, color, background-color, border-color, box-shadow, filter !important;
     scroll-behavior: auto !important;
   }
   button[data-held='true'] { transform: none; }
+  .dialog { animation-name: fade-in; }
+  .dialog[data-ending-style] { animation-name: fade-out; }
 }
 
 /* Marks */
@@ -320,8 +336,10 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 .dialog-place { display: contents; }
 .dialog-frame { position: fixed; inset: 0; z-index: var(--layer-cover); display: flex; align-items: center; justify-content: center; }
-.dialog-scrim { position: absolute; inset: 0; background: var(--scrim); }
-.dialog { position: relative; display: flex; flex-direction: column; width: var(--dialog-width); max-width: 100%; max-height: 84vh; overflow: hidden; background: var(--background); border: var(--line) solid var(--track); border-radius: var(--radius); box-shadow: var(--float-shadow); outline: 0; }
+.dialog-scrim { position: absolute; inset: 0; background: var(--scrim); animation: fade-in var(--duration-enter) var(--ease-enter); }
+.dialog-scrim[data-ending-style] { animation: fade-out var(--duration-exit) var(--ease-exit) forwards; }
+.dialog { position: relative; display: flex; flex-direction: column; width: var(--dialog-width); max-width: 100%; max-height: 84vh; overflow: hidden; background: var(--background); border: var(--line) solid var(--track); border-radius: var(--radius); box-shadow: var(--float-shadow); outline: 0; animation: rise-in var(--duration-enter) var(--ease-enter); }
+.dialog[data-ending-style] { animation: sink-out var(--duration-exit) var(--ease-exit) forwards; }
 .dialog[data-wide='true'] { width: var(--dialog-wide); }
 
 @media (max-width: 899px) {

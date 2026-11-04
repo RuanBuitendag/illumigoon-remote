@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Dialog, Eyebrow, Icon, Press } from '../design-system';
+import { Dialog, Eyebrow, Icon, Press, useCloseDialog } from '../design-system';
 
 type SheetProps = {
   // Names the sheet in its head, and to a screen reader.
@@ -16,6 +16,16 @@ type SheetProps = {
   onClose: () => void;
 };
 
+// The cross leaves with the sheet's motion, and the sheet's `onClose` follows.
+function SheetClose() {
+  const close = useCloseDialog();
+  return (
+    <Press className="sheet-close" label="Close" onClick={close}>
+      <Icon.X c="currentColor" />
+    </Press>
+  );
+}
+
 // The one sheet, in the app and in Edit: a head with the name and the way out, over what the sheet holds.
 export function Sheet({ label, icon, detail, actions, isWide, children, onClose }: SheetProps) {
   return (
@@ -27,11 +37,7 @@ export function Sheet({ label, icon, detail, actions, isWide, children, onClose 
         </div>
         <div className="sheet-keys">
           {detail}
-          {actions ?? (
-            <Press className="sheet-close" label="Close" onClick={onClose}>
-              <Icon.X c="currentColor" />
-            </Press>
-          )}
+          {actions ?? <SheetClose />}
         </div>
       </div>
       {children}

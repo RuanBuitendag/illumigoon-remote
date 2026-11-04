@@ -26,7 +26,8 @@ import {
   Toast,
   WhichLights,
 } from '../../../composites';
-import { Icon, LedStrip, PowerKey, TextKey } from '../../../design-system';
+import { useState } from 'react';
+import { Icon, LedStrip, PowerKey, Presence, TextKey } from '../../../design-system';
 import { LONG_NAME, nothing, OnDemand, RECORDING, type Specimen } from './specimen';
 
 const strip = <LedStrip recording={RECORDING} shape="room" onFirstView={nothing} />;
@@ -157,7 +158,19 @@ const PAGES: Specimen[] = [
       'long text': <ComponentFrame size="line"><Toast text={LONG_NAME}>{undo}</Toast></ComponentFrame>,
     },
   },
+  { name: 'Presence', states: { 'a toast that leaves': <LeavingToast /> } },
 ];
+
+// A toast inside Presence: HIDE lets it leave with its motion, SHOW brings it back.
+function LeavingToast() {
+  const [isShown, setIsShown] = useState(true);
+  return (
+    <ComponentFrame size="line">
+      <TextKey onClick={() => setIsShown(!isShown)}>{isShown ? 'HIDE' : 'SHOW'}</TextKey>
+      <Presence>{isShown && <Toast text="Saved." />}</Presence>
+    </ComponentFrame>
+  );
+}
 
 const SHEETS: Specimen[] = [
   {
