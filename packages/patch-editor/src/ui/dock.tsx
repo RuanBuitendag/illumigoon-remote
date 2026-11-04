@@ -1,6 +1,6 @@
 /** The modulator bar along the bottom, and the matrix as a list. */
 
-import { useEffect, useRef, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
+import { useEffect, type KeyboardEvent, type PointerEvent, type ReactNode } from 'react';
 import { Icon } from '../../../../src/design-system';
 import { useLatest } from './useLatest';
 import {
@@ -17,7 +17,7 @@ import {
 import {
   Lab, Mono, ModIcon, RackToggle, slotNumber,
   } from './bits';
-import { onFrame, sample } from './live';
+import { ModScope } from './ModScope';
 import { useCollapsed } from './collapsed';
 import { Param } from './Param';
 import type { Ctl } from './ctl';
@@ -29,43 +29,6 @@ import { Key } from './controls';
 export const M = ({ children }: { children: ReactNode }) => (
   <span style={{ fontFamily: 'var(--mono)', color: 'var(--text-4)' }}>{children}</span>
 );
-
-/**
- * The level bar on a slot. Written by the shared animation loop rather than by React —
- * sixty renders a second of the whole editor to move one bar is what made this stutter.
- */
-function LiveMeter({ mod }: { mod: Modulator }) {
-  const bar = useRef<HTMLElement | null>(null);
-  const held = useLatest(mod);
-
-  /**
-   * Whether there is anything here to watch.
-   *
-   * An audio band, a threshold and an envelope report nothing at all — `sample` says so
-   * rather than guessing — and a bypassed slot reports nothing either. Subscribing anyway
-   * had those slots writing the same `0%` sixty times a second for as long as the editor
-   * was open, and a patch built on audio is mostly those. `Knob` makes the same check
-   * before it subscribes.
-   */
-  const live = sample(mod, 0) !== undefined;
-
-  useEffect(() => {
-    if (!live) {
-      const el = bar.current;
-      if (el) { el.style.width = '0%'; el.style.opacity = 'var(--opacity-behind)'; }
-      return;
-    }
-    return onFrame(t => {
-      const el = bar.current;
-      if (!el) return;
-      const v = sample(held.current, t);
-      el.style.width = v === undefined ? '0%' : `calc(${(v * 100).toFixed(1)}% - 2px)`;
-      el.style.opacity = v === undefined ? 'var(--opacity-behind)' : '1';
-    });
-  }, [live, held]);
-
-  return <div className="meter well"><i ref={el => { bar.current = el; }} /></div>;
-}
 
 const lfoDetail = (m: Modulator) => {
   const p = m.params;
@@ -263,7 +226,7 @@ function TileBody({ ctl, m, played, dead }: {
   if (played) return <MacroDial ctl={ctl} m={m} />;
   return (
     <div className="col" style={{ gap: 'var(--space-2)' }}>
-      <LiveMeter mod={m} />
+      <ModScope mod={m} />
       <span className="detail">{dead ?? detailOf(m)}</span>
     </div>
   );

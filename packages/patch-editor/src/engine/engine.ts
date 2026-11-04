@@ -9,6 +9,8 @@
  *     const uint8_t* eng_frame(int pixels)
  *     uint32_t       eng_catalog_hash(void)
  *     int            eng_uses_audio(void)
+ *     float          eng_mod_value(int slot, int out)
+ *     uint32_t       eng_mod_fires(int slot, int out)
  *
  * What the editor does with it -- the tap, the seed, the clock -- is `preview.ts`.
  *
@@ -35,6 +37,9 @@ export interface EngineModule {
   _eng_uses_audio(): number;
   /** Absent from an engine built before the house screen's recordings had a stand-in beat. */
   _eng_demo_audio?(on: number): void;
+  /** Absent from an engine built before the modulator visuals (LIFE-1961). */
+  _eng_mod_value?(slot: number, out: number): number;
+  _eng_mod_fires?(slot: number, out: number): number;
 }
 
 type Factory = (overrides?: object) => Promise<EngineModule>;
@@ -118,4 +123,16 @@ export class Engine {
    * A no-op on an engine built without it.
    */
   demoAudio(on: boolean) { this.m._eng_demo_audio?.(on ? 1 : 0); }
+
+  /**
+   * What the modulator in `slot` put out after the last tick (`eng_mod_value`), or undefined for
+   * an empty or bypassed slot, or an engine built without the call.
+   */
+  modValue(slot: number, out = 0): number | undefined {
+    const v = this.m._eng_mod_value?.(slot, out);
+    return v === undefined || Number.isNaN(v) ? undefined : v;
+  }
+
+  /** How many ticks the slot fired on since its node was built (`eng_mod_fires`), unsigned. */
+  modFires(slot: number, out = 0): number { return (this.m._eng_mod_fires?.(slot, out) ?? 0) >>> 0; }
 }

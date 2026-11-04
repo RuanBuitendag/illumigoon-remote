@@ -280,7 +280,8 @@
 .patch-editor .modslot {
   width: var(--edit-tile-width);
   height: var(--edit-tile-height);
-  padding: var(--space-3);
+  /* Less above and below than at the sides, so the scope fits in the tile's height (LIFE-1961). */
+  padding: var(--space-2) var(--space-3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -325,21 +326,9 @@
   outline-offset: calc(-1 * var(--line));
 }
 .patch-editor .modslot .mname { font: var(--type-note); flex-grow: 1; }
-.patch-editor .modslot .meter { height: var(--space-1); }
-/*
- * No transition on the width. `LiveMeter` writes it every frame, so a 60ms ease can never
- * arrive — it re-targets every 16ms, which damps the bar and lags it rather than smoothing
- * anything, and asks for an interpolated layout of a glowing element on every frame in
- * between. It made sense when the bar was driven by React and moved in jumps; the shared
- * loop is what replaced that.
- */
-.patch-editor .modslot .meter > i {
-  display: block;
-  height: var(--line-strong);
-  margin: var(--line) 0;
-  background: var(--modulation);
-}
-.patch-editor .modslot[data-dead='true'] .meter > i { background: var(--text-5); box-shadow: none; }
+/* The scope on a tile (LIFE-1961): the slot's output over the last seconds, drawn by `ModScope`
+   on a canvas, so its height is the only thing set here. */
+.patch-editor .modslot .modscope { display: block; width: 100%; height: var(--space-3); }
 .patch-editor .modslot .detail { font: var(--type-small); color: var(--text-4); }
 
 /* `.macroplate` was here — the dial-and-plate tile the macro rack used to draw. Both racks

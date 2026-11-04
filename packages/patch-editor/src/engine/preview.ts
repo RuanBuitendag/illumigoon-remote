@@ -140,6 +140,16 @@ export function seedPreview(patch: Patch) {
   feedPreview(frame);
 }
 
+/**
+ * What the preview's modulator in `slot` is doing: its output after the last tick, and how many
+ * ticks it has fired on. Null while there is no engine to ask. Read by the rack's scopes, so the
+ * picture on a tile is what the engine computed, not a second copy of it (LIFE-1961).
+ */
+export function readModulator(slot: number): { value: number | undefined; fires: number } | null {
+  if (!engine) return null;
+  return { value: engine.modValue(slot), fires: engine.modFires(slot) };
+}
+
 let last: number | null = null;
 let owed = 0;
 
