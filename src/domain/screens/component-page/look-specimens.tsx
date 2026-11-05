@@ -13,6 +13,7 @@ import {
   QuietNote,
   FavouriteLookItem,
   FavouriteLooks,
+  FavouriteSceneItem,
   RoomCard,
   RoomDragList,
   RoomSection,
@@ -120,10 +121,27 @@ const LOOKS: Specimen[] = [
     },
   },
   {
+    name: 'FavouriteSceneItem',
+    states: {
+      default: (
+        <FavouriteSceneItem {...hold} name="Window" isShowing={false}>
+          {tile}
+          {tile}
+        </FavouriteSceneItem>
+      ),
+      showing: (
+        <FavouriteSceneItem {...hold} name="Window" isShowing>
+          {tile}
+          {tile}
+        </FavouriteSceneItem>
+      ),
+    },
+  },
+  {
     name: 'FavouriteLooks',
     states: {
       default: (
-        <FavouriteLooks>
+        <FavouriteLooks action={<TextKey onClick={nothing}>+ SCENE</TextKey>}>
           <FavouriteLookItem {...hold} name="Candle" isPlaying={false} strip={strip} />
           <FavouriteLookItem {...hold} name="Starfield" isPlaying={false} strip={strip} />
         </FavouriteLooks>

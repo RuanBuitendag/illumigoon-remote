@@ -110,7 +110,9 @@
    controls inside them (D64). */
 /* More space between the room's groups than inside one (Gestalt proximity, UX lint `loose-groups`). */
 .room-section { display: flex; flex-direction: column; margin-top: var(--space-6); }
-.room-section .favourite-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
+/* Favourites is a section of the room of its own, so + SCENE does not crowd the look's section. */
+.room-scroll > .favourite-block { margin-top: var(--space-6); }
+.room-scroll .favourite-looks { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: var(--space-3); }
 .light-card { margin-bottom: var(--space-2); }
 /* A light that cannot be chosen says why in its note, so the row is not also faded. */
 .light-pick:disabled, .light-tape:disabled { opacity: 1; }
@@ -119,7 +121,6 @@
 .light-note { overflow-wrap: anywhere; }
 .light-tape { display: block; width: 100%; }
 .light-tape .led-strip-room { height: var(--row-tall); margin: 0 var(--edge); }
-.room-scroll .scene-shelf { margin-top: var(--space-5); padding: 0; }
 /* On the Looks place the page already keeps the gutter (LIFE-1964). */
 .page-intro + .scene-shelf { margin-top: var(--space-5); padding: 0; }
 .library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: var(--clear-sticky); }
@@ -134,6 +135,10 @@
 .favourite-look { display: flex; flex-direction: column; min-width: 0; min-height: var(--row-tall); text-align: left; }
 .favourite-look-name { color: var(--text-3); font: var(--type-note); overflow-wrap: anywhere; }
 .favourite-look[aria-pressed='true'] .favourite-look-name { color: var(--text-1); }
+/* A scene's strip is split into one part for each light (LIFE-1964 scenes option B). */
+.favourite-scene-strip { display: flex; gap: var(--space-1); margin-top: var(--space-2); }
+.favourite-scene-strip .led-strip-tile { flex: 1; min-width: 0; margin-top: 0; }
+.favourite-look[data-held='true'] .led-strip { filter: brightness(1.35); }
 .page-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); }
 .page-title-row .page-title { min-width: 0; }
 /* The star sits at the top right of a look, over the end of its heading row, in a full finger target. */

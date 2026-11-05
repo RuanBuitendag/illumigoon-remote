@@ -63,13 +63,27 @@ export function FavouriteLookItem({ name, isPlaying, strip, onPick, onHold, onHo
   );
 }
 
-// With no favourites, the row says how to get one.
-export function FavouriteLooks({ empty, children }: { empty?: string; children?: ReactNode }) {
+type FavouriteSceneItemProps = HoldProps & { name: string; isShowing: boolean; children: ReactNode };
+
+// A scene is as small as a favourite look. Its one strip has a part for each light, in the room's order.
+export function FavouriteSceneItem({ name, isShowing, children, onPick, onHold, onHoldEnd }: FavouriteSceneItemProps) {
   return (
-    <div className="favourite-block">
-      <Eyebrow>FAVOURITES</Eyebrow>
+    <Press className="favourite-look" isPressed={isShowing} onClick={onPick} onHold={onHold} onHoldEnd={onHoldEnd}>
+      <span className="favourite-look-name">{name}</span>
+      <span className="favourite-scene-strip">{children}</span>
+    </Press>
+  );
+}
+
+type FavouriteLooksProps = { empty?: string; action?: ReactNode; children?: ReactNode };
+
+// With no favourites, the row says how to get one.
+export function FavouriteLooks({ empty, action, children }: FavouriteLooksProps) {
+  return (
+    <section className="favourite-block">
+      <HeadingRow heading={<Eyebrow>FAVOURITES</Eyebrow>}>{action}</HeadingRow>
       {empty ? <p className="note">{empty}</p> : <div className="favourite-looks">{children}</div>}
-    </div>
+    </section>
   );
 }
 

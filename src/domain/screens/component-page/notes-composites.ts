@@ -199,11 +199,18 @@ const LOOK_NOTES: Record<string, Notes> = {
     'Show the looks starred on Looks.',
     'Add a description. The tile is small.',
   ),
+  FavouriteSceneItem: note(
+    'A scene as small as a favourite look: a name and one strip with a part for each light.',
+    PRESSES,
+    'A button, named by the scene, pressed while the room shows it.',
+    'Keep the parts in the order of the lights of the scene.',
+    'Draw a card per light. The room has no space for it.',
+  ),
   FavouriteLooks: note(
-    'The starred looks of a room, two to a row, or a line that says how to star one.',
+    'The scenes and starred looks of a room, three to a row, with + SCENE, or a line that says how to star one.',
     ITS_PARTS,
     'No role of its own.',
-    'Keep the order they were starred in.',
+    'Put the scenes first, then the looks in the order they were starred in.',
     'Show recent looks here. The room keeps favourites only.',
   ),
   WhichLine: note(

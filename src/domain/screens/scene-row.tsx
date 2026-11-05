@@ -72,10 +72,10 @@ function useCurrentScene(scenes: SceneEntry[], room: Room | undefined) {
   return { showing, current, changedFrom };
 }
 
-// Home holds the scenes that cross rooms, and a room holds its own. One room has every scene.
+// Looks holds every scene, so each one is managed there. A room shows its own in its Favourites.
 export function SceneRow({ rooms, room }: SceneRowProps) {
   const scenes = useLibrary((library) => library.scenes).filter(
-    (scene) => !scene.error && (rooms.length < 2 || roomOfScene(scene, rooms)?.id === room?.id),
+    (scene) => !scene.error && (!room || rooms.length < 2 || roomOfScene(scene, rooms)?.id === room.id),
   );
   const problem = useLibrary((library) => library.problem);
   const { showing, current, changedFrom } = useCurrentScene(scenes, room);

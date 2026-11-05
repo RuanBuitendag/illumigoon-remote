@@ -31,6 +31,7 @@ export {
   LookSearch,
   FavouriteLookItem,
   FavouriteLooks,
+  FavouriteSceneItem,
   WhichLine,
 } from './look-list';
 export { NamingRow } from './naming-row';

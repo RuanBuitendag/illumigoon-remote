@@ -31,7 +31,6 @@ import { LookStrip } from './look-strip';
 import { OffTimerSheet, schedulingLights } from './off-timer-sheet';
 import { FavouriteLookRow } from './favourite-looks';
 import { RoomLockNote } from './room-summary';
-import { SceneRow } from './scene-row';
 
 const PERCENT = 100;
 
@@ -152,7 +151,6 @@ function LookPanel({ room, lights }: { room: Room; lights: Light[] }) {
         onEdit={canChange ? () => openPage('editor', room.id) : undefined}
         onLooks={() => openPage('looks', room.id)}
       />
-      <FavouriteLookRow lights={lights} />
       {isMixed && <QuietNote>Choose a light to change its settings.</QuietNote>}
       {!isMixed && !canChange && <QuietNote>{offNote(lights)}</QuietNote>}
       {canChange && <LookSettings room={room} lights={lights} light={light} />}
@@ -203,9 +201,9 @@ export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
         onLevel={(next) => setBrightness(writableLights, next)}
       />
       {room.isLocked && <RoomLockNote room={room} />}
-      <SceneRow rooms={rooms} room={room} />
-      <LightCards room={room} chosen={chosen} />
+      <FavouriteLookRow room={room} rooms={rooms} lights={chosen} />
       <LookPanel room={room} lights={chosen} />
+      <LightCards room={room} chosen={chosen} />
       <RoomMore room={room} />
     </RoomLayout>
   );
