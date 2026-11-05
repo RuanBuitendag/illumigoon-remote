@@ -31,22 +31,16 @@ const tile = <LedStrip recording={RECORDING} shape="tile" onFirstView={nothing} 
 const hold = { onPick: nothing, onHold: nothing, onHoldEnd: nothing };
 const look = { ...hold, name: 'Candle', hasSound: false, isPlaying: false, strip };
 const power = <PowerKey label="Lounge power" isOn onChange={nothing} />;
-const lights = [
-  { id: 'left', name: 'Left', state: null },
-  { id: 'right', name: 'Right', state: 'silent' as const },
-];
 const card = {
   name: 'Lounge',
   strip,
-  lookName: 'Candle',
-  hasSound: false,
+  lights: 'Left, Right',
+  look: 'Candle',
+  isOff: false,
   power,
-  lightStates: lights,
   note: null,
-  hasLooks: false,
   isOpen: false,
   onOpen: nothing,
-  onLooks: nothing,
   children: null,
 };
 const lightCard = { name: 'Left', note: '', isChosen: false, disabled: false, strip, power, onChoose: nothing, onHold: nothing };
@@ -152,9 +146,10 @@ const ROOMS: Specimen[] = [
     name: 'RoomCard',
     states: {
       default: <RoomCard {...card} />,
-      open: <RoomCard {...card} isOpen hasSound />,
-      'loading, not answered yet': <RoomCard {...card} lookName="" onOpen={undefined} onLooks={undefined} note="Waiting for the lights." />,
-      'held by someone else': <RoomCard {...card} name={LONG_NAME} onLooks={undefined} note="Locked by another phone." />,
+      open: <RoomCard {...card} isOpen />,
+      off: <RoomCard {...card} name="Office" lights="Desk" look="off" isOff />,
+      'loading, not answered yet': <RoomCard {...card} look="" onOpen={undefined} note="Right does not answer." />,
+      'held by someone else': <RoomCard {...card} name={LONG_NAME} lights="4 lights" note="Locked by another phone." />,
     },
   },
   {

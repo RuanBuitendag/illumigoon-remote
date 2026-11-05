@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { JumpSheet as JumpSheetLayout, type JumpGroup } from '../../composites';
 import { libraryFor } from '../store/look-library';
 import { useLookFiles } from '../store/look-files';
-import { closeJump, jumpToLook, jumpToRoom } from '../store/navigation-store';
+import { closeJump, HOUSE_NAME, jumpHome, jumpToLook, jumpToRoom } from '../store/navigation-store';
 import { playingLookName, type Room } from '../store/rooms';
 
 type LookFiles = ReturnType<typeof useLookFiles.getState>;
@@ -37,6 +37,12 @@ function roomHits(rooms: Room[], wanted: string) {
     }));
 }
 
+// The one house; picking it goes to its rooms.
+function houseHits(wanted: string) {
+  if (!answers(HOUSE_NAME, wanted)) return [];
+  return [{ id: 'house-home', name: HOUSE_NAME, detail: 'House', onPick: jumpHome }];
+}
+
 // A long press on the bar, or Ctrl+K on the laptop, opens it (LIFE-1964).
 export function JumpSheet({ rooms }: { rooms: Room[] }) {
   const [query, setQuery] = useState('');
@@ -46,12 +52,13 @@ export function JumpSheet({ rooms }: { rooms: Room[] }) {
   const groups: JumpGroup[] = [
     { title: 'ROOMS', hits: roomHits(rooms, wanted) },
     { title: 'LOOKS', hits: lookHits(rooms, { mine, shelf }, wanted).slice(0, MOST_HITS) },
+    { title: 'HOUSES', hits: houseHits(wanted) },
   ];
   return (
     <JumpSheetLayout
       query={query}
       groups={groups}
-      empty={`No room or look matches ${query.trim()}.`}
+      empty={`No room, look or house matches ${query.trim()}.`}
       onQuery={setQuery}
       onClose={closeJump}
     />

@@ -21,11 +21,18 @@ async function until(check, what, milliseconds = 8000) {
   throw new Error(`waited for: ${what}`);
 }
 
+// A room's looks open from its LOOKS key, once the room is open.
+async function openRoomLooks(page, roomName) {
+  await page.getByRole('button', { name: `Open ${roomName}` }).click();
+  await page.locator('main.screen:not([inert])').last().getByRole('button', { name: 'LOOKS', exact: true }).click();
+}
+
 const see = (page, text) => page.getByText(text).first().waitFor({ timeout: 8000 });
 
+// Add a light lives in Settings since Home shows the rooms only (LIFE-1964).
 async function openAddLight(page) {
-  await see(page, '+ Add a light');
-  await page.getByText('+ Add a light').click();
+  await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'SETTINGS', exact: true }).click();
+  await page.locator('main.screen:not([inert])').last().getByRole('button', { name: /^Add a light/ }).click();
   await see(page, 'Looking for new lights.');
 }
 
@@ -64,9 +71,9 @@ export const journeys = [
     name: 'Home shows a room and its lights',
     lights: { '10.0.0.1': desk, '10.0.0.2': lamp },
     async run({ page }) {
+      // The card names the lights that are on (LIFE-1964 option B): Lamp is on, Desk is off.
       await see(page, 'Bedroom');
-      await see(page, 'Desk');
-      await see(page, 'Lamp');
+      await see(page.getByRole('button', { name: 'Open Bedroom' }), 'Lamp');
     },
   },
   {
@@ -82,9 +89,9 @@ export const journeys = [
     name: 'A light that dies says so, and comes back by itself',
     lights: { '10.0.0.1': desk, '10.0.0.2': lamp },
     async run({ page, lights }) {
-      await see(page, 'Desk');
-      // Home marks a light that stops answering on its room card; the light's name stays in place.
-      const silentDesk = page.locator('.room-light', { hasText: 'Desk' }).locator('.status-mark[data-state=silent]');
+      await see(page, 'Bedroom');
+      // Home names a light that stops answering in a note on its room card.
+      const silentDesk = page.getByText('Desk does not answer.');
       lights['10.0.0.1'].powerOff();
       await silentDesk.waitFor({ timeout: 30000 });
       lights['10.0.0.1'].powerOn();
@@ -242,7 +249,7 @@ export const journeys = [
     lights: { '10.0.0.2': lamp },
     async run({ page }) {
       await see(page, 'Lamp');
-      await page.getByRole('button', { name: /^Bedroom look: / }).click();
+      await openRoomLooks(page, 'Bedroom');
       await see(page, 'On Bedroom');
     },
   },
@@ -251,7 +258,7 @@ export const journeys = [
     lights: { '10.0.0.2': patchLamp },
     async run({ page }) {
       await see(page, 'Lamp');
-      await page.getByRole('button', { name: /^Bedroom look: / }).click();
+      await openRoomLooks(page, 'Bedroom');
       await see(page, 'Candle');
       await see(page, 'Solid colour');
       for (const gone of ['Lava lamp', 'Black Hole', 'Simple looks', 'Examples', 'Most used']) {
@@ -260,8 +267,10 @@ export const journeys = [
       await page.getByText('Candle', { exact: true }).first().click();
       await see(page, 'Playing Candle');
       // Most used keeps the order the page opened with, so a play shows there the next time it opens.
-      await page.getByRole('button', { name: 'Rooms', exact: true }).click();
-      await page.getByRole('button', { name: /^Bedroom look: / }).click();
+      // ROOMS on the bar closes the page, then the room.
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'ROOMS', exact: true }).click();
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'ROOMS', exact: true }).click();
+      await openRoomLooks(page, 'Bedroom');
       await see(page, 'Most used');
     },
   },

@@ -72,7 +72,6 @@
   --palette-width: 148px;
   /* Sizes of drawn things (TO-2, GE-10). A size that is a row, a step or a line uses that token; these are the
      rest. lint:rules fails a raw height, width or box-shadow edge in the app's layers. */
-  --home-header: 104px;
   --scene-card: 172px;
   /* A level beside its fader, up to 100. */
   --level-value: 26px;

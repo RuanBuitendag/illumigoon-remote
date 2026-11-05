@@ -7,10 +7,8 @@ import {
   ComponentPageLayout,
   ComponentState,
   EditLayout,
-  HomeAdd,
   HomeLayout,
   HouseNote,
-  HouseSection,
   JumpSheet,
   Overlay,
   OverlayBlock,
@@ -39,11 +37,15 @@ import { LONG_NAME, nothing, OnDemand, RECORDING, type Specimen } from './specim
 const strip = <LedStrip recording={RECORDING} shape="room" onFirstView={nothing} />;
 const power = <PowerKey label="Lounge power" isOn onChange={nothing} />;
 const notice = <BottomNotice text="A new version is ready." actionLabel="Update now" onAction={nothing} />;
+const houseKey = (
+  <TextKey onClick={nothing}>
+    SWITCH HOUSE
+    <Icon.Chev c="currentColor" />
+  </TextKey>
+);
 const home = (
-  <HomeLayout wordmark="ILLUMIGOON" onWordmark={nothing} notice={null}>
-    <HouseSection title="ROOMS" action={<TextKey onClick={nothing}>ALL OFF</TextKey>}>
-      <QuietNote>Rooms stand here.</QuietNote>
-    </HouseSection>
+  <HomeLayout title="Home" action={houseKey} notice={null}>
+    <QuietNote>Rooms stand here.</QuietNote>
   </HomeLayout>
 );
 const room = (
@@ -80,22 +82,17 @@ const HOME: Specimen[] = [
       default: <ComponentFrame size="screen">{home}</ComponentFrame>,
       'with a notice': (
         <ComponentFrame size="screen">
-          <HomeLayout wordmark="ILLUMIGOON" onWordmark={nothing} notice={notice}>
-            <HomeAdd onClick={nothing}>+ ADD A LIGHT</HomeAdd>
+          <HomeLayout title="Home" action={houseKey} notice={notice}>
+            <QuietNote>Rooms stand here.</QuietNote>
           </HomeLayout>
         </ComponentFrame>
       ),
     },
   },
   {
-    name: 'HouseSection',
-    states: { default: <HouseSection title="ROOMS" action={null}>{null}</HouseSection> },
-  },
-  {
     name: 'HouseNote',
     states: { default: <HouseNote text="No lights on this Wi-Fi yet." actionLabel="ADD A LIGHT" onAction={nothing} /> },
   },
-  { name: 'HomeAdd', states: { default: <HomeAdd onClick={nothing}>+ ADD A ROOM</HomeAdd> } },
   {
     name: 'BottomNotice',
     states: {

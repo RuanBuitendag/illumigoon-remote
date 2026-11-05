@@ -34,13 +34,10 @@
 /* Home */
 
 .home-scroll, .room-scroll { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-.home-header { display: flex; align-items: flex-start; height: var(--home-header); padding: var(--page-top) var(--gutter) 0; }
-.wordmark { position: relative; color: var(--text-3); font: var(--type-value); letter-spacing: var(--tracking-label); }
-.wordmark::after { content: ''; position: absolute; inset: calc((1lh - var(--row)) / 2) 0; }
-.home-column { display: flex; flex-direction: column; gap: var(--section); padding: var(--space-1) 0 var(--clear-notice); }
-.house-section { padding: 0 var(--gutter); }
+.home-header { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); padding: var(--page-top) var(--gutter) var(--space-3); }
+.home-title { color: var(--text-1); font: var(--type-heading); }
+.home-column { display: flex; flex-direction: column; gap: var(--space-4); padding: var(--space-1) 0 var(--clear-notice); }
 .house-note { display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: 0 var(--gutter); }
-.home-add { align-self: flex-start; padding: 0 var(--gutter); }
 .toast { position: fixed; left: 0; right: 0; bottom: max(var(--space-4), env(safe-area-inset-bottom)); z-index: var(--layer-float); display: flex; align-items: center; gap: var(--space-3); width: fit-content; max-width: calc(100% - 2 * var(--gutter)); margin: 0 auto; padding: 0 var(--space-4); border-radius: var(--radius); background: var(--fill); color: var(--on-fill); box-shadow: var(--float-shadow); outline: var(--line) solid transparent; }
 /* Forced colours draw the toast's clear edge in the text colour, and a bar of colours keeps its colours. */
 @media (forced-colors: active) {
@@ -87,18 +84,16 @@
 /* Room cards */
 
 .room-card { position: relative; margin: 0 var(--gutter); padding-bottom: var(--space-2); border-bottom: var(--line) solid var(--track); }
-.room-open { display: block; width: 100%; }
-.room-heading { display: flex; align-items: center; gap: var(--space-2); min-height: var(--row); padding-right: var(--space-7); color: var(--text-4); }
-.room-power { position: absolute; top: 0; right: 0; display: flex; align-items: center; height: var(--row); }
+.room-open { display: block; width: 100%; padding-top: var(--space-3); text-align: left; }
+.room-name { display: flex; align-items: center; min-height: var(--space-6); padding-right: var(--space-7); color: var(--text-1); font: var(--type-heading); }
+.room-line { display: block; padding-right: var(--space-7); color: var(--text-2); overflow-wrap: anywhere; }
+.room-dot { color: var(--text-3); }
+/* A thin strip under the line, so the card stays as short as option B draws it. */
+.room-card .led-strip-room { height: var(--row); margin-block: var(--space-2) 0; }
+.room-look[data-off='true'] { color: var(--text-3); }
+.room-power { position: absolute; top: var(--space-3); right: 0; display: flex; align-items: center; height: var(--space-6); }
 .room-actions { display: flex; flex-direction: column; gap: var(--space-1); }
-.room-card[data-has-looks='true'] .room-actions { min-height: var(--row-tall); }
-.room-name { color: var(--text-1); font: var(--type-heading); }
 .which-line { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); margin-top: var(--space-3); color: var(--text-2); }
-.room-look { display: flex; align-items: center; gap: var(--space-2); width: 100%; min-height: var(--row); }
-.room-look-key { display: inline-flex; align-items: center; gap: var(--space-2); margin-left: auto; color: var(--text-2); }
-.room-look-name { color: var(--text-2); overflow-wrap: anywhere; }
-.room-lights { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-4); }
-.room-light { display: flex; align-items: center; gap: var(--space-2); color: var(--text-1); }
 .quiet-note { margin: var(--space-2) 0; }
 .lock-note { display: flex; align-items: center; gap: var(--space-3); min-height: var(--row); }
 
@@ -125,6 +120,8 @@
 .light-tape { display: block; width: 100%; }
 .light-tape .led-strip-room { height: var(--row-tall); margin: 0 var(--edge); }
 .room-scroll .scene-shelf { margin-top: var(--space-5); padding: 0; }
+/* On the Looks place the page already keeps the gutter (LIFE-1964). */
+.page-intro + .scene-shelf { margin-top: var(--space-5); padding: 0; }
 .library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: var(--clear-sticky); }
 .library-group { display: flex; flex-direction: column; gap: var(--space-5); }
 .library-group > .heading-row { margin-bottom: calc(-1 * var(--space-4)); }
@@ -262,7 +259,7 @@
 /* Laptop */
 
 @media (min-width: 900px) {
-  .home-header { height: calc(var(--space-6) + var(--row)); padding: var(--space-6) var(--gutter) 0; }
+  .home-header { padding: var(--space-6) var(--gutter) var(--space-3); }
   .scene-list { flex-wrap: wrap; margin: 0; padding: 0; overflow: visible; }
   .place-frame > .screen-stack { bottom: 0; left: var(--place-rail); }
   .place-frame > .place-bar { inset: 0 auto 0 0; }

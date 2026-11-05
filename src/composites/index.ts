@@ -19,7 +19,7 @@ export {
   ToggleRow,
 } from './control-rows';
 export { LightDragList, RoomDragList } from './drag-list';
-export { BottomNotice, HomeAdd, HomeLayout, HouseNote, HouseSection } from './home-layout';
+export { BottomNotice, HomeLayout, HouseNote } from './home-layout';
 export { LevelRow } from './level-row';
 export {
   LookElsewhere,

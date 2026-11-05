@@ -1,16 +1,12 @@
 import { LockNote, RoomCard } from '../../composites';
 import { PowerKey } from '../../design-system';
-import { movesToMusic } from '../looks/look-catalog';
 import { setPower, type Light } from '../store/fleet-store';
-import { useHousehold } from '../store/household-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom, useNavigation } from '../store/navigation-store';
 import {
   highestBrightness,
   isAnyOn,
   hasOneLookName,
-  lightState,
-  lookIdOf,
   lookNameOf,
   previewOfAnimation,
   type Room,
@@ -53,10 +49,24 @@ function timerText(room: Room) {
   return offTimersOf(lights).length > 0 ? offTimerNote(lights) : null;
 }
 
-type LightStateLine = { id: string; name: string; state: ReturnType<typeof lightState> | null };
+// Two names fit on the line; more lights are counted (LIFE-1964 option B).
+const MOST_NAMES = 2;
 
-const stateOfLight = (light: Light): LightStateLine => ({ id: light.address, name: light.name, state: lightState(light) });
-const stateOfWaiting = ({ id, name }: { id: string; name: string }): LightStateLine => ({ id, name, state: 'silent' });
+function namesOf(names: string[]) {
+  return names.length > MOST_NAMES ? `${names.length} lights` : names.join(', ');
+}
+
+// An on room names the lights that are on; an off room names all of them.
+function lightsLine(room: Room, onlineLights: Light[], isOn: boolean) {
+  const lit = onlineLights.filter(({ isOn: isLit }) => isLit).map(({ name }) => name);
+  return namesOf(isOn ? lit : room.lights.map(({ name }) => name));
+}
+
+function silentText(room: Room, waitingLights: { name: string }[]) {
+  const silent = [...room.lights.filter(({ isOnline }) => !isOnline), ...waitingLights].map(({ name }) => name);
+  if (silent.length === 0) return null;
+  return `${silent.join(', ')} ${silent.length === 1 ? 'does' : 'do'} not answer.`;
+}
 
 type RoomSummaryProps = { room: Room; waitingLights: { id: string; name: string }[] };
 
@@ -64,13 +74,11 @@ type RoomSummaryProps = { room: Room; waitingLights: { id: string; name: string 
 function useRoomLook(room: Room) {
   const onlineLights = useShownLights(room.onlineLights);
   const animation = onlineLights[0]?.animation ?? null;
-  const lookId = lookIdOf(animation);
   return {
     onlineLights,
     source: previewOfAnimation(animation),
     isOn: isAnyOn(onlineLights),
     level: highestBrightness(onlineLights),
-    hasSound: Boolean(lookId && movesToMusic(lookId)),
   };
 }
 
@@ -86,32 +94,22 @@ function RoomPower({ room, isOn }: { room: Room; isOn: boolean }) {
   );
 }
 
-// Lights that have not answered yet keep their place on the card, as lights that do not answer.
+// Lights that have not answered yet are named in the note, as lights that do not answer.
 export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
-  const { writableLights } = room;
-  const hasLooks = useHousehold((household) => (household.recentLooks[room.id]?.length ?? 0) > 0);
-  const lightStates = [...room.lights.map(stateOfLight), ...waitingLights.map(stateOfWaiting)];
   const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
-  const { onlineLights, source, isOn, level, hasSound } = useRoomLook(room);
+  const { onlineLights, source, isOn, level } = useRoomLook(room);
   const hasPower = !room.isLocked;
-  // The power switch shows the room's state, so only a light that differs from it gets a mark.
-  const switchState = isOn ? 'on' : 'off';
-  const marked = lightStates.map((line) =>
-    hasPower && line.state === switchState ? { ...line, state: null } : line,
-  );
   return (
     <RoomCard
       name={room.name}
       power={hasPower && <RoomPower room={room} isOn={isOn} />}
       strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
-      lookName={lookLabel(onlineLights)}
-      hasSound={hasSound}
-      lightStates={marked}
-      hasLooks={hasLooks}
-      note={timerText(room)}
+      lights={lightsLine(room, onlineLights, isOn)}
+      look={isOn ? lookLabel(onlineLights) : 'off'}
+      isOff={!isOn}
+      note={timerText(room) ?? silentText(room, waitingLights)}
       isOpen={isOpen}
       onOpen={room.lights.length > 0 ? () => openRoom(room.id) : undefined}
-      onLooks={writableLights.length > 0 ? () => openPage('looks', room.id) : undefined}
     >
       {room.isLocked && <RoomLockNote room={room} />}
     </RoomCard>

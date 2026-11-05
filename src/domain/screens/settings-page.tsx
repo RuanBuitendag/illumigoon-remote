@@ -1,9 +1,24 @@
-import { InfoRow, MoreRow, PageFrame, PageSection } from '../../composites';
+import { InfoRow, MoreRow, PageFrame, PageSection, ToggleRow } from '../../composites';
 import { Eyebrow, TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate } from '../app-update/app-update';
+import { setHousePower } from '../store/house-power';
+import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
-import type { Room } from '../store/rooms';
+import { isAnyOn, type Room } from '../store/rooms';
 import { lightCount } from '../store/scenes';
+
+function AllLights({ rooms }: { rooms: Room[] }) {
+  const lights = rooms.flatMap((room) => room.writableLights);
+  const shownLights = useShownLights(lights);
+  return (
+    <ToggleRow
+      label="All lights"
+      isOn={isAnyOn(shownLights)}
+      disabled={lights.length === 0}
+      onChange={(isOn) => setHousePower(rooms, isOn)}
+    />
+  );
+}
 
 // The Settings place of the bar holds what had no home before: the house, each room's settings and the app.
 export function SettingsPage({ rooms }: { rooms: Room[] }) {
@@ -22,8 +37,8 @@ export function SettingsPage({ rooms }: { rooms: Room[] }) {
       </PageSection>
       <PageSection>
         <Eyebrow>HOUSE</Eyebrow>
+        <AllLights rooms={rooms} />
         <MoreRow label="Add a light" note="Set up new lights on the home Wi-Fi" onOpen={() => openPage('add-light')} />
-        <MoreRow label="Recent" note="The last 10 states of the house" onOpen={() => openPage('history')} />
       </PageSection>
       <PageSection>
         <Eyebrow>APP</Eyebrow>

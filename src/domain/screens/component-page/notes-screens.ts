@@ -9,18 +9,11 @@ const ON_TOP = 'The focus moves in when it opens and stays inside. Escape closes
 
 const SCREEN_NOTES: Record<string, Notes> = {
   HomeLayout: note(
-    'The wordmark, the rooms, and a notice at the foot.',
-    'Tab goes from the wordmark down through the rooms.',
+    'The house name, SWITCH HOUSE, the rooms, and a notice at the foot.',
+    'Tab goes from SWITCH HOUSE down through the rooms.',
     'A header, sections, and a footer that is a status.',
     'Keep the rooms first; a notice waits at the foot.',
     'Put a second notice over the rooms.',
-  ),
-  HouseSection: note(
-    'A heading and a key, over the rooms.',
-    ITS_PARTS,
-    'A section, with its title as a heading.',
-    'Put a key for the whole house here: ALL OFF.',
-    'Put a key for one room here.',
   ),
   HouseNote: note(
     'A line and a key, for a house with nothing in it yet.',
@@ -28,13 +21,6 @@ const SCREEN_NOTES: Record<string, Notes> = {
     'Plain text and a button.',
     'Say what is missing and the one step that fills it.',
     'Show it once the house has a light.',
-  ),
-  HomeAdd: note(
-    'An AddKey on a row of its own.',
-    PRESSES,
-    'A button, named by its words.',
-    'Put it under what it adds to.',
-    'Put two on one screen.',
   ),
   BottomNotice: note(
     'A line at the foot, with a key and maybe Later.',

@@ -39,7 +39,8 @@ export const cornerOwner = [
       await page.reload();
       await page.getByRole('button', { name: 'Open Living room' }).waitFor();
       expect((await page.getByRole('button', { name: 'Open Lounge' }).count()) === 0, 'Home still says Lounge');
-      await see(page.getByRole('button', { name: 'Open Living room' }), 'Window');
+      // The reload keeps the page that was open, so the light's new name is read there.
+      await see(onTop(page), 'Window');
     },
   },
   {
@@ -59,15 +60,19 @@ export const cornerOwner = [
     name: 'P3-S3 save a scene, change the room, and bring the scene back',
     lights: LOUNGE,
     async run({ page, lights }) {
-      await press(page, '+ SAVE');
+      // Scenes live in the Looks place since Home shows the rooms only (LIFE-1964).
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'LOOKS', exact: true }).click();
+      await press(onTop(page), '+ SAVE');
       const sheet = sceneSheet(page);
       expect(await sheet.getByRole('button', { name: 'SAVE', exact: true }).isDisabled(), 'SAVE works with no name');
       await sheet.getByRole('textbox', { name: 'Scene name' }).fill('Test evening');
       await press(sheet, 'SAVE');
-      const scene = page.getByRole('button', { name: /^Test evening/ });
+      const scene = onTop(page).getByRole('button', { name: /^Test evening/ });
       await scene.waitFor();
-      await page.getByRole('switch', { name: 'Lounge power' }).click();
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'ROOMS', exact: true }).click();
+      await page.getByRole('switch', { name: 'Lounge power' }).first().click();
       await until(() => everyLight(lights, (light) => !light.isOn), 'the Lounge to turn off');
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'LOOKS', exact: true }).click();
       await scene.click();
       await until(() => everyLight(lights, (light) => light.isOn), 'the scene to turn the Lounge on again');
       expect(everyLight(lights, (light) => plays(light, SHIPPED.candle)), 'the scene changed the look');
@@ -77,7 +82,8 @@ export const cornerOwner = [
     name: 'P3-S4 a change of mind closes the scene sheet with Escape',
     lights: LOUNGE,
     async run({ page }) {
-      await press(page, '+ SAVE');
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'LOOKS', exact: true }).click();
+      await press(onTop(page), '+ SAVE');
       await sceneSheet(page).getByRole('textbox', { name: 'Scene name' }).fill('Test not wanted');
       await page.keyboard.press('Escape');
       await sceneSheet(page).waitFor({ state: 'hidden', timeout: 2000 });

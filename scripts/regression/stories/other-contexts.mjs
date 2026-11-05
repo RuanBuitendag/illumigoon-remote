@@ -10,9 +10,9 @@ export const otherContexts = [
     name: 'P5-S1 play a look while one light of the room is off at the wall',
     lights: LOUNGE,
     async run({ page, lights }) {
-      await see(page.getByRole('button', { name: 'Open Lounge' }), 'Back Right');
+      await see(page.getByRole('button', { name: 'Open Lounge' }), '4 lights');
       lights['10.0.0.14'].powerOff();
-      const silent = page.locator('.room-light', { hasText: 'Back Right' }).locator('.status-mark[data-state=silent]');
+      const silent = page.getByText('Back Right does not answer.');
       await silent.waitFor({ timeout: 30000 });
       await openLooks(page);
       await onTop(page).getByRole('button', { name: /^Starfield/ }).click();

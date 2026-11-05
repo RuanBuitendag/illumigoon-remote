@@ -9,6 +9,7 @@ import { lightsInScope, patchLights, type Room } from '../store/rooms';
 import { LookLibrary } from './look-library';
 import { PasteLookSheet } from './paste-look-sheet';
 import { RenameLookSheet } from './rename-look-sheet';
+import { SceneRow } from './scene-row';
 import { WhichLightsSheet } from './which-lights-sheet';
 
 // Only lights that play looks count, so a room is still named when one of its lights cannot.
@@ -94,6 +95,7 @@ export function LooksPage({ room, rooms, isPlace }: LooksPageProps) {
         intro="Tap to play. Hold to try."
         {...backOf(isPlace, backLabel)}
       >
+        {isPlace && <SceneRow rooms={rooms} />}
         <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
         <LookLibrary
           lights={lights}

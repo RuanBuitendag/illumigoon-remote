@@ -81,11 +81,6 @@ export function useRooms() {
   );
 }
 
-export function lightState({ isOnline, isOn }: Light) {
-  if (!isOnline) return 'silent';
-  return isOn ? 'on' : 'off';
-}
-
 export const isAnyOn = (lights: Light[]) => lights.some((light) => light.isOn);
 export const highestBrightness = (lights: Light[]) =>
   lights.length === 0 ? 0 : Math.max(...lights.map((light) => light.brightness));
@@ -124,11 +119,6 @@ export function currentControls(light: Light | undefined): Parameter[] {
 export function canPlay(light: Light, { type }: AnimationState) {
   if (type === 'patch') return playsPatches(light);
   return light.manifests.some((manifest) => manifest.id === type);
-}
-
-export function lookIdOf(animation: AnimationState | null) {
-  if (animation?.type !== 'patch') return animation?.type ?? null;
-  return findPatchLook(animation.params)?.id ?? null;
 }
 
 export const OWN_LOOK = 'Custom look';

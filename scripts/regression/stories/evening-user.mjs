@@ -14,8 +14,8 @@ export const eveningUser = [
     name: 'P1-S1 open the Lounge from Home while a light is still waking',
     lights: LOUNGE,
     async run({ page, lights }) {
-      const look = page.getByRole('button', { name: 'Lounge look: Candle' });
-      await see(page.getByRole('button', { name: 'Open Lounge' }), 'Back Right');
+      const look = page.getByRole('switch', { name: 'Lounge power' });
+      await see(page.getByRole('button', { name: 'Open Lounge' }), '4 lights');
       // Home keeps the place of a light it has shown once it has settled, so the next start can hold it.
       await page.waitForTimeout(SETTLED_MS);
       lights['10.0.0.14'].powerOff();
@@ -30,7 +30,7 @@ export const eveningUser = [
       const chosen = onTop(page).getByRole('button', { name: /^Choose /, pressed: true });
       await until(async () => (await chosen.count()) === 4, 'every light to be chosen when the room opens');
       await press(onTop(page), 'Rooms');
-      await see(page, 'ILLUMIGOON');
+      await see(page, 'SWITCH HOUSE');
     },
   },
   {
@@ -178,11 +178,11 @@ export const eveningUser = [
         await shown();
         expect(taps === 1, `${name} took ${taps} taps`);
       };
-      await see(page, 'ILLUMIGOON');
+      await see(page, 'SWITCH HOUSE');
       await placeTaps('LOOKS', () => onTop(page).getByRole('heading', { name: 'Looks', level: 1 }).waitFor());
       await placeTaps('SETTINGS', () => onTop(page).getByRole('heading', { name: 'Settings', level: 1 }).waitFor());
       await placeTaps('EDIT', () => page.locator('main.screen-page[data-open="true"] .edit-title').waitFor());
-      await placeTaps('ROOMS', () => see(onTop(page), 'ILLUMIGOON'));
+      await placeTaps('ROOMS', () => see(onTop(page), 'SWITCH HOUSE'));
       taps = 0;
       await jump('lou');
       await pick('Lounge');

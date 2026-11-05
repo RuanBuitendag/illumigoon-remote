@@ -50,9 +50,6 @@ const open = (name) => (page) => page.getByRole('button', { name, exact: true })
 const startingWith = (start) => ({ name: new RegExp(`^${start}`) });
 const openStarting = (start) => (page) => onTop(page).getByRole('button', startingWith(start)).first().click();
 const pressOnTop = (name) => (page) => press(onTop(page), name);
-// On the laptop the open room stands beside Home, so a key of Home is pressed on Home itself.
-const onHome = (start) => (page) =>
-  page.locator('main.screen-home').getByRole('button', startingWith(start)).first().click();
 
 const BEDROOM = [open('Open Bedroom')];
 const LOUNGE = [open('Open Lounge')];
@@ -65,10 +62,11 @@ const LOOKS = [onBar('LOOKS')];
 // Each place is the taps from a fresh Home that reach it.
 const PLACES = {
   Home: [],
-  'Save scene sheet': [onHome('\\+ SAVE')],
-  'scene history': [onHome('RECENT')],
+  // Scenes live in the Looks place, and Add a light in Settings, since Home shows the rooms only (LIFE-1964).
+  'Save scene sheet': [...LOOKS, pressOnTop('+ SAVE')],
+  'scene history': [...LOOKS, pressOnTop('RECENT')],
   Settings: [onBar('SETTINGS')],
-  'Add a light': [onHome('\\+ Add a light')],
+  'Add a light': [onBar('SETTINGS'), openStarting('Add a light')],
   Bedroom: BEDROOM,
   'Bedroom, one light chosen': [...BEDROOM, openStarting('Choose Left')],
   'Bedroom, naming a kept look': [...BEDROOM, pressOnTop('SAVE AS NEW')],

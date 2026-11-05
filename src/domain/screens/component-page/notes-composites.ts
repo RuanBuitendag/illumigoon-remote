@@ -224,8 +224,8 @@ const LOOK_NOTES: Record<string, Notes> = {
 
 const ROOM_NOTES: Record<string, Notes> = {
   RoomCard: note(
-    'The room’s name, its lights, a strip, the look, and a power switch.',
-    'Tab reaches Open Lounge, then its power, then LOOKS.',
+    'The room’s name, one line of its lights and look, a strip, and a power switch.',
+    'Tab reaches Open Lounge, then its power.',
     'Buttons and a switch, named by the room.',
     'Show each light’s name once.',
     'Tint the card. Colour comes from the strip.',

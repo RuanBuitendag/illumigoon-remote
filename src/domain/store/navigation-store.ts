@@ -103,6 +103,9 @@ export function openEditFrom(roomId: string) {
   openPage('editor', roomId);
 }
 
+// One house today: there is no model of many houses yet, so the jump sheet lists this one.
+export const HOUSE_NAME = 'Home';
+
 export const openJump = () => useNavigation.setState({ isJumpOpen: true });
 export const closeJump = () => useNavigation.setState({ isJumpOpen: false });
 export const setLooksQuery = (looksQuery: string) => useNavigation.setState({ looksQuery });
@@ -111,6 +114,11 @@ export function jumpToRoom(roomId: string) {
   goToPlace('rooms');
   useNavigation.setState({ ...CLOSED });
   openRoom(roomId);
+}
+
+export function jumpHome() {
+  goToPlace('rooms');
+  useNavigation.setState({ ...CLOSED, isRoomOpen: false });
 }
 
 export function jumpToLook(name: string) {
