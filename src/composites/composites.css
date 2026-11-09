@@ -24,7 +24,7 @@
 .edit-title { flex: 0 1 auto; min-width: 0; padding: 0 var(--gutter); font: var(--type-heading); overflow-wrap: anywhere; }
 .edit-where { flex: none; padding: 0 var(--gutter) var(--space-2); color: var(--text-3); font: var(--type-note); }
 .edit-body { flex: 1; min-height: 0; }
-.edit-sections { flex: none; padding: 0 var(--gutter); border-top: var(--line) solid var(--track); }
+.edit-sections { flex: none; padding: 0 var(--gutter); }
 .edit-sections .option-row { flex-wrap: nowrap; justify-content: space-between; gap: var(--space-2); }
 .edit-sections .option { font: var(--type-note); }
 /* Over Edit an app sheet asks above the editor's own sheets. */
@@ -56,7 +56,7 @@
 
 .home-screen { display: flex; flex-direction: column; height: 100%; }
 .home-screen > .home-scroll { flex: 1; min-height: 0; height: auto; }
-.bottom-notice { flex: none; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--gutter) var(--space-6); border-top: var(--line) solid var(--track); color: var(--info); font: var(--type-note); }
+.bottom-notice { flex: none; display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--gutter) var(--space-6); color: var(--info); font: var(--type-note); }
 
 .level-row { display: flex; align-items: center; gap: var(--space-3); }
 .level-value { width: var(--level-value); text-align: right; }
@@ -65,7 +65,7 @@
 
 .scene-shelf { display: flex; flex-direction: column; gap: var(--space-2); padding: 0 var(--gutter); }
 /* A section opens as Edit's panels do: its small capital name over a hairline (D57). */
-.heading-row { display: flex; align-items: center; justify-content: space-between; min-height: var(--row); border-bottom: var(--line) solid var(--track); }
+.heading-row { display: flex; align-items: center; justify-content: space-between; min-height: var(--row); }
 .scene-list, .palette-row { display: flex; gap: var(--space-5); margin: 0 var(--edge); padding: 0 var(--gutter) var(--space-1); overflow-x: auto; scrollbar-width: none; }
 .scene-card { flex: none; display: flex; flex-direction: column; gap: var(--space-2); width: var(--scene-card); }
 .scene-apply { display: flex; flex-direction: column; align-items: stretch; gap: var(--space-2); }
@@ -83,7 +83,7 @@
 
 /* Room cards */
 
-.room-card { position: relative; margin: 0 var(--gutter); padding-bottom: var(--space-2); border-bottom: var(--line) solid var(--track); }
+.room-card { position: relative; margin: 0 var(--gutter); padding-bottom: var(--space-2); }
 .room-open { display: block; width: 100%; padding-top: var(--space-3); text-align: left; }
 .room-name { display: flex; align-items: center; min-height: var(--space-6); padding-right: var(--space-7); color: var(--text-1); font: var(--type-heading); }
 .room-line { display: block; padding-right: var(--space-7); color: var(--text-2); overflow-wrap: anywhere; }
@@ -164,7 +164,7 @@
 
 /* Sheets */
 
-.sheet-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--row-tall); padding: 0 var(--space-5); border-bottom: var(--line) solid var(--track); }
+.sheet-head { flex: none; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--row-tall); padding: 0 var(--space-5); }
 .sheet-name, .sheet-keys { display: flex; align-items: center; gap: var(--space-3); min-width: 0; }
 .sheet-keys { gap: var(--space-4); }
 .sheet-title { min-width: 0; color: var(--text-1); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; overflow-wrap: anywhere; }
@@ -174,7 +174,7 @@
 .sheet-head .text-key { min-height: 0; }
 .sheet-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-4) var(--space-5) var(--space-5); overflow-y: auto; }
 .control-list { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-5); }
-.sheet-footer { display: flex; justify-content: space-between; margin-top: var(--space-2); padding-top: var(--space-1); border-top: var(--line) solid var(--track); }
+.sheet-footer { display: flex; justify-content: space-between; margin-top: var(--space-2); padding-top: var(--space-1); }
 .control-group { display: flex; flex-direction: column; gap: var(--space-2); }
 /* A control is named as Edit names a dial: a small capital label over it, its value beside it (D55). */
 .control-label { display: flex; align-items: center; justify-content: space-between; color: var(--text-4); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; }
@@ -226,7 +226,7 @@
 .day-key { width: var(--row); height: var(--row); color: var(--text-4); text-align: center; }
 .page-status { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-5); color: var(--text-2); }
 .drag-list { display: contents; }
-.arrange-row { display: flex; align-items: center; gap: var(--space-1); border-bottom: var(--line) solid var(--track); }
+.arrange-row { display: flex; align-items: center; gap: var(--space-1); }
 .arrange-row .text-field { border-bottom: 0; }
 .arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: var(--row); height: var(--row); margin-left: calc(-1 * var(--space-4)); color: var(--text-5); cursor: grab; touch-action: none; }
 .scan-note { margin-top: var(--section); }
@@ -252,7 +252,7 @@
 .place-view[data-shown='false'] { visibility: hidden; }
 .place-page { overflow-y: auto; padding: var(--page-top) var(--gutter) var(--space-7); }
 .jump-group { display: flex; flex-direction: column; margin-top: var(--space-5); }
-.jump-hit { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); min-height: var(--row); border-bottom: var(--line) solid var(--track); color: var(--text-1); font: var(--type-body); text-align: left; }
+.jump-hit { display: flex; justify-content: space-between; align-items: center; gap: var(--space-3); min-height: var(--row); color: var(--text-1); font: var(--type-body); text-align: left; }
 
 /* Phone: the sheet's head wraps rather than squeezes its name. */
 

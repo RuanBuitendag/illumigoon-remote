@@ -58,7 +58,7 @@ export function FavouriteLookRow({ room, rooms, lights }: FavouriteLookRowProps)
   const isEmpty = looks.length === 0 && scenes.length === 0;
   return (
     <>
-      <FavouriteLooks action={action} empty={isEmpty ? 'Star a look to put it here' : undefined}>
+      <FavouriteLooks action={action} isEmpty={isEmpty}>
         {scenes.map((scene) => (
           <SceneItem key={scene.file} scene={scene} room={room} rooms={rooms} />
         ))}

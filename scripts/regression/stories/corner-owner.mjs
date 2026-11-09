@@ -110,7 +110,8 @@ export const cornerOwner = [
       await openLounge(page);
       // The look's tile in the room Favourites is a button. The look's own name above it is not.
       const favourite = onTop(page).getByRole('button', { name: /^Test gone/ });
-      await see(onTop(page), 'Star a look to put it here');
+      await see(onTop(page), 'FAVOURITES');
+      expect((await onTop(page).getByText('Star a look to put it here').count()) === 0, 'Favourites explained the star');
       await keepAsNew(page, 'Test gone');
       await press(onTop(page), 'LOOKS');
       // One tap on the star stars the look, and plays nothing.

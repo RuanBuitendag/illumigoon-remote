@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Overlay, OverlayText, WhichLights } from '../../composites';
 import { KeyRow, TextKey } from '../../design-system';
-import { patchLights, type Room } from '../store/rooms';
+import type { Room } from '../store/rooms';
 
 type WhichLightsSheetProps = {
   rooms: Room[];
@@ -11,13 +11,14 @@ type WhichLightsSheetProps = {
   onClose: () => void;
 };
 
-// Only lights that can play the looks on the page, and a silent or locked light cannot take one.
+// Every light that can take a look now. A silent or locked light cannot. A light on older software plays the
+// basic looks, so it is here too: the page lists only the looks that every chosen light can play.
 const shownRoomsOf = (rooms: Room[]) =>
   rooms
     .map(({ id, name, writableLights }) => ({
       id,
       name,
-      lights: patchLights(writableLights).map(({ address, name: lightName }) => ({ id: address, name: lightName })),
+      lights: writableLights.map(({ address, name: lightName }) => ({ id: address, name: lightName })),
     }))
     .filter(({ lights }) => lights.length > 0);
 

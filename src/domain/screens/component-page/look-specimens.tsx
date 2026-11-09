@@ -146,7 +146,7 @@ const LOOKS: Specimen[] = [
           <FavouriteLookItem {...hold} name="Starfield" isPlaying={false} strip={strip} />
         </FavouriteLooks>
       ),
-      empty: <FavouriteLooks empty="Star a look to put it here" />,
+      empty: <FavouriteLooks isEmpty action={<TextKey onClick={nothing}>+ SCENE</TextKey>} />,
     },
   },
   { name: 'WhichLine', states: { default: <WhichLine text="Plays on Left and Right" onClick={nothing} /> } },

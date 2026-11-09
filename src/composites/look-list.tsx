@@ -75,14 +75,14 @@ export function FavouriteSceneItem({ name, isShowing, children, onPick, onHold, 
   );
 }
 
-type FavouriteLooksProps = { empty?: string; action?: ReactNode; children?: ReactNode };
+type FavouriteLooksProps = { isEmpty?: boolean; action?: ReactNode; children?: ReactNode };
 
-// With no favourites, the row says how to get one.
-export function FavouriteLooks({ empty, action, children }: FavouriteLooksProps) {
+// With no favourites, only the heading and its key show. The star on Looks is plain enough to need no line.
+export function FavouriteLooks({ isEmpty, action, children }: FavouriteLooksProps) {
   return (
     <section className="favourite-block">
       <HeadingRow heading={<Eyebrow>FAVOURITES</Eyebrow>}>{action}</HeadingRow>
-      {empty ? <p className="note">{empty}</p> : <div className="favourite-looks">{children}</div>}
+      {!isEmpty && <div className="favourite-looks">{children}</div>}
     </section>
   );
 }

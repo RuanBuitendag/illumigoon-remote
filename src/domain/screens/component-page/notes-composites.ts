@@ -207,7 +207,7 @@ const LOOK_NOTES: Record<string, Notes> = {
     'Draw a card per light. The room has no space for it.',
   ),
   FavouriteLooks: note(
-    'The scenes and starred looks of a room, three to a row, with + SCENE, or a line that says how to star one.',
+    'The scenes and starred looks of a room, three to a row, with + SCENE. With none, the heading and its key only.',
     ITS_PARTS,
     'No role of its own.',
     'Put the scenes first, then the looks in the order they were starred in.',
