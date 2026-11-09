@@ -19,7 +19,7 @@ type Look = { name: string; surface?: { key: string; label: string; type: string
 const LOOKS: Look[] = [coals, candle, starfield, oceanSwell, beachSunset, warmWhite];
 
 type Rank = 'primary' | 'secondary' | 'quiet';
-type Args = { keys: 'ranked' | 'all words'; power: 'switch' | 'word' | 'split' };
+type Args = { keys: 'ranked' | 'all words'; power: 'symbol' | 'switch' | 'word' | 'split'; motion: 'outline' | 'mesh' | 'still' };
 
 function PatchStrip({ look, shape, isOn = true, brightness = 1 }: { look: Look; shape: 'tile' | 'room' | 'line'; isOn?: boolean; brightness?: number }) {
   const source = useMemo(() => ({ kind: 'patch' as const, key: `prototype-${look.name}`, document: look }), [look]);
@@ -35,7 +35,21 @@ function Key({ rank, keys, children, onClick }: { rank: Rank; keys: Args['keys']
   );
 }
 
-function Power({ kind, label, isOn, onChange }: { kind: Args['power']; label: string; isOn: boolean; onChange: (next: boolean) => void }) {
+type PowerProps = { kind: Args['power']; label: string; isOn: boolean; onChange: (next: boolean) => void };
+
+function Power({ kind, label, isOn, onChange }: PowerProps) {
+  if (kind === 'symbol') {
+    return (
+      <button type="button" className="proto-power-symbol" aria-label={label} aria-pressed={isOn} onClick={() => onChange(!isOn)}>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path className="proto-power-symbol-base" pathLength={1} d="M7.5 6.2 A8 8 0 1 0 16.5 6.2" />
+          <path className="proto-power-symbol-base" pathLength={1} d="M12 2.5 V11" />
+          <path className="proto-power-symbol-lit" pathLength={1} d="M7.5 6.2 A8 8 0 1 0 16.5 6.2" />
+          <path className="proto-power-symbol-lit" pathLength={1} d="M12 2.5 V11" />
+        </svg>
+      </button>
+    );
+  }
   if (kind === 'switch') return <PowerKey label={label} isOn={isOn} onChange={onChange} />;
   if (kind === 'word') {
     return (
@@ -56,7 +70,7 @@ function sliders(look: Look) {
   return (look.surface ?? []).filter(({ type }) => type === 'slider');
 }
 
-function RoomWithLooks({ keys, power }: Args) {
+function RoomWithLooks({ keys, power, motion }: Args) {
   const [playing, setPlaying] = useState<Look>(coals);
   const [isOn, setOn] = useState(true);
   const [level, setLevel] = useState(0.7);
@@ -70,7 +84,7 @@ function RoomWithLooks({ keys, power }: Args) {
   };
   const controls = sliders(playing);
   return (
-    <div className="proto-column">
+    <div className="proto-column" data-motion={motion}>
       <RoomLayout
         name="Bedroom"
         backLabel="Rooms"
@@ -103,7 +117,7 @@ function RoomWithLooks({ keys, power }: Args) {
         </RoomSection>
         <RoomSection>
           <div className="proto-look-head">
-            <span className="proto-look-name">{isOn ? playing.name : 'Off'}</span>
+            <span className="proto-look-name" key={isOn ? playing.name : 'off'}>{isOn ? playing.name : 'Off'}</span>
             {isOn && (
               <span className="proto-keys">
                 <Key rank="quiet" keys={keys} onClick={nothing}>
@@ -115,9 +129,9 @@ function RoomWithLooks({ keys, power }: Args) {
               </span>
             )}
           </div>
-          {isOn &&
-            isAdjusting &&
-            controls.map(({ key, label, min = 0, max = 100, step = 1, default: start }) => {
+          {isOn && isAdjusting && (
+            <div className="proto-adjust">
+            {controls.map(({ key, label, min = 0, max = 100, step = 1, default: start }) => {
               const value = values[key] ?? Number(start ?? min);
               return (
                 <SliderRow
@@ -132,7 +146,6 @@ function RoomWithLooks({ keys, power }: Args) {
                 />
               );
             })}
-          {isOn && isAdjusting && (
             <span className="proto-keys-end">
               <Key rank="quiet" keys={keys} onClick={() => setValues({})}>
                 RESET
@@ -141,6 +154,7 @@ function RoomWithLooks({ keys, power }: Args) {
                 SAVE AS NEW
               </Key>
             </span>
+            </div>
           )}
         </RoomSection>
         <RoomSection eyebrow="LIGHTS">
@@ -168,11 +182,11 @@ function RoomWithLooks({ keys, power }: Args) {
 }
 
 // The three ranks side by side, and in the place each one is for.
-function KeyRanks({ keys }: Args) {
+function KeyRanks({ keys, motion }: Args) {
   const [isOn, setOn] = useState(true);
   const nothing = () => undefined;
   return (
-    <div className="proto-compare">
+    <div className="proto-compare" data-motion={motion}>
       <Eyebrow>PRIMARY</Eyebrow>
       <span className="proto-keys">
         <Key rank="primary" keys={keys} onClick={nothing}>SAVE</Key>
@@ -206,10 +220,11 @@ function KeyRanks({ keys }: Args) {
 export default {
   title: 'Prototypes/Room with looks first',
   parameters: { layout: 'fullscreen' },
-  args: { keys: 'ranked', power: 'word' },
+  args: { keys: 'ranked', power: 'symbol', motion: 'outline' },
   argTypes: {
     keys: { control: 'inline-radio', options: ['ranked', 'all words'], description: 'Ranked keys, or every key as words as now' },
-    power: { control: 'inline-radio', options: ['switch', 'word', 'split'], description: 'The power key' },
+    power: { control: 'inline-radio', options: ['symbol', 'switch', 'word', 'split'], description: 'The power key' },
+    motion: { control: 'inline-radio', options: ['outline', 'mesh', 'still'], description: 'A piece of light travels round each framed key, a band of wire mesh drifts round it, or no motion' },
   },
 } satisfies Meta<Args>;
 
@@ -227,4 +242,37 @@ export const Laptop: Story = {
 
 export const Keys: Story = {
   render: (args) => <KeyRanks {...args} />,
+};
+
+// The two moving outlines side by side: a piece of light, and a band of wire mesh.
+export const Motion: Story = {
+  render: (args) => (
+    <div className="proto-side-by-side">
+      <KeyRanks {...args} motion="outline" />
+      <KeyRanks {...args} motion="mesh" />
+    </div>
+  ),
+};
+
+// Every power key side by side, each with its own state, on the moving outline.
+const POWERS: Args['power'][] = ['symbol', 'switch', 'word', 'split'];
+function PowerRow({ kind }: { kind: Args['power'] }) {
+  const [isOn, setOn] = useState(false);
+  return (
+    <>
+      <Eyebrow>{kind.toUpperCase()}</Eyebrow>
+      <span>
+        <Power kind={kind} label={`${kind} power`} isOn={isOn} onChange={setOn} />
+      </span>
+    </>
+  );
+}
+export const PowerKeys: Story = {
+  render: () => (
+    <div className="proto-compare" data-motion="outline">
+      {POWERS.map((kind) => (
+        <PowerRow key={kind} kind={kind} />
+      ))}
+    </div>
+  ),
 };
