@@ -48,8 +48,16 @@ All source sits in three layers. Imports only point down. `src/main.tsx` is the 
 | `lint:rules` | `scripts/lint/rules.mjs` | files outside the layers, a look in the domain, raw colours and controls, type or spacing outside the tokens, a door's component missing from the component page |
 | `lint:editor` | the package gate | the same tools over `packages/patch-editor` |
 
-A new export of a door gets a specimen on the component page, `?components` on the dev server, in
-`src/domain/screens/component-page` (D68).
+A new export of a door gets a specimen and notes in `src/domain/screens/component-page` (D68), and a story,
+`specimenStory('Name', DOOR)`, in `stories/` (D95).
+
+## Storybook
+
+`npm run storybook` starts Storybook on port 6006: the tokens under Foundations, the primitives under Design
+system, the composites and Edit's controls under Composites, and the real app on made-up lights under Screens, each
+on the phone and laptop sizes. It is the place to build and judge a prototype: put it together from the doors in a
+story first, then move it into the app. Stories live in `stories/`, outside the layers, and import only the doors
+and the domain's stores.
 
 `npm run lint:ux` checks how screens and flows feel: too many jobs on a screen, questions before an action, a fact
 said twice, slow presses. Run it before you report a change to a screen. It is not in `npm run lint` yet. See

@@ -13,7 +13,8 @@ that prove they hold.
 | Primitives | `src/design-system`, behind its door `index.ts`: keys, `Fader` with `FaderBand` and `FaderDot`, `Dialog`, `Presence`, `TextField`, `Icon` and `IconFrame` on one 14 canvas with one 1.2 line (D74), marks, text with `Picked`, colour chips with `Swatch`, pad, LED strip |
 | Composites | `src/composites`, with `composites.css`. Primitives put together, with no data, among them `Sheet` with `SheetBody` and `Toast` |
 | The editor's look | `packages/patch-editor/src/styles.css`, and inline styles in `packages/patch-editor/src` |
-| Component page | `?components` on the dev server: every component of the two doors and of Edit in each state, with its notes and a focus state, from `src/domain/screens/component-page` (D68) |
+| Storybook | `npm run storybook`, port 6006: the tokens, every component of the two doors and of Edit in each state with its notes, and the real screens on made-up lights at phone and laptop size, from `stories/` (D95) |
+| Component page | `?components` on the dev server: every component of the two doors and of Edit in each state, with its notes and a focus state, from `src/domain/screens/component-page` (D68). Storybook draws from the same specimens |
 | Decisions | `docs/design-system/decisions.md`, one dated choice each, numbered from D1. A new one takes the next free number at the end |
 | Audits | `docs/design-system/audit-YYYY-MM-DD.md`, one per run. Keep the old ones |
 | Checks | `npm run lint`, and `scripts/lint/rules.mjs` for raw colours, type, spacing, sizes, offsets, box-shadow edges and controls, the contrast of every token pair, the style rules of `voice.md` that a machine can check, and a component with no specimen or no notes on the component page |
@@ -56,7 +57,8 @@ It does not check, so a person reads for these:
    short line, in the voice of `voice.md`.
 4. The page draws the first state again with the focus ring. Set `focus` to another state's name, or to `null` for
    a screen, a sheet or dialog that takes the focus itself, or a part with no control.
-5. Run `STORY_PORT=5291 node scripts/regression/run.mjs --only LIFE-1955`.
+5. Add its story to the file of its group in `stories/`: `export const Name = specimenStory('Name', DOOR);`.
+6. Run `STORY_PORT=5291 node scripts/regression/run.mjs --only LIFE-1955`.
 
 A control of Edit's goes into `packages/patch-editor/src/ui/specimens.tsx`, and its notes still go in the app's
 notes files.

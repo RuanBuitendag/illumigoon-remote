@@ -5,3 +5,4 @@ Payload/
 *.ipa
 .claude/
 *.tsbuildinfo
+storybook-static/

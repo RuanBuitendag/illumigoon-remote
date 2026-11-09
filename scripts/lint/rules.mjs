@@ -302,6 +302,34 @@ function checkComponentPage() {
 
 checkComponentPage();
 
+// Storybook draws each component from its specimen (LIFE-1986), so every component of the two doors and every
+// one of Edit's controls has a story: `export const Name = specimenStory('Name', DOOR)` in a file of `stories/`.
+const STORIES = 'stories';
+
+function checkStories() {
+  const stories = walk(STORIES)
+    .filter((file) => file.endsWith('.stories.tsx'))
+    .map((file) => fs.readFileSync(file, 'utf8'))
+    .join('\n');
+  const hasStory = (name) => new RegExp(`^export const ${name} = specimenStory\\('${name}',`, 'm').test(stories);
+  const missingStory = (file, name) =>
+    report(file, 1, 'missing-story', `${name}: give it a story, specimenStory('${name}', DOOR), in ${STORIES}`);
+  for (const layer of ['design-system', 'composites']) {
+    const door = `${SOURCE}/${layer}/index.ts`;
+    if (!fs.existsSync(door)) continue;
+    const text = fs.readFileSync(door, 'utf8');
+    for (const name of namesIn(text, DOOR_EXPORTS).filter((name) => /^[A-Z][a-z]/.test(name))) {
+      if (!hasStory(name)) missingStory(door, name);
+    }
+  }
+  const editSpecimens = fs.readFileSync(EDIT_SPECIMEN_FILE, 'utf8');
+  for (const [, name] of editSpecimens.matchAll(/^\s*name: '(\w+)'/gm)) {
+    if (!hasStory(name)) missingStory(EDIT_SPECIMEN_FILE, name);
+  }
+}
+
+checkStories();
+
 // The style rules of voice.md that a machine can check (BR-5, BR-6), over the words the app shows in src: the
 // text in JSX, a text prop such as `label`, and every string with a space in it, which is a phrase, not a key or
 // a class. The rules are the one list in voice-rules.json, which Edit's gate reads too (D82).

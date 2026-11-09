@@ -1064,3 +1064,15 @@ three capitalised words in a row.
 Why: BR-5, BR-6, LIFE-1956. "Palettes", "Pick another device" and "a device over the mesh" passed the check,
 because they sat in a record, a template or a function.
 Date: 2026-11-04
+
+**D95. Storybook is the catalogue**
+
+Chosen: Storybook 10 (`npm run storybook`, port 6006) shows the tokens, every component of the two doors and of
+Edit in each state, and the real screens on the made-up lights of `?demo`, on the phone and laptop sizes. The
+stories sit in `stories/`, outside the three layers, and import the doors. A component's story draws its specimen
+and notes from `src/domain/screens/component-page`, so Storybook and `?components` show the same thing until the
+page goes. In Storybook the screens answer `/api` in the page, as on the phone, so no light is reached.
+`lint:rules` fails a component with no story (`missing-story`).
+Why: TL-2, TL-6, LIFE-1986. Ruan: "I want the entire illumigoon app's ui inside storybook for quick prototyping and
+eval". The component page could not show a screen at a phone size, a token, or a prototype made of components.
+Date: 2026-11-09
