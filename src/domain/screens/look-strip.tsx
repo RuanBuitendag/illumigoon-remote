@@ -7,10 +7,11 @@ type LookStripProps = {
   shape: 'room' | 'tile' | 'line';
   isOn?: boolean;
   brightness?: number;
+  refusedAt?: number;
 };
 
 // A recording costs time, so a strip asks for one only once it comes into view.
-export function LookStrip({ source, shape, isOn, brightness }: LookStripProps) {
+export function LookStrip({ source, shape, isOn, brightness, refusedAt }: LookStripProps) {
   const [isSeen, setSeen] = useState(false);
   const recording = useRecording(isSeen ? source : null);
   return (
@@ -19,6 +20,7 @@ export function LookStrip({ source, shape, isOn, brightness }: LookStripProps) {
       shape={shape}
       isOn={isOn}
       brightness={brightness}
+      refusedAt={refusedAt}
       onFirstView={() => setSeen(true)}
     />
   );

@@ -79,6 +79,7 @@ function useRoomLook(room: Room) {
     source: previewOfAnimation(animation),
     isOn: isAnyOn(onlineLights),
     level: highestBrightness(onlineLights),
+    refusedAt: Math.max(0, ...onlineLights.map(({ refusedAt }) => refusedAt ?? 0)),
   };
 }
 
@@ -97,13 +98,13 @@ function RoomPower({ room, isOn }: { room: Room; isOn: boolean }) {
 // Lights that have not answered yet are named in the note, as lights that do not answer.
 export function RoomSummary({ room, waitingLights }: RoomSummaryProps) {
   const isOpen = useNavigation(({ roomId, isRoomOpen }) => isRoomOpen && roomId === room.id);
-  const { onlineLights, source, isOn, level } = useRoomLook(room);
+  const { onlineLights, source, isOn, level, refusedAt } = useRoomLook(room);
   const hasPower = !room.isLocked;
   return (
     <RoomCard
       name={room.name}
       power={hasPower && <RoomPower room={room} isOn={isOn} />}
-      strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} />}
+      strip={<LookStrip source={source} shape="room" isOn={isOn} brightness={level} refusedAt={refusedAt} />}
       lights={lightsLine(room, onlineLights, isOn)}
       look={isOn ? lookLabel(onlineLights) : 'off'}
       isOff={!isOn}

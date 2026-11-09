@@ -19,8 +19,16 @@ type LedStripProps = {
   shape: keyof typeof SHAPES;
   isOn?: boolean;
   brightness?: number;
+  // When the light last refused a change: the strip shakes once at each new time (D110).
+  refusedAt?: number;
   onFirstView: () => void;
 };
+
+function replay(canvas: HTMLCanvasElement, feedback: 'took' | 'refused') {
+  canvas.removeAttribute('data-feedback');
+  void canvas.offsetWidth;
+  canvas.setAttribute('data-feedback', feedback);
+}
 
 // A room's strip glows once when a new look starts on it: the one big moment of the app (D107). The first
 // recording is the look already there, so it does not glow.
@@ -31,13 +39,21 @@ function useLookStartGlow(canvasRef: RefObject<HTMLCanvasElement | null>, record
     const before = shown.current;
     if (recording) shown.current = recording;
     if (!canvas || !recording || !before || before === recording) return;
-    canvas.removeAttribute('data-feedback');
-    void canvas.offsetWidth;
-    canvas.setAttribute('data-feedback', 'took');
+    replay(canvas, 'took');
   }, [canvasRef, recording]);
 }
 
-export function LedStrip({ recording, shape, isOn = true, brightness = 1, onFirstView }: LedStripProps) {
+function useRefusedShake(canvasRef: RefObject<HTMLCanvasElement | null>, refusedAt: number) {
+  const shown = useRef(refusedAt);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || refusedAt === shown.current) return;
+    shown.current = refusedAt;
+    replay(canvas, 'refused');
+  }, [canvasRef, refusedAt]);
+}
+
+export function LedStrip({ recording, shape, isOn = true, brightness = 1, refusedAt = 0, onFirstView }: LedStripProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stripRef = useRef<Strip | null>(null);
   const onFirstViewRef = useRef(onFirstView);
@@ -60,6 +76,7 @@ export function LedStrip({ recording, shape, isOn = true, brightness = 1, onFirs
     if (stripRef.current && recording) playRecording(stripRef.current, recording);
   }, [recording]);
   useLookStartGlow(canvasRef, shape === 'room' ? recording : null);
+  useRefusedShake(canvasRef, refusedAt);
 
   useEffect(() => {
     if (!stripRef.current) return;

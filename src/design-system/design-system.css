@@ -341,6 +341,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 /* Feedback (D107): a part the light took glows once; a part it refused shakes a step each way. */
 @keyframes took { 30% { filter: brightness(1.8); } }
+@keyframes refused-dim { 30% { filter: brightness(0.4); } }
 @keyframes refused { 20%, 60% { translate: calc(-1 * var(--space-1)) 0; } 40%, 80% { translate: var(--space-1) 0; } }
 [data-feedback='took'] { animation: took var(--duration-expressive) var(--ease-out); }
 [data-feedback='refused'] { animation: refused var(--duration-settle) var(--ease-out); }
@@ -363,7 +364,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   button[data-held='true'] { transform: none; }
   .text-key[data-rank]::before { animation: none; }
   .key-menu { animation-name: fade-in; }
-  [data-feedback='refused'] { animation: none; }
+  [data-feedback='refused'] { animation: refused-dim var(--duration-settle) var(--ease-out); }
   .activity-light { width: 100%; translate: none; animation-name: activity-pulse; }
   .led-strip[data-loading='true'] { animation: none; }
   .key-menu[data-ending-style] { animation-name: fade-out; }

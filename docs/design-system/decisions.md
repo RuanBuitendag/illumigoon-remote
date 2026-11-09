@@ -1210,3 +1210,24 @@ Why: LIFE-1991. Apple pairs visual feedback with haptics and keeps them off freq
 what sets Things 3 apart. The plugin is native, so it reaches the iPhone with the next app build from
 `ios-app.yml`, not with a web update.
 Date: 2026-11-09
+
+**D110. A change to a light is sent, then answered or refused**
+
+Chosen: one pattern for power, level, a look and a scene.
+
+- Sent: the screen shows the new state at once, with the haptic of its role (D109). The app holds that state for
+  `LOCAL_WRITE_HOLD_MS`, because the next heartbeat can still carry the old value. A light whose socket is down keeps
+  the write and gets it when it is back (LIFE-1931); its card already says that it does not answer.
+- Answered: the first heartbeat after the hold agrees with what was asked (`answerOf` in `light-answer.ts`). Nothing
+  more shows, because the strip already shows it and the light itself is in the room.
+- Refused: that heartbeat disagrees. The screen goes back to what the light says, the light's strip shakes once (dims
+  once with reduced motion), and the finger feels the error haptic. The room's strip on Home shakes if any of its
+  lights refused.
+- No answer: a light that stops sending heartbeats is offline, and the room card names it as a light that does not
+  answer. That fact stays in that one place.
+
+A light reports power and brightness, not its look, so a look and a scene are judged by the power that rides on the
+same write. A change made from another phone during the hold can show as a refusal; this is rare and costs one shake.
+Why: LIFE-1992. Reviews criticise Nanoleaf because its app never confirms that a change was taken, and LIFX users
+report scenes sent twice. A silent answer keeps the app quiet when all is well, so a refusal stands out.
+Date: 2026-11-09

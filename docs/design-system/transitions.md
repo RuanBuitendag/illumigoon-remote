@@ -52,7 +52,7 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 | A colour slot in a set | `.colour-slot` | springs to its share of the row | `--duration-spring`, `--ease-spring` | no growth |
 | A new look starts on a room (expressive) | `.led-strip-room[data-feedback='took']`, `led-strip.tsx` | the room's strip glows once | `--duration-expressive` | the same: it is a filter |
 | A light took a change (expressive) | `[data-feedback='took']` | the part that changed glows once | `--duration-expressive` | the same: it is a filter |
-| A light refused a change | `[data-feedback='refused']` | the part shakes a step each way, twice | `--duration-settle` | stays still; the words say it |
+| A light refused a change | `.led-strip[data-feedback='refused']`, `led-strip.tsx` | the strip goes back to what the light shows and shakes a step each way, twice (D110) | `--duration-settle` | the strip dims once |
 | Work under way | `.activity`, `design-system.css` | a piece of light runs along a hairline | `--duration-activity`, `--ease-draw` | the line pulses |
 | A strip that waits for its recording | `.led-strip[data-loading]` | a soft light sweeps over the slot | `--duration-activity` | stays still |
 | A ranked key | `.text-key[data-rank]::before` | a piece of light travels round it (D100) | `--duration-travel` | stays still |

@@ -21,6 +21,7 @@ import type {
   Transition,
 } from '../light-network/protocol';
 import { feel } from './haptics';
+import { answerOf, withAsked, type AskedState } from './light-answer';
 
 // After a write, the next heartbeat can still carry the old value. It must not undo the switch.
 const LOCAL_WRITE_HOLD_MS = 1200;
@@ -50,6 +51,9 @@ export type Light = {
   transitionMs?: number;
   localWriteUntil: number;
   lookWrittenAt: number;
+  // What the app asked for and the light has not yet answered, and when it last refused (D110).
+  askedFor?: AskedState;
+  refusedAt?: number;
   hold?: LightHold;
   appliedLook?: AppliedLook;
   softwareVersion: string;
@@ -114,10 +118,23 @@ const reportedAbout = (heartbeat: Heartbeat) => ({
   canSchedule: heartbeat.light_sched_hash !== undefined,
 });
 
+const isHeld = (light: Light) => Boolean(light.hold) || Date.now() < light.localWriteUntil;
+
+// The first heartbeat after the hold answers the last change: the light took it, or the screen goes back to what the
+// light says and shows that it refused.
+function answerHeartbeat(light: Light | undefined, heartbeat: Heartbeat) {
+  if (!light?.askedFor || isHeld(light)) return {};
+  if (answerOf(light.askedFor, heartbeat) === 'took') return { askedFor: undefined };
+  feel('refused');
+  return { askedFor: undefined, refusedAt: Date.now() };
+}
+
 function applyHeartbeat(address: string, heartbeat: Heartbeat) {
+  const answer = answerHeartbeat(useFleet.getState().lights[address], heartbeat);
   updateLight(address, (light) => {
-    const held = Boolean(light.hold) || Date.now() < light.localWriteUntil;
+    const held = isHeld(light);
     return {
+      ...answer,
       hold: light.hold?.isRestoreSent ? undefined : light.hold,
       name: heartbeat.device_name,
       roomId: held ? light.roomId : heartbeat.room_id,
@@ -300,7 +317,11 @@ const holdLocalWrite = () => Date.now() + LOCAL_WRITE_HOLD_MS;
 export function setPower(lights: Light[], isOn: boolean) {
   for (const { address } of lights) {
     connections.get(address)?.sendState('power', 'light_set_state', { is_on: isOn });
-    updateLight(address, { isOn, localWriteUntil: holdLocalWrite() });
+    updateLight(address, ({ askedFor }) => ({
+      isOn,
+      askedFor: withAsked(askedFor, { isOn }),
+      localWriteUntil: holdLocalWrite(),
+    }));
   }
 }
 
@@ -313,7 +334,11 @@ export function switchPower(lights: Light[], isOn: boolean) {
 export function setBrightness(lights: Light[], brightness: number) {
   for (const { address } of lights) {
     connections.get(address)?.sendSampled('brightness', 'light_set_state', { brightness });
-    updateLight(address, { brightness, localWriteUntil: holdLocalWrite() });
+    updateLight(address, ({ askedFor }) => ({
+      brightness,
+      askedFor: withAsked(askedFor, { brightness }),
+      localWriteUntil: holdLocalWrite(),
+    }));
   }
 }
 
@@ -346,6 +371,7 @@ export function noteLook(address: string, lookName: string, animation: Animation
     animation,
     appliedLook: appliedLookOf(lookName, animation),
     hold: undefined,
+    askedFor: { isOn: true },
     localWriteUntil: holdLocalWrite(),
     lookWrittenAt: Date.now(),
   });
@@ -372,6 +398,7 @@ export function noteState(light: Light, { isOn, brightness, lookName, animation 
     animation: animation ?? light.animation,
     appliedLook: animation && lookName ? appliedLookOf(lookName, animation) : light.appliedLook,
     hold: animation ? undefined : light.hold,
+    askedFor: withAsked(light.askedFor, { isOn, brightness }),
     localWriteUntil: holdLocalWrite(),
   });
 }

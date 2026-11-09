@@ -82,6 +82,7 @@ function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
                 shape="room"
                 isOn={light.isOnline && light.isOn}
                 brightness={light.brightness}
+                refusedAt={light.refusedAt}
               />
             }
             power={
