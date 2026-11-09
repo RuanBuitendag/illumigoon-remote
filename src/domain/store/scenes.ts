@@ -5,6 +5,7 @@ import type { Scene, SceneLight } from './library-store';
 import { cancelWaiting } from './light-timing';
 import { canPlay, isSameAnimation, lookNameOf, type Room } from './rooms';
 import { momentsOf, offerUndo, showNotice } from './undo';
+import { feel } from './haptics';
 
 export const WHOLE_HOUSE = 'house';
 
@@ -48,6 +49,7 @@ function applyToLight(light: Light, saved: SceneLight) {
 
 // The notice says which lights the scene had to leave alone: nobody can reach them or someone holds them.
 export function applyScene(scene: Scene, rooms: Room[]) {
+  feel('pick');
   const writable = rooms.flatMap((room) => room.writableLights);
   const reached = scene.lights.flatMap((saved) => {
     const light = writable.find((candidate) => lightIdOf(candidate) === saved.id);

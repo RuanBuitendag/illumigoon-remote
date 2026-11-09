@@ -20,6 +20,7 @@ import type {
   ScheduleEntry,
   Transition,
 } from '../light-network/protocol';
+import { feel } from './haptics';
 
 // After a write, the next heartbeat can still carry the old value. It must not undo the switch.
 const LOCAL_WRITE_HOLD_MS = 1200;
@@ -228,6 +229,7 @@ function onLightLost(serviceName: string) {
 
 // For a light that is gone for good. A light that answers again comes back by itself.
 export function forgetDeadLight({ address }: Light) {
+  feel('destroy');
   typedAddresses.delete(address);
   forgetLightAddress(address);
   forgetLight(address);
@@ -300,6 +302,12 @@ export function setPower(lights: Light[], isOn: boolean) {
     connections.get(address)?.sendState('power', 'light_set_state', { is_on: isOn });
     updateLight(address, { isOn, localWriteUntil: holdLocalWrite() });
   }
+}
+
+// A person turned lights on or off, by a power key.
+export function switchPower(lights: Light[], isOn: boolean) {
+  feel('power');
+  setPower(lights, isOn);
 }
 
 export function setBrightness(lights: Light[], brightness: number) {
@@ -510,6 +518,7 @@ export function changeLightWifi({ address }: Light, wifiName: string, wifiPasswo
 
 // The light comes back with no name, room or Wi-Fi, so this one will never answer again.
 export function resetLight(light: Light) {
+  feel('destroy');
   connections.get(light.address)?.send('device_reset');
   window.setTimeout(() => forgetDeadLight(light), SEND_FLUSH_MS);
 }

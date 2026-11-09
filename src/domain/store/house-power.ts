@@ -1,4 +1,4 @@
-import { setPower, type Light } from './fleet-store';
+import { switchPower, type Light } from './fleet-store';
 import type { Room } from './rooms';
 import { lightCount } from './scenes';
 import { momentsOf, offerUndo } from './undo';
@@ -26,5 +26,5 @@ export function setHousePower(rooms: Room[], isOn: boolean) {
   const count = lightCount(changed.length);
   wereOn = isOn ? [] : changed.map(({ address }) => address);
   offerUndo({ text: isOn ? `${count} on` : `${count} off.${lockedOnText(rooms)}`, moments: momentsOf(changed) });
-  setPower(changed, isOn);
+  switchPower(changed, isOn);
 }

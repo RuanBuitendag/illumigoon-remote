@@ -16,6 +16,7 @@ import { gapOf, isOlder } from './light-timing';
 import { useNavigation } from './navigation-store';
 import { canPlay, type Room } from './rooms';
 import { animationOf, sceneLookName } from './scenes';
+import { feel } from './haptics';
 
 // Hold a look and the lights show it until the finger lifts. A long look can restart an older light,
 // and a light saves its look a second after each change, so a hold is two look changes at most and
@@ -159,6 +160,7 @@ function startPreview(lights: PlannedLight[]) {
 }
 
 export function previewLook(lights: Light[], lookName: string, look: AnimationState) {
+  feel('hold');
   const target = { isOn: true, animation: look, lookName };
   startPreview(previewPlan(lights, look, Date.now()).map((step) => ({ ...step, target })));
 }
@@ -182,6 +184,7 @@ function planSceneLight(light: Light, saved: SceneLight, now: number): PlannedLi
 }
 
 export function previewScene({ lights }: Scene, rooms: Room[]) {
+  feel('hold');
   const writable = rooms.flatMap((room) => room.writableLights);
   const now = Date.now();
   startPreview(

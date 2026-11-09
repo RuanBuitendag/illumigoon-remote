@@ -3,6 +3,7 @@ import type { PaletteEntry, Scene, SceneEntry, SceneLight } from '@illumigoon/pa
 import { editorApi } from './editor-host';
 import { lightIdOf, type Light } from './fleet-store';
 import { useHousehold, type OldScene } from './household-store';
+import { feel } from './haptics';
 
 // A room as far as moving old scenes goes. Named here, because the rooms read the looks in this library.
 type Room = { id: string; lights: Light[] };
@@ -70,6 +71,7 @@ export const updateScene = (entry: SceneEntry, lights: SceneLight[]) =>
 
 export const removeScene = ({ file }: SceneEntry) =>
   attempt(async () => {
+    feel('destroy');
     const { deleteScene } = await library();
     await deleteScene(file);
     useLibrary.setState(({ scenes }) => ({ scenes: scenes.filter((scene) => scene.file !== file) }));

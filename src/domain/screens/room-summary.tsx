@@ -1,6 +1,6 @@
 import { LockNote, RoomCard } from '../../composites';
 import { PowerKey } from '../../design-system';
-import { setPower, type Light } from '../store/fleet-store';
+import { switchPower, type Light } from '../store/fleet-store';
 import { useShownLights } from '../store/look-preview';
 import { openPage, openRoom, useNavigation } from '../store/navigation-store';
 import {
@@ -89,7 +89,7 @@ function RoomPower({ room, isOn }: { room: Room; isOn: boolean }) {
       label={`${room.name} power`}
       isOn={isOn}
       disabled={writableLights.length === 0}
-      onChange={(next) => setPower(writableLights, next)}
+      onChange={(next) => switchPower(writableLights, next)}
     />
   );
 }

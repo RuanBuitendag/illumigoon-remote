@@ -10,7 +10,7 @@ import {
   SliderRow,
 } from '../../composites';
 import { PowerKey, TextKey } from '../../design-system';
-import { flashLights, setBrightness, setPower, type Light } from '../store/fleet-store';
+import { flashLights, setBrightness, switchPower, type Light } from '../store/fleet-store';
 import { playLook } from '../store/look-play';
 import { useShownLights } from '../store/look-preview';
 import { chooseLight, chooseLights, closeRoom, openPage, useNavigation } from '../store/navigation-store';
@@ -91,7 +91,7 @@ function LightCards({ room, chosen }: { room: Room; chosen: Light[] }) {
                   label={`${light.name} power`}
                   isOn={light.isOn}
                   disabled={!canChange}
-                  onChange={(next) => setPower([light], next)}
+                  onChange={(next) => switchPower([light], next)}
                 />
               )
             }
@@ -187,7 +187,7 @@ export function RoomScreen({ room, rooms }: { room: Room; rooms: Room[] }) {
           label={`${room.name} power`}
           isOn={isOn}
           disabled={isReadOnly}
-          onChange={(next) => setPower(writableLights, next)}
+          onChange={(next) => switchPower(writableLights, next)}
         />
       }
       backLabel="Rooms"

@@ -9,6 +9,7 @@ import { cancelWaiting, gapOf, laterOn } from './light-timing';
 import { saveLook, useLookFiles } from './look-files';
 import { editedLook, isSameAnimation, lookNameOf, OWN_LOOK } from './rooms';
 import { momentsOf, offerUndo, showNotice } from './undo';
+import { feel } from './haptics';
 
 // A look written to a light that is off can replace the one it has saved when the light is short of
 // memory. So that light comes on first, and takes the look a gap later. The screen shows it at once.
@@ -48,6 +49,7 @@ function keepChangesInRecent(lights: Light[]) {
 
 // The one way a tap puts a look on lights.
 export function playLook(lights: Light[], name: string, animation: AnimationState) {
+  feel('pick');
   offerUndo({ text: `Playing ${name}`, moments: momentsOf(lights) });
   keepChangesInRecent(lights);
   for (const roomId of new Set(lights.map((light) => light.roomId))) {

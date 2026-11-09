@@ -1198,3 +1198,15 @@ Why: LIFE-1990. Fluent's container transform suits a card that grows into a page
 iPhone navigation push, which Apple uses for a step down a hierarchy, and Home stays mounted under it, so a part
 flying between the two would fight the push. Look again if the room screen ever opens in place.
 Date: 2026-11-09
+
+**D109. Haptics follow a role table**
+
+Chosen: `feel(role)` in `src/domain/store/haptics.ts` is the one way the app taps the finger, through
+`@capacitor/haptics`. The roles: power on or off is a light impact; a look or scene picked is a medium impact; a hold
+that starts a preview is a heavy impact; a change the light refused is the error notification; a delete, forget or
+reset is the warning notification. A fader, a scroll and a colour pick have none, since they fire many times a
+second. The laptop, and an iPhone build from before the plugin, stay silent.
+Why: LIFE-1991. Apple pairs visual feedback with haptics and keeps them off frequent events. Reviews name haptics as
+what sets Things 3 apart. The plugin is native, so it reaches the iPhone with the next app build from
+`ios-app.yml`, not with a web update.
+Date: 2026-11-09

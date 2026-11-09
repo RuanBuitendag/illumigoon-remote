@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { attempt, library } from './library-store';
 import { addLook, askServer, loadLooks, useLookFiles, type LookFile } from './look-files';
+import { feel } from './haptics';
 
 // What a person can do to the looks on the Looks page, apart from playing them.
 
@@ -55,6 +56,7 @@ export const exportLook = ({ doc }: LookFile) =>
 
 export const removeLook = ({ file, name }: LookFile) =>
   attempt(async () => {
+    feel('destroy');
     const { deletePreset, deletePublished } = await library();
     await deletePreset(file);
     await deletePublished(file);
