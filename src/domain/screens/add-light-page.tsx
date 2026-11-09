@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { HeadingRow, PageFrame, PageHint, PageSection, ScanNote } from '../../composites';
-import { ActionKey, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
+import { ActionKey, Activity, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
 import type { NewLight } from '../light-network/protocol';
 import { SCAN_PREVIEW } from '../looks/recordings';
 import {
@@ -107,6 +107,7 @@ function AddressForm() {
         </TextKey>
       </KeyRow>
       {sought && <PageHint>{soughtText()}</PageHint>}
+      {sought && !isFound && !hasWaited && <Activity label={`Looking at ${sought}`} />}
     </PageSection>
   );
 }

@@ -7,6 +7,8 @@ export default { title: 'Design system' } satisfies Meta;
 
 export const ActionKey = specimenStory('ActionKey', DOOR);
 export const AddKey = specimenStory('AddKey', DOOR);
+export const Activity = specimenStory('Activity', DOOR);
+export const ArmedKey = specimenStory('ArmedKey', DOOR);
 export const BackKey = specimenStory('BackKey', DOOR);
 export const ColourFill = specimenStory('ColourFill', DOOR);
 export const ColourPad = specimenStory('ColourPad', DOOR);
@@ -19,6 +21,7 @@ export const FaderDot = specimenStory('FaderDot', DOOR);
 export const FileKey = specimenStory('FileKey', DOOR);
 export const Icon = specimenStory('Icon', DOOR);
 export const IconFrame = specimenStory('IconFrame', DOOR);
+export const KeyGroup = specimenStory('KeyGroup', DOOR);
 export const KeyRow = specimenStory('KeyRow', DOOR);
 export const LedStrip = specimenStory('LedStrip', DOOR);
 export const LinkKey = specimenStory('LinkKey', DOOR);

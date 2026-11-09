@@ -250,7 +250,7 @@ function ScheduleItem({ room, schedule, onChange }: ScheduleItemProps) {
         isOn={entry.enabled !== false}
         onChange={(isOn) => setScheduleEnabled(room.writableLights, entry.id, isOn)}
       />
-      <TextKey isQuiet onClick={() => removeWithUndo(room, schedule)}>
+      <TextKey rank="destructive" onClick={() => removeWithUndo(room, schedule)}>
         REMOVE
       </TextKey>
     </InfoRow>

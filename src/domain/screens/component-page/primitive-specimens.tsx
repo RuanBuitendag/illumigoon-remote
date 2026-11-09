@@ -2,7 +2,9 @@ import type { ComponentType, ReactNode } from 'react';
 import { PaintSample } from '../../../composites';
 import {
   ActionKey,
+  Activity,
   AddKey,
+  ArmedKey,
   BackKey,
   BLACK_HEX,
   ColourPad,
@@ -17,6 +19,7 @@ import {
   hexToColour,
   Icon,
   IconFrame,
+  KeyGroup,
   KeyRow,
   LedStrip,
   LinkKey,
@@ -46,7 +49,7 @@ type WordKeyProps = {
   children: ReactNode;
   disabled?: boolean;
   isQuiet?: boolean;
-  rank?: 'primary' | 'secondary';
+  rank?: 'primary' | 'secondary' | 'destructive';
   isPressed?: boolean;
   onClick: () => void;
   onHold?: () => void;
@@ -58,6 +61,7 @@ const KINDS = {
   quiet: { isQuiet: true },
   primary: { rank: 'primary' as const },
   secondary: { rank: 'secondary' as const },
+  destructive: { rank: 'destructive' as const },
   disabled: { disabled: true },
   'long text': {},
 };
@@ -74,7 +78,7 @@ function wordKey(name: string, Key: ComponentType<WordKeyProps>, word: string, k
 
 const KEYS: Specimen[] = [
   wordKey('Press', Press, 'A press with no look of its own', ['pressed', 'held (press and hold)', 'disabled']),
-  wordKey('TextKey', TextKey, 'SAVE', ['primary', 'secondary', 'quiet', 'disabled', 'long text']),
+  wordKey('TextKey', TextKey, 'SAVE', ['primary', 'secondary', 'destructive', 'quiet', 'disabled', 'long text']),
   wordKey('ActionKey', ActionKey, 'Join this Wi-Fi', ['disabled', 'long text']),
   wordKey('LinkKey', LinkKey, 'Update now', ['long text']),
   // An add key keeps to one line (`white-space: nowrap`), so it has no long text state.
@@ -100,6 +104,33 @@ const KEYS: Specimen[] = [
         <KeyRow>
           <TextKey onClick={nothing}>RESET</TextKey>
           <TextKey onClick={nothing}>EDIT</TextKey>
+        </KeyRow>
+      ),
+    },
+  },
+  { name: 'ArmedKey', states: { 'tap twice': <ArmedKey name="DELETE" onSelect={nothing} /> } },
+  {
+    name: 'KeyGroup',
+    states: {
+      'room for all': (
+        <KeyRow>
+          <KeyGroup more={[{ name: 'EXPORT', onSelect: nothing }]}>
+            <TextKey onClick={nothing}>RENAME</TextKey>
+            <TextKey onClick={nothing}>COPY</TextKey>
+          </KeyGroup>
+        </KeyRow>
+      ),
+      'folded into MORE': (
+        <KeyRow>
+          <KeyGroup
+            more={[
+              { name: 'EXPORT', onSelect: nothing },
+              { name: 'DELETE', isDestructive: true, onSelect: nothing },
+            ]}
+          >
+            <TextKey onClick={nothing}>RENAME</TextKey>
+            <TextKey onClick={nothing}>COPY</TextKey>
+          </KeyGroup>
         </KeyRow>
       ),
     },
@@ -249,6 +280,7 @@ const MARKS: Specimen[] = [
     },
   },
   { name: 'SoundMark', states: { default: <SoundMark /> } },
+  { name: 'Activity', states: { running: <Activity label="Updating" /> } },
   { name: 'Eyebrow', states: { default: <Eyebrow>LIGHTS</Eyebrow>, 'long text': <Eyebrow>{LONG_NAME.toUpperCase()}</Eyebrow> } },
   {
     name: 'Picked',

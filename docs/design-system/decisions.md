@@ -1118,3 +1118,62 @@ frame, and outside the fill of a primary key. It stops for a disabled key and fo
 Why: Ruan, 9 Nov 2026: "theres no animations.... a super minimalist app like this should have cool animations", then
 "Plain outline" over a band of wire mesh.
 Date: 2026-11-09
+
+**D101. A destructive key has its own rank**
+
+Chosen: `TextKey` takes `rank="destructive"` for a key that deletes, forgets, resets or removes: words only, in the
+danger colour --bad, with no frame and no travelling light. It is never primary, because the rank has one value. An
+action with undo acts at once; one without undo asks for a second tap through `ArmedKey`, which says TAP AGAIN TO
+and its word. Used on DELETE (scenes, looks, recordings), FORGET, RESET on a light, and REMOVE on a schedule.
+Why: LIFE-1988. Apple, Carbon, Polaris and Geist all mark a destructive action apart, and Apple says it is never the
+main action. Before this, DELETE looked like any key, and --bad was in no key.
+Date: 2026-11-09
+
+**D102. A group shows three keys, and MORE holds the rest**
+
+Chosen: `KeyGroup` takes the keys that always show as children, most used first, and the rest in `more`. While the
+group has three keys or fewer, all show. With more, the children show and a MORE key with three dots opens a menu of
+the rest. A pair of arrow keys that move a thing counts as one control. The main action never goes in `more`. In the
+menu, a destructive key without undo asks for a second tap as `ArmedKey` does.
+Used on the scene shelf (MANAGE, + SAVE; UPDATE and RECENT fold) and a look of Mine (RENAME, COPY; EXPORT and DELETE
+fold).
+Why: LIFE-1988. Carbon puts actions over three in an overflow menu, and Apple uses a pull-down button for the same.
+Before this, the scene shelf had four keys in its heading row.
+Date: 2026-11-09
+
+**D103. lint:rules fails a second primary key**
+
+Chosen: a screen or sheet is one file, so `lint:rules` fails a file in the layers with more than one
+`rank="primary"`.
+Why: LIFE-1988. D98 wrote the rule, and nothing kept it. Carbon allows one primary action per page. Proved with a
+second primary key added to save-scene-sheet.tsx, which the check failed.
+Date: 2026-11-09
+
+**D104. A key that shows only an icon has a label**
+
+Chosen: `TextKey` takes `label`, the name a reader hears. `lint:rules` fails a `TextKey` or `Press` whose only child
+is an icon and that has no label. An icon stands alone only where its meaning is common: an arrow to move, three dots
+for MORE, the power symbol. Anything else says a word.
+Why: LIFE-1988. Carbon and Material require a name on an icon-only button. The arrow keys in the colour editor had
+none. Proved with an icon-only key added to save-scene-sheet.tsx, which the check failed, and one with a label, which
+it passed.
+Date: 2026-11-09
+
+**D105. Work under way shows a running light**
+
+Chosen: `Activity` is a hairline with a piece of light that runs along it in --duration-activity, a progress bar with
+no value for a screen reader. It shows under the words that say what is under way: a light's software update, and a
+light sought by its address. A strip that waits for its recording has a soft light that sweeps over its slot. With
+reduced motion the line pulses and the strip stays still.
+Why: LIFE-1989. Apple shows an activity indicator for work with no known end, and Polaris has Spinner and
+Progress. Before this, nothing in the app moved while a light updated. A running light keeps to the app's one motif,
+the light (LIFE-1993), where a spinner would not.
+Date: 2026-11-09
+
+**D106. An empty list says what is missing, and its one step**
+
+Chosen: `EmptyState` holds a short title in body type and, only when the step is not plain, the one step under it.
+Used on Recent. Favourites keep only their heading and key, since the star on Looks is plain (9 Nov 2026).
+Why: LIFE-1989. Polaris gives an empty state one clear first step. Ruan asked on 9 Nov 2026 for no hint that states
+the obvious, so the step is there only when it is not.
+Date: 2026-11-09

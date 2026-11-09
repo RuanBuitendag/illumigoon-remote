@@ -60,10 +60,10 @@ function SlotKeys({ count, canArrange, canRemove, selected, copied, onCopy, onPa
       </TextKey>
       {canArrange && (
         <>
-          <TextKey disabled={selected === 0} onClick={() => onMove(-1)}>
+          <TextKey label="Move left" disabled={selected === 0} onClick={() => onMove(-1)}>
             <Icon.Back c="currentColor" />
           </TextKey>
-          <TextKey disabled={selected === count - 1} onClick={() => onMove(1)}>
+          <TextKey label="Move right" disabled={selected === count - 1} onClick={() => onMove(1)}>
             <Icon.Fwd c="currentColor" />
           </TextKey>
           <TextKey disabled={!canRemove} onClick={onRemove}>

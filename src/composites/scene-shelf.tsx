@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Eyebrow, Picked, Press, TextKey } from '../design-system';
+import { Eyebrow, KeyGroup, Picked, Press, TextKey, type FoldedKey } from '../design-system';
 import { HeadingRow } from './control-rows';
 import { QuietNote } from './room-card';
 
@@ -46,7 +46,9 @@ export function SceneCard(props: SceneCardProps) {
         <span className="scene-edit">
           <TextKey onClick={onUpdate}>UPDATE</TextKey>
           <TextKey onClick={onRename}>RENAME</TextKey>
-          <TextKey onClick={onDelete}>DELETE</TextKey>
+          <TextKey rank="destructive" onClick={onDelete}>
+            DELETE
+          </TextKey>
         </span>
       )}
     </div>
@@ -95,14 +97,19 @@ type SceneShelfProps = {
 
 export function SceneShelf(props: SceneShelfProps) {
   const { title, current, hasScenes, isEditing, note, onEdit, onSave, onUpdate, onRecent, children } = props;
+  // Saving and managing are the shelf's own keys; update and recent fold into MORE when all four show (D102).
+  const more: FoldedKey[] = [
+    ...(onUpdate ? [{ name: 'UPDATE', onSelect: onUpdate }] : []),
+    ...(onRecent ? [{ name: 'RECENT', onSelect: onRecent }] : []),
+  ];
   return (
     <section className="scene-shelf">
       <HeadingRow heading={<Eyebrow>{title}</Eyebrow>}>
         <span className="scene-keys">
-          {onRecent && <TextKey onClick={onRecent}>RECENT</TextKey>}
-          {onUpdate && <TextKey onClick={onUpdate}>UPDATE</TextKey>}
-          {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>}
-          <TextKey onClick={onSave}>+ SAVE</TextKey>
+          <KeyGroup more={more}>
+            {hasScenes && <TextKey onClick={onEdit}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>}
+            <TextKey onClick={onSave}>+ SAVE</TextKey>
+          </KeyGroup>
         </span>
       </HeadingRow>
       {current?.text && (

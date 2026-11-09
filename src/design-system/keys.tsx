@@ -37,26 +37,39 @@ export function Press({ className, label, isPressed, disabled, onClick, onHold, 
   );
 }
 
+type KeyRank = 'primary' | 'secondary' | 'destructive';
+
 type TextKeyProps = {
   children: ReactNode;
+  // The name a reader hears. A key that shows only an icon must have one (D104).
+  label?: string;
   disabled?: boolean;
   isQuiet?: boolean;
   // primary: the one main action of a screen or sheet, filled. secondary: an action that opens or changes something
-  // here, framed. With no rank the key is words only (D98).
-  rank?: 'primary' | 'secondary';
+  // here, framed. destructive: an action that deletes or forgets, in the danger colour, never primary (D101). With
+  // no rank the key is words only (D98).
+  rank?: KeyRank;
   onClick: () => void;
 };
 
-export function TextKey({ children, disabled, isQuiet, rank, onClick }: TextKeyProps) {
+export function TextKey({ children, label, disabled, isQuiet, rank, onClick }: TextKeyProps) {
   return (
-    <button type="button" className="text-key" data-quiet={isQuiet} data-rank={rank} disabled={disabled} onClick={onClick}>
+    <button
+      type="button"
+      className="text-key"
+      aria-label={label}
+      data-quiet={isQuiet}
+      data-rank={rank}
+      disabled={disabled}
+      onClick={onClick}
+    >
       {children}
     </button>
   );
 }
 
 // The one main action of a form, in the same size as its fields.
-export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'isQuiet' | 'rank'>) {
+export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'isQuiet' | 'rank' | 'label'>) {
   return (
     <button type="button" className="action-key" disabled={disabled} onClick={onClick}>
       {children}

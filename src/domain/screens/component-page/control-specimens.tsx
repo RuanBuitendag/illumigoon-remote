@@ -12,6 +12,7 @@ import {
   LockStatus,
   NamedSelectRow,
   NamingRow,
+  EmptyState,
   PageHint,
   ScanNote,
   SelectRow,
@@ -154,6 +155,17 @@ const LISTS: Specimen[] = [
   },
   { name: 'LockStatus', states: { default: <LockStatus>Locked to this phone</LockStatus> } },
   { name: 'PageHint', states: { default: <PageHint>Hold a look to see it here first.</PageHint> } },
+  {
+    name: 'EmptyState',
+    states: {
+      'title only': <EmptyState title="No scenes yet" />,
+      'with its step': (
+        <EmptyState title="Nothing yet">
+          <PageHint>Change a light, and it shows here.</PageHint>
+        </EmptyState>
+      ),
+    },
+  },
   { name: 'ScanNote', states: { loading: <ScanNote strip={strip}>Looking for lights on this Wi-Fi.</ScanNote> } },
   {
     name: 'ArrangeRow',

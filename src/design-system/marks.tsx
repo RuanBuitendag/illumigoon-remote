@@ -7,3 +7,13 @@ export function SoundMark() {
   );
 }
 
+
+// Work under way with no known end: a hairline with a piece of light that runs along it (D105). A screen reader
+// hears a progress bar with no value, named by `label`.
+export function Activity({ label }: { label: string }) {
+  return (
+    <span className="activity" role="progressbar" aria-label={label}>
+      <span className="activity-light" />
+    </span>
+  );
+}

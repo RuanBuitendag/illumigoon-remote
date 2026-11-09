@@ -16,6 +16,8 @@
 //   - Every media query width in the app and the editor is the --wide token.
 //   - The words the app shows keep the style rules of docs/design-system/voice.md that a machine can check.
 //   - No name is cut off with an ellipsis or a line clamp in composites or the design system. It wraps (DA-14).
+//   - A screen or sheet, which is one file, has at most one primary key (D103).
+//   - A key that shows only an icon has a label (D104).
 
 import fs from 'node:fs';
 import path from 'node:path';
@@ -229,6 +231,22 @@ function checkCss(file, layer) {
   }
 }
 
+// Key ranks (D103, D104). Each screen and sheet is a file of its own, so one primary key per file is one per view.
+const PRIMARY_KEY = /\brank="primary"/g;
+const ICON_ONLY_KEY = /<(TextKey|Press)\b((?:=>|[^>])*)>\s*<Icon\.\w+[^>]*\/>\s*<\/\1>/g;
+function checkKeyRanks(file) {
+  const text = fs.readFileSync(file, 'utf8');
+  const primaries = [...text.matchAll(PRIMARY_KEY)];
+  for (const extra of primaries.slice(1)) {
+    report(file, lineOf(text, extra.index), 'two-primary-keys', 'a screen or sheet has one primary key: make this one secondary');
+  }
+  for (const match of text.matchAll(ICON_ONLY_KEY)) {
+    if (!/\b(label|aria-label)=/.test(match[2])) {
+      report(file, lineOf(text, match.index), 'icon-key-name', `${match[1]} with only an icon: give it a label`);
+    }
+  }
+}
+
 for (const file of walk(SOURCE)) {
   const layer = layerOf(file);
   if (GENERATED.test(file)) continue;
@@ -241,6 +259,7 @@ for (const file of walk(SOURCE)) {
     checkInlineGeometry(file, [...INLINE_GEOMETRY, ...INLINE_SIZE]);
   }
   if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);
+  if (layer && file.endsWith('.tsx')) checkKeyRanks(file);
 }
 
 runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);

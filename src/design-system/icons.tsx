@@ -127,6 +127,14 @@ export const Icon = {
       <path d="M7 2v1.5M7 10.5V12M2 7h1.5M10.5 7H12M3.5 3.5l1 1M9.5 9.5l1 1M3.5 10.5l1-1M9.5 4.5l1-1" />
     </IconFrame>
   ),
+  /** Three dots: the key that opens the rest of a group of keys (D102). */
+  More: ({ c }: { c?: string } = {}) => (
+    <IconFrame colour="none">
+      {[3, 7, 11].map((x) => (
+        <circle key={x} cx={x} cy="7" r="1.1" fill={c ?? 'var(--text-2)'} />
+      ))}
+    </IconFrame>
+  ),
   X: ({ c }: { c?: string } = {}) => (
     <IconFrame at={[2.5, 2.5]} colour={c ?? 'var(--text-5)'}>
       <path d="M1 1l7 7M8 1l-7 7" />

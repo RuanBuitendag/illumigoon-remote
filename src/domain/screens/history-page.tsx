@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PageFrame, PageHint, PageSection, StateCard, StateList } from '../../composites';
+import { EmptyState, PageFrame, PageHint, StateCard, StateList } from '../../composites';
 import type { SceneLight } from '../store/library-store';
 import { endPreview, previewScene } from '../store/look-preview';
 import { closePage, useBackLabel } from '../store/navigation-store';
@@ -23,9 +23,9 @@ export function HistoryPage({ rooms }: { rooms: Room[] }) {
       onBack={closePage}
     >
       {states.length === 0 && (
-        <PageSection>
-          <PageHint>Nothing yet. Change a light, and it shows here.</PageHint>
-        </PageSection>
+        <EmptyState title="Nothing yet">
+          <PageHint>Change a light, and it shows here.</PageHint>
+        </EmptyState>
       )}
       <StateList>
         {states.map((state, index) => (

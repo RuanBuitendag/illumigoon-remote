@@ -122,6 +122,8 @@
   /* A line that draws itself: the power symbol turning on. */
   --duration-draw: 520ms;
   --ease-draw: cubic-bezier(0.6, 0, 0.2, 1);
+  /* One run of the light along an activity line, and one sweep over a strip that waits for its recording (D105). */
+  --duration-activity: 1.4s;
   /* One trip of the piece of light round a ranked key (D100). */
   --duration-travel: 4s;
   /* Things that appear and leave (MO-2): a sheet, a dialog, a toast. Entering slows into place; leaving speeds
@@ -345,6 +347,10 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   }
   button[data-held='true'] { transform: none; }
   .text-key[data-rank]::before { animation: none; }
+  .key-menu { animation-name: fade-in; }
+  .activity-light { width: 100%; translate: none; animation-name: activity-pulse; }
+  .led-strip[data-loading='true'] { animation: none; }
+  .key-menu[data-ending-style] { animation-name: fade-out; }
   .dialog { animation-name: fade-in; }
   .dialog[data-ending-style] { animation-name: fade-out; }
 }
@@ -368,6 +374,12 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 /* Edit's live mark: a short flat bar, full ink when the light is on, the off grey when it is off, and
    broken into dots when it does not answer. No circle (D51). */
 
+/* Activity (D105): a hairline, and a piece of light that runs along it from left to right. */
+@keyframes activity-run { from { translate: -100% 0; } to { translate: 340% 0; } }
+@keyframes activity-pulse { 50% { opacity: var(--opacity-behind); } }
+.activity { position: relative; display: block; width: 100%; height: var(--line-strong); overflow: hidden; background: var(--track); }
+.activity-light { position: absolute; top: 0; bottom: 0; left: 0; width: 30%; background: linear-gradient(90deg, transparent, var(--text-1), transparent); animation: activity-run var(--duration-activity) var(--ease-draw) infinite; }
+
 /* Text */
 
 .eyebrow { color: var(--text-4); }
@@ -389,10 +401,10 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
    both, outside the fill of a primary key (D100). */
 @property --key-turn { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 @keyframes key-travel { to { --key-turn: 360deg; } }
-.text-key[data-rank] { justify-content: center; width: fit-content; padding: 0 var(--space-4); border-radius: var(--radius); white-space: nowrap; }
+.text-key:is([data-rank='primary'], [data-rank='secondary']) { justify-content: center; width: fit-content; padding: 0 var(--space-4); border-radius: var(--radius); white-space: nowrap; }
 .text-key[data-rank='primary'] { background: var(--fill); color: var(--on-fill); }
 .text-key[data-rank='secondary'] { color: var(--text-1); }
-.text-key[data-rank]::before {
+.text-key:is([data-rank='primary'], [data-rank='secondary'])::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -406,6 +418,17 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 .text-key[data-rank='primary']::before { inset: calc(-1 * var(--space-1)); background: conic-gradient(from var(--key-turn), transparent 0 75%, var(--text-1) 92%, transparent 100%); }
 .text-key[data-rank]:disabled::before { animation: none; }
 .text-key[data-rank='primary']:disabled { background: var(--track); }
+/* A destructive key (D101): words only, in the danger colour, with no frame and no travelling light. */
+.text-key[data-rank='destructive'] { color: var(--bad); }
+/* The key that opens the rest of a group (D102), and its menu: a box on the page, as a dialog is, with a row per key. */
+.more-key { justify-content: center; min-width: var(--row); }
+.key-menu-place { z-index: var(--layer-float); }
+.key-menu { display: flex; flex-direction: column; padding: var(--space-2) 0; background: var(--background); border: var(--line) solid var(--track); border-radius: var(--radius); box-shadow: var(--float-shadow); outline: 0; transform-origin: var(--transform-origin); animation: rise-in var(--duration-enter) var(--ease-enter); }
+.key-menu[data-ending-style] { animation: sink-out var(--duration-exit) var(--ease-exit) forwards; }
+.key-menu-item { display: flex; align-items: center; min-height: var(--row); padding: 0 var(--space-4); color: var(--text-2); font: var(--type-label); letter-spacing: var(--tracking-label); cursor: pointer; outline: 0; }
+.key-menu-item[data-highlighted] { background: var(--wash-strong); color: var(--text-1); }
+.key-menu-item[data-destructive='true'] { color: var(--bad); }
+.key-menu-item[data-disabled] { opacity: var(--opacity-disabled); cursor: default; }
 /* A form's main action and its fields read at body size, as Edit's forms do, under the heading that names the page (D54). */
 .action-key { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); color: var(--text-1); font: var(--type-body); }
 .key-row { display: flex; align-items: center; gap: var(--space-5); }
@@ -501,3 +524,6 @@ input.swatch::-moz-color-swatch { border: var(--line) solid var(--track); border
 .led-strip-room { width: calc(100% + 2 * var(--gutter)); height: var(--strip-room); margin: var(--space-2) var(--edge); }
 .led-strip-tile { height: var(--strip-tile); margin-top: var(--space-2); }
 .led-strip-line { height: var(--strip-line); }
+/* A strip that waits for its recording: a soft light sweeps over the empty slot (D105). */
+@keyframes strip-wait { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.led-strip[data-loading='true'] { background: linear-gradient(90deg, var(--slot) 35%, var(--wash-strong) 50%, var(--slot) 65%) var(--slot); background-size: 300% 100%; animation: strip-wait var(--duration-activity) linear infinite; }

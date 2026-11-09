@@ -30,6 +30,16 @@ export function PageSection({ children }: { children: ReactNode }) {
   return <section className="page-section">{children}</section>;
 }
 
+// A list or page with nothing in it yet: what is missing, then the one step that fills it (D106).
+export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
+  return (
+    <section className="page-section empty-state">
+      <p className="empty-title">{title}</p>
+      {children}
+    </section>
+  );
+}
+
 export function PageHint({ children }: { children: ReactNode }) {
   return <p className="note">{children}</p>;
 }

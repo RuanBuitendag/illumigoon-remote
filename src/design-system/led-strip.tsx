@@ -51,5 +51,12 @@ export function LedStrip({ recording, shape, isOn = true, brightness = 1, onFirs
     stripRef.current.brightness = brightness;
   }, [isOn, brightness]);
 
-  return <canvas ref={canvasRef} className={`led-strip led-strip-${shape}`} aria-hidden="true" />;
+  return (
+    <canvas
+      ref={canvasRef}
+      className={`led-strip led-strip-${shape}`}
+      data-loading={recording === null}
+      aria-hidden="true"
+    />
+  );
 }

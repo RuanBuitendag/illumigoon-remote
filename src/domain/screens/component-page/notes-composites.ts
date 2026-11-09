@@ -105,6 +105,13 @@ const CONTROL_NOTES: Record<string, Notes> = {
     'Say who holds the lock: Locked to this phone.',
     'Use it for something that went wrong.',
   ),
+  EmptyState: note(
+    'A short title in body type for what is missing, and under it the one step that fills it, when that step is not plain.',
+    'None of its own. The step under it is a stop of its own.',
+    'A section with its title as text.',
+    'Say what is missing in two or three words: Nothing yet.',
+    'Explain the feature, or put more than one step under it.',
+  ),
   PageHint: note(
     'A line in the note type.',
     DRAWN,

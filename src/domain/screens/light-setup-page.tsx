@@ -48,7 +48,9 @@ function ResetConfirm({ light, onCancel }: { light: Light; onCancel: () => void 
     <>
       <PageHint>Reset wipes the name, room and Wi-Fi of this light. It then waits to be set up again.</PageHint>
       <KeyRow>
-        <TextKey onClick={() => resetLight(light)}>{`RESET ${light.name.toUpperCase()}`}</TextKey>
+        <TextKey rank="destructive" onClick={() => resetLight(light)}>
+          {`RESET ${light.name.toUpperCase()}`}
+        </TextKey>
         <TextKey isQuiet onClick={onCancel}>
           CANCEL
         </TextKey>

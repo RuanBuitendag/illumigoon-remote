@@ -43,6 +43,7 @@ export {
   InfoRow,
   LockStatus,
   PageFrame,
+  EmptyState,
   PageHint,
   PageSection,
   ScanNote,

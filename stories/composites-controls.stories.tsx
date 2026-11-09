@@ -18,6 +18,7 @@ export const LightDragList = specimenStory('LightDragList', DOOR);
 export const LockStatus = specimenStory('LockStatus', DOOR);
 export const NamedSelectRow = specimenStory('NamedSelectRow', DOOR);
 export const NamingRow = specimenStory('NamingRow', DOOR);
+export const EmptyState = specimenStory('EmptyState', DOOR);
 export const PageHint = specimenStory('PageHint', DOOR);
 export const ScanNote = specimenStory('ScanNote', DOOR);
 export const SelectRow = specimenStory('SelectRow', DOOR);

@@ -10,7 +10,7 @@ import {
   StepperRow,
   ToggleRow,
 } from '../../composites';
-import { ActionKey, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
+import { ActionKey, ArmedKey, Eyebrow, KeyRow, OptionRow, TextField, TextKey } from '../../design-system';
 import {
   forgetDeadLight,
   lightIdOf,
@@ -263,12 +263,7 @@ function MoveLights({ room }: { room: Room }) {
 
 // A light that has gone for good stays on the card until someone says so.
 function ForgetKey({ light }: { light: Light }) {
-  const [isArmed, setArmed] = useState(false);
-  return (
-    <TextKey isQuiet onClick={() => (isArmed ? forgetDeadLight(light) : setArmed(true))}>
-      {isArmed ? 'FORGET?' : 'FORGET'}
-    </TextKey>
-  );
+  return <ArmedKey name="FORGET" onSelect={() => forgetDeadLight(light)} />;
 }
 
 export function ArrangePage({ room }: { room: Room }) {

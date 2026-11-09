@@ -8,7 +8,7 @@ import {
   LookProblem,
   LookSearch,
 } from '../../composites';
-import { FileKey, KeyRow, TextKey } from '../../design-system';
+import { ArmedKey, FileKey, KeyGroup, KeyRow, TextKey, type FoldedKey } from '../../design-system';
 import { requestRecording } from '../looks/recordings';
 import type { Light } from '../store/fleet-store';
 import {
@@ -72,23 +72,6 @@ function useWarmPreviews(looks: LibraryLook[]) {
   }, []);
 }
 
-// Deleting takes a second tap on the same key, and the key says so.
-function useArmedDelete() {
-  const [armed, setArmed] = useState<string | null>(null);
-  return (key: string, remove: () => void) => (
-    <TextKey
-      onClick={() => {
-        setArmed(armed === key ? null : key);
-        if (armed === key) remove();
-      }}
-    >
-      {armed === key ? 'TAP AGAIN TO DELETE' : 'DELETE'}
-    </TextKey>
-  );
-}
-
-type DeleteKey = ReturnType<typeof useArmedDelete>;
-
 const COPIED_MS = 2000;
 
 function CopyKey({ look }: { look: LookFile }) {
@@ -101,17 +84,21 @@ function CopyKey({ look }: { look: LookFile }) {
   return <TextKey onClick={() => void copyLook(look).then(setCopied)}>{isCopied ? 'COPIED' : 'COPY'}</TextKey>;
 }
 
-type FileActionsProps = { look: LookFile; deleteKey: DeleteKey; onRename: (look: LookFile) => void };
+type FileActionsProps = { look: LookFile; onRename: (look: LookFile) => void };
 
-function FileActions({ look, deleteKey, onRename }: FileActionsProps) {
+// Rename and copy show; export and delete fold into MORE when the row has no room (D102).
+function FileActions({ look, onRename }: FileActionsProps) {
   const isOwn = !look.isExample;
+  const doc = look.doc;
+  const more: FoldedKey[] = [
+    ...(doc ? [{ name: 'EXPORT', onSelect: () => void exportLook(look) }] : []),
+    ...(isOwn ? [{ name: 'DELETE', isDestructive: true, onSelect: () => void removeLook(look) }] : []),
+  ];
   return (
-    <>
-      {isOwn && look.doc && <TextKey onClick={() => onRename(look)}>RENAME</TextKey>}
-      {look.doc && <CopyKey look={look} />}
-      {look.doc && <TextKey onClick={() => void exportLook(look)}>EXPORT</TextKey>}
-      {isOwn && deleteKey(look.file, () => void removeLook(look))}
-    </>
+    <KeyGroup more={more}>
+      {isOwn && doc && <TextKey onClick={() => onRename(look)}>RENAME</TextKey>}
+      {doc && <CopyKey look={look} />}
+    </KeyGroup>
   );
 }
 
@@ -167,7 +154,6 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
   const shownLights = useShownLights(lights);
   const playingName = playingLookName(shownLights);
   const wanted = query.trim().toLowerCase();
-  const deleteKey = useArmedDelete();
   useFreshLooks();
   const library = libraryFor(lights, mine, shelf, { plays, favourites });
   useWarmPreviews(library.flatMap(({ looks }) => looks));
@@ -196,7 +182,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
         name={name}
         place={place}
         isPlaying={fullName === playingName}
-        action={isEditing && file ? deleteKey(key, () => void removePreset(file)) : undefined}
+        action={isEditing && file ? <ArmedKey name="DELETE" onSelect={() => void removePreset(file)} /> : undefined}
         onPick={() => pick({ ...look, name: fullName, animation })}
         onHold={() => hold({ ...look, name: fullName, animation })}
         onHoldEnd={endPreview}
@@ -232,7 +218,7 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
             isPlaying={`${title}/${look.id}` === playing}
             disabled={isEditing || !look.animation}
             strip={<LookStrip source={look.preview} shape="tile" brightness={TILE_BRIGHTNESS} />}
-            actions={isEditing && look.file && <FileActions look={look.file} deleteKey={deleteKey} onRename={onRename} />}
+            actions={isEditing && look.file && <FileActions look={look.file} onRename={onRename} />}
             isFavourite={favourites.includes(look.name)}
             onStar={look.animation ? () => toggleFavourite(look.name) : undefined}
             onPick={() => pick(look)}

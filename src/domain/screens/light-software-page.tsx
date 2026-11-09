@@ -1,5 +1,6 @@
 import { InfoRow, PageFrame, PageHint, PageSection, ToggleRow } from '../../composites';
-import { TextKey } from '../../design-system';
+import { Fragment } from 'react';
+import { Activity, TextKey } from '../../design-system';
 import { setAutoUpdate, updateSoftware, type Light } from '../store/fleet-store';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { closePage, useBackLabel } from '../store/navigation-store';
@@ -30,9 +31,10 @@ const masterText = ({ isMaster }: Light, { lights }: Room) =>
 
 const canPlayPatches = ({ manifests }: Light) => manifests.some(({ id }) => id === 'patch');
 
+const isUpdating = (light: Light) => Boolean(updateText(light)?.startsWith('Updating'));
+
 function isUpdatable(light: Light, newVersion: string | null) {
-  const isRunning = updateText(light)?.startsWith('Updating');
-  return Boolean(newVersion) && light.isOnline && !light.isLockedByOther && !isRunning;
+  return Boolean(newVersion) && light.isOnline && !light.isLockedByOther && !isUpdating(light);
 }
 
 export function LightSoftwarePage({ room }: { room: Room }) {
@@ -55,9 +57,12 @@ export function LightSoftwarePage({ room }: { room: Room }) {
         {room.lights.map((light) => {
           const newVersion = newVersionOf(light, servers);
           return (
-            <InfoRow key={light.address} label={light.name} note={masterText(light, room) + statusText(light, newVersion)}>
-              {isUpdatable(light, newVersion) && <TextKey onClick={() => updateSoftware([light])}>UPDATE</TextKey>}
-            </InfoRow>
+            <Fragment key={light.address}>
+              <InfoRow label={light.name} note={masterText(light, room) + statusText(light, newVersion)}>
+                {isUpdatable(light, newVersion) && <TextKey onClick={() => updateSoftware([light])}>UPDATE</TextKey>}
+              </InfoRow>
+              {isUpdating(light) && <Activity label={`Updating ${light.name}`} />}
+            </Fragment>
           );
         })}
       </PageSection>
