@@ -26,6 +26,8 @@ export function Press({ className, label, isPressed, disabled, onClick, onHold, 
       aria-pressed={isPressed}
       disabled={disabled}
       data-held={hold.isHeld}
+      data-holdable={Boolean(onHold) && !disabled}
+      data-pressing={hold.isPressing}
       onClick={() => {
         if (hold.isTap.current) onClick();
       }}
@@ -152,6 +154,17 @@ export function PowerKey({ label, isOn, disabled, onChange }: PowerKeyProps) {
         <path className="power-symbol-lit" pathLength={1} d={POWER_RING} />
         <path className="power-symbol-lit" pathLength={1} d={POWER_BAR} />
       </svg>
+    </Switch.Root>
+  );
+}
+
+type SettingSwitchProps = { label: string; isOn: boolean; disabled?: boolean; onChange: (isOn: boolean) => void };
+
+// The switch for a setting that is not power: a ring that fills when on. The power symbol is for power alone (D115).
+export function SettingSwitch({ label, isOn, disabled, onChange }: SettingSwitchProps) {
+  return (
+    <Switch.Root className="toggle" aria-label={label} checked={isOn} disabled={disabled} onCheckedChange={onChange}>
+      <span className="toggle-mark" aria-hidden="true" />
     </Switch.Root>
   );
 }

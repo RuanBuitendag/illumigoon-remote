@@ -20,7 +20,7 @@ export { useDragOrder } from './drag-order';
 export { Fader, FaderBand, FaderDot } from './fader';
 export { ArmedKey, KeyGroup } from './key-group';
 export type { FoldedKey } from './key-group';
-export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, TextKey } from './keys';
+export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, SettingSwitch, TextKey } from './keys';
 export { WIDE } from './layout';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';

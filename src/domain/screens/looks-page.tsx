@@ -92,7 +92,6 @@ export function LooksPage({ room, rooms, isPlace }: LooksPageProps) {
       <PageFrame
         title="Looks"
         action={newLook}
-        intro="Tap to play. Hold to try."
         {...backOf(isPlace, backLabel)}
       >
         {isPlace && <SceneRow rooms={rooms} />}

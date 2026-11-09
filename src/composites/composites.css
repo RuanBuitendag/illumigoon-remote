@@ -133,6 +133,10 @@
 .light-pick { flex: 1; display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--row); color: var(--text-4); }
 .light-note { overflow-wrap: anywhere; }
 .light-tape { display: block; width: 100%; }
+/* A place key's mark sits at the top of the key, clear of the iPhone's home bar, and grows both ways. */
+.place-key[data-holdable='true']::after { top: 0; bottom: auto; left: 50%; translate: -50% 0; }
+/* The card holds by its name and by its strip; the strip alone carries the hold mark. */
+.light-pick[data-holdable='true']::after { display: none; }
 .light-tape .led-strip-room { margin: 0 var(--edge); }
 /* On the Looks place the page already keeps the gutter (LIFE-1964). */
 .page-intro + .scene-shelf { margin-top: var(--space-5); padding: 0; }
@@ -156,7 +160,7 @@
 .page-title-row .page-title { min-width: 0; }
 /* The star sits at the top right of a look, over the end of its heading row, in a full finger target. */
 .look-row { position: relative; }
-.look-star { position: absolute; top: 0; right: 0; display: flex; align-items: center; justify-content: flex-end; min-width: var(--row); min-height: var(--row); }
+.look-star { position: absolute; z-index: var(--layer-raised); top: 0; right: 0; display: flex; align-items: center; justify-content: flex-end; min-width: var(--row); min-height: var(--row); }
 .look-row:has(.look-star) .look-item-heading { padding-right: var(--row); }
 .look-item { display: block; width: 100%; scroll-margin-block: calc(var(--clear-sticky) + var(--gutter)) var(--gutter); }
 .look-item:disabled { cursor: default; }
@@ -242,7 +246,6 @@
 .page-status { display: flex; align-items: center; gap: var(--space-3); margin-top: var(--space-5); color: var(--text-2); }
 .drag-list { display: contents; }
 .arrange-row { display: flex; align-items: center; gap: var(--space-1); }
-.arrange-row .text-field { border-bottom: 0; }
 .arrange-grip { display: flex; align-items: center; justify-content: center; flex: none; width: var(--row); height: var(--row); margin-left: calc(-1 * var(--space-4)); color: var(--text-5); cursor: grab; touch-action: none; }
 .scan-note { margin-top: var(--section); }
 
@@ -255,7 +258,7 @@
 /* The bar of places (LIFE-1964). The screens stand above it. */
 
 .place-frame > .screen-stack { bottom: var(--place-bar); }
-.place-bar { display: flex; height: var(--place-bar); padding: 0 var(--space-2) env(safe-area-inset-bottom); border-top: var(--line) solid var(--track); background: var(--background); }
+.place-bar { display: flex; height: var(--place-bar); padding: 0 var(--space-2) env(safe-area-inset-bottom); background: var(--background); }
 .place-frame > .place-bar { position: fixed; inset: auto 0 0; z-index: var(--layer-raised); }
 .place-key { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--space-1); min-height: var(--row-tall); color: var(--text-5); font: var(--type-label); letter-spacing: var(--tracking-label); }
 .place-key .icon { width: calc(var(--space-4) + var(--space-1)); height: calc(var(--space-4) + var(--space-1)); }
@@ -283,7 +286,7 @@
   .scene-list { flex-wrap: wrap; margin: 0; padding: 0; overflow: visible; }
   .place-frame > .screen-stack { bottom: 0; left: var(--place-rail); }
   .place-frame > .place-bar { inset: 0 auto 0 0; }
-  .place-bar { flex-direction: column; justify-content: flex-start; width: var(--place-rail); height: auto; padding: var(--space-6) 0 0; border-top: 0; border-right: var(--line) solid var(--track); }
+  .place-bar { flex-direction: column; justify-content: flex-start; width: var(--place-rail); height: auto; padding: var(--space-6) 0 0; }
   .place-key { flex: none; min-height: calc(var(--row-tall) + var(--space-3)); }
   .place-frame .edit-layout { bottom: 0; left: var(--place-rail); padding-bottom: env(safe-area-inset-bottom); }
   .place-frame .toast:not([data-over-dock='true']) { bottom: max(var(--space-4), env(safe-area-inset-bottom)); left: calc(var(--place-rail) + var(--side-column)); }
@@ -291,7 +294,7 @@
   .room-scroll, .screen-page, .place-page, .search { padding-inline: max(var(--gutter), calc(50% - var(--half-column))); }
   .room-scroll::before { margin-inline: 0; }
   .room-scroll > .back-key { display: none; }
-  .screen-home { right: auto; width: var(--side-column); box-shadow: var(--line) 0 0 var(--track); }
+  .screen-home { right: auto; width: var(--side-column); }
   .screen-home[data-pushed='true'] { transform: none; opacity: 1; }
   .screen-room { left: var(--side-column); transform: none; transition: none; }
   .screen-room[data-open='true'] { box-shadow: none; }

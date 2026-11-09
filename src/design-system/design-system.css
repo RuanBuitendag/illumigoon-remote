@@ -98,6 +98,8 @@
   --line-strong: 2px;
   /* A bar to be seen at a glance: Edit's live mark, the thumb on a colour bar. */
   --line-thick: 3px;
+  /* The mark on a key that can be held (D114). */
+  --hold-mark: 4px;
   /* Stacking order. Each value counts inside its own stacking context: a sticky bar in a screen,
      a screen over Home, Edit and sheets over the screens, the undo notice over all of them. */
   --layer-raised: 2;
@@ -119,6 +121,8 @@
      glow for the slow light colour on a fader. */
   --ease-out: ease-out;
   --duration-press: 140ms;
+  /* How long a finger stays down before a press is a hold: `HOLD_MS` in hold.ts (D114). */
+  --duration-hold: 400ms;
   --duration-settle: 240ms;
   --duration-push: 550ms;
   --duration-glow: 900ms;
@@ -317,6 +321,12 @@ button, input, textarea { font: inherit; color: inherit; }
 button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-touch-callout: none; transition: transform var(--duration-press) var(--ease-out); }
 button:disabled { cursor: default; opacity: var(--opacity-disabled); }
 button[data-held='true'] { transform: translateY(-2px) scale(1.015); transition: transform var(--duration-spring) var(--ease-spring); }
+/* A key that can be held carries one small dot at its bottom left. While a finger is down the dot grows along the
+   bottom edge, and it reaches the far side as the hold starts (D114). */
+button[data-holdable='true'] { position: relative; }
+button[data-holdable='true']::after { content: ''; position: absolute; bottom: 0; left: 0; width: var(--hold-mark); height: var(--hold-mark); border-radius: var(--hold-mark); background: var(--text-4); pointer-events: none; transition: width var(--duration-press) var(--ease-out), background-color var(--duration-press) var(--ease-out); }
+button[data-holdable='true'][data-pressing='true']::after { width: 100%; background: var(--text-2); transition: width var(--duration-hold) linear; }
+button[data-holdable='true'][data-held='true']::after { width: 100%; background: var(--text-1); }
 
 [data-sorting] { user-select: none; }
 [data-sorting] > * { transition: transform var(--duration-press) var(--ease-out); }
@@ -365,6 +375,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
     scroll-behavior: auto !important;
   }
   button[data-held='true'] { transform: none; }
+  button[data-holdable='true'][data-pressing='true']::after { width: var(--hold-mark); }
   .text-key[data-rank]::before { animation: none; }
   .key-menu { animation-name: fade-in; }
   [data-feedback='refused'] { animation: refused-dim var(--duration-settle) var(--ease-out); }
@@ -469,6 +480,13 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 .power-key[data-checked] .power-symbol-lit { stroke-dashoffset: 0; }
 .power-key[data-checked] .power-symbol { filter: drop-shadow(0 0 var(--space-1) var(--text-1)); }
 
+/* A setting's switch (D115): a ring that fills when on, so it never reads as power. */
+.toggle { display: inline-grid; place-items: center; flex: none; width: var(--row); height: var(--row); padding: 0; border: 0; background: none; cursor: pointer; }
+.toggle[data-disabled] { opacity: var(--opacity-disabled); }
+.toggle-mark { width: var(--space-4); height: var(--space-4); border: var(--line-strong) solid var(--text-4); border-radius: 50%; transition: background-color var(--duration-settle) var(--ease-out), border-color var(--duration-settle) var(--ease-out), scale var(--duration-spring) var(--ease-spring); }
+.toggle[data-checked] .toggle-mark { border-color: var(--text-1); background: var(--text-1); }
+.toggle:active .toggle-mark { scale: 0.8; transition-duration: var(--duration-press); }
+
 .option-row { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); }
 .option { height: var(--row); color: var(--text-4); }
 
@@ -515,8 +533,8 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 /* Text fields */
 
-.text-field { width: 100%; min-width: 0; border-bottom: var(--line) solid var(--track); }
-.text-area { width: 100%; min-height: var(--text-area); padding: var(--space-3) 0; border-bottom: var(--line) solid var(--track); font: var(--type-value); resize: vertical; }
+.text-field { width: 100%; min-width: 0; }
+.text-area { width: 100%; min-height: var(--text-area); padding: var(--space-3) 0; font: var(--type-value); resize: vertical; }
 .text-field-large { height: var(--row); font: var(--type-body); }
 .text-field-small { flex: 1; height: var(--row); font: var(--type-body); }
 

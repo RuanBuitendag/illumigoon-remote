@@ -6,7 +6,6 @@ type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void
 
 type LookItemProps = HoldProps & {
   name: string;
-  description?: string;
   note?: string | null;
   hasSound: boolean;
   isPlaying: boolean;
@@ -21,7 +20,7 @@ type LookItemProps = HoldProps & {
 };
 
 export function LookItem({ actions, children, isFavourite, onStar, ...look }: LookItemProps) {
-  const { name, description, note, hasSound, isPlaying, disabled, strip, onPick, onHold, onHoldEnd } = look;
+  const { name, note, hasSound, isPlaying, disabled, strip, onPick, onHold, onHoldEnd } = look;
   return (
     <div className="look-row">
       {onStar && (
@@ -42,7 +41,6 @@ export function LookItem({ actions, children, isFavourite, onStar, ...look }: Lo
           {hasSound && <SoundMark />}
           {isPlaying && <span className="key-text look-playing">PLAYING</span>}
         </span>
-        {description && <span className="note look-description">{description}</span>}
         {note && <span className="note look-description">{note}</span>}
         {strip}
       </Press>
@@ -107,17 +105,16 @@ export function LookPreset({ name, place, isPlaying, action, onPick, onHold, onH
   );
 }
 
-type LookElsewhereProps = { name: string; description: string; action: ReactNode };
+type LookElsewhereProps = { name: string; action: ReactNode };
 
 // A published look that is not in the folder. It cannot play until it has been fetched.
-export function LookElsewhere({ name, description, action }: LookElsewhereProps) {
+export function LookElsewhere({ name, action }: LookElsewhereProps) {
   return (
     <div className="look-row">
       <span className="look-item-heading">
         <span className="look-item-name">{name}</span>
         <span className="key-text look-elsewhere-action">{action}</span>
       </span>
-      {description && <span className="note look-description">{description}</span>}
     </div>
   );
 }

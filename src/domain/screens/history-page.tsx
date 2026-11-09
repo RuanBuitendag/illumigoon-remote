@@ -18,7 +18,6 @@ export function HistoryPage({ rooms }: { rooms: Room[] }) {
   return (
     <PageFrame
       title="Recent"
-      intro="The last 10 states of the house. Tap to go back. Hold to try."
       backLabel={useBackLabel(undefined)}
       onBack={closePage}
     >

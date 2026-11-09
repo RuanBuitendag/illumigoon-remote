@@ -48,6 +48,7 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 | A fader's fill | `.fader-fill` | the light colour glows over | `--duration-glow` | the same: it is colour |
 | A look in the list | `.look-item .led-strip` | the strip brightens or dims | `--duration-press`, `--ease-out` | the same: it is a filter |
 | The parts of a room or a page that opens | `.room-scroll > *`, `.screen-page > *`, `composites.css` | each rises in a step after the one above it; the eighth and later come together | `--duration-enter`, `--ease-enter`, `--stagger-step` | all fade in together |
+| A key that can be held, while a finger is down | `button[data-holdable]::after`, `design-system.css` | the dot at its edge grows along it and reaches the far side as the hold starts (D114) | `--duration-hold`, `--hold-mark` | the dot stays a dot and fills the edge when the hold starts |
 | A key let go after a hold, the power key after a press | `button[data-held]`, `.power-key` | springs back with a small overshoot | `--duration-spring`, `--ease-spring` | stays still |
 | A colour slot in a set | `.colour-slot` | springs to its share of the row | `--duration-spring`, `--ease-spring` | no growth |
 | A new look starts on a room (expressive) | `.led-strip-room[data-feedback='took']`, `led-strip.tsx` | the room's strip glows once | `--duration-expressive` | the same: it is a filter |

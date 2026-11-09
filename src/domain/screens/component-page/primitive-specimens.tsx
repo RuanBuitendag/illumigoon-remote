@@ -26,6 +26,7 @@ import {
   OptionRow,
   Picked,
   PowerKey,
+  SettingSwitch,
   Press,
   SoundMark,
   Swatch,
@@ -142,6 +143,15 @@ const KEYS: Specimen[] = [
       on: <PowerKey label="Power" isOn onChange={nothing} />,
       'disabled off': <PowerKey label="Power" isOn={false} disabled onChange={nothing} />,
       'disabled on': <PowerKey label="Power" isOn disabled onChange={nothing} />,
+    },
+  },
+  {
+    name: 'SettingSwitch',
+    states: {
+      off: <SettingSwitch label="Blend" isOn={false} onChange={nothing} />,
+      on: <SettingSwitch label="Blend" isOn onChange={nothing} />,
+      'disabled off': <SettingSwitch label="Blend" isOn={false} disabled onChange={nothing} />,
+      'disabled on': <SettingSwitch label="Blend" isOn disabled onChange={nothing} />,
     },
   },
   {

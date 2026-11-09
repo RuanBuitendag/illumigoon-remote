@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Fader, OptionRow, PowerKey, TextKey, ValueText } from '../design-system';
+import { Fader, OptionRow, SettingSwitch, TextKey, ValueText } from '../design-system';
 
 function ControlLine({ label, children }: { label: string; children: ReactNode }) {
   return (
@@ -86,7 +86,7 @@ type ToggleRowProps = {
 export function ToggleRow({ label, isOn, disabled, onChange }: ToggleRowProps) {
   return (
     <ControlLine label={label}>
-      <PowerKey label={label} isOn={isOn} disabled={disabled} onChange={onChange} />
+      <SettingSwitch label={label} isOn={isOn} disabled={disabled} onChange={onChange} />
     </ControlLine>
   );
 }

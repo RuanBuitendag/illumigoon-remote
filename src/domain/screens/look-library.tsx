@@ -110,12 +110,11 @@ function PublishedElsewhere({ wanted }: { wanted: string }) {
   const ready = elsewhere.filter(({ id, name }) => id && includesText(name, wanted));
   if (ready.length === 0) return null;
   return (
-    <LookGroup title={ELSEWHERE} note="Shared from another device. GET adds one to Mine.">
-      {ready.map(({ familyId, id, name, presets }) => (
+    <LookGroup title={ELSEWHERE}>
+      {ready.map(({ familyId, id, name }) => (
         <LookElsewhere
           key={familyId}
           name={name}
-          description={presets.map((preset) => preset.name).join(', ')}
           action={
             <TextKey disabled={fetching !== null} onClick={() => id && void fetchLook(id, name)}>
               {fetching === id ? 'GETTING' : 'GET'}
@@ -190,12 +189,11 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
     ));
 
   const groupRows = (group: LibraryGroup) => {
-    const { title, note: groupNote, looks } = group;
+    const { title, looks } = group;
     return (
       <LookGroup
         key={title}
         title={title}
-        note={groupNote}
         action={
           title === 'Mine' && <TextKey onClick={() => onEditing(!isEditing)}>{isEditing ? 'DONE' : 'MANAGE'}</TextKey>
         }
@@ -212,7 +210,6 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
           <LookItem
             key={look.id}
             name={look.name}
-            description={look.description}
             note={lookNote(look)}
             hasSound={look.hasSound}
             isPlaying={`${title}/${look.id}` === playing}

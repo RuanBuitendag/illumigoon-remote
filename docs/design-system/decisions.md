@@ -1274,3 +1274,32 @@ Chosen, in one place for the set in `src/design-system/icons.tsx`:
 Why: LIFE-1993. Things and Apple keep one line weight and one corner across the set. D2, D49, D74 and D104 held parts
 of this; the corner and when an icon may appear were not written.
 Date: 2026-11-09
+
+**D114. A key that can be held carries a dot**
+
+Chosen: `Press` marks a key with `onHold` as `data-holdable`. The key carries one small dot (`--hold-mark`) at its
+bottom left, in `--text-4`. While a finger is down the dot grows along the bottom edge over `--duration-hold`, the
+same 400 ms as `HOLD_MS`, and it reaches the far side as the hold starts. A tap lets go before that, so the dot
+shrinks back. A place key carries it at the top, clear of the iPhone's home bar. A light card holds by its name and
+its strip, and only the strip carries the dot. With reduced motion the dot does not grow and fills the edge when the
+hold starts. This replaces the words "Tap to play. Hold to try." on Looks and Recent.
+Why: LIFE-1997. Ruan asked for holdable keys to be marked. A hold that only words explain is hidden, and the words
+were removed as obvious hints. The growing dot also shows how long to keep the finger down.
+Date: 2026-11-09
+
+**D115. The power symbol is for power alone; a setting takes a SettingSwitch**
+
+Chosen: `PowerKey` stays on the controls that turn lights on or off: Home's room cards, the room's level row and
+each light card. Every other on or off setting (a look's Blend, Auto update, the room lock and the app settings)
+takes `SettingSwitch`: a ring that is a dim outline when off and fills when on. `ToggleRow` draws a SettingSwitch. (Edit keeps its own `Toggle` for mute and solo, D82.)
+Why: Ruan, 10 Nov 2026: "the power button is only for power stuff". A power symbol on Blend says that Blend turns
+something off. The sliding switch was rejected for power (D99), so the SettingSwitch is a mark of its own.
+Date: 2026-11-10
+
+**D116. No long grey lines**
+
+Chosen: a text field has no line under it; its placeholder and its caret show where it is. The place bar has no line
+on its top or side, the laptop's room column has none on its edge, and Edit's rows, wells and panels have none
+between them. Space separates them. A fader's track and the activity line stay, since they are the control itself.
+Why: Ruan, 10 Nov 2026: no line on the search bar or anywhere. This extends "No dividers" (9 Nov 2026).
+Date: 2026-11-10

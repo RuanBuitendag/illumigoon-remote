@@ -98,14 +98,21 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Tab reaches it, and Space or Enter turns it on or off.',
     'A switch, with aria-checked, named by what it powers.',
     'Name it by what it powers: Lounge power.',
-    'Write ON or OFF beside it. The switch says it.',
+    'Use it for anything that is not power. That is a SettingSwitch.',
+  ),
+  SettingSwitch: note(
+    'A ring. Off, it is a dim outline; on, it fills.',
+    'Tab reaches it, and Space or Enter turns it on or off.',
+    'A switch, with aria-checked, named by its setting.',
+    'Use it for a setting that is on or off: Blend, Auto update.',
+    'Use it for power. That is a PowerKey.',
   ),
   OptionRow: note(
     'A row of words. The picked one wears the selected line.',
     'Tab reaches each word, and Enter or Space picks it.',
     'A group named by its label, of buttons with aria-pressed.',
     'Use it for two to four choices that fit on one line.',
-    'Use it for on and off. That is a PowerKey.',
+    'Use it for on and off. That is a SettingSwitch or a PowerKey.',
   ),
   Fader: note(
     'A track, a lit band from the start to the value, and a thumb.',

@@ -28,6 +28,7 @@ export const LinkKey = specimenStory('LinkKey', DOOR);
 export const OptionRow = specimenStory('OptionRow', DOOR);
 export const Picked = specimenStory('Picked', DOOR);
 export const PowerKey = specimenStory('PowerKey', DOOR);
+export const SettingSwitch = specimenStory('SettingSwitch', DOOR);
 export const Press = specimenStory('Press', DOOR);
 export const SoundMark = specimenStory('SoundMark', DOOR);
 export const Swatch = specimenStory('Swatch', DOOR);

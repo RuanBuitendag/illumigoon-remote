@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent, type PointerEvent as ReactPointerEvent } from 'react';
 
-// Tap acts and hold shows. A finger that stays still for this long is a hold.
+// Tap acts and hold shows. A finger that stays still for this long is a hold. `--duration-hold` is the same time.
 const HOLD_MS = 400;
 // A finger that moves further than this is scrolling, so lists still scroll from a row.
 const MOVE_LIMIT_PX = 10;
@@ -56,6 +56,8 @@ export function watchPress(start: Pointer, { onHold, onDrag, onEnd }: PressEvent
 // A press under `HOLD_MS` stays a tap, and the click that follows a hold or a scroll is swallowed.
 export function useHold(onHold?: () => void, onHoldEnd?: () => void) {
   const [isHeld, setHeld] = useState(false);
+  // A finger is down and the hold has not started yet: the hold mark grows (D114).
+  const [isPressing, setPressing] = useState(false);
   const isTap = useRef(true);
   const endPress = useRef<(() => void) | null>(null);
 
@@ -65,15 +67,18 @@ export function useHold(onHold?: () => void, onHoldEnd?: () => void) {
     isTap.current = true;
     if (!onHold || event.button !== 0 || endPress.current) return;
     let didHold = false;
+    setPressing(true);
     endPress.current = watchPress(event, {
       onHold: () => {
         didHold = true;
+        setPressing(false);
         setHeld(true);
         onHold();
       },
       onEnd: (wasTap) => {
         endPress.current = null;
         isTap.current = wasTap;
+        setPressing(false);
         setHeld(false);
         if (didHold) onHoldEnd?.();
       },
@@ -85,5 +90,5 @@ export function useHold(onHold?: () => void, onHoldEnd?: () => void) {
     if (onHold) event.preventDefault();
   };
 
-  return { isHeld, isTap, onPointerDown, onContextMenu };
+  return { isHeld, isPressing, isTap, onPointerDown, onContextMenu };
 }

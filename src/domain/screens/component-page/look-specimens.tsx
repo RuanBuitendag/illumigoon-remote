@@ -63,10 +63,10 @@ const LOOKS: Specimen[] = [
   {
     name: 'LookItem',
     states: {
-      default: <LookItem {...look} description="A warm flicker." />,
+      default: <LookItem {...look} />,
       playing: <LookItem {...look} isPlaying hasSound />,
       disabled: <LookItem {...look} disabled note="Plays on Left only" />,
-      'long text': <LookItem {...look} name={LONG_NAME} description={LONG_NAME} />,
+      'long text': <LookItem {...look} name={LONG_NAME} />,
       'with keys': <LookItem {...look} actions={<TextKey onClick={nothing}>RENAME</TextKey>} />,
     },
   },
@@ -105,7 +105,7 @@ const LOOKS: Specimen[] = [
   },
   {
     name: 'LookElsewhere',
-    states: { default: <LookElsewhere name="Aurora" description="Published, not in this folder." action={fetchKey} /> },
+    states: { default: <LookElsewhere name="Aurora" action={fetchKey} /> },
   },
   { name: 'LookProblem', states: { error: <LookProblem>This look could not be read: the file is broken.</LookProblem> } },
   {

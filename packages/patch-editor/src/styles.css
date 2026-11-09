@@ -32,7 +32,6 @@
 
 .patch-editor .raise { border-radius: var(--radius); }
 .patch-editor .raise-hi { background: var(--wash); border-radius: var(--radius); }
-.patch-editor .well { border-bottom: var(--line) solid var(--track); }
 .patch-editor .flatcard { border-radius: var(--radius); }
 @media (hover: hover) { .patch-editor .flatcard:hover { background: var(--wash); } }
 
@@ -124,7 +123,7 @@
 .patch-editor .sectionpart { display: contents; }
 .patch-editor .body { flex-grow: 1; display: flex; min-height: 0; }
 
-.patch-editor .panel { display: flex; flex-direction: column; background: var(--background); border-right: var(--line) solid var(--track); min-height: 0; }
+.patch-editor .panel { display: flex; flex-direction: column; background: var(--background); min-height: 0; }
 .patch-editor .panelhead {
   display: flex;
   align-items: center;
@@ -525,12 +524,11 @@
 
 /*
  * A fragment row: the name a person gave, their sentence under it, and the row's one key. Flat,
- * with no fill behind it; a hairline parts one row from the next.
+ * with no fill behind it and no line between rows.
  */
 .patch-editor .fragrow {
   display: flex; align-items: center; gap: var(--space-4);
   min-height: var(--row-tall); padding: var(--space-3) var(--space-4);
-  border-bottom: var(--line) solid var(--track);
 }
 .patch-editor .fragrow > button { flex-shrink: 0; white-space: nowrap; }
 .patch-editor .fragname { font: var(--type-note); color: var(--text-1); }
@@ -867,7 +865,7 @@
   .patch-editor .body { flex-direction: column; }
   .patch-editor .body .sectionpart > * { width: 100% !important; flex: none; }
   .patch-editor .body .vr { display: none; }
-  .patch-editor .body .panel { border-right: 0; border-bottom: var(--line) solid var(--track); }
+  .patch-editor .body .panel { border-right: 0; }
   .patch-editor .body .scroll, .patch-editor .centre { overflow: visible; max-height: none; }
   /* The empty spacers that push a panel's foot down. A column that grows to hold names stays. */
   /* Only a div: an input is always :empty, and this hid the fields that name a section on the phone. */

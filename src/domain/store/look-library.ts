@@ -33,7 +33,7 @@ export type LibraryPreset = {
   animation: AnimationState;
 };
 
-export type LibraryGroup = { kind: 'mine' | 'catalog' | 'example'; title: string; note: string; looks: LibraryLook[] };
+export type LibraryGroup = { kind: 'mine' | 'catalog' | 'example'; title: string; looks: LibraryLook[] };
 
 type PresetRow = NonNullable<ReturnType<Shelf['under']['get']>>[number];
 
@@ -74,7 +74,7 @@ function mostUsedGroup(groups: LibraryGroup[], plays: Record<string, number>): L
   const played = groups.flatMap(({ looks }) => looks).filter(({ name }) => (plays[name] ?? 0) > 0);
   const looks = played.sort((a, b) => (plays[b.name] ?? 0) - (plays[a.name] ?? 0)).slice(0, MOST_USED);
   const shown = looks.map((look) => ({ ...look, file: null, presets: [] }));
-  return { kind: 'catalog', title: 'Most used', note: '', looks: shown };
+  return { kind: 'catalog', title: 'Most used', looks: shown };
 }
 
 const byFolder = (a: string | null, b: string | null) => (a ?? '').localeCompare(b ?? '');
@@ -133,7 +133,6 @@ function mineGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGr
   return folders.map((folder) => ({
     kind: 'mine',
     title: folder ? `Mine, ${folder}` : 'Mine',
-    note: files.length > 0 ? 'Kept by you' : 'A look you save lands here',
     looks: looksOfFiles(files.filter(({ group }) => group === folder), lights, shelf),
   }));
 }
@@ -143,7 +142,7 @@ function mineGroups(files: LookFile[], lights: Light[], shelf: Shelf): LibraryGr
 function favouriteGroup(groups: LibraryGroup[], favourites: string[]): LibraryGroup {
   const all = groups.flatMap(({ looks }) => looks);
   const looks = favourites.flatMap((name) => all.find((look) => look.name === name && look.animation) ?? []);
-  return { kind: 'catalog', title: 'Favourites', note: '', looks: looks.map((look) => ({ ...look, file: null, presets: [] })) };
+  return { kind: 'catalog', title: 'Favourites', looks: looks.map((look) => ({ ...look, file: null, presets: [] })) };
 }
 
 export function favouriteLooks(lights: Light[], mine: LookFile[], shelf: Shelf, favourites: string[]) {
@@ -169,9 +168,9 @@ type LibraryUse = { plays: Record<string, number>; favourites: string[] };
 
 const includesText = (text: string, wanted: string) => text.toLowerCase().includes(wanted);
 
-// A look answers to its name, its presets, its description, and the name and note of its group.
+// A look answers to its name, its presets, its description, and the name of its group.
 function answers(look: LibraryLook, group: LibraryGroup, wanted: string) {
-  const texts = [look.name, look.description, group.title, group.note, ...look.presets.map(({ name }) => name)];
+  const texts = [look.name, look.description, group.title, ...look.presets.map(({ name }) => name)];
   return texts.some((text) => includesText(text, wanted));
 }
 
