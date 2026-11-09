@@ -1,6 +1,7 @@
 import { InfoRow, MoreRow, PageFrame, PageSection, ToggleRow } from '../../composites';
 import { Eyebrow, TextKey } from '../../design-system';
 import { APP_VERSION, checkForUpdate } from '../app-update/app-update';
+import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { setHousePower } from '../store/house-power';
 import { useShownLights } from '../store/look-preview';
 import { openPage } from '../store/navigation-store';
@@ -20,8 +21,14 @@ function AllLights({ rooms }: { rooms: Room[] }) {
   );
 }
 
+// A room with new light software says so here, and its Light software page says for how many lights.
+function roomNote(room: Room, servers: ReturnType<typeof useLatestVersions.getState>['servers']) {
+  return room.lights.some((light) => newVersionOf(light, servers)) ? 'New light software' : lightCount(room.lights.length);
+}
+
 // The Settings place of the bar holds what had no home before: the house, each room's settings and the app.
 export function SettingsPage({ rooms }: { rooms: Room[] }) {
+  const servers = useLatestVersions((latest) => latest.servers);
   return (
     <PageFrame title="Settings">
       <PageSection>
@@ -30,7 +37,7 @@ export function SettingsPage({ rooms }: { rooms: Room[] }) {
           <MoreRow
             key={room.id}
             label={room.name}
-            note={lightCount(room.lights.length)}
+            note={roomNote(room, servers)}
             onOpen={() => openPage('room-settings', room.id)}
           />
         ))}

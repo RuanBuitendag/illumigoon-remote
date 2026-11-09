@@ -297,11 +297,12 @@ export const journeys = [
     },
   },
   {
-    name: 'New light software shows a notice',
+    name: 'New light software shows in Settings',
     lights: { '10.0.0.2': lamp },
     latestSoftware: '9.9.9',
     async run({ page }) {
-      await see(page, 'New light software is ready.');
+      await page.getByRole('navigation', { name: 'Places' }).getByRole('button', { name: 'SETTINGS', exact: true }).click();
+      await see(page, 'New light software');
     },
   },
   {

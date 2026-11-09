@@ -104,7 +104,7 @@ Status is the result of the last full run (4 Nov 2026): pass, or known fail with
 | P3-S2 schedules on old software say what to do | Schedules, Light software | `stories/corner-owner.mjs` | pass |
 | P3-S3 save a scene and bring it back | scenes | `stories/corner-owner.mjs` | pass |
 | P3-S4 Escape closes the scene sheet | scenes | `stories/corner-owner.mjs` | pass |
-| P3-S5 the software notice leaves the rooms usable | software notice, Light software | `stories/corner-owner.mjs` | pass |
+| P3-S5 new light software is told in Settings | Settings, Light software | `stories/corner-owner.mjs` | pass |
 | P3-S6 a starred look shows in the room Favourites, and a deleted one leaves | stars, Favourites, Mine, MANAGE | `stories/corner-owner.mjs` | pass |
 | P3-S7 set the transition, try it, keep it | Transition | `stories/corner-owner.mjs` | pass |
 | P4-S1 to P4-S13 | Add a light, own Wi-Fi, Light setup | `journeys.mjs` | pass |

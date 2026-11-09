@@ -50,12 +50,14 @@ Features: scenes. Contexts: laptop keyboard. Should take: 1 key.
 - **Wrong actions:** the sheet opened by mistake.
 - **Changes of mind:** Escape.
 
-### P3-S5 new light software shows a notice that leaves the rooms usable
+### P3-S5 new light software is told in Settings, and Home stays clear
 
-Features: software notice, Light software. Contexts: phone, a newer version on the server. Should take: 0 taps to dismiss.
+Features: Settings, Light software. Contexts: phone, a newer version on the server. Should take: 0 taps to dismiss.
 
-1. Home says "New light software is ready."
-2. `Open Lounge` and `Lounge power` can still be pressed; nothing lies over them (finding 5).
+Changed 9 Nov 2026 (UX-10): Home had a notice for every person; the software is a job for the owner, in Settings.
+
+1. Settings says "New light software" on the Lounge row.
+2. Home has no software notice. `Open Lounge` and `Lounge power` can be pressed; nothing lies over them (finding 5).
 3. Room settings says "New version for 4 lights".
 
 - **Failures:** new software on the server.
@@ -66,7 +68,7 @@ Features: software notice, Light software. Contexts: phone, a newer version on t
 
 Features: stars, Favourites, Mine, MANAGE. Contexts: phone. Should take: 1 tap to star, 3 taps to delete.
 
-1. The room says "Star a look to put it here".
+1. The room shows FAVOURITES and + SCENE, with no line that explains the star (9 Nov 2026).
 2. Keep a look as "Test gone". On Looks, tap its star: it shows under FAVOURITES and does not play (LIFE-1965).
 3. Back on the room, Test gone is in Favourites, and stays there after a reload.
 4. Looks, `MANAGE`, `DELETE`, `TAP AGAIN TO DELETE`, `DONE`.

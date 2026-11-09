@@ -42,8 +42,6 @@ type Household = {
   favouriteLooks: string[];
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
-  // Light software versions the notice on Home was told to leave for later.
-  skippedSoftware: string[];
   knownRooms: KnownRoom[];
 };
 
@@ -60,7 +58,6 @@ export const useHousehold = create<Household>()(
       lookPlays: {} as Record<string, number>,
       favouriteLooks: [] as string[],
       lightAddresses: [] as string[],
-      skippedSoftware: [] as string[],
       knownRooms: [] as KnownRoom[],
     }),
     { name: 'household' },
@@ -101,12 +98,6 @@ export function toggleFavourite(name: string) {
     favouriteLooks: favouriteLooks.includes(name)
       ? favouriteLooks.filter((kept) => kept !== name)
       : [...favouriteLooks, name],
-  }));
-}
-
-export function skipSoftware(versions: string[]) {
-  useHousehold.setState(({ skippedSoftware }) => ({
-    skippedSoftware: [...new Set([...skippedSoftware, ...versions])],
   }));
 }
 

@@ -1,48 +1,20 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { BottomNotice, HomeLayout, HouseNote, RoomDragList } from '../../composites';
 import { Icon, TextKey } from '../../design-system';
 import { checkForUpdate, useUpdateError } from '../app-update/app-update';
-import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { searchAgain, useFleet } from '../store/fleet-store';
-import { setRoomOrder, skipSoftware, useHousehold } from '../store/household-store';
+import { setRoomOrder } from '../store/household-store';
 import { useRoomPlaces } from '../store/known-rooms';
 import { moveOldScenes } from '../store/library-store';
-import { HOUSE_NAME, openJump, openPage } from '../store/navigation-store';
+import { HOUSE_NAME, openJump } from '../store/navigation-store';
 import type { Room } from '../store/rooms';
 import { RoomSummary } from './room-summary';
 import { SEARCH_REFUSED_TEXT } from './search-screen';
 
-function SoftwareNotice({ rooms }: { rooms: Room[] }) {
-  const servers = useLatestVersions((latest) => latest.servers);
-  const skipped = useHousehold((household) => household.skippedSoftware);
-  const [isSeen, setSeen] = useState(false);
-  const waiting = rooms.flatMap(({ id, lights }) =>
-    lights.flatMap((light) => {
-      const version = newVersionOf(light, servers);
-      return version && !skipped.includes(version) ? [{ roomId: id, version }] : [];
-    }),
-  );
-  const [first] = waiting;
-  if (isSeen || !first) return null;
-  const see = () => {
-    setSeen(true);
-    openPage('software', first.roomId);
-  };
-  const later = () => skipSoftware(waiting.map(({ version }) => version));
-  return (
-    <BottomNotice
-      text="New light software is ready."
-      actionLabel="See"
-      onAction={see}
-      laterLabel="Later"
-      onLater={later}
-    />
-  );
-}
-
-function UpdateNotice({ rooms }: { rooms: Room[] }) {
+// New light software is told in Settings, for the person who looks after the lights (UX-10).
+function UpdateNotice() {
   const updateError = useUpdateError((update) => update.message);
-  if (!updateError) return <SoftwareNotice rooms={rooms} />;
+  if (!updateError) return null;
   return <BottomNotice text={`The update failed: ${updateError}`} actionLabel="Retry" onAction={checkForUpdate} />;
 }
 
@@ -65,7 +37,7 @@ export function HomeScreen({ rooms }: { rooms: Room[] }) {
   }, [rooms]);
 
   return (
-    <HomeLayout title={HOUSE_NAME} action={houseKey} notice={<UpdateNotice rooms={rooms} />}>
+    <HomeLayout title={HOUSE_NAME} action={houseKey} notice={<UpdateNotice />}>
       {isSilent && (
         <HouseNote
           text={

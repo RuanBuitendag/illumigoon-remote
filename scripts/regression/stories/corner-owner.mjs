@@ -91,14 +91,18 @@ export const cornerOwner = [
     },
   },
   {
-    name: 'P3-S5 new light software shows a notice that leaves the rooms usable',
+    name: 'P3-S5 new light software is told in Settings, and Home stays clear',
     lights: LOUNGE,
     latestSoftware: '9.9.9',
     async run({ page }) {
-      await see(page, 'New light software is ready.');
+      const bar = page.getByRole('navigation', { name: 'Places' });
+      await bar.getByRole('button', { name: 'SETTINGS', exact: true }).click();
+      await see(onTop(page), 'New light software');
+      await bar.getByRole('button', { name: 'ROOMS', exact: true }).click();
       // A trial click fails when anything lies over the target.
       await page.getByRole('button', { name: 'Open Lounge' }).click({ trial: true, timeout: 3000 });
       await page.getByRole('switch', { name: 'Lounge power' }).click({ trial: true, timeout: 3000 });
+      expect((await page.getByText('New light software is ready.').count()) === 0, 'Home told of new software');
       await openRoomSettings(page);
       await see(onTop(page), 'New version for 4 lights');
     },

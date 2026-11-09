@@ -78,7 +78,7 @@ Reach: 2 taps (`Open Lounge`, `Room settings`), then 1 per row.
   has focus (P5-S3).
 - **OK** Schedules on old light software say what to do and lead to Light software (P3-S2).
 - **OK** Transition style and length reach every light and stay over a reload (P3-S7).
-- **OK** The software notice leaves the rooms usable (finding 5, P3-S5).
+- **OK** New light software is told in Settings, so nothing lies over the rooms on Home (finding 5, P3-S5; moved 9 Nov 2026, UX-10).
 
 ## Recent looks and Mine
 
