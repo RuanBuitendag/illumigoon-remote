@@ -19,7 +19,7 @@ type Look = { name: string; surface?: { key: string; label: string; type: string
 const LOOKS: Look[] = [coals, candle, starfield, oceanSwell, beachSunset, warmWhite];
 
 type Rank = 'primary' | 'secondary' | 'quiet';
-type Args = { keys: 'ranked' | 'all words'; power: 'symbol' | 'switch' | 'word' | 'split'; motion: 'outline' | 'mesh' | 'still' };
+type Args = { keys: 'ranked' | 'all words'; power: 'symbol' | 'switch' | 'word' | 'split'; motion: 'outline' | 'still' };
 
 function PatchStrip({ look, shape, isOn = true, brightness = 1 }: { look: Look; shape: 'tile' | 'room' | 'line'; isOn?: boolean; brightness?: number }) {
   const source = useMemo(() => ({ kind: 'patch' as const, key: `prototype-${look.name}`, document: look }), [look]);
@@ -224,7 +224,7 @@ export default {
   argTypes: {
     keys: { control: 'inline-radio', options: ['ranked', 'all words'], description: 'Ranked keys, or every key as words as now' },
     power: { control: 'inline-radio', options: ['symbol', 'switch', 'word', 'split'], description: 'The power key' },
-    motion: { control: 'inline-radio', options: ['outline', 'mesh', 'still'], description: 'A piece of light travels round each framed key, a band of wire mesh drifts round it, or no motion' },
+    motion: { control: 'inline-radio', options: ['outline', 'still'], description: 'A piece of light travels round each framed key, or no motion' },
   },
 } satisfies Meta<Args>;
 
@@ -244,15 +244,6 @@ export const Keys: Story = {
   render: (args) => <KeyRanks {...args} />,
 };
 
-// The two moving outlines side by side: a piece of light, and a band of wire mesh.
-export const Motion: Story = {
-  render: (args) => (
-    <div className="proto-side-by-side">
-      <KeyRanks {...args} motion="outline" />
-      <KeyRanks {...args} motion="mesh" />
-    </div>
-  ),
-};
 
 // Every power key side by side, each with its own state, on the moving outline.
 const POWERS: Args['power'][] = ['symbol', 'switch', 'word', 'split'];

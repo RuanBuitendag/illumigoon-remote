@@ -46,6 +46,7 @@ type WordKeyProps = {
   children: ReactNode;
   disabled?: boolean;
   isQuiet?: boolean;
+  rank?: 'primary' | 'secondary';
   isPressed?: boolean;
   onClick: () => void;
   onHold?: () => void;
@@ -55,6 +56,8 @@ const KINDS = {
   pressed: { isPressed: true },
   'held (press and hold)': { onHold: nothing },
   quiet: { isQuiet: true },
+  primary: { rank: 'primary' as const },
+  secondary: { rank: 'secondary' as const },
   disabled: { disabled: true },
   'long text': {},
 };
@@ -71,7 +74,7 @@ function wordKey(name: string, Key: ComponentType<WordKeyProps>, word: string, k
 
 const KEYS: Specimen[] = [
   wordKey('Press', Press, 'A press with no look of its own', ['pressed', 'held (press and hold)', 'disabled']),
-  wordKey('TextKey', TextKey, 'SAVE', ['quiet', 'disabled', 'long text']),
+  wordKey('TextKey', TextKey, 'SAVE', ['primary', 'secondary', 'quiet', 'disabled', 'long text']),
   wordKey('ActionKey', ActionKey, 'Join this Wi-Fi', ['disabled', 'long text']),
   wordKey('LinkKey', LinkKey, 'Update now', ['long text']),
   // An add key keeps to one line (`white-space: nowrap`), so it has no long text state.

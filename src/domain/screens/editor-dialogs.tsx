@@ -24,7 +24,7 @@ function QuestionSheet({ text, suggestion, onAnswer }: Question) {
           <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey
+          <TextKey rank="primary"
             disabled={isNaming && !name.trim()}
             onClick={() => {
               answer.current = name.trim();

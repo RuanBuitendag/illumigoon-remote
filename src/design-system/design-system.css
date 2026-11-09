@@ -80,8 +80,8 @@
   /* How wide a page's intro may run, so it reads as a few short lines. */
   --measure: 330px;
   --text-area: 200px;
-  --switch-width: 44px;
-  --switch-height: 24px;
+  /* The power symbol, inside its key of --row each way. */
+  --power-symbol: 26px;
   --sound-mark: 12px;
   --fader-dot: 10px;
   --strip-room: 72px;
@@ -119,6 +119,11 @@
   --duration-settle: 240ms;
   --duration-push: 550ms;
   --duration-glow: 900ms;
+  /* A line that draws itself: the power symbol turning on. */
+  --duration-draw: 520ms;
+  --ease-draw: cubic-bezier(0.6, 0, 0.2, 1);
+  /* One trip of the piece of light round a ranked key (D100). */
+  --duration-travel: 4s;
   /* Things that appear and leave (MO-2): a sheet, a dialog, a toast. Entering slows into place; leaving speeds
      away and is quicker, so the screen under it is back at once. */
   --ease-enter: cubic-bezier(0, 0, 0.2, 1);
@@ -339,6 +344,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
     scroll-behavior: auto !important;
   }
   button[data-held='true'] { transform: none; }
+  .text-key[data-rank]::before { animation: none; }
   .dialog { animation-name: fade-in; }
   .dialog[data-ending-style] { animation-name: fade-out; }
 }
@@ -349,7 +355,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
    so they keep them. */
 @media (forced-colors: active) {
   button:disabled { color: GrayText; }
-  .power-key, .fader-control,   .led-strip, .swatch, .colour-slot, .colour-pad { forced-color-adjust: none; }
+  .power-key, .text-key[data-rank], .fader-control, .led-strip, .swatch, .colour-slot, .colour-pad { forced-color-adjust: none; }
 }
 
 /* Marks */
@@ -379,6 +385,27 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 .text-key { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--row); color: var(--text-2); }
 .text-key[data-quiet='true'] { color: var(--text-4); }
+/* Ranks (D98). A primary key is filled; a secondary key is framed by a dim line. A short piece of light travels round
+   both, outside the fill of a primary key (D100). */
+@property --key-turn { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+@keyframes key-travel { to { --key-turn: 360deg; } }
+.text-key[data-rank] { justify-content: center; width: fit-content; padding: 0 var(--space-4); border-radius: var(--radius); white-space: nowrap; }
+.text-key[data-rank='primary'] { background: var(--fill); color: var(--on-fill); }
+.text-key[data-rank='secondary'] { color: var(--text-1); }
+.text-key[data-rank]::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: var(--line);
+  background: conic-gradient(from var(--key-turn), transparent 0 75%, var(--text-1) 92%, transparent 100%), linear-gradient(var(--text-4) 0 0);
+  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
+  animation: key-travel var(--duration-travel) linear infinite;
+  pointer-events: none;
+}
+.text-key[data-rank='primary']::before { inset: calc(-1 * var(--space-1)); background: conic-gradient(from var(--key-turn), transparent 0 75%, var(--text-1) 92%, transparent 100%); }
+.text-key[data-rank]:disabled::before { animation: none; }
+.text-key[data-rank='primary']:disabled { background: var(--track); }
 /* A form's main action and its fields read at body size, as Edit's forms do, under the heading that names the page (D54). */
 .action-key { display: flex; align-items: center; justify-content: space-between; width: 100%; min-height: var(--row); color: var(--text-1); font: var(--type-body); }
 .key-row { display: flex; align-items: center; gap: var(--space-5); }
@@ -389,12 +416,14 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 /* The switch, flat as Edit draws things (D52): a box with the small corner and a hairline edge, and a square
    thumb. On, the box fills with ink. Its press area grows to --row each way. */
-.power-key { position: relative; display: block; flex: none; width: var(--switch-width); height: var(--switch-height); padding: 0; border: 0; border-radius: var(--radius); background: none; box-shadow: inset 0 0 0 var(--line) var(--track); cursor: pointer; transition: background-color var(--duration-settle), box-shadow var(--duration-settle); }
-.power-key::after { content: ''; position: absolute; inset: calc((var(--switch-height) - var(--row)) / 2) 0; }
-.power-key[data-checked] { background: var(--fill); box-shadow: none; }
+.power-key { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--row); height: var(--row); padding: 0; border: 0; background: none; cursor: pointer; }
+.power-key:active { transform: scale(0.88) rotate(-12deg); }
 .power-key[data-disabled] { opacity: var(--opacity-disabled); }
-.power-key-thumb { position: absolute; top: var(--space-1); left: var(--space-1); width: calc(var(--switch-height) - 2 * var(--space-1)); height: calc(var(--switch-height) - 2 * var(--space-1)); border-radius: var(--radius); background: var(--text-4); transition: transform var(--duration-settle) var(--push), background-color var(--duration-settle); }
-.power-key[data-checked] .power-key-thumb { background: var(--on-fill); transform: translateX(calc(var(--switch-width) - var(--switch-height))); }
+.power-symbol { width: var(--power-symbol); height: var(--power-symbol); overflow: visible; fill: none; stroke-width: var(--line-strong); stroke-linecap: round; transition: filter var(--duration-glow); }
+.power-symbol-base { stroke: var(--text-4); }
+.power-symbol-lit { stroke: var(--text-1); stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset var(--duration-draw) var(--ease-draw); }
+.power-key[data-checked] .power-symbol-lit { stroke-dashoffset: 0; }
+.power-key[data-checked] .power-symbol { filter: drop-shadow(0 0 var(--space-1) var(--text-1)); }
 
 .option-row { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-5); }
 .option { height: var(--row); color: var(--text-4); }

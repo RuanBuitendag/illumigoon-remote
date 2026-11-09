@@ -102,7 +102,7 @@ function AddressForm() {
       />
       {/* The address is the way round, so its key is a text key: one main action per screen (UX lint). */}
       <KeyRow>
-        <TextKey disabled={!address.trim()} onClick={add}>
+        <TextKey rank="primary" disabled={!address.trim()} onClick={add}>
           ADD ADDRESS
         </TextKey>
       </KeyRow>

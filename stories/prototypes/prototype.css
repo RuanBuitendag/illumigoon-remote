@@ -80,35 +80,6 @@
 [data-motion='outline'] :is(.proto-key, .proto-power-word):active::before { animation-duration: 0.8s; }
 [data-motion='outline'] .proto-adjust { animation: proto-rise 240ms ease-out; }
 
-/* motion 'mesh': the outline is a band of fine crossed wires that drift round the key. The label sits on a dark field
-   inside the band. A primary key keeps its fill, with the band just outside it. */
-@keyframes proto-drift { to { background-position: 32px 0, -32px 0; } }
-[data-motion='mesh'] :is(.proto-key[data-rank='secondary'], .proto-key[data-rank='primary'], .proto-power-word) {
-  position: relative;
-}
-[data-motion='mesh'] :is(.proto-key[data-rank='secondary'], .proto-power-word) { box-shadow: none; }
-[data-motion='mesh'] :is(.proto-key[data-rank='secondary'], .proto-key[data-rank='primary'], .proto-power-word)::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: var(--space-1);
-  background-image:
-    repeating-linear-gradient(60deg, var(--text-3) 0 var(--line), transparent var(--line) 8px),
-    repeating-linear-gradient(-60deg, var(--text-3) 0 var(--line), transparent var(--line) 8px);
-  background-size: 32px 32px;
-  mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: proto-drift 7s linear infinite;
-  pointer-events: none;
-}
-[data-motion='mesh'] .proto-key[data-rank='primary']::before { inset: calc(-2 * var(--space-1)); }
-[data-motion='mesh'] :is(.proto-power-word)[aria-pressed='true']::before { content: none; }
-[data-motion='mesh'] :is(.proto-key, .proto-power-word):active { opacity: 1; animation: proto-press 160ms ease-out; }
-[data-motion='mesh'] :is(.proto-key, .proto-power-word):active::before { animation-duration: 0.8s; }
-[data-motion='mesh'] .proto-adjust { animation: proto-rise 240ms ease-out; }
-
-.proto-side-by-side { display: flex; flex-wrap: wrap; }
-
 @media (prefers-reduced-motion: reduce) {
   [data-motion] *, [data-motion] *::before { animation: none !important; }
 }
@@ -121,24 +92,24 @@
 @keyframes proto-ripple-out { from { opacity: 0.5; transform: scale(1.2); } to { opacity: 0; transform: scale(0.3); } }
 
 /* The parts of the room rise in, one after another. */
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > * { animation: proto-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > :nth-child(2) { animation-delay: 60ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > :nth-child(3) { animation-delay: 120ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > :nth-child(4) { animation-delay: 180ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > :nth-child(5) { animation-delay: 240ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .room-scroll > :nth-child(n + 6) { animation-delay: 300ms; }
+[data-motion='outline'] .room-scroll > * { animation: proto-rise 520ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+[data-motion='outline'] .room-scroll > :nth-child(2) { animation-delay: 60ms; }
+[data-motion='outline'] .room-scroll > :nth-child(3) { animation-delay: 120ms; }
+[data-motion='outline'] .room-scroll > :nth-child(4) { animation-delay: 180ms; }
+[data-motion='outline'] .room-scroll > :nth-child(5) { animation-delay: 240ms; }
+[data-motion='outline'] .room-scroll > :nth-child(n + 6) { animation-delay: 300ms; }
 
 /* The sliders under ADJUST come in one after another. */
-:is([data-motion='outline'], [data-motion='mesh']) .proto-adjust > * { animation: proto-rise 360ms ease-out both; }
-:is([data-motion='outline'], [data-motion='mesh']) .proto-adjust > :nth-child(2) { animation-delay: 50ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .proto-adjust > :nth-child(3) { animation-delay: 100ms; }
-:is([data-motion='outline'], [data-motion='mesh']) .proto-adjust > :nth-child(n + 4) { animation-delay: 150ms; }
+[data-motion='outline'] .proto-adjust > * { animation: proto-rise 360ms ease-out both; }
+[data-motion='outline'] .proto-adjust > :nth-child(2) { animation-delay: 50ms; }
+[data-motion='outline'] .proto-adjust > :nth-child(3) { animation-delay: 100ms; }
+[data-motion='outline'] .proto-adjust > :nth-child(n + 4) { animation-delay: 150ms; }
 
 /* A look tile sinks under the finger. The one that plays flares once, and a piece of light travels round it. */
-:is([data-motion='outline'], [data-motion='mesh']) .favourite-look { position: relative; transition: transform 160ms ease-out; }
-:is([data-motion='outline'], [data-motion='mesh']) .favourite-look:active { transform: scale(0.95); }
-:is([data-motion='outline'], [data-motion='mesh']) .favourite-look[aria-pressed='true'] .led-strip { animation: proto-flare 700ms ease-out; }
-:is([data-motion='outline'], [data-motion='mesh']) .favourite-look[aria-pressed='true']::after {
+[data-motion='outline'] .favourite-look { position: relative; transition: transform 160ms ease-out; }
+[data-motion='outline'] .favourite-look:active { transform: scale(0.95); }
+[data-motion='outline'] .favourite-look[aria-pressed='true'] .led-strip { animation: proto-flare 700ms ease-out; }
+[data-motion='outline'] .favourite-look[aria-pressed='true']::after {
   content: '';
   position: absolute;
   inset: calc(-1 * var(--space-2));
@@ -151,7 +122,7 @@
 }
 
 /* The name of a new look slides in. */
-:is([data-motion='outline'], [data-motion='mesh']) .proto-look-name { animation: proto-slide 420ms cubic-bezier(0.2, 0.8, 0.2, 1); }
+[data-motion='outline'] .proto-look-name { animation: proto-slide 420ms cubic-bezier(0.2, 0.8, 0.2, 1); }
 
 /* symbol: the power symbol in thin line. Off, it is dim. On, a bright line draws itself over it and glows. */
 .proto-power-symbol { display: inline-grid; place-items: center; flex: none; width: var(--row); height: var(--row); transition: transform 160ms ease-out; }

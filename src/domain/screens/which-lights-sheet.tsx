@@ -41,7 +41,7 @@ export function WhichLightsSheet({ rooms, room, picked, onDone, onClose }: Which
           <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey
+          <TextKey rank="primary"
             disabled={chosen.length === 0}
             onClick={() => {
               onDone(chosen);

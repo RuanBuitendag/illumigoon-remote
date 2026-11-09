@@ -41,19 +41,22 @@ type TextKeyProps = {
   children: ReactNode;
   disabled?: boolean;
   isQuiet?: boolean;
+  // primary: the one main action of a screen or sheet, filled. secondary: an action that opens or changes something
+  // here, framed. With no rank the key is words only (D98).
+  rank?: 'primary' | 'secondary';
   onClick: () => void;
 };
 
-export function TextKey({ children, disabled, isQuiet, onClick }: TextKeyProps) {
+export function TextKey({ children, disabled, isQuiet, rank, onClick }: TextKeyProps) {
   return (
-    <button type="button" className="text-key" data-quiet={isQuiet} disabled={disabled} onClick={onClick}>
+    <button type="button" className="text-key" data-quiet={isQuiet} data-rank={rank} disabled={disabled} onClick={onClick}>
       {children}
     </button>
   );
 }
 
 // The one main action of a form, in the same size as its fields.
-export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'isQuiet'>) {
+export function ActionKey({ children, disabled, onClick }: Omit<TextKeyProps, 'isQuiet' | 'rank'>) {
   return (
     <button type="button" className="action-key" disabled={disabled} onClick={onClick}>
       {children}
@@ -123,16 +126,19 @@ type PowerKeyProps = {
   onChange: (isOn: boolean) => void;
 };
 
+const POWER_RING = 'M7.5 6.2 A8 8 0 1 0 16.5 6.2';
+const POWER_BAR = 'M12 2.5 V11';
+
+// The power symbol in thin line. Off, it is dim. On, a bright line draws itself over it and glows (D99).
 export function PowerKey({ label, isOn, disabled, onChange }: PowerKeyProps) {
   return (
-    <Switch.Root
-      className="power-key"
-      aria-label={label}
-      checked={isOn}
-      disabled={disabled}
-      onCheckedChange={onChange}
-    >
-      <Switch.Thumb className="power-key-thumb" />
+    <Switch.Root className="power-key" aria-label={label} checked={isOn} disabled={disabled} onCheckedChange={onChange}>
+      <svg className="power-symbol" viewBox="0 0 24 24" aria-hidden="true">
+        <path className="power-symbol-base" pathLength={1} d={POWER_RING} />
+        <path className="power-symbol-base" pathLength={1} d={POWER_BAR} />
+        <path className="power-symbol-lit" pathLength={1} d={POWER_RING} />
+        <path className="power-symbol-lit" pathLength={1} d={POWER_BAR} />
+      </svg>
     </Switch.Root>
   );
 }

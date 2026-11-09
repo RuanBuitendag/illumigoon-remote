@@ -22,7 +22,7 @@ export function RenameLookSheet({ look, onClose }: { look: LookFile; onClose: ()
           <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={name.trim() === ''} onClick={() => void save(close)}>
+          <TextKey rank="primary" disabled={name.trim() === ''} onClick={() => void save(close)}>
             SAVE
           </TextKey>
         </KeyRow>

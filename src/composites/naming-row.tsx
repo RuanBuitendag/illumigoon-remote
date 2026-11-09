@@ -17,7 +17,7 @@ export function NamingRow({ label, suggestion = '', onCancel, onKeep }: NamingRo
       <TextKey isQuiet onClick={onCancel}>
         CANCEL
       </TextKey>
-      <TextKey disabled={!name.trim()} onClick={() => onKeep(name.trim())}>
+      <TextKey rank="primary" disabled={!name.trim()} onClick={() => onKeep(name.trim())}>
         KEEP
       </TextKey>
     </div>

@@ -63,7 +63,7 @@ export function EditLayout<Section extends string>(props: EditLayoutProps<Sectio
     <div className="edit-layout">
       <header className="edit-header">
         <BackKey label={backLabel} onClick={onBack} />
-        {onSave && <TextKey onClick={onSave}>SAVE</TextKey>}
+        {onSave && <TextKey rank="primary" onClick={onSave}>SAVE</TextKey>}
       </header>
       <h1 className="edit-title">{title}</h1>
       {where && <p className="edit-where">{where}</p>}

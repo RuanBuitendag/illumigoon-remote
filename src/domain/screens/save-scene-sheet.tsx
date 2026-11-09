@@ -62,7 +62,7 @@ export function SaveSceneSheet({ rooms, room, renaming, keeping, onClose }: Save
           <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={() => save(close)}>
+          <TextKey rank="primary" disabled={!name.trim() || (!renaming && captured.lights.length === 0)} onClick={() => save(close)}>
             SAVE
           </TextKey>
         </KeyRow>

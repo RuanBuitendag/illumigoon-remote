@@ -27,7 +27,7 @@ export function PasteLookSheet({ onClose }: { onClose: () => void }) {
           <TextKey isQuiet onClick={close}>
             CANCEL
           </TextKey>
-          <TextKey disabled={text.trim() === ''} onClick={() => void add(close)}>
+          <TextKey rank="primary" disabled={text.trim() === ''} onClick={() => void add(close)}>
             ADD TO MINE
           </TextKey>
         </KeyRow>

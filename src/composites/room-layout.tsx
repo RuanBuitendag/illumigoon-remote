@@ -36,7 +36,7 @@ export function LookHeading({ name, onReset, onEdit, onLooks }: LookHeadingProps
       <span className="look-heading-name">{name}</span>
       <KeyRow>
         {onReset && <TextKey onClick={onReset}>RESET</TextKey>}
-        {onEdit && <TextKey onClick={onEdit}>EDIT</TextKey>}
+        {onEdit && <TextKey rank="secondary" onClick={onEdit}>EDIT</TextKey>}
         <TextKey onClick={onLooks}>
           LOOKS
           <Icon.Fwd c="currentColor" />

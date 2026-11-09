@@ -1090,3 +1090,31 @@ Why: Ruan, 9 Nov 2026: "status mark? is that really even relevant.... the light 
 screen used it. One fact in one place.
 Replaces: D51.
 Date: 2026-11-09
+
+**D98. Keys have ranks**
+
+Chosen: `TextKey` takes `rank`. A primary key is filled with ink, one on a screen or sheet at most: the main action
+of a sheet, such as SAVE. A secondary key is framed by a dim line: an action that opens or changes something here,
+such as EDIT on a room's look. A key with no rank stays words only.
+Why: Ruan, 9 Nov 2026: "the buttons look too much alike.... its literally just text... theres no primary button and
+secondary buttons", "the keys need to be better differentiated". Tried in Storybook, Prototypes / Room with looks
+first.
+Date: 2026-11-09
+
+**D99. The power key is the power symbol**
+
+Chosen: `PowerKey` draws the power symbol in thin line, --row each way. Off, it is dim. On, a bright line draws
+itself over it in --duration-draw and glows. It stays a switch for a screen reader. It shows no look.
+Why: Ruan, 9 Nov 2026: "I dont like the power key", "the power key should be simple it shouldnt show the look", "I
+do like the simbol more". Rejected in the prototype: ON/OFF word keys, a split key, a rounded square and a pill
+filled with the look's light.
+Replaces: the sliding switch.
+Date: 2026-11-09
+
+**D100. A piece of light travels round a ranked key**
+
+Chosen: a short bright piece of line travels round a primary or secondary key once in --duration-travel, over the dim
+frame, and outside the fill of a primary key. It stops for a disabled key and for reduced motion.
+Why: Ruan, 9 Nov 2026: "theres no animations.... a super minimalist app like this should have cool animations", then
+"Plain outline" over a band of wire mesh.
+Date: 2026-11-09

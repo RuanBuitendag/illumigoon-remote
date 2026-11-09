@@ -24,11 +24,11 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Give it a look of its own here. A new look is a composite with its own class.',
   ),
   TextKey: note(
-    'One or two words in the label type, in capitals.',
+    'One or two words in the label type, in capitals. A primary key is filled and a secondary key is framed, and a piece of light travels round both.',
     PRESSES,
     'A button, named by its words.',
-    'Say a verb or a noun the person knows: SAVE, EDIT.',
-    'Write a sentence on it.',
+    'Say a verb or a noun the person knows: SAVE, EDIT. Make the main action of a sheet primary, and an action that opens something here secondary.',
+    'Put two primary keys on one screen or sheet.',
   ),
   ActionKey: note(
     'A sentence-case line across the row, with a chevron at its end.',
@@ -73,7 +73,7 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Mix a key and a switch in one row.',
   ),
   PowerKey: note(
-    'A track and a thumb. The thumb is ink when on and steps down the ramp when off.',
+    'The power symbol in thin line. Dim when off; on, a bright line draws over it and glows.',
     'Tab reaches it, and Space or Enter turns it on or off.',
     'A switch, with aria-checked, named by what it powers.',
     'Name it by what it powers: Lounge power.',
