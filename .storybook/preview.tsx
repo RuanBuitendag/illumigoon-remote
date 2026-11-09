@@ -14,6 +14,15 @@ const SIZES = {
   laptop: { name: 'Laptop', styles: { width: '1280px', height: '800px' }, type: 'desktop' },
 } as const;
 
+// Storybook stays on this machine, as the journey tests do. The in-page `/api` asks the online look server
+// for shared looks, so a story would show whatever somebody published last. Here that server has nothing.
+const browserFetch = window.fetch.bind(window);
+window.fetch = (input, init) => {
+  const url = new URL(input instanceof Request ? input.url : String(input), location.href);
+  if (url.hostname === location.hostname) return browserFetch(input, init);
+  return Promise.reject(new TypeError(`Storybook stays local: ${url.host} is not reached`));
+};
+
 const preview: Preview = {
   parameters: {
     layout: 'fullscreen',
