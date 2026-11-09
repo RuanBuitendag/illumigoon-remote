@@ -2,9 +2,10 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { App } from '../src/domain';
 import { startDemoFleet } from '../src/domain/store/demo-fleet';
 import { useNavigation, type PageKind, type Place } from '../src/domain/store/navigation-store';
+import { answerAsLeft } from './made-up-light';
 
 // The real app on the made-up lights of `?demo` (Left, Right, Lounge and Desk in three rooms). No light is
-// reached: the fleet is set by hand, and `/api` is answered in the page. Each story opens one place or page,
+// reached: the fleet is set by hand, `/api` is answered in the page, and Edit talks to a fake Left. Each story opens one place or page,
 // on the phone or the laptop size. Press about in the story as in the app.
 
 type Where = {
@@ -49,7 +50,11 @@ const SIZES = ['phone', 'laptop'] as const;
 
 function screen(where: Where, size: (typeof SIZES)[number]): Story {
   return {
-    beforeEach: () => goTo(where),
+    beforeEach: () => {
+      const putBack = where.page === 'editor' ? answerAsLeft() : undefined;
+      goTo(where);
+      return putBack;
+    },
     globals: { viewport: { value: size, isRotated: false } },
   };
 }
@@ -74,8 +79,8 @@ export const JumpSheetPhone = onPhone({ isJumpOpen: true });
 export const JumpSheetLaptop = onLaptop({ isJumpOpen: true });
 export const EditPhone = onPhone(room('Bedroom', 'editor'));
 export const EditLaptop = onLaptop(room('Bedroom', 'editor'));
-export const RoomLooksPhone = onPhone(room('Lounge', 'looks'));
-export const RoomLooksLaptop = onLaptop(room('Lounge', 'looks'));
+export const RoomLooksPhone = onPhone(room('Bedroom', 'looks'));
+export const RoomLooksLaptop = onLaptop(room('Bedroom', 'looks'));
 export const RoomSettingsPhone = onPhone(room('Lounge', 'room-settings'));
 export const RoomSettingsLaptop = onLaptop(room('Lounge', 'room-settings'));
 export const SchedulesPhone = onPhone(room('Lounge', 'schedules'));

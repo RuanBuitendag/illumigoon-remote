@@ -7,7 +7,9 @@ const config: StorybookConfig = {
   stories: ['../stories/**/*.stories.tsx'],
   addons: ['@storybook/addon-docs', '@storybook/addon-a11y'],
   framework: { name: '@storybook/react-vite', options: {} },
-  core: { disableTelemetry: true },
+  core: { disableTelemetry: true, disableWhatsNewNotifications: true },
+  // Storybook's own "Get started" box is not this project's work, so the menu starts with the catalogue.
+  features: { sidebarOnboardingChecklist: false },
   // The screens answer `/api` in the page, as the phone does, so Edit and the look library work with no helper
   // process and no light is reached.
   viteFinal: (viteConfig) => ({
