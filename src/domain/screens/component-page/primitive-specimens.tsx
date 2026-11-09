@@ -25,7 +25,6 @@ import {
   PowerKey,
   Press,
   SoundMark,
-  StatusMark,
   Swatch,
   TextArea,
   TextField,
@@ -245,10 +244,6 @@ const MARKS: Specimen[] = [
         </IconFrame>
       ),
     },
-  },
-  {
-    name: 'StatusMark',
-    states: { on: <StatusMark state="on" />, off: <StatusMark state="off" />, silent: <StatusMark state="silent" /> },
   },
   { name: 'SoundMark', states: { default: <SoundMark /> } },
   { name: 'Eyebrow', states: { default: <Eyebrow>LIGHTS</Eyebrow>, 'long text': <Eyebrow>{LONG_NAME.toUpperCase()}</Eyebrow> } },

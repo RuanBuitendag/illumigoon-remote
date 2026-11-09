@@ -8,7 +8,7 @@ rule names where the app already follows it, so a new screen can copy it.
 | Principle | What it means | What follows from it | Where it shows now |
 | -- | -- | -- | -- |
 | The light is the picture | The LED strip drawing is the main thing on a screen. Text and controls stay quiet around it | No coloured accents in the chrome, no tinted cards, no orange or amber. Colour on screen comes from the lights | `.led-strip`, `illumigoon-no-tinted-cards`, `--warn` is grey |
-| Lit means live | Ink is full only for what is on or playing now. What is off or waiting is a step down the text ramp | A control that is off uses `--text-4` or `--thumb-off`, not a new colour | `.fader[data-lit]`, `.power-key[data-checked]`, `.status-mark` |
+| Lit means live | Ink is full only for what is on or playing now. What is off or waiting is a step down the text ramp | A control that is off uses `--text-4` or `--thumb-off`, not a new colour | `.fader[data-lit]`, `.power-key[data-checked]` |
 | Flat | No shadow for depth except a sheet or notice that floats over a screen | Hairlines (`--line`, `--track`) divide; a faint `--wash` marks something raised | the editor's header in `packages/patch-editor/src/styles.css` |
 | Say a thing once | One fact has one place on a screen | A dot that says a light is silent is not repeated as a sentence | `no-duplicated-information` standard, the room light rows |
 | No small print | Every line of text is there to be read | No footnotes, no caveats, no read times. Text never goes under `--size-small` | `--size-small` is the floor (LIFE-1938) |

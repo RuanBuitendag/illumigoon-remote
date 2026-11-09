@@ -33,7 +33,7 @@ const preview: Preview = {
     docs: { theme: themes.dark },
     a11y: { test: 'todo' },
     options: {
-      storySort: { order: ['Foundations', 'Design system', 'Composites', 'Screens'] },
+      storySort: { order: ['Foundations', 'Design system', 'Composites', 'Screens', 'Prototypes'] },
     },
   },
   tags: ['autodocs'],

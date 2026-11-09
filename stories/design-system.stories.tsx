@@ -27,7 +27,6 @@ export const Picked = specimenStory('Picked', DOOR);
 export const PowerKey = specimenStory('PowerKey', DOOR);
 export const Press = specimenStory('Press', DOOR);
 export const SoundMark = specimenStory('SoundMark', DOOR);
-export const StatusMark = specimenStory('StatusMark', DOOR);
 export const Swatch = specimenStory('Swatch', DOOR);
 export const TextArea = specimenStory('TextArea', DOOR);
 export const TextField = specimenStory('TextField', DOOR);

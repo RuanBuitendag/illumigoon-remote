@@ -24,7 +24,7 @@ export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';
 export { Icon, IconFrame } from './icons';
-export { SoundMark, StatusMark } from './marks';
+export { SoundMark } from './marks';
 export { Presence } from './presence';
 export { Eyebrow, Picked, ValueText } from './text';
 export { UNDO_SECONDS } from './timing';

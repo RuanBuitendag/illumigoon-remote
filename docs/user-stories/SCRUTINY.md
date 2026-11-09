@@ -12,8 +12,8 @@ Reach: open a room 1 tap; play a look 2 taps (`Lounge look: Candle`, then a look
 
 - **OK** The card holds its place while a light wakes (P1-S1).
 - **OK** A light that stops answering gets a mark beside its name, and loses it when it returns (P5-S1).
-- **U-001** The silent mark (`StatusMark`, `src/design-system/marks.tsx`) is an empty `<i>` with no role or text,
-  so a screen reader says nothing about a light that does not answer. Give it an accessible name.
+- **U-001 OK** The silent mark had no accessible name. It is gone since 9 Nov 2026 (D97): the light's strip shows
+  that it does not answer.
 - **U-002** The look button's accessible name is "Lounge look: Candle" while its visible text ends in LOOKS. Speech
   input users who say "LOOKS" do not reach it (WCAG 2.5.3, label in name).
 

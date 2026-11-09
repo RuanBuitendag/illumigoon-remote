@@ -1,0 +1,47 @@
+/* Sketches for prototypes in Storybook. Tokens only. A sketch that is chosen moves into the design system or the
+   composites, and leaves this file. */
+
+/* Three ranks of key, so the main action stands out from the rest.
+   primary: filled, one on a screen or sheet at most. secondary: outlined. quiet: words only, as TextKey is now. */
+.proto-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  min-height: var(--row);
+  padding: 0 var(--space-4);
+  border-radius: var(--radius);
+  font: var(--type-label);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.proto-key[data-rank='primary'] { background: var(--text-1); color: var(--background); }
+.proto-key[data-rank='secondary'] { box-shadow: inset 0 0 0 var(--line) var(--text-4); color: var(--text-1); }
+.proto-key[data-rank='quiet'] { padding: 0; color: var(--text-3); }
+.proto-key:active { opacity: 0.7; }
+.proto-key:focus-visible { outline: var(--line-strong) solid var(--text-1); outline-offset: var(--line-strong); }
+
+.proto-keys { display: flex; align-items: center; gap: var(--space-4); }
+.proto-keys-end { display: flex; align-items: center; justify-content: flex-end; gap: var(--space-4); }
+.proto-wide { width: 100%; }
+
+/* The room's looks, three to a row, as the favourites grid. */
+.proto-looks { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+
+.proto-look-head { display: flex; align-items: center; justify-content: space-between; gap: var(--space-3); min-height: var(--row-tall); }
+.proto-look-name { color: var(--text-1); font: var(--type-heading); }
+
+.proto-sheet { display: flex; flex-direction: column; gap: var(--space-5); max-width: 420px; padding: var(--space-5) var(--gutter); }
+.proto-sheet-text { color: var(--text-3); font: var(--type-body); }
+.proto-column { max-width: 560px; }
+
+/* Power, two sketches in place of the sliding switch.
+   word: one key that says the state, filled when on. split: OFF and ON side by side, the one that holds filled. */
+.proto-power-word { min-width: calc(var(--row) * 1.5); }
+.proto-power-word[aria-pressed='true'] { background: var(--text-1); color: var(--background); box-shadow: none; }
+.proto-power-word[aria-pressed='false'] { box-shadow: inset 0 0 0 var(--line) var(--text-4); color: var(--text-3); }
+.proto-power-split { display: inline-flex; border-radius: var(--radius); box-shadow: inset 0 0 0 var(--line) var(--text-4); }
+.proto-power-split button { min-width: var(--row); min-height: var(--row); padding: 0 var(--space-3); border-radius: var(--radius); color: var(--text-4); font: var(--type-label); letter-spacing: var(--tracking-label); }
+.proto-power-split button[aria-pressed='true'] { background: var(--text-1); color: var(--background); }
+.proto-compare { display: grid; grid-template-columns: max-content 1fr; align-items: center; gap: var(--space-5) var(--space-6); padding: var(--space-5) var(--gutter); color: var(--text-3); font: var(--type-note); }

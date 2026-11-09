@@ -170,13 +170,6 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Use it for Edit’s wave shapes.',
     'Use it for a new icon. Add the icon to the set.',
   ),
-  StatusMark: note(
-    'A short flat bar: ink when on, grey when off, dotted when the light does not answer.',
-    DRAWN,
-    'Drawn only. The reader hears the light’s name beside it.',
-    'Put the light’s name next to it.',
-    'Give a state a colour. The mark stays in the ink ramp.',
-  ),
   SoundMark: note(
     'Three short bars.',
     DRAWN,

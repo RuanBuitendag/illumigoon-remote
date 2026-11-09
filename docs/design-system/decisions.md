@@ -1076,3 +1076,17 @@ page goes. In Storybook the screens answer `/api` in the page, as on the phone, 
 Why: TL-2, TL-6, LIFE-1986. Ruan: "I want the entire illumigoon app's ui inside storybook for quick prototyping and
 eval". The component page could not show a screen at a phone size, a token, or a prototype made of components.
 Date: 2026-11-09
+
+**D96. The sound mark is a musical note**
+
+Chosen: `SoundMark` draws a musical note in place of three bars, 12 px tall.
+Why: Ruan, 9 Nov 2026: "sound mark should also be a note".
+Date: 2026-11-09
+
+**D97. No status mark**
+
+Chosen: `StatusMark` is deleted. A light's strip shows whether it is on, and its note says when it does not answer.
+Why: Ruan, 9 Nov 2026: "status mark? is that really even relevant.... the light strip already has that info". No
+screen used it. One fact in one place.
+Replaces: D51.
+Date: 2026-11-09

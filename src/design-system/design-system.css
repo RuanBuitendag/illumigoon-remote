@@ -82,7 +82,7 @@
   --text-area: 200px;
   --switch-width: 44px;
   --switch-height: 24px;
-  --sound-mark: 9px;
+  --sound-mark: 12px;
   --fader-dot: 10px;
   --strip-room: 72px;
   --strip-tile: 28px;
@@ -349,8 +349,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
    so they keep them. */
 @media (forced-colors: active) {
   button:disabled { color: GrayText; }
-  .power-key, .fader-control, .status-mark, .sound-mark, .picked::after { forced-color-adjust: none; }
-  .led-strip, .swatch, .colour-slot, .colour-pad { forced-color-adjust: none; }
+  .power-key, .fader-control,   .led-strip, .swatch, .colour-slot, .colour-pad { forced-color-adjust: none; }
 }
 
 /* Marks */
@@ -358,16 +357,10 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 .icon { flex: none; }
 
 /* Three bars spread across a square, short, full and two thirds. */
-.sound-mark { flex: none; display: inline-flex; align-items: flex-end; gap: calc((var(--sound-mark) - 3 * var(--line-strong)) / 2); height: var(--sound-mark); color: var(--text-4); }
-.sound-mark i { width: var(--line-strong); height: 44%; background: currentColor; }
-.sound-mark i:nth-child(2) { height: 100%; }
-.sound-mark i:nth-child(3) { height: 67%; }
+.sound-mark { flex: none; width: auto; height: var(--sound-mark); color: var(--text-4); }
 
 /* Edit's live mark: a short flat bar, full ink when the light is on, the off grey when it is off, and
    broken into dots when it does not answer. No circle (D51). */
-.status-mark { flex: none; width: var(--space-3); height: var(--line-thick); background: var(--thumb-off); }
-.status-mark[data-state='on'] { background: var(--fill); }
-.status-mark[data-state='silent'] { background: repeating-linear-gradient(90deg, var(--text-4) 0 var(--line-strong), transparent var(--line-strong) var(--space-1)); }
 
 /* Text */
 
