@@ -101,8 +101,8 @@
 .room-name { display: flex; align-items: center; min-height: var(--space-6); padding-right: var(--space-7); color: var(--text-1); font: var(--type-heading); }
 .room-line { display: block; padding-right: var(--space-7); color: var(--text-2); overflow-wrap: anywhere; }
 .room-dot { color: var(--text-3); }
-/* A thin strip under the line, so the card stays as short as option B draws it. */
-.room-card .led-strip-room { height: var(--row); margin-block: var(--space-2) 0; }
+/* The strip is the card's main part: the light of the room, at full height. */
+.room-card .led-strip-room { margin-block: var(--space-2) 0; }
 .room-look[data-off='true'] { color: var(--text-3); }
 .room-power { position: absolute; top: var(--space-3); right: 0; display: flex; align-items: center; height: var(--space-6); }
 .room-actions { display: flex; flex-direction: column; gap: var(--space-1); }
@@ -115,7 +115,7 @@
 .room-scroll { padding: 0 var(--gutter) var(--space-7); }
 .room-scroll::before { content: ''; position: sticky; top: 0; z-index: var(--layer-raised); display: block; height: env(safe-area-inset-top); margin: 0 var(--edge) calc(var(--page-top) - env(safe-area-inset-top)); background: var(--background); }
 .room-title-row { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); margin-top: var(--space-2); }
-.room-title-row .page-title { min-width: 0; margin-top: 0; }
+.room-title-row .page-title { min-width: 0; margin-top: 0; font: var(--type-title); }
 .look-heading { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: var(--row); }
 .look-heading-name { min-width: 0; padding: var(--space-2) 0; font: var(--type-heading); overflow-wrap: anywhere; }
 .look-heading .key-row { flex: none; gap: var(--space-4); }
@@ -133,7 +133,7 @@
 .light-pick { flex: 1; display: flex; align-items: center; gap: var(--space-3); min-width: 0; min-height: var(--row); color: var(--text-4); }
 .light-note { overflow-wrap: anywhere; }
 .light-tape { display: block; width: 100%; }
-.light-tape .led-strip-room { height: var(--row-tall); margin: 0 var(--edge); }
+.light-tape .led-strip-room { margin: 0 var(--edge); }
 /* On the Looks place the page already keeps the gutter (LIFE-1964). */
 .page-intro + .scene-shelf { margin-top: var(--space-5); padding: 0; }
 .library { display: flex; flex-direction: column; gap: var(--section); margin-top: var(--section); margin-bottom: calc(var(--clear-notice) - var(--space-7)); scroll-margin-top: var(--clear-sticky); }
@@ -186,9 +186,10 @@
 .sheet-close::after { content: ''; position: absolute; top: 50%; left: 50%; width: var(--row); height: var(--row); translate: -50% -50%; }
 .sheet-head .text-key { min-height: 0; }
 .sheet-body { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: var(--space-5); padding: var(--space-4) var(--space-5) var(--space-5); overflow-y: auto; }
-.control-list { display: flex; flex-direction: column; gap: var(--space-5); margin-top: var(--space-5); }
+/* Groups are told apart by space alone: a wide step between groups, none inside one, where each row keeps its own. */
+.control-list { display: flex; flex-direction: column; gap: var(--space-6); margin-top: var(--space-5); }
 .sheet-footer { display: flex; justify-content: space-between; margin-top: var(--space-2); padding-top: var(--space-1); }
-.control-group { display: flex; flex-direction: column; gap: var(--space-2); }
+.control-group { display: flex; flex-direction: column; }
 /* A control is named as Edit names a dial: a small capital label over it, its value beside it (D55). */
 .control-label { display: flex; align-items: center; justify-content: space-between; color: var(--text-4); font: var(--type-label); letter-spacing: var(--tracking-label); text-transform: uppercase; }
 .control-label .value-text { text-transform: none; letter-spacing: normal; }

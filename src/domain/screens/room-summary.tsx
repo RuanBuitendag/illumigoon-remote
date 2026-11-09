@@ -56,10 +56,12 @@ function namesOf(names: string[]) {
   return names.length > MOST_NAMES ? `${names.length} lights` : names.join(', ');
 }
 
-// An on room names the lights that are on; an off room names all of them.
+// An on room names the lights that are on; an off room names all of them. A light named as its room is not named
+// again.
 function lightsLine(room: Room, onlineLights: Light[], isOn: boolean) {
   const lit = onlineLights.filter(({ isOn: isLit }) => isLit).map(({ name }) => name);
-  return namesOf(isOn ? lit : room.lights.map(({ name }) => name));
+  const names = (isOn ? lit : room.lights.map(({ name }) => name)).filter((name) => name !== room.name);
+  return namesOf(names);
 }
 
 function silentText(room: Room, waitingLights: { name: string }[]) {

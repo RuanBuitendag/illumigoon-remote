@@ -36,7 +36,7 @@ export function RoomCard(card: RoomCardProps) {
           {card.lights}
           {card.look && (
             <>
-              <span className="room-dot"> · </span>
+              {card.lights && <span className="room-dot"> · </span>}
               <span className="room-look" data-off={card.isOff}>
                 {card.look}
               </span>

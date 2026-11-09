@@ -313,8 +313,8 @@ function OpenColourEditor({ first, ...props }: ColourEditorProps & { first: Colo
         <div key={field.key} className="colour-field">
           <span className="control-label">
             {field.label}
-            {field === first && (
-              <TextKey isQuiet disabled={!canUndo} onClick={onUndo}>
+            {field === first && canUndo && (
+              <TextKey isQuiet onClick={onUndo}>
                 UNDO
               </TextKey>
             )}

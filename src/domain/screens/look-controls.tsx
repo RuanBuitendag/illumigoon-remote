@@ -140,8 +140,8 @@ export function LookControls({ lights }: { lights: Light[] }) {
       ) : (
         <SheetFooter>
           {/* With colours, Undo stands beside them, where most changes are made. */}
-          {!hasColours && (
-            <TextKey isQuiet disabled={!undo.canUndo} onClick={undo.undo}>
+          {!hasColours && undo.canUndo && (
+            <TextKey isQuiet onClick={undo.undo}>
               UNDO
             </TextKey>
           )}
