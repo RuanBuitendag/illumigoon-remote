@@ -18,6 +18,19 @@
   .screen-room { transform: none; opacity: 0; visibility: hidden; transition: opacity var(--duration-push) var(--push), visibility 0s linear var(--duration-push); }
   .screen-room[data-open='true'] { opacity: 1; visibility: visible; transition: opacity var(--duration-push) var(--push); }
 }
+/* A screen that opens brings its parts in one after another, a step apart, from the top (D107). Only the first
+   eight wait; the rest come with the eighth. Under reduced motion they fade in together. */
+:is(.screen-room[data-open='true'] .room-scroll, .screen-page[data-open='true']) > * { animation: rise-in var(--duration-enter) var(--ease-enter) backwards; animation-delay: calc(min(var(--stagger-at, 0), 7) * var(--stagger-step)); }
+:is(.room-scroll, .screen-page) > :nth-child(2) { --stagger-at: 1; }
+:is(.room-scroll, .screen-page) > :nth-child(3) { --stagger-at: 2; }
+:is(.room-scroll, .screen-page) > :nth-child(4) { --stagger-at: 3; }
+:is(.room-scroll, .screen-page) > :nth-child(5) { --stagger-at: 4; }
+:is(.room-scroll, .screen-page) > :nth-child(6) { --stagger-at: 5; }
+:is(.room-scroll, .screen-page) > :nth-child(7) { --stagger-at: 6; }
+:is(.room-scroll, .screen-page) > :nth-child(n + 8) { --stagger-at: 7; }
+@media (prefers-reduced-motion: reduce) {
+  :is(.screen-room[data-open='true'] .room-scroll, .screen-page[data-open='true']) > * { animation-name: fade-in; animation-delay: 0s; }
+}
 .edit-layout { position: fixed; inset: 0; z-index: var(--layer-cover); display: flex; flex-direction: column; padding: var(--page-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left); background: var(--background); }
 .edit-header { flex: none; display: flex; align-items: center; justify-content: space-between; padding: 0 var(--gutter); }
 .edit-header .text-key { min-width: var(--row); justify-content: flex-end; }

@@ -129,8 +129,10 @@ export const cornerOwner = [
       await press(onTop(page), 'LOOKS');
       const looks = onTop(page);
       await press(looks, 'MANAGE');
-      await press(looks, 'DELETE');
-      await press(looks, 'TAP AGAIN TO DELETE');
+      // Delete sits in MORE beside a look of Mine, and asks for a second tap there (D101, D102).
+      await looks.getByRole('button', { name: 'More', exact: true }).first().click();
+      await page.getByRole('menuitem', { name: 'DELETE', exact: true }).click();
+      await page.getByRole('menuitem', { name: 'TAP AGAIN TO DELETE', exact: true }).click();
       const named = looks.getByRole('button', { name: /^Test gone/ });
       await until(async () => (await named.count()) === 0, 'the look to leave the Looks page');
       await press(looks, 'DONE');

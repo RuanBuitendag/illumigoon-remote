@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type RefObject } from 'react';
 import {
   addStrip,
   playRecording,
@@ -22,6 +22,21 @@ type LedStripProps = {
   onFirstView: () => void;
 };
 
+// A room's strip glows once when a new look starts on it: the one big moment of the app (D107). The first
+// recording is the look already there, so it does not glow.
+function useLookStartGlow(canvasRef: RefObject<HTMLCanvasElement | null>, recording: StripRecording | null) {
+  const shown = useRef<StripRecording | null>(null);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    const before = shown.current;
+    if (recording) shown.current = recording;
+    if (!canvas || !recording || !before || before === recording) return;
+    canvas.removeAttribute('data-feedback');
+    void canvas.offsetWidth;
+    canvas.setAttribute('data-feedback', 'took');
+  }, [canvasRef, recording]);
+}
+
 export function LedStrip({ recording, shape, isOn = true, brightness = 1, onFirstView }: LedStripProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const stripRef = useRef<Strip | null>(null);
@@ -44,6 +59,7 @@ export function LedStrip({ recording, shape, isOn = true, brightness = 1, onFirs
   useEffect(() => {
     if (stripRef.current && recording) playRecording(stripRef.current, recording);
   }, [recording]);
+  useLookStartGlow(canvasRef, shape === 'room' ? recording : null);
 
   useEffect(() => {
     if (!stripRef.current) return;

@@ -3,6 +3,11 @@
 What moves in the app and in Edit, how it moves, and which tokens it uses (TR-1). The tokens are in
 `src/design-system/design-system.css`, under Motion (D36) and the appear and leave group (MO-2).
 
+Motion has two kinds (D107). Productive motion is quick and plain, for what happens often: a press, a push, a
+sheet. Expressive motion is slower and brighter, for the few big moments: a look that starts on a room, a light that
+takes a change. A state change runs as a transition, so a new change on its way starts from where the part is and
+can be caught part-way; only what appears or leaves runs as a keyframe animation.
+
 Under reduced motion (D36) nothing slides, grows or springs. Colour and opacity still change, and what
 appears or leaves only fades. The LED strips are content and keep drawing.
 
@@ -20,6 +25,14 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 | `--push` | cubic-bezier(0.32, 0.72, 0, 1) | a screen push, and a switch's thumb |
 | `--ease-enter` | cubic-bezier(0, 0, 0.2, 1) | appearing: slows into place |
 | `--ease-exit` | cubic-bezier(0.4, 0, 1, 1) | leaving: speeds away |
+| `--duration-draw` | 520ms | a line that draws itself: the power symbol turning on |
+| `--ease-draw` | cubic-bezier(0.6, 0, 0.2, 1) | the same draw, and the run of an activity line |
+| `--duration-travel` | 4s | one trip of the light round a ranked key |
+| `--duration-activity` | 1.4s | one run of an activity line, one sweep over a strip that waits |
+| `--duration-spring` | 480ms | a part that springs back after a press, or springs to its new size |
+| `--ease-spring` | a spring curve with a small overshoot | the same |
+| `--duration-expressive` | 900ms | a big moment: a look that starts, a change the light took |
+| `--stagger-step` | 40ms | the step between the parts of a screen that come in one after another |
 
 ## The app
 
@@ -33,8 +46,20 @@ appears or leaves only fades. The LED strips are content and keep drawing.
 | A row in a sorted list | `[data-sorting] > *`, `drag-order.ts` | the others slide to make room; the dropped row settles | `--duration-press`, `--ease-out` | no slide |
 | A switch | `.power-key`, `.power-key-thumb` | the thumb slides across and the fill changes colour | `--duration-settle`, `--push` | the colour changes, the thumb jumps |
 | A fader's fill | `.fader-fill` | the light colour glows over | `--duration-glow` | the same: it is colour |
-| A colour slot in a set | `.colour-slot` | grows to its share of the row | `--duration-settle`, `--ease-out` | no growth |
 | A look in the list | `.look-item .led-strip` | the strip brightens or dims | `--duration-press`, `--ease-out` | the same: it is a filter |
+| The parts of a room or a page that opens | `.room-scroll > *`, `.screen-page > *`, `composites.css` | each rises in a step after the one above it; the eighth and later come together | `--duration-enter`, `--ease-enter`, `--stagger-step` | all fade in together |
+| A key let go after a hold, the power key after a press | `button[data-held]`, `.power-key` | springs back with a small overshoot | `--duration-spring`, `--ease-spring` | stays still |
+| A colour slot in a set | `.colour-slot` | springs to its share of the row | `--duration-spring`, `--ease-spring` | no growth |
+| A new look starts on a room (expressive) | `.led-strip-room[data-feedback='took']`, `led-strip.tsx` | the room's strip glows once | `--duration-expressive` | the same: it is a filter |
+| A light took a change (expressive) | `[data-feedback='took']` | the part that changed glows once | `--duration-expressive` | the same: it is a filter |
+| A light refused a change | `[data-feedback='refused']` | the part shakes a step each way, twice | `--duration-settle` | stays still; the words say it |
+| Work under way | `.activity`, `design-system.css` | a piece of light runs along a hairline | `--duration-activity`, `--ease-draw` | the line pulses |
+| A strip that waits for its recording | `.led-strip[data-loading]` | a soft light sweeps over the slot | `--duration-activity` | stays still |
+| A ranked key | `.text-key[data-rank]::before` | a piece of light travels round it (D100) | `--duration-travel` | stays still |
+| The MORE menu | `.key-menu` | rises in; sinks out | the enter and exit tokens | fades |
+
+No part moves from one screen into the next (no shared element, D108). The push is the link between a room card and
+its room.
 
 ## Edit
 

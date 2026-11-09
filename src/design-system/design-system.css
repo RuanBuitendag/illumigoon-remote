@@ -132,6 +132,15 @@
   --ease-exit: cubic-bezier(0.4, 0, 1, 1);
   --duration-enter: 200ms;
   --duration-exit: 140ms;
+  /* Motion has two kinds (D107). Productive motion is the tokens above: quick, for what happens often. Expressive
+     motion is for the few big moments: a look that starts on a room, a light that joins. */
+  --duration-expressive: 900ms;
+  /* A spring with a small overshoot, written as a curve so a transition can use it. A transition that changes on
+     its way starts again from where it is, so a spring in a transition can be caught part-way. */
+  --ease-spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 15.5%, 0.938 21.1%, 1.017 25.9%, 1.043 29.7%, 1.051 34.1%, 1.044 39.6%, 1.007 54.1%, 0.996 63.1%, 1);
+  --duration-spring: 480ms;
+  /* The step between the parts of a screen that come in one after another, and the most parts that wait. */
+  --stagger-step: 40ms;
   --opacity-disabled: 0.4;
   --opacity-behind: 0.3;
   /* A mark a step under the word it qualifies: a unit beside its value, a sign beside its source. */
@@ -304,7 +313,7 @@ i { display: block; font-style: normal; }
 button, input, textarea { font: inherit; color: inherit; }
 button { padding: 0; border: 0; background: none; text-align: left; cursor: pointer; touch-action: manipulation; -webkit-touch-callout: none; transition: transform var(--duration-press) var(--ease-out); }
 button:disabled { cursor: default; opacity: var(--opacity-disabled); }
-button[data-held='true'] { transform: translateY(-2px) scale(1.015); }
+button[data-held='true'] { transform: translateY(-2px) scale(1.015); transition: transform var(--duration-spring) var(--ease-spring); }
 
 [data-sorting] { user-select: none; }
 [data-sorting] > * { transition: transform var(--duration-press) var(--ease-out); }
@@ -330,6 +339,12 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   input, textarea, select { font-size: var(--size-field); }
 }
 
+/* Feedback (D107): a part the light took glows once; a part it refused shakes a step each way. */
+@keyframes took { 30% { filter: brightness(1.8); } }
+@keyframes refused { 20%, 60% { translate: calc(-1 * var(--space-1)) 0; } 40%, 80% { translate: var(--space-1) 0; } }
+[data-feedback='took'] { animation: took var(--duration-expressive) var(--ease-out); }
+[data-feedback='refused'] { animation: refused var(--duration-settle) var(--ease-out); }
+
 /* Appearing and leaving (MO-2): rise a step and fade in, sink a step and fade out. */
 @keyframes rise-in { from { opacity: 0; transform: translateY(var(--space-2)); } }
 @keyframes sink-out { to { opacity: 0; transform: translateY(var(--space-2)); } }
@@ -348,6 +363,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
   button[data-held='true'] { transform: none; }
   .text-key[data-rank]::before { animation: none; }
   .key-menu { animation-name: fade-in; }
+  [data-feedback='refused'] { animation: none; }
   .activity-light { width: 100%; translate: none; animation-name: activity-pulse; }
   .led-strip[data-loading='true'] { animation: none; }
   .key-menu[data-ending-style] { animation-name: fade-out; }
@@ -440,7 +456,8 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 /* The switch, flat as Edit draws things (D52): a box with the small corner and a hairline edge, and a square
    thumb. On, the box fills with ink. Its press area grows to --row each way. */
 .power-key { position: relative; display: inline-grid; place-items: center; flex: none; width: var(--row); height: var(--row); padding: 0; border: 0; background: none; cursor: pointer; }
-.power-key:active { transform: scale(0.88) rotate(-12deg); }
+.power-key { transition: transform var(--duration-spring) var(--ease-spring); }
+.power-key:active { transform: scale(0.88) rotate(-12deg); transition-duration: var(--duration-press); }
 .power-key[data-disabled] { opacity: var(--opacity-disabled); }
 .power-symbol { width: var(--power-symbol); height: var(--power-symbol); overflow: visible; fill: none; stroke-width: var(--line-strong); stroke-linecap: round; transition: filter var(--duration-glow); }
 .power-symbol-base { stroke: var(--text-4); }
@@ -501,7 +518,7 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 
 /* Colour chips */
 
-.colour-slot { position: relative; display: block; flex: 1 1 0; min-width: 0; height: var(--row); transition: flex-grow var(--duration-settle) var(--ease-out); }
+.colour-slot { position: relative; display: block; flex: 1 1 0; min-width: 0; height: var(--row); transition: flex-grow var(--duration-spring) var(--ease-spring); }
 .colour-slot[aria-pressed='true'] { flex-grow: 2; }
 .colour-slot .picked { display: block; width: 100%; height: 100%; }
 .colour-slot .swatch { width: 100%; height: 100%; }

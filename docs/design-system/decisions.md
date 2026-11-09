@@ -1177,3 +1177,24 @@ Used on Recent. Favourites keep only their heading and key, since the star on Lo
 Why: LIFE-1989. Polaris gives an empty state one clear first step. Ruan asked on 9 Nov 2026 for no hint that states
 the obvious, so the step is there only when it is not.
 Date: 2026-11-09
+
+**D107. Motion has a productive kind and an expressive kind**
+
+Chosen: the tokens for press, settle, push, enter and exit are productive: quick, for what happens often. Expressive
+motion, --duration-expressive, is for the few big moments: a room's strip glows once when a new look starts on it,
+and a part the light took glows once (`[data-feedback='took']`). A part the light refused shakes
+(`[data-feedback='refused']`). The parts of a room or page that opens rise in one after another, --stagger-step
+apart, up to eight. A press and a colour slot spring with --ease-spring, in a transition, so a new change starts from
+where the part is. Every one has a reduced-motion version in transitions.md.
+Why: LIFE-1990. Carbon splits productive and expressive motion. Fluent staggers what enters. Material 3 Expressive
+and Apple use springs that can be caught part-way. Apple says to keep motion off what happens often, so the
+expressive kind stays on rare moments.
+Date: 2026-11-09
+
+**D108. No shared element between screens**
+
+Chosen: no part moves from a room card into the room screen. The push from the side links the two.
+Why: LIFE-1990. Fluent's container transform suits a card that grows into a page. The room screen slides in as an
+iPhone navigation push, which Apple uses for a step down a hierarchy, and Home stays mounted under it, so a part
+flying between the two would fight the push. Look again if the room screen ever opens in place.
+Date: 2026-11-09
