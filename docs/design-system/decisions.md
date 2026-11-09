@@ -1231,3 +1231,46 @@ same write. A change made from another phone during the hold can show as a refus
 Why: LIFE-1992. Reviews criticise Nanoleaf because its app never confirms that a change was taken, and LIFX users
 report scenes sent twice. A silent answer keeps the app quiet when all is well, so a refusal stands out.
 Date: 2026-11-09
+
+**D111. The LED strip is the one signature**
+
+Chosen: the app's identity is the light itself, drawn as the LED strip. It is the only colour on a screen and the
+only part that moves without a touch.
+
+- It appears only where it stands for a light or a look: a room card, a light card, a look tile, a scene row, and the
+  strip that waits while the app looks for lights. It is drawn through `LookStrip`, so it always shows a real look.
+- It never decorates: no strip as a divider, a background, a header, a splash or an empty page.
+- No second motif joins it: no logo mark in the screens, no coloured accent, no tinted panel.
+- `lint:rules` reports `strip-outside-a-light` for a `<LedStrip` outside `look-strip.tsx` and the component page.
+  Proved with a strip added to room-summary.tsx, which the check failed.
+
+Why: LIFE-1993. Monochrome products keep one owned device each: Nothing has its Glyph lights, Teenage Engineering its
+instrument face. The strip is the product, it already moves, and it is already the app's only colour.
+Date: 2026-11-09
+
+**D112. Geist stays, as the quiet face**
+
+Chosen: `--sans` stays Geist and `--mono` stays Geist Mono (D8). The type is a quiet carrier for names and numbers.
+The identity is the strip (D111), so the type does not try to carry it.
+Why: LIFE-1993 asked whether Geist makes the app read as Vercel. Few people outside web work know the face, and a
+face of our own would add a licence or a drawing job for no gain the strip does not give. A change of face would
+also need every type token tuned again and a check on the iPhone. Geist Mono's even figures keep levels and times
+from moving as they change. Revisit if a person says the app looks like another product.
+Date: 2026-11-09
+
+**D113. Icon set rules**
+
+Chosen, in one place for the set in `src/design-system/icons.tsx`:
+
+- Stroke: one line, `ICON_STROKE`, in `currentColor` or the one colour given. No fill, no opacity (D74).
+- Size: one square canvas, `ICON_CANVAS`; a smaller glyph sits at its middle. `size` scales the whole drawing.
+- Corner: round caps and round joins on every line, set in `IconFrame`.
+- When an icon is allowed: beside a word, or alone where its meaning is common (an arrow to move, three dots for
+  more, the power symbol, a cross to close), and then with a label (D104). Never as decoration, and never a second
+  icon for a fact a word already says.
+- New icons join `Icon` and are drawn in `IconFrame`; Edit's wave drawings take their own canvas (D49).
+
+`icons.test.ts` holds every icon to the canvas, the line, no opacity, and the round caps and joins.
+Why: LIFE-1993. Things and Apple keep one line weight and one corner across the set. D2, D49, D74 and D104 held parts
+of this; the corner and when an icon may appear were not written.
+Date: 2026-11-09

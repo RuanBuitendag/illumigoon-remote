@@ -247,6 +247,19 @@ function checkKeyRanks(file) {
   }
 }
 
+// The LED strip is the app's one signature (D111): it draws a light, so it is drawn only through LookStrip, which
+// gives it a light's look. The component page shows it as a specimen.
+const STRIP_DOORS = [`${SOURCE}/domain/screens/look-strip.tsx`, `${SOURCE}/design-system/led-strip.tsx`];
+const STRIP_USE = /<LedStrip\b/g;
+function checkStripUse(file) {
+  if (STRIP_DOORS.includes(file) || file.startsWith(COMPONENT_PAGE_DIR)) return;
+  const text = fs.readFileSync(file, 'utf8');
+  for (const match of text.matchAll(STRIP_USE)) {
+    report(file, lineOf(text, match.index), 'strip-outside-a-light', 'draw a light by LookStrip, never the LedStrip as decoration');
+  }
+}
+const COMPONENT_PAGE_DIR = `${SOURCE}/domain/screens/component-page`;
+
 for (const file of walk(SOURCE)) {
   const layer = layerOf(file);
   if (GENERATED.test(file)) continue;
@@ -260,6 +273,7 @@ for (const file of walk(SOURCE)) {
   }
   if (layer && /\.(css|tsx?)$/.test(file)) checkMediaWidths(file);
   if (layer && file.endsWith('.tsx')) checkKeyRanks(file);
+  if (layer && file.endsWith('.tsx')) checkStripUse(file);
 }
 
 runChecks(EDITOR_STYLES, [CSS_RAW_COLOUR]);

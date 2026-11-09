@@ -12,6 +12,8 @@ describe('the icon set', () => {
       expect(markup).toContain(`stroke-width="${ICON_STROKE}"`);
       expect(markup.match(/viewBox=|stroke-width=/g)).toHaveLength(2);
       expect(markup).not.toContain('opacity');
+      expect(markup).toContain('stroke-linecap="round"');
+      expect(markup).toContain('stroke-linejoin="round"');
     });
   }
 });
