@@ -303,3 +303,15 @@
   .toast:not([data-over-dock='true']) { left: var(--side-column); max-width: calc(100% - var(--side-column) - 2 * var(--gutter)); }
   .edit-sections { display: none; }
 }
+
+/* Depth, a trial behind a setting (LIFE-2015): the parts of the effects that touch composites. */
+/* A hold on a light makes its strip glow brighter, in place of the bar that grows under it. */
+html[data-depth-glow] .light-tape[data-holdable='true']::after { display: none; }
+html[data-depth-glow] .light-tape[data-pressing='true'] .led-strip-room,
+html[data-depth-glow] .light-tape[data-held='true'] .led-strip-room { filter: brightness(1.5) drop-shadow(0 0 var(--depth-strip-glow-held) var(--look-glow, transparent)); }
+html[data-depth-glass] .screen-page > .back-key,
+html[data-depth-glass] .look-search { background: var(--depth-bar-tint); backdrop-filter: blur(var(--depth-bar-blur)) saturate(1.5); }
+html[data-depth-glass] .room-scroll::before,
+html[data-depth-glass] .screen-page::before { background: transparent; }
+html[data-depth-lit-keys] .look-playing { text-shadow: 0 0 var(--depth-text-glow) var(--look-glow, transparent); }
+html[data-depth-lit-keys] .page-title { text-shadow: 0 0 var(--depth-title-glow) color-mix(in srgb, var(--look-glow, transparent) 45%, transparent); }

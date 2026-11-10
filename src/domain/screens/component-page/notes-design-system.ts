@@ -184,6 +184,13 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Pick the shape that fits the place: room, tile or line.',
     'Show a photo of a light instead.',
   ),
+  DepthLight: note(
+    'A blurred copy of the strips on the screen, a film grain, and one attribute on the page for each effect.',
+    DRAWN,
+    'Hidden from the reader. It adds light only and says nothing.',
+    'Put it once at the top of the app, with the effects the Depth setting turns on.',
+    'Put a second one on a screen, or use it to colour a thing that is not lit by a strip.',
+  ),
   Icon: note(
     'A line drawing on the one 14 canvas, with the one 1.2 line.',
     DRAWN,

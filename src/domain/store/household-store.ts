@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { STARTER_COLOUR_SETS } from '../../design-system';
+import { STARTER_COLOUR_SETS, type DepthEffects } from '../../design-system';
 import type { AnimationState } from '../light-network/protocol';
 
 // Everything the lights do not keep themselves: it lives on this phone.
@@ -43,6 +43,8 @@ type Household = {
   // Lights the network does not announce, as typed on Add a light.
   lightAddresses: string[];
   knownRooms: KnownRoom[];
+  // Which depth effects are on, a trial set on Settings (LIFE-2015). All are off at first.
+  depth: DepthEffects;
 };
 
 export const useHousehold = create<Household>()(
@@ -59,11 +61,15 @@ export const useHousehold = create<Household>()(
       favouriteLooks: [] as string[],
       lightAddresses: [] as string[],
       knownRooms: [] as KnownRoom[],
+      depth: { glow: false, glass: false, litKeys: false, grain: false } as DepthEffects,
     }),
     { name: 'household' },
   ),
 );
 
+export function setDepth(effect: keyof DepthEffects, isOn: boolean) {
+  useHousehold.setState(({ depth }) => ({ depth: { ...depth, [effect]: isOn } }));
+}
 
 export function rememberLightAddress(address: string) {
   useHousehold.setState(({ lightAddresses }) => ({

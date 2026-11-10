@@ -22,6 +22,8 @@ export { ArmedKey, KeyGroup } from './key-group';
 export type { FoldedKey } from './key-group';
 export { ActionKey, AddKey, BackKey, FileKey, KeyRow, LinkKey, OptionRow, PowerKey, Press, SettingSwitch, TextKey } from './keys';
 export { WIDE } from './layout';
+export { DepthLight } from './depth-light';
+export type { DepthEffects } from './depth-light';
 export { LedStrip } from './led-strip';
 export { LED_COUNT } from './led-strip-player';
 export type { StripRecording } from './led-strip-player';

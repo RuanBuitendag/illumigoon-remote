@@ -34,7 +34,7 @@ const GROUPS = {
     'OptionRow', 'Fader', 'FaderBand', 'FaderDot', 'TextField', 'TextArea', 'Swatch', 'ColourSlot', 'ColourPad',
     'ColourFill',
   ],
-  'Design system/Light and icons': ['LedStrip', 'Icon', 'IconFrame', 'SoundMark', 'Activity'],
+  'Design system/Light and icons': ['LedStrip', 'DepthLight', 'Icon', 'IconFrame', 'SoundMark', 'Activity'],
   'Design system/Text': ['Eyebrow', 'Picked', 'ValueText'],
   'Design system/Overlays': ['Dialog'],
   'Composites/Controls': [

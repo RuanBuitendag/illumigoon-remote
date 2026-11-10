@@ -9,6 +9,7 @@ import {
   BLACK_HEX,
   ColourPad,
   ColourSlot,
+  DepthLight,
   Dialog,
   Eyebrow,
   Fader,
@@ -271,6 +272,23 @@ const COLOURS: Specimen[] = [
       dim: <LedStrip recording={RECORDING} shape="line" brightness={0.3} onFirstView={nothing} />,
       off: <LedStrip recording={RECORDING} shape="line" isOn={false} onFirstView={nothing} />,
       'loading, no recording yet': <LedStrip recording={null} shape="line" onFirstView={nothing} />,
+    },
+  },
+  {
+    name: 'DepthLight',
+    // It changes the whole page, so it shows only when asked, in a frame, and goes again with CLOSE.
+    states: {
+      'every effect on': (
+        <OnDemand label="SHOW DEPTH">
+          {(close) => (
+            <>
+              <DepthLight glow glass litKeys grain />
+              <LedStrip recording={RECORDING} shape="room" onFirstView={nothing} />
+              <TextKey onClick={close}>CLOSE</TextKey>
+            </>
+          )}
+        </OnDemand>
+      ),
     },
   },
 ];

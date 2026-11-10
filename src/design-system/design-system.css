@@ -167,6 +167,27 @@
   --wash-strong: rgba(255, 255, 255, 0.09);
   --scrim: rgba(9, 9, 10, 0.72);
   --float-shadow: 0 16px 40px rgba(0, 0, 0, 0.6);
+  /* Depth, a trial behind a setting (LIFE-2015): light from the strips' own LEDs, glass over the lit page, grain.
+     DepthLight sets one attribute on <html> for each effect; the rules below hang on them. */
+  --depth-glow-blur: 56px;
+  --depth-glow-opacity: 0.4;
+  --depth-strip-glow: 10px;
+  --depth-strip-glow-held: 22px;
+  --depth-key-glow: 6px;
+  --depth-text-glow: 12px;
+  --depth-title-glow: 32px;
+  --depth-glass-blur: 28px;
+  --depth-bar-blur: 24px;
+  --depth-scrim-blur: 6px;
+  --depth-glass-tint: color-mix(in srgb, var(--background) 62%, transparent);
+  --depth-bar-tint: color-mix(in srgb, var(--background) 55%, transparent);
+  --depth-glass-line: color-mix(in srgb, var(--text-1) 12%, transparent);
+  --depth-glass-edge: inset 0 var(--line) 0 color-mix(in srgb, var(--text-1) 14%, transparent);
+  --depth-bar-edge: inset 0 var(--line) 0 color-mix(in srgb, var(--text-1) 10%, transparent);
+  --depth-float-shadow: 0 24px 64px -12px rgba(0, 0, 0, 0.7);
+  --depth-scrim: rgba(0, 0, 0, 0.35);
+  --depth-falloff: rgba(0, 0, 0, 0.55);
+  --depth-grain-opacity: 0.5;
   --well: #0b0b0c;
   --modulation: var(--fill);
   --modulation-soft: var(--text-1);
@@ -243,6 +264,10 @@
     --wash-strong: rgba(0, 0, 0, 0.08);
     --scrim: rgba(242, 241, 237, 0.72);
     --float-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+    /* Light added to a pale page and a dark edge on it read as dirt, so the glow and the grain are off. */
+    --depth-glow-opacity: 0;
+    --depth-grain-opacity: 0;
+    --depth-scrim: rgba(242, 241, 237, 0.35);
     --well: #131315;
     --modulation-ghost: rgba(0, 0, 0, 0.08);
     --warn: var(--text-2);
@@ -566,3 +591,22 @@ input.swatch::-moz-color-swatch { border: var(--line) solid var(--track); border
 /* A strip that waits for its recording: a soft light sweeps over the empty slot (D105). */
 @keyframes strip-wait { from { background-position: 100% 0; } to { background-position: 0 0; } }
 .led-strip[data-loading='true'] { background: linear-gradient(90deg, var(--slot) 35%, var(--wash-strong) 50%, var(--slot) 65%) var(--slot); background-size: 300% 100%; animation: strip-wait var(--duration-activity) linear infinite; }
+
+/* Depth, a trial behind a setting (LIFE-2015). DepthLight draws .depth-glow and .depth-grain and sets the attributes. */
+/* 1. The look lights the page: a blurred copy of the strips lies over the screens. The screen blend only adds
+   light, so the black takes the colour and the text stays as it is. */
+.depth-glow { position: fixed; inset: -10%; z-index: 1; width: 120%; height: 120%; filter: blur(var(--depth-glow-blur)) saturate(1.5); mix-blend-mode: screen; opacity: 0; pointer-events: none; transition: opacity var(--duration-glow) var(--ease-out); }
+html[data-depth-glow] .depth-glow { opacity: var(--depth-glow-opacity); }
+/* The strip's own LEDs glow; a drop shadow follows the lit pixels, so no box shows round the strip. */
+html[data-depth-glow] .led-strip-room { filter: drop-shadow(0 0 var(--depth-strip-glow) var(--look-glow, transparent)); transition: filter var(--duration-hold) linear; }
+/* 2. Glass: what floats over the page blurs the lit page behind it, with a thin light edge on top. */
+html[data-depth-glass] .dialog,
+html[data-depth-glass] .key-menu { background: var(--depth-glass-tint); border-color: var(--depth-glass-line); box-shadow: var(--depth-glass-edge), var(--depth-float-shadow); backdrop-filter: blur(var(--depth-glass-blur)) saturate(1.6); }
+html[data-depth-glass] .dialog-scrim { background: var(--depth-scrim); backdrop-filter: blur(var(--depth-scrim-blur)); }
+html[data-depth-glass] .place-bar { background: var(--depth-bar-tint); box-shadow: var(--depth-bar-edge); backdrop-filter: blur(var(--depth-bar-blur)) saturate(1.5); }
+/* 3. Lit keys: the power symbol glows in the colour of the playing look. */
+html[data-depth-lit-keys] .power-symbol-lit { filter: drop-shadow(0 0 var(--depth-key-glow) var(--look-glow, transparent)); }
+html[data-depth-lit-keys] button:focus-visible { text-shadow: 0 0 var(--depth-text-glow) var(--look-glow, transparent); }
+/* 4. Grain and falloff: a fine film grain, and the black falls away at the edges, so it reads as a space. */
+.depth-grain { position: fixed; inset: 0; z-index: var(--layer-raised); opacity: 0; pointer-events: none; background: radial-gradient(ellipse 120% 90% at 50% 35%, transparent 55%, var(--depth-falloff) 100%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode: overlay; transition: opacity var(--duration-glow) var(--ease-out); }
+html[data-depth-grain] .depth-grain { opacity: var(--depth-grain-opacity); }

@@ -3,7 +3,8 @@ import { startLibrary } from '../store/library-store';
 import { startLooks } from '../store/look-files';
 import { noteHouseState } from '../store/state-history';
 import { PlaceBar, PlaceFrame, PlaceView, ScreenStack, useIsWide } from '../../composites';
-import { Icon } from '../../design-system';
+import { DepthLight, Icon } from '../../design-system';
+import { useHousehold } from '../store/household-store';
 import {
   closePage,
   closeRoom,
@@ -150,6 +151,12 @@ function Places({ rooms }: { rooms: Room[] }) {
   );
 }
 
+// The depth effects turned on in Settings, over every screen.
+function Depth() {
+  const depth = useHousehold((household) => household.depth);
+  return <DepthLight {...depth} />;
+}
+
 export function App() {
   const rooms = useRooms();
   const roomId = useNavigation((navigation) => navigation.roomId);
@@ -195,6 +202,7 @@ export function App() {
         isHomeFull={!isRooms}
       />
       {isJumpOpen && <JumpSheet rooms={rooms} />}
+      <Depth />
     </PlaceFrame>
   );
 }
