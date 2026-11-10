@@ -141,7 +141,8 @@ const existing = ROOTS.flatMap((root) =>
 ).filter((file) => fs.readFileSync(file, 'utf8').startsWith('// Written by `npm run stories`'));
 
 for (const [target, text] of written) {
-  const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8') : null;
+  // Git may check the files out with CRLF line ends on Windows; those are the same file.
+  const current = fs.existsSync(target) ? fs.readFileSync(target, 'utf8').replace(/\r\n/g, '\n') : null;
   if (current === text) continue;
   if (isCheck) problems.push(`${target} is out of date: run npm run stories`);
   else {
