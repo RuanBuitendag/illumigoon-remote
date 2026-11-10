@@ -1,6 +1,6 @@
 import { InfoRow, MoreRow, PageFrame, PageSection, ToggleRow } from '../../composites';
 import { Eyebrow, TextKey } from '../../design-system';
-import { APP_VERSION, checkForUpdate } from '../app-update/app-update';
+import { APP_VERSION, checkForUpdate, useUpdateStatus } from '../app-update/app-update';
 import { newVersionOf, useLatestVersions } from '../store/firmware-versions';
 import { setHousePower } from '../store/house-power';
 import { setDepth, useHousehold } from '../store/household-store';
@@ -69,12 +69,20 @@ export function SettingsPage({ rooms }: { rooms: Room[] }) {
         <MoreRow label="Add a light" note="Set up new lights on the home Wi-Fi" onOpen={() => openPage('add-light')} />
       </PageSection>
       <Depth />
-      <PageSection>
-        <Eyebrow>APP</Eyebrow>
-        <InfoRow label="Version" note={APP_VERSION}>
-          <TextKey onClick={checkForUpdate}>CHECK</TextKey>
-        </InfoRow>
-      </PageSection>
+      <AppVersion />
     </PageFrame>
+  );
+}
+
+// The note says what CHECK did, so a press always shows a result.
+function AppVersion() {
+  const status = useUpdateStatus((update) => update.status);
+  return (
+    <PageSection>
+      <Eyebrow>APP</Eyebrow>
+      <InfoRow label="Version" note={status ? `${APP_VERSION}: ${status}` : APP_VERSION}>
+        <TextKey onClick={checkForUpdate}>CHECK</TextKey>
+      </InfoRow>
+    </PageSection>
   );
 }
