@@ -135,6 +135,13 @@ export const Icon = {
       ))}
     </IconFrame>
   ),
+  /** A magnifier: search. */
+  Search: ({ c }: { c?: string } = {}) => (
+    <IconFrame at={[1.75, 1.75]} colour={c ?? 'var(--text-4)'}>
+      <circle cx="4.25" cy="4.25" r="3.5" />
+      <path d="M6.9 6.9l3.6 3.6" />
+    </IconFrame>
+  ),
   X: ({ c }: { c?: string } = {}) => (
     <IconFrame at={[2.5, 2.5]} colour={c ?? 'var(--text-5)'}>
       <path d="M1 1l7 7M8 1l-7 7" />

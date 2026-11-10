@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { PageFrame, WhichLine } from '../../composites';
+import { LookSearch, PageFrame, WhichLine } from '../../composites';
 import { AddKey } from '../../design-system';
 import type { Light } from '../store/fleet-store';
 import type { LookFile } from '../store/look-files';
@@ -94,13 +94,13 @@ export function LooksPage({ room, rooms, isPlace }: LooksPageProps) {
         action={newLook}
         {...backOf(isPlace, backLabel)}
       >
+        <LookSearch value={query} onChange={setQuery} />
         {isPlace && <SceneRow rooms={rooms} />}
         <WhichLine text={whichLine(lights, rooms)} onClick={() => setSheet({ kind: 'which' })} />
         <LookLibrary
           lights={lights}
           query={query}
           isEditing={isEditing}
-          onQuery={setQuery}
           onEditing={setEditing}
           onPaste={() => setSheet({ kind: 'paste' })}
           onRename={(look) => setSheet({ kind: 'rename', look })}

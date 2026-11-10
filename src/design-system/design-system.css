@@ -562,6 +562,17 @@ input::placeholder, textarea::placeholder { color: var(--text-5); }
 .text-area { width: 100%; min-height: var(--text-area); padding: var(--space-3) 0; font: var(--type-value); resize: vertical; }
 .text-field-large { height: var(--row); font: var(--type-body); }
 .text-field-small { flex: 1; height: var(--row); font: var(--type-body); }
+/* The search field has an edge, so it reads as a place to type before anything is in it. Its text is
+   --size-field, so Safari on the iPhone does not zoom in. */
+.search-field { display: flex; align-items: center; gap: var(--space-3); width: 100%; height: var(--row); padding: 0 var(--space-3); border: var(--line) solid var(--track); border-radius: var(--radius); color: var(--text-4); transition: border-color var(--duration-press) var(--ease-out); }
+.search-field:focus-within { border-color: var(--text-4); }
+/* The ring goes round the whole field, not inside its edge round the input. */
+.search-field-input:focus-visible { outline: 0; }
+.search-field:has(.search-field-input:focus-visible) { outline: var(--focus-line) solid var(--focus); outline-offset: var(--focus-gap); }
+.search-field-input { flex: 1; min-width: 0; height: 100%; font: var(--weight-regular) var(--size-field)/1.35 var(--sans); color: var(--text-1); appearance: none; }
+.search-field-input::placeholder { color: var(--text-5); }
+.search-field-input::-webkit-search-cancel-button { display: none; }
+.search-field-clear { display: inline-flex; align-items: center; justify-content: center; width: var(--row); height: var(--row); margin-right: calc(-1 * var(--space-3)); }
 
 /* Colour chips */
 

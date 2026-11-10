@@ -21,6 +21,7 @@ export const Looks = stateStory('Icon', 'Looks');
 export const Faders = stateStory('Icon', 'Faders');
 export const Settings = stateStory('Icon', 'Settings');
 export const More = stateStory('Icon', 'More');
+export const Search = stateStory('Icon', 'Search');
 export const X = stateStory('Icon', 'X');
 export const Chev = stateStory('Icon', 'Chev');
 export const Arrow = stateStory('Icon', 'Arrow');

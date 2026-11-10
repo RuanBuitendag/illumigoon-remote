@@ -6,7 +6,6 @@ import {
   LookList,
   LookPreset,
   LookProblem,
-  LookSearch,
 } from '../../composites';
 import { ArmedKey, FileKey, KeyGroup, KeyRow, TextKey, type FoldedKey } from '../../design-system';
 import { requestRecording } from '../looks/recordings';
@@ -137,14 +136,13 @@ type LookLibraryProps = {
   lights: Light[];
   query: string;
   isEditing: boolean;
-  onQuery: (query: string) => void;
   onEditing: (isEditing: boolean) => void;
   onPaste: () => void;
   onRename: (look: LookFile) => void;
 };
 
 // Most used keeps the order it opened with, so a tap never moves the rows under the finger.
-export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPaste, onRename }: LookLibraryProps) {
+export function LookLibrary({ lights, query, isEditing, onEditing, onPaste, onRename }: LookLibraryProps) {
   const mine = useLookFiles((files) => files.mine);
   const [plays] = useState(() => useHousehold.getState().lookPlays);
   const favourites = useHousehold((household) => household.favouriteLooks);
@@ -230,15 +228,12 @@ export function LookLibrary({ lights, query, isEditing, onQuery, onEditing, onPa
   };
 
   return (
-    <>
-      <LookSearch value={query} onChange={onQuery} />
-      <LookList search={wanted}>
+    <LookList search={wanted}>
         {sharedNote && <LookProblem>{sharedNote}</LookProblem>}
         {note && <LookProblem>{note}</LookProblem>}
         {groups.length === 0 && <LookProblem>{`No look matches ${query.trim()}.`}</LookProblem>}
         {groups.map(groupRows)}
         <PublishedElsewhere wanted={wanted} />
-      </LookList>
-    </>
+    </LookList>
   );
 }

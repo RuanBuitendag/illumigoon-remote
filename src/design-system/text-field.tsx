@@ -1,3 +1,6 @@
+import { Icon } from './icons';
+import { Press } from './keys';
+
 type TextFieldProps = {
   label: string;
   size: 'large' | 'small';
@@ -38,5 +41,30 @@ export function TextArea({ label, onChange, ...input }: TextAreaProps) {
       spellCheck={false}
       onChange={(event) => onChange(event.target.value)}
     />
+  );
+}
+
+type SearchFieldProps = { label: string; value: string; onChange: (value: string) => void };
+
+// A field that filters a list as you type: an edge, a magnifier at the start, and an X that clears it.
+export function SearchField({ label, value, onChange }: SearchFieldProps) {
+  return (
+    <div className="search-field" role="search">
+      <Icon.Search />
+      <input
+        className="search-field-input"
+        type="search"
+        aria-label={label}
+        placeholder={label}
+        enterKeyHint="search"
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+      />
+      {value && (
+        <Press className="search-field-clear" label="Clear the search" onClick={() => onChange('')}>
+          <Icon.X c="var(--text-3)" />
+        </Press>
+      )}
+    </div>
   );
 }

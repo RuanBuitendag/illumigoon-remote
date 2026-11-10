@@ -5,7 +5,7 @@
 .screen-home[data-pushed='true'] { transform: translateX(-28%); opacity: var(--opacity-behind); }
 .screen-room, .screen-page { transform: translateX(102%); z-index: var(--layer-raised); }
 .screen-page { z-index: var(--layer-above); overflow-y: auto; padding: var(--page-top) var(--gutter) var(--space-7); }
-.screen-page::before { content: ''; position: sticky; top: calc(-1 * var(--page-top)); z-index: var(--layer-above); display: block; height: var(--page-top); margin: calc(-1 * var(--page-top)) var(--edge) 0; background: var(--background); }
+.screen-page::before, .place-page::before { content: ''; position: sticky; top: calc(-1 * var(--page-top)); z-index: var(--layer-above); display: block; height: var(--page-top); margin: calc(-1 * var(--page-top)) var(--edge) 0; background: var(--background); }
 .screen-room[data-open='true'], .screen-page[data-open='true'] { transform: none; box-shadow: var(--push-shadow); }
 /* D36: under reduced motion the push becomes a fade, and a screen opens in place. On the laptop the
    room stands beside Home and does not move, so only the page fades there. */
@@ -145,7 +145,9 @@
 .library-group > .heading-row { margin-bottom: calc(-1 * var(--space-4)); }
 .library-group > .note { margin-bottom: calc(-1 * var(--space-2)); }
 .screen-page > .back-key { position: sticky; top: 0; z-index: var(--layer-above); width: calc(100% + 2 * var(--gutter)); margin: 0 var(--edge); padding: 0 var(--gutter); background: var(--background); }
-.look-search { position: sticky; top: var(--row); z-index: var(--layer-raised); display: flex; margin: 0 var(--edge); padding: 0 var(--gutter); background: var(--background); }
+.look-search { position: sticky; top: 0; z-index: var(--layer-raised); display: flex; margin: 0 var(--edge) var(--space-3); padding: var(--space-2) var(--gutter); background: var(--background); }
+/* Under a back key the search stays clear of it. */
+.back-key ~ .look-search { top: var(--row); }
 .look-row { display: flex; flex-direction: column; min-width: 0; }
 .favourite-block { display: flex; flex-direction: column; gap: var(--space-2); }
 .favourite-looks { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-3) var(--space-5); }

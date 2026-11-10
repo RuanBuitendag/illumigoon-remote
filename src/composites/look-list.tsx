@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { Eyebrow, Icon, Press, SoundMark, TextField } from '../design-system';
+import { Eyebrow, Icon, Press, SearchField, SoundMark } from '../design-system';
 import { HeadingRow } from './control-rows';
 
 type HoldProps = { onPick: () => void; onHold: () => void; onHoldEnd: () => void };
@@ -139,7 +139,7 @@ export function LookGroup({ title, note, action, children }: LookGroupProps) {
 export function LookSearch({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   return (
     <div className="look-search">
-      <TextField size="small" label="Search looks" placeholder="Search looks" value={value} onChange={onChange} />
+      <SearchField label="Search looks" value={value} onChange={onChange} />
     </div>
   );
 }

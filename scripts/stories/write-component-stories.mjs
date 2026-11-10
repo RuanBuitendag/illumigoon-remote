@@ -31,7 +31,7 @@ const GROUPS = {
     'PowerKey', 'SettingSwitch',
   ],
   'Design system/Inputs': [
-    'OptionRow', 'Fader', 'FaderBand', 'FaderDot', 'TextField', 'TextArea', 'Swatch', 'ColourSlot', 'ColourPad',
+    'OptionRow', 'Fader', 'FaderBand', 'FaderDot', 'TextField', 'SearchField', 'TextArea', 'Swatch', 'ColourSlot', 'ColourPad',
     'ColourFill',
   ],
   'Design system/Light and icons': ['LedStrip', 'DepthLight', 'Icon', 'IconFrame', 'SoundMark', 'Activity'],

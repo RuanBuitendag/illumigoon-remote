@@ -142,6 +142,13 @@ export const DESIGN_SYSTEM_NOTES: Record<string, Notes> = {
     'Give every field a label, even when the placeholder says the same.',
     'Set its text under the field size on a phone. Safari zooms in.',
   ),
+  SearchField: note(
+    'An edged field with a magnifier at the start, and an X that clears it once it holds text.',
+    'Tab in and type; the list filters as you type. Tab to the X and press Enter to clear.',
+    'A search landmark that holds a text box named by its label, and a key named Clear the search.',
+    'Put it at the top of the list it filters, under the title, so it stays in reach on scroll.',
+    'Use it for a name or any value that is kept. That is a TextField.',
+  ),
   TextArea: note(
     'A box of lines with the field’s underline.',
     'Tab in and type. Enter starts a new line, and Tab leaves.',

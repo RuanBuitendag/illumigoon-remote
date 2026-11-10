@@ -32,6 +32,7 @@ import {
   SoundMark,
   Swatch,
   TextArea,
+  SearchField,
   TextField,
   TextKey,
   ValueText,
@@ -224,6 +225,14 @@ const FIELDS: Specimen[] = [
       'long text': <TextField {...field} defaultValue={LONG_NAME} />,
       password: <TextField {...field} label="Password" type="password" defaultValue="made-up" />,
       time: <TextField {...field} label="Time" type="time" defaultValue="07:30" />,
+    },
+  },
+  {
+    name: 'SearchField',
+    states: {
+      empty: <SearchField label="Search looks" value="" onChange={nothing} />,
+      typed: <SearchField label="Search looks" value="cand" onChange={nothing} />,
+      'long text': <SearchField label="Search looks" value={LONG_NAME} onChange={nothing} />,
     },
   },
   {

@@ -32,4 +32,4 @@ export { Activity, SoundMark } from './marks';
 export { Presence } from './presence';
 export { Eyebrow, Picked, ValueText } from './text';
 export { UNDO_SECONDS } from './timing';
-export { TextArea, TextField } from './text-field';
+export { SearchField, TextArea, TextField } from './text-field';
