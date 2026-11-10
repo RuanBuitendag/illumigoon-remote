@@ -336,17 +336,14 @@ function checkComponentPage() {
 checkComponentPage();
 
 // Storybook draws each component from its specimen (LIFE-1986), so every component of the two doors and every
-// one of Edit's controls has a story: `export const Name = specimenStory('Name', DOOR)` in a file of `stories/`.
+// one of Edit's controls has a file of its own in `stories/`, `Name.stories.tsx`, written by `npm run stories`.
 const STORIES = 'stories';
 
 function checkStories() {
-  const stories = walk(STORIES)
-    .filter((file) => file.endsWith('.stories.tsx'))
-    .map((file) => fs.readFileSync(file, 'utf8'))
-    .join('\n');
-  const hasStory = (name) => new RegExp(`^export const ${name} = specimenStory\\('${name}',`, 'm').test(stories);
+  const files = new Set(walk(STORIES).map((file) => path.basename(file)));
+  const hasStory = (name) => files.has(`${name}.stories.tsx`);
   const missingStory = (file, name) =>
-    report(file, 1, 'missing-story', `${name}: give it a story, specimenStory('${name}', DOOR), in ${STORIES}`);
+    report(file, 1, 'missing-story', `${name}: give it a group in scripts/stories, then run npm run stories`);
   for (const layer of ['design-system', 'composites']) {
     const door = `${SOURCE}/${layer}/index.ts`;
     if (!fs.existsSync(door)) continue;

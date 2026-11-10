@@ -30,8 +30,10 @@
     "release:laptop": "npm run dist:laptop -- --publish always && node scripts/promote-release.mjs",
     "lint:editor": "npm run lint --workspace @illumigoon/patch-editor",
     "lint:ux": "node scripts/lint/ux.mjs",
-    "storybook": "storybook dev -p 6006 --no-open",
-    "build-storybook": "storybook build -o storybook-static"
+    "stories": "node scripts/stories/write-component-stories.mjs",
+    "lint:stories": "node scripts/stories/write-component-stories.mjs --check",
+    "storybook": "npm run --silent stories && storybook dev -p 6006 --no-open",
+    "build-storybook": "npm run --silent stories && storybook build -o storybook-static"
   },
   "dependencies": {
     "@base-ui/react": "^1.9.0",

@@ -33,9 +33,23 @@ const preview: Preview = {
     docs: { theme: themes.dark },
     a11y: { test: 'todo' },
     options: {
-      storySort: { order: ['Foundations', 'Design system', 'Composites', 'Screens'] },
+      // The sidebar follows the layers, from the tokens up to the screens, then the flows through them and the
+      // prototypes that are not in the app yet (LIFE-2009, LIFE-2010).
+      storySort: {
+        order: [
+          'Design system',
+          ['Tokens', 'Keys', 'Inputs', 'Text', 'Light and icons', 'Overlays'],
+          'Composites',
+          'Screens',
+          ['Rooms', 'Room', 'Looks', 'Settings', 'Room pages'],
+          'Flows',
+          'Prototypes',
+        ],
+      },
     },
   },
+  // Every story opens on the phone size; the viewport toolbar switches it to the laptop.
+  initialGlobals: { viewport: { value: 'phone', isRotated: false } },
   tags: ['autodocs'],
 };
 
